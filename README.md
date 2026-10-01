@@ -24,7 +24,7 @@ Proyecto de la asignatura Ingeniería de Software, gestionado con Scrum en Jira 
 
 ## Requisitos
 
-- Node.js 22 o superior y npm 10 o superior
+- Node.js 22.22.3 o superior (o 24.15+) y npm 10 o superior. Angular CLI 22 no arranca con versiones anteriores; se revisa con `node -v`.
 - Git
 
 ## Instalación
