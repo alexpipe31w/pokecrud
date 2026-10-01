@@ -1,0 +1,15 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/pokedex" text="Pokédex"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Detalle</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <app-page-placeholder
+    [title]="'Detalle del Pokémon #' + (id() ?? '')"
+    issue="IS-12 · HU-04"
+  ></app-page-placeholder>
+</ion-content>
