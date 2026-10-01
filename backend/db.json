@@ -1,0 +1,57 @@
+{
+  "teams": [
+    {
+      "id": 1,
+      "name": "Equipo Kanto",
+      "description": "Mis iniciales y clásicos de la primera generación",
+      "pokemonIds": [25, 6, 9, 3, 143, 149],
+      "createdAt": "2026-09-28T14:00:00.000Z",
+      "updatedAt": "2026-09-28T14:00:00.000Z"
+    },
+    {
+      "id": 2,
+      "name": "Equipo Fuego",
+      "description": "Solo Pokémon de tipo fuego",
+      "pokemonIds": [4, 37, 58],
+      "createdAt": "2026-09-29T09:30:00.000Z",
+      "updatedAt": "2026-09-29T09:30:00.000Z"
+    }
+  ],
+  "favorites": [
+    {
+      "id": 1,
+      "pokemonId": 25,
+      "pokemonName": "pikachu",
+      "note": "El primero que conocí, un clásico.",
+      "rating": 5,
+      "createdAt": "2026-09-28T15:10:00.000Z"
+    },
+    {
+      "id": 2,
+      "pokemonId": 150,
+      "pokemonName": "mewtwo",
+      "note": "El más fuerte de la primera generación.",
+      "rating": 4,
+      "createdAt": "2026-09-28T15:20:00.000Z"
+    },
+    {
+      "id": 3,
+      "pokemonId": 94,
+      "pokemonName": "gengar",
+      "note": "",
+      "rating": 4,
+      "createdAt": "2026-09-29T10:05:00.000Z"
+    }
+  ],
+  "customPokemon": [
+    {
+      "id": 1,
+      "name": "Opitazo",
+      "types": ["fire", "ground"],
+      "stats": { "hp": 80, "attack": 110, "defense": 70, "speed": 95 },
+      "imageUrl": "",
+      "description": "Pokémon de ejemplo inspirado en el calor de Neiva.",
+      "createdAt": "2026-09-29T11:00:00.000Z"
+    }
+  ]
+}
