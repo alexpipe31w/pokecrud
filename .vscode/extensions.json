@@ -1,0 +1,8 @@
+{
+  "recommendations": [
+    "Webnative.webnative",
+    "angular.ng-template",
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode"
+  ]
+}

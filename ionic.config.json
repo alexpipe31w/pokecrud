@@ -1,0 +1,8 @@
+{
+  "name": "pokecrud",
+  "app_id": "",
+  "type": "angular-standalone",
+  "integrations": {
+    "capacitor": {}
+  }
+}
