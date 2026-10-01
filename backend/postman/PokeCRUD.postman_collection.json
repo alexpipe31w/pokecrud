@@ -1,0 +1,390 @@
+{
+  "info": {
+    "name": "PokéCRUD - Backend JSON Server",
+    "description": "Peticiones a las colecciones teams, favorites y customPokemon. Levantar antes el backend con `npm run api`.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Equipos (/teams)",
+      "item": [
+        {
+          "name": "Listar",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{apiUrl}}/teams",
+              "host": ["{{apiUrl}}"],
+              "path": ["teams"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener por id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{apiUrl}}/teams/1",
+              "host": ["{{apiUrl}}"],
+              "path": ["teams", "1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Crear",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Equipo Agua\",\n  \"description\": \"Solo tipo agua\",\n  \"pokemonIds\": [\n    7,\n    54,\n    131\n  ],\n  \"createdAt\": \"2026-10-01T12:00:00.000Z\",\n  \"updatedAt\": \"2026-10-01T12:00:00.000Z\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{apiUrl}}/teams",
+              "host": ["{{apiUrl}}"],
+              "path": ["teams"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Reemplazar",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Equipo Kanto (editado)\",\n  \"description\": \"Actualizado con PUT\",\n  \"pokemonIds\": [\n    25,\n    6,\n    9\n  ],\n  \"createdAt\": \"2026-09-28T14:00:00.000Z\",\n  \"updatedAt\": \"2026-10-01T12:30:00.000Z\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{apiUrl}}/teams/1",
+              "host": ["{{apiUrl}}"],
+              "path": ["teams", "1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Actualizar parcial",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"description\": \"Descripción cambiada con PATCH\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{apiUrl}}/teams/1",
+              "host": ["{{apiUrl}}"],
+              "path": ["teams", "1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Eliminar",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{apiUrl}}/teams/2",
+              "host": ["{{apiUrl}}"],
+              "path": ["teams", "2"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Favoritos (/favorites)",
+      "item": [
+        {
+          "name": "Listar",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{apiUrl}}/favorites",
+              "host": ["{{apiUrl}}"],
+              "path": ["favorites"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener por id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{apiUrl}}/favorites/1",
+              "host": ["{{apiUrl}}"],
+              "path": ["favorites", "1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Crear",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pokemonId\": 1,\n  \"pokemonName\": \"bulbasaur\",\n  \"note\": \"Mi inicial de planta\",\n  \"rating\": 3,\n  \"createdAt\": \"2026-10-01T12:00:00.000Z\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{apiUrl}}/favorites",
+              "host": ["{{apiUrl}}"],
+              "path": ["favorites"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Reemplazar",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pokemonId\": 25,\n  \"pokemonName\": \"pikachu\",\n  \"note\": \"Nota reemplazada con PUT\",\n  \"rating\": 5,\n  \"createdAt\": \"2026-09-28T15:10:00.000Z\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{apiUrl}}/favorites/1",
+              "host": ["{{apiUrl}}"],
+              "path": ["favorites", "1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Actualizar parcial",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"rating\": 2\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{apiUrl}}/favorites/1",
+              "host": ["{{apiUrl}}"],
+              "path": ["favorites", "1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Eliminar",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{apiUrl}}/favorites/2",
+              "host": ["{{apiUrl}}"],
+              "path": ["favorites", "2"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Pokémon personalizados (/customPokemon)",
+      "item": [
+        {
+          "name": "Listar",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{apiUrl}}/customPokemon",
+              "host": ["{{apiUrl}}"],
+              "path": ["customPokemon"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener por id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{apiUrl}}/customPokemon/1",
+              "host": ["{{apiUrl}}"],
+              "path": ["customPokemon", "1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Crear",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Cafetín\",\n  \"types\": [\n    \"grass\"\n  ],\n  \"stats\": {\n    \"hp\": 60,\n    \"attack\": 55,\n    \"defense\": 65,\n    \"speed\": 120\n  },\n  \"imageUrl\": \"\",\n  \"description\": \"Nunca duerme.\",\n  \"createdAt\": \"2026-10-01T12:00:00.000Z\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{apiUrl}}/customPokemon",
+              "host": ["{{apiUrl}}"],
+              "path": ["customPokemon"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Reemplazar",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Opitazo\",\n  \"types\": [\n    \"fire\"\n  ],\n  \"stats\": {\n    \"hp\": 90,\n    \"attack\": 120,\n    \"defense\": 75,\n    \"speed\": 100\n  },\n  \"imageUrl\": \"\",\n  \"description\": \"Reemplazado con PUT\",\n  \"createdAt\": \"2026-09-29T11:00:00.000Z\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{apiUrl}}/customPokemon/1",
+              "host": ["{{apiUrl}}"],
+              "path": ["customPokemon", "1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Actualizar parcial",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"description\": \"Descripción cambiada con PATCH\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{apiUrl}}/customPokemon/1",
+              "host": ["{{apiUrl}}"],
+              "path": ["customPokemon", "1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Eliminar",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{apiUrl}}/customPokemon/2",
+              "host": ["{{apiUrl}}"],
+              "path": ["customPokemon", "2"]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "apiUrl",
+      "value": "http://localhost:3000"
+    }
+  ]
+}
