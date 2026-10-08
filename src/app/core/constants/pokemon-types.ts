@@ -21,6 +21,3 @@ export const POKEMON_TYPES: Record<string, { label: string; color: string }> = {
 };
 
 export const POKEMON_TYPE_KEYS = Object.keys(POKEMON_TYPES);
-
-/** Cantidad de Pokémon de la primera generación que maneja la app. */
-export const MAX_POKEMON_ID = 151;
