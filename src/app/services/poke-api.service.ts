@@ -1,9 +1,8 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { Observable, map, shareReplay, throwError } from 'rxjs';
+import { Observable, catchError, map, shareReplay, throwError } from 'rxjs';
 
 import { environment } from '../../environments/environment';
-import { MAX_POKEMON_ID } from '../core/constants/pokemon-types';
 import { defaultPrice, defaultStock } from '../core/utils/pokemon-defaults';
 import { PokemonDraft, PokemonRef, PokemonStats } from '../models/pokemon.model';
 
@@ -30,6 +29,12 @@ interface PokeApiSpecies {
   flavor_text_entries: { flavor_text: string; language: { name: string } }[];
 }
 
+/** Suficiente para traer todos los Pokémon de PokéAPI en una sola petición (hoy son ~1350). */
+const POKEAPI_LIST_LIMIT = 2000;
+
+/** Desde este id PokéAPI lista formas especiales (megas, regionales…), no especies de la Pokédex. */
+const FORM_ID_START = 10000;
+
 const STAT_KEYS: Record<string, keyof PokemonStats> = {
   hp: 'hp',
   attack: 'attack',
@@ -39,21 +44,25 @@ const STAT_KEYS: Record<string, keyof PokemonStats> = {
   speed: 'speed',
 };
 
-/** Consulta PokéAPI (solo lectura) limitada a los primeros 151 Pokémon. */
+/** Consulta PokéAPI (solo lectura): cualquier Pokémon de la Pokédex nacional. */
 @Injectable({ providedIn: 'root' })
 export class PokeApiService {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = environment.pokeApiUrl;
 
   private readonly refs$ = this.http
-    .get<PokeApiList>(`${this.baseUrl}/pokemon`, { params: { limit: MAX_POKEMON_ID } })
+    .get<PokeApiList>(`${this.baseUrl}/pokemon`, { params: { limit: POKEAPI_LIST_LIMIT } })
     .pipe(
-      map((res) => res.results.map((r) => ({ id: idFromUrl(r.url), name: r.name }))),
+      map((res) =>
+        res.results
+          .map((r) => ({ id: idFromUrl(r.url), name: r.name }))
+          .filter((r) => r.id < FORM_ID_START),
+      ),
       shareReplay(1),
     );
 
-  /** Lista (id + nombre) de los primeros 151 Pokémon. Se pide una sola vez. */
-  list151(): Observable<PokemonRef[]> {
+  /** Lista (id + nombre) de todos los Pokémon de PokéAPI, sin formas especiales. Se pide una sola vez. */
+  listAll(): Observable<PokemonRef[]> {
     return this.refs$;
   }
 
@@ -69,22 +78,22 @@ export class PokeApiService {
       .pipe(map(spanishDescription));
   }
 
-  /** Trae los datos completos de un Pokémon (1–151) listos para el formulario. */
+  /** Trae los datos completos de un Pokémon listos para el formulario. */
   getById(idOrName: number | string): Observable<PokemonDraft> {
     const key = String(idOrName).trim().toLowerCase().replace(/^#/, '');
     const asNumber = Number(key);
-    if (!key || (Number.isInteger(asNumber) && (asNumber < 1 || asNumber > MAX_POKEMON_ID))) {
-      return throwError(
-        () => new Error(`Solo se permiten los Pokémon del 1 al ${MAX_POKEMON_ID}.`),
-      );
+    if (!key || (Number.isInteger(asNumber) && asNumber < 1)) {
+      return throwError(() => new Error('Escribe un número de Pokédex o un nombre válido.'));
     }
     return this.http.get<PokeApiPokemon>(`${this.baseUrl}/pokemon/${key}`).pipe(
-      map((raw) => {
-        if (raw.id > MAX_POKEMON_ID) {
-          throw new Error(`Solo se permiten los Pokémon del 1 al ${MAX_POKEMON_ID}.`);
-        }
-        return toDraft(raw);
-      }),
+      map(toDraft),
+      catchError((err: unknown) =>
+        throwError(() =>
+          err instanceof HttpErrorResponse && err.status === 404
+            ? new Error(`No se encontró «${key}» en PokéAPI.`)
+            : err,
+        ),
+      ),
     );
   }
 }

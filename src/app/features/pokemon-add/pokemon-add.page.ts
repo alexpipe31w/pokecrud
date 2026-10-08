@@ -28,8 +28,11 @@ import { PokemonService } from '../../services/pokemon.service';
 import { UiService } from '../../services/ui.service';
 import { PokemonFormComponent } from '../../shared/components/pokemon-form/pokemon-form.component';
 
+/** Resultados que se muestran a la vez en el buscador. */
+const MAX_RESULTS = 30;
+
 /**
- * Agregar un Pokémon: se busca por número o nombre en PokéAPI (1–151)
+ * Agregar un Pokémon: se busca por número o nombre en PokéAPI (cualquier generación)
  * y el formulario aparece prellenado con sus datos para editarlos antes de guardar.
  */
 @Component({
@@ -62,17 +65,19 @@ export class PokemonAddPage {
   private readonly router = inject(Router);
   private readonly navCtrl = inject(NavController);
 
-  /** Los 151 nombres de PokéAPI (`null` mientras cargan, `[]` si falla). */
-  protected readonly refs = toSignal(this.pokeApi.list151().pipe(catchError(() => of([]))), {
+  /** Todos los nombres de PokéAPI (`null` mientras cargan, `[]` si falla). */
+  protected readonly refs = toSignal(this.pokeApi.listAll().pipe(catchError(() => of([]))), {
     initialValue: null,
   });
 
   protected readonly term = signal('');
-  protected readonly results = computed(() => {
+  private readonly matches = computed(() => {
     const refs = this.refs();
     const term = this.term().trim();
-    return refs && term ? filterRefs(refs, term).slice(0, 30) : [];
+    return refs && term ? filterRefs(refs, term) : [];
   });
+  protected readonly totalMatches = computed(() => this.matches().length);
+  protected readonly results = computed(() => this.matches().slice(0, MAX_RESULTS));
 
   protected readonly selected = signal<PokemonDraft | null>(null);
   protected readonly loadingDetail = signal(false);

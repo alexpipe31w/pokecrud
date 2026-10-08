@@ -12,7 +12,7 @@
   @if (!selected()) {
     <ion-toolbar>
       <ion-searchbar
-        placeholder="Número (1–151) o nombre"
+        placeholder="Número o nombre"
         [debounce]="400"
         (ionInput)="onSearch($event)"
       ></ion-searchbar>
@@ -47,7 +47,10 @@
     </div>
   } @else if (!term().trim()) {
     <div class="state">
-      <p>Escribe el número (por ejemplo <b>150</b>) o el nombre (por ejemplo <b>mew</b>).</p>
+      <p>
+        Escribe el número (por ejemplo <b>150</b> o <b>448</b>) o el nombre (por ejemplo
+        <b>lucario</b>).
+      </p>
     </div>
   } @else {
     <ion-list lines="full">
@@ -63,9 +66,15 @@
         </ion-item>
       } @empty {
         <div class="state">
-          <p>No se encontró ningún Pokémon (solo del 1 al 151).</p>
+          <p>No se encontró ningún Pokémon.</p>
         </div>
       }
     </ion-list>
+    @if (totalMatches() > results().length) {
+      <p class="hint">
+        Mostrando {{ results().length }} de {{ totalMatches() }} coincidencias. Escribe más para
+        afinar la búsqueda.
+      </p>
+    }
   }
 </ion-content>
