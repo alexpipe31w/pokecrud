@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "PokéCRUD - Backend JSON Server",
-    "description": "Peticiones a las colecciones teams, favorites y customPokemon. Levantar antes el backend con `npm run api`.",
+    "description": "Peticiones a las colecciones teams, favorites, customPokemon y pokemon (primeros 151). Levantar antes el backend con `npm run api`.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
@@ -374,6 +374,160 @@
               "raw": "{{apiUrl}}/customPokemon/2",
               "host": ["{{apiUrl}}"],
               "path": ["customPokemon", "2"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Primeros 151 (/pokemon)",
+      "item": [
+        {
+          "name": "Listar (ordenado por id)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{apiUrl}}/pokemon?_sort=id&_order=asc",
+              "host": ["{{apiUrl}}"],
+              "path": ["pokemon"],
+              "query": [
+                {
+                  "key": "_sort",
+                  "value": "id"
+                },
+                {
+                  "key": "_order",
+                  "value": "asc"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Buscar por nombre",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{apiUrl}}/pokemon?name_like=mew",
+              "host": ["{{apiUrl}}"],
+              "path": ["pokemon"],
+              "query": [
+                {
+                  "key": "name_like",
+                  "value": "mew"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener por id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{apiUrl}}/pokemon/150",
+              "host": ["{{apiUrl}}"],
+              "path": ["pokemon", "150"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Crear (después de eliminar el 150)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": 150,\n  \"name\": \"mewtwo\",\n  \"types\": [\n    \"psychic\"\n  ],\n  \"abilities\": [\n    \"pressure\",\n    \"unnerve\"\n  ],\n  \"imageUrl\": \"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/150.png\",\n  \"height\": 2,\n  \"weight\": 122,\n  \"baseExperience\": 306,\n  \"stats\": {\n    \"hp\": 106,\n    \"attack\": 110,\n    \"defense\": 90,\n    \"specialAttack\": 154,\n    \"specialDefense\": 90,\n    \"speed\": 130\n  },\n  \"price\": 30600,\n  \"stock\": 5,\n  \"createdAt\": \"2026-10-08T12:00:00.000Z\",\n  \"updatedAt\": \"2026-10-08T12:00:00.000Z\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{apiUrl}}/pokemon",
+              "host": ["{{apiUrl}}"],
+              "path": ["pokemon"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Reemplazar",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": 150,\n  \"name\": \"mewtwo\",\n  \"types\": [\n    \"psychic\"\n  ],\n  \"abilities\": [\n    \"pressure\",\n    \"unnerve\"\n  ],\n  \"imageUrl\": \"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/150.png\",\n  \"height\": 2,\n  \"weight\": 122,\n  \"baseExperience\": 306,\n  \"stats\": {\n    \"hp\": 106,\n    \"attack\": 110,\n    \"defense\": 90,\n    \"specialAttack\": 154,\n    \"specialDefense\": 90,\n    \"speed\": 130\n  },\n  \"price\": 50000,\n  \"stock\": 2,\n  \"createdAt\": \"2026-10-08T12:00:00.000Z\",\n  \"updatedAt\": \"2026-10-08T13:00:00.000Z\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{apiUrl}}/pokemon/150",
+              "host": ["{{apiUrl}}"],
+              "path": ["pokemon", "150"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Actualizar parcial (precio y stock)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"price\": 45000,\n  \"stock\": 10\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{apiUrl}}/pokemon/150",
+              "host": ["{{apiUrl}}"],
+              "path": ["pokemon", "150"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Eliminar",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{apiUrl}}/pokemon/150",
+              "host": ["{{apiUrl}}"],
+              "path": ["pokemon", "150"]
             }
           },
           "response": []

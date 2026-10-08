@@ -3,13 +3,94 @@
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/tabs/pokedex" text="Pokédex"></ion-back-button>
     </ion-buttons>
-    <ion-title>Detalle</ion-title>
+    <ion-title>{{ pokemon() ? (pokemon()!.name | titlecase) : 'Detalle' }}</ion-title>
+    @if (pokemon()) {
+      <ion-buttons slot="end">
+        <ion-button (click)="edit()" aria-label="Editar">
+          <ion-icon slot="icon-only" name="create-outline"></ion-icon>
+        </ion-button>
+        <ion-button color="danger" (click)="remove()" aria-label="Eliminar">
+          <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+        </ion-button>
+      </ion-buttons>
+    }
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <app-page-placeholder
-    [title]="'Detalle del Pokémon #' + (id() ?? '')"
-    issue="IS-12 · HU-04"
-  ></app-page-placeholder>
+  @if (loading()) {
+    <div class="state"><ion-spinner name="crescent"></ion-spinner></div>
+  } @else if (notFound()) {
+    <div class="state">
+      <ion-text color="medium">
+        <p>El Pokémon #{{ id() }} no está en la base de datos.</p>
+      </ion-text>
+      <ion-button fill="outline" (click)="goToList()"> Volver a la Pokédex </ion-button>
+    </div>
+  } @else if (pokemon(); as p) {
+    <section class="hero">
+      <span class="dex">{{ dexNumber(p.id) }}</span>
+      @if (p.imageUrl) {
+        <img [src]="p.imageUrl" [alt]="p.name" />
+      }
+      <h1>{{ p.name | titlecase }}</h1>
+      <app-type-chips [types]="p.types"></app-type-chips>
+    </section>
+
+    <section class="cards">
+      <div class="card">
+        <span class="label">Precio</span>
+        <strong>{{ p.price | currency: 'COP' : 'symbol-narrow' : '1.0-0' }}</strong>
+      </div>
+      <div class="card">
+        <span class="label">Stock</span>
+        <strong [class.out]="p.stock === 0">{{ p.stock }} uds.</strong>
+      </div>
+      <div class="card">
+        <span class="label">Altura</span>
+        <strong>{{ p.height | number: '1.1-1' }} m</strong>
+      </div>
+      <div class="card">
+        <span class="label">Peso</span>
+        <strong>{{ p.weight | number: '1.1-1' }} kg</strong>
+      </div>
+      <div class="card">
+        <span class="label">Exp. base</span>
+        <strong>{{ p.baseExperience }}</strong>
+      </div>
+    </section>
+
+    <section class="block">
+      <h2>Descripción</h2>
+      @if (description() === null) {
+        <ion-spinner name="dots"></ion-spinner>
+      } @else {
+        <p>{{ description() || 'Sin descripción disponible.' }}</p>
+      }
+    </section>
+
+    <section class="block">
+      <h2>Habilidades</h2>
+      <p>
+        @for (a of p.abilities; track a; let last = $last) {
+          {{ a | titlecase }}{{ last ? '' : ', ' }}
+        } @empty {
+          —
+        }
+      </p>
+    </section>
+
+    <section class="block">
+      <h2>Estadísticas base</h2>
+      @for (s of statLabels; track s.key) {
+        <div class="stat">
+          <span class="stat-label">{{ s.label }}</span>
+          <span class="stat-value">{{ p.stats[s.key] }}</span>
+          <ion-progress-bar [value]="p.stats[s.key] / 255"></ion-progress-bar>
+        </div>
+      }
+    </section>
+
+    <p class="updated">Actualizado: {{ p.updatedAt.slice(0, 10) }}</p>
+  }
 </ion-content>

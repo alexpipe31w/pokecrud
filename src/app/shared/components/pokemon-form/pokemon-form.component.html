@@ -1,0 +1,152 @@
+<form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+  <div class="preview">
+    @if (form.controls.imageUrl.value) {
+      <img [src]="form.controls.imageUrl.value" [alt]="form.controls.name.value" />
+    }
+    <span class="dex">{{ dexNumber(initial().id) }}</span>
+  </div>
+
+  <ion-list lines="full">
+    <ion-list-header><ion-label>Datos generales</ion-label></ion-list-header>
+
+    <ion-item>
+      <ion-input
+        label="Nombre"
+        labelPlacement="stacked"
+        formControlName="name"
+        [class.ion-invalid]="invalid('name')"
+        [class.ion-touched]="invalid('name')"
+        errorText="El nombre es obligatorio"
+      ></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-select
+        label="Tipos (máx. 2)"
+        labelPlacement="stacked"
+        formControlName="types"
+        [multiple]="true"
+        interface="alert"
+        cancelText="Cancelar"
+        okText="Aceptar"
+      >
+        @for (key of typeKeys; track key) {
+          <ion-select-option [value]="key">{{ types[key].label }}</ion-select-option>
+        }
+      </ion-select>
+    </ion-item>
+    @if (invalid('types')) {
+      <p class="field-error">Elige al menos un tipo</p>
+    }
+
+    <ion-item>
+      <ion-input
+        label="Habilidades (separadas por coma)"
+        labelPlacement="stacked"
+        formControlName="abilities"
+      ></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-input
+        label="URL de la imagen"
+        labelPlacement="stacked"
+        type="url"
+        formControlName="imageUrl"
+      ></ion-input>
+    </ion-item>
+
+    <div class="grid">
+      <ion-item>
+        <ion-input
+          label="Altura (m)"
+          labelPlacement="stacked"
+          type="number"
+          inputmode="decimal"
+          min="0"
+          step="0.1"
+          formControlName="height"
+        ></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-input
+          label="Peso (kg)"
+          labelPlacement="stacked"
+          type="number"
+          inputmode="decimal"
+          min="0"
+          step="0.1"
+          formControlName="weight"
+        ></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-input
+          label="Exp. base"
+          labelPlacement="stacked"
+          type="number"
+          inputmode="numeric"
+          min="0"
+          formControlName="baseExperience"
+        ></ion-input>
+      </ion-item>
+    </div>
+
+    <ion-list-header><ion-label>Inventario</ion-label></ion-list-header>
+    <div class="grid">
+      <ion-item>
+        <ion-input
+          label="Precio ($)"
+          labelPlacement="stacked"
+          type="number"
+          inputmode="decimal"
+          min="0"
+          formControlName="price"
+          [class.ion-invalid]="invalid('price')"
+          [class.ion-touched]="invalid('price')"
+          errorText="Debe ser 0 o más"
+        ></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-input
+          label="Stock"
+          labelPlacement="stacked"
+          type="number"
+          inputmode="numeric"
+          min="0"
+          formControlName="stock"
+          [class.ion-invalid]="invalid('stock')"
+          [class.ion-touched]="invalid('stock')"
+          errorText="Debe ser 0 o más"
+        ></ion-input>
+      </ion-item>
+    </div>
+
+    <ion-list-header><ion-label>Estadísticas base</ion-label></ion-list-header>
+    <div class="grid" formGroupName="stats">
+      @for (stat of statFields; track stat.key) {
+        <ion-item>
+          <ion-input
+            [label]="stat.label"
+            labelPlacement="stacked"
+            type="number"
+            inputmode="numeric"
+            min="1"
+            max="255"
+            [formControlName]="stat.key"
+            [class.ion-invalid]="invalid('stats.' + stat.key)"
+            [class.ion-touched]="invalid('stats.' + stat.key)"
+            errorText="Entre 1 y 255"
+          ></ion-input>
+        </ion-item>
+      }
+    </div>
+  </ion-list>
+
+  <ion-button class="ion-margin" expand="block" type="submit" [disabled]="saving()">
+    @if (saving()) {
+      <ion-spinner name="crescent"></ion-spinner>
+    } @else {
+      {{ submitLabel() }}
+    }
+  </ion-button>
+</form>
