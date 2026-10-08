@@ -57,6 +57,7 @@ npx ionic serve
 | `npm start`         | Levanta la app en modo desarrollo                           |
 | `npm run api`       | Levanta JSON Server con `backend/db.json` en el puerto 3000 |
 | `npm run api:reset` | Restaura `backend/db.json` con los datos de ejemplo         |
+| `npm run seed:151`  | Descarga los primeros 151 Pokémon de PokéAPI a la BD        |
 | `npm run build`     | Compila la app en `www/`                                    |
 | `npm test`          | Ejecuta las pruebas unitarias                               |
 | `npm run lint`      | Revisa el código con ESLint                                 |
@@ -70,6 +71,7 @@ pokecrud/
 │   ├── db.json               # Base de datos de JSON Server
 │   ├── db.seed.json          # Datos de ejemplo (para npm run api:reset)
 │   └── postman/              # Colección de Postman con todas las peticiones
+├── scripts/seed-151.mjs      # Precarga los 151 Pokémon desde PokéAPI
 ├── docs/evidencias/          # Capturas que se adjuntan en Jira
 └── src/
     ├── environments/         # pokeApiUrl y apiUrl
@@ -83,13 +85,15 @@ pokecrud/
 
 ## Rutas de la app
 
-| Ruta                | Pantalla               | Historia            |
-| ------------------- | ---------------------- | ------------------- |
-| `/tabs/pokedex`     | Pokédex                | HU-03, HU-05, HU-14 |
-| `/pokemon/:id`      | Detalle de un Pokémon  | HU-04               |
-| `/tabs/equipos`     | Mis Equipos            | HU-08 a HU-11       |
-| `/tabs/favoritos`   | Favoritos              | HU-12, HU-13        |
-| `/tabs/mis-pokemon` | Pokémon personalizados | HU-15 a HU-18       |
+| Ruta                  | Pantalla                                                               | Historia            |
+| --------------------- | ---------------------------------------------------------------------- | ------------------- |
+| `/tabs/pokedex`       | Los primeros 151 (lista, buscar, editar, eliminar)                     | HU-03, HU-05, HU-14 |
+| `/pokemon/nuevo`      | Agregar: buscar en PokéAPI por número o nombre y formulario prellenado | HU-03               |
+| `/pokemon/:id`        | Detalle de un Pokémon (tipo, stats, precio, stock)                     | HU-04               |
+| `/pokemon/:id/editar` | Editar un Pokémon                                                      | HU-03               |
+| `/tabs/equipos`       | Mis Equipos                                                            | HU-08 a HU-11       |
+| `/tabs/favoritos`     | Favoritos                                                              | HU-12, HU-13        |
+| `/tabs/mis-pokemon`   | Pokémon personalizados                                                 | HU-15 a HU-18       |
 
 ## Backend propio (JSON Server)
 
@@ -100,14 +104,18 @@ PokéAPI es de solo lectura, así que los datos del CRUD se guardan en JSON Serv
 | Equipos                | `/teams` y `/teams/:id`                 | GET, POST, PUT, PATCH, DELETE |
 | Favoritos              | `/favorites` y `/favorites/:id`         | GET, POST, PUT, PATCH, DELETE |
 | Pokémon personalizados | `/customPokemon` y `/customPokemon/:id` | GET, POST, PUT, PATCH, DELETE |
+| Primeros 151 Pokémon   | `/pokemon` y `/pokemon/:id`             | GET, POST, PUT, PATCH, DELETE |
 
 ### Modelo de datos
 
 - **Team:** `id, name, description, pokemonIds[] (máx. 6), createdAt, updatedAt`
 - **Favorite:** `id, pokemonId, pokemonName, note, rating (1-5), createdAt`
 - **CustomPokemon:** `id, name, types[], stats { hp, attack, defense, speed }, imageUrl, description, createdAt`
+- **Pokemon:** `id (n.º de Pokédex 1-151), name, types[], abilities[], imageUrl, height (m), weight (kg), baseExperience, stats { hp, attack, defense, specialAttack, specialDefense, speed }, price, stock, createdAt, updatedAt`
 
-`db.json` trae 2 equipos, 3 favoritos y 1 Pokémon personalizado de ejemplo. JSON Server escribe en ese archivo cada vez que se crea, edita o elimina algo; para volver a los datos iniciales se usa `npm run api:reset`.
+  Los datos vienen de PokéAPI. `price` y `stock` no existen en PokéAPI: se generan al precargar (precio = experiencia base × 100) y se editan desde la app.
+
+`db.json` trae 2 equipos, 3 favoritos, 1 Pokémon personalizado de ejemplo y los primeros 151 Pokémon. JSON Server escribe en ese archivo cada vez que se crea, edita o elimina algo; para volver a los datos iniciales se usa `npm run api:reset`.
 
 Para probar los endpoints, importar en Postman `backend/postman/PokeCRUD.postman_collection.json`.
 

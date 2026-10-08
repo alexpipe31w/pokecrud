@@ -1,11 +1,144 @@
-import { Component } from '@angular/core';
-import { IonContent, IonHeader, IonTitle, IonToolbar } from '@ionic/angular';
+import { CurrencyPipe, TitleCasePipe } from '@angular/common';
+import { Component, computed, effect, inject, signal, untracked } from '@angular/core';
+import { Router } from '@angular/router';
+import {
+  IonButton,
+  IonContent,
+  IonFab,
+  IonFabButton,
+  IonHeader,
+  IonIcon,
+  IonItem,
+  IonItemOption,
+  IonItemOptions,
+  IonItemSliding,
+  IonLabel,
+  IonList,
+  IonNote,
+  IonRefresher,
+  IonRefresherContent,
+  IonSearchbar,
+  IonSpinner,
+  IonText,
+  IonThumbnail,
+  IonTitle,
+  IonToolbar,
+  RefresherCustomEvent,
+} from '@ionic/angular';
+import { addIcons } from 'ionicons';
+import { add, createOutline, trashOutline } from 'ionicons/icons';
+import { finalize } from 'rxjs';
 
-import { PagePlaceholderComponent } from '../../shared/components/page-placeholder/page-placeholder.component';
+import { dexNumber, displayName, spriteUrl } from '../../core/utils/pokemon-defaults';
+import { Pokemon } from '../../models/pokemon.model';
+import { filterRefs } from '../../services/poke-api.service';
+import { PokemonService } from '../../services/pokemon.service';
+import { UiService } from '../../services/ui.service';
+import { TypeChipsComponent } from '../../shared/components/type-chips/type-chips.component';
 
+/** Listado de los primeros 151 Pokémon guardados en la base de datos (IS-11 · HU-03). */
 @Component({
   selector: 'app-pokedex',
   templateUrl: 'pokedex.page.html',
-  imports: [IonHeader, IonToolbar, IonTitle, IonContent, PagePlaceholderComponent],
+  styleUrl: 'pokedex.page.scss',
+  imports: [
+    CurrencyPipe,
+    TitleCasePipe,
+    IonHeader,
+    IonToolbar,
+    IonTitle,
+    IonContent,
+    IonSearchbar,
+    IonList,
+    IonItemSliding,
+    IonItem,
+    IonItemOptions,
+    IonItemOption,
+    IonThumbnail,
+    IonLabel,
+    IonNote,
+    IonIcon,
+    IonFab,
+    IonFabButton,
+    IonRefresher,
+    IonRefresherContent,
+    IonSpinner,
+    IonText,
+    IonButton,
+    TypeChipsComponent,
+  ],
 })
-export class PokedexPage {}
+export class PokedexPage {
+  private readonly pokemonService = inject(PokemonService);
+  private readonly ui = inject(UiService);
+  private readonly router = inject(Router);
+
+  protected readonly pokemon = signal<Pokemon[]>([]);
+  protected readonly loading = signal(true);
+  protected readonly error = signal<string | null>(null);
+  protected readonly term = signal('');
+
+  protected readonly filtered = computed(() => filterRefs(this.pokemon(), this.term()));
+
+  protected readonly dexNumber = dexNumber;
+  protected readonly spriteUrl = spriteUrl;
+
+  constructor() {
+    addIcons({ add, createOutline, trashOutline });
+    // Carga inicial y recarga automática cuando se agrega, edita o elimina un Pokémon.
+    effect(() => {
+      this.pokemonService.version();
+      untracked(() => this.load());
+    });
+  }
+
+  protected load(refresher?: RefresherCustomEvent): void {
+    if (!refresher) this.loading.set(true);
+    this.error.set(null);
+    this.pokemonService
+      .getAll()
+      .pipe(
+        finalize(() => {
+          this.loading.set(false);
+          refresher?.target.complete();
+        }),
+      )
+      .subscribe({
+        next: (list) => this.pokemon.set(list),
+        error: () =>
+          this.error.set(
+            'No se pudo conectar con la base de datos. ¿Está corriendo `npm run api`?',
+          ),
+      });
+  }
+
+  protected onSearch(event: Event): void {
+    this.term.set((event as CustomEvent<{ value?: string | null }>).detail.value ?? '');
+  }
+
+  protected open(p: Pokemon): void {
+    this.router.navigate(['/pokemon', p.id]);
+  }
+
+  protected edit(p: Pokemon, sliding: IonItemSliding): void {
+    sliding.close();
+    this.router.navigate(['/pokemon', p.id, 'editar']);
+  }
+
+  protected async remove(p: Pokemon, sliding: IonItemSliding): Promise<void> {
+    await sliding.close();
+    const ok = await this.ui.confirm(
+      'Eliminar Pokémon',
+      `¿Seguro que quieres eliminar a ${displayName(p.name)} (${dexNumber(p.id)})?`,
+    );
+    if (!ok) return;
+    this.pokemonService.delete(p.id).subscribe({
+      next: () => this.ui.toast(`${displayName(p.name)} eliminado`),
+      error: () => this.ui.toast('No se pudo eliminar', 'danger'),
+    });
+  }
+
+  protected add(): void {
+    this.router.navigate(['/pokemon/nuevo']);
+  }
+}

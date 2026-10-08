@@ -1,15 +1,78 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>Pokédex</ion-title>
+    <ion-title>Los primeros 151</ion-title>
+  </ion-toolbar>
+  <ion-toolbar>
+    <ion-searchbar
+      placeholder="Buscar por número o nombre"
+      [debounce]="200"
+      (ionInput)="onSearch($event)"
+    ></ion-searchbar>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Pokédex</ion-title>
-    </ion-toolbar>
-  </ion-header>
+  <ion-refresher slot="fixed" (ionRefresh)="load($any($event))">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
 
-  <app-page-placeholder title="Pokédex" issue="IS-11 · HU-03"></app-page-placeholder>
+  @if (loading()) {
+    <div class="state"><ion-spinner name="crescent"></ion-spinner></div>
+  } @else if (error()) {
+    <div class="state">
+      <ion-text color="danger"
+        ><p>{{ error() }}</p></ion-text
+      >
+      <ion-button fill="outline" (click)="load()">Reintentar</ion-button>
+    </div>
+  } @else {
+    <p class="count">
+      {{ filtered().length }} de {{ pokemon().length }} Pokémon · desliza un Pokémon para editarlo o
+      eliminarlo
+    </p>
+
+    <ion-list lines="full">
+      @for (p of filtered(); track p.id) {
+        <ion-item-sliding #sliding>
+          <ion-item button detail="true" (click)="open(p)">
+            <ion-thumbnail slot="start">
+              <img [src]="spriteUrl(p.id)" [alt]="p.name" loading="lazy" />
+            </ion-thumbnail>
+            <ion-label>
+              <p class="dex">{{ dexNumber(p.id) }}</p>
+              <h2>{{ p.name | titlecase }}</h2>
+              <app-type-chips [types]="p.types"></app-type-chips>
+            </ion-label>
+            <ion-note slot="end" class="inventory">
+              <strong>{{ p.price | currency: 'COP' : 'symbol-narrow' : '1.0-0' }}</strong>
+              <span [class.out]="p.stock === 0">Stock: {{ p.stock }}</span>
+            </ion-note>
+          </ion-item>
+
+          <ion-item-options side="end">
+            <ion-item-option color="primary" (click)="edit(p, sliding)">
+              <ion-icon slot="icon-only" name="create-outline" aria-label="Editar"></ion-icon>
+            </ion-item-option>
+            <ion-item-option color="danger" (click)="remove(p, sliding)">
+              <ion-icon slot="icon-only" name="trash-outline" aria-label="Eliminar"></ion-icon>
+            </ion-item-option>
+          </ion-item-options>
+        </ion-item-sliding>
+      } @empty {
+        <div class="state">
+          @if (pokemon().length === 0) {
+            <p>No hay Pokémon guardados. Pulsa + para agregar uno.</p>
+          } @else {
+            <p>Ningún Pokémon coincide con «{{ term() }}».</p>
+          }
+        </div>
+      }
+    </ion-list>
+  }
+
+  <ion-fab slot="fixed" vertical="bottom" horizontal="end">
+    <ion-fab-button (click)="add()" aria-label="Agregar Pokémon">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
 </ion-content>
