@@ -1,0 +1,71 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      @if (selected()) {
+        <ion-button (click)="backToSearch()">Buscar otro</ion-button>
+      } @else {
+        <ion-back-button defaultHref="/tabs/pokedex" text="Pokédex"></ion-back-button>
+      }
+    </ion-buttons>
+    <ion-title>Agregar Pokémon</ion-title>
+  </ion-toolbar>
+  @if (!selected()) {
+    <ion-toolbar>
+      <ion-searchbar
+        placeholder="Número (1–151) o nombre"
+        [debounce]="400"
+        (ionInput)="onSearch($event)"
+      ></ion-searchbar>
+    </ion-toolbar>
+  }
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  @if (loadingDetail()) {
+    <div class="state"><ion-spinner name="crescent"></ion-spinner></div>
+  } @else if (selected(); as draft) {
+    @if (alreadySaved()) {
+      <div class="warning">
+        <ion-text color="warning">
+          <p>{{ dexNumber(draft.id) }} {{ draft.name | titlecase }} ya está en la base de datos.</p>
+        </ion-text>
+        <ion-button size="small" fill="outline" (click)="goToEdit()">Editarlo</ion-button>
+      </div>
+    }
+    <p class="hint">Datos traídos de PokéAPI. Puedes cambiar cualquier campo antes de guardar.</p>
+    <app-pokemon-form
+      [initial]="draft"
+      submitLabel="Agregar a la Pokédex"
+      [saving]="saving()"
+      (save)="save($event)"
+    ></app-pokemon-form>
+  } @else if (refs() === null) {
+    <div class="state"><ion-spinner name="crescent"></ion-spinner></div>
+  } @else if (refs()!.length === 0) {
+    <div class="state">
+      <ion-text color="danger"><p>No se pudo conectar con PokéAPI.</p></ion-text>
+    </div>
+  } @else if (!term().trim()) {
+    <div class="state">
+      <p>Escribe el número (por ejemplo <b>150</b>) o el nombre (por ejemplo <b>mew</b>).</p>
+    </div>
+  } @else {
+    <ion-list lines="full">
+      @for (r of results(); track r.id) {
+        <ion-item button detail="true" (click)="pick(r)">
+          <ion-thumbnail slot="start">
+            <img [src]="spriteUrl(r.id)" [alt]="r.name" loading="lazy" />
+          </ion-thumbnail>
+          <ion-label>
+            <p class="dex">{{ dexNumber(r.id) }}</p>
+            <h2>{{ r.name | titlecase }}</h2>
+          </ion-label>
+        </ion-item>
+      } @empty {
+        <div class="state">
+          <p>No se encontró ningún Pokémon (solo del 1 al 151).</p>
+        </div>
+      }
+    </ion-list>
+  }
+</ion-content>
