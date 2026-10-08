@@ -40,4 +40,26 @@ describe('PokedexPage', () => {
     expect(text).toContain('Mewtwo');
     expect(text).toContain('2 de 2 Pokémon');
   });
+
+  it('shows 20 at first and 20 more on infinite scroll', async () => {
+    const all = Array.from({ length: 45 }, (_, i) => ({
+      id: i + 1,
+      name: `poke${i + 1}`,
+      types: ['normal'],
+      price: 100,
+      stock: 1,
+    }));
+    http.expectOne(`${environment.apiUrl}/pokemon?_sort=id&_order=asc`).flush(all);
+    await fixture.whenStable();
+    fixture.detectChanges();
+    const items = () => fixture.nativeElement.querySelectorAll('ion-item-sliding').length;
+    expect(items()).toBe(20);
+
+    const page = fixture.componentInstance as unknown as {
+      loadMore(e: { target: { complete(): void } }): void;
+    };
+    page.loadMore({ target: { complete: () => undefined } });
+    fixture.detectChanges();
+    expect(items()).toBe(40);
+  });
 });

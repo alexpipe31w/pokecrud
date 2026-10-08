@@ -26,6 +26,10 @@ interface PokeApiPokemon {
   };
 }
 
+interface PokeApiSpecies {
+  flavor_text_entries: { flavor_text: string; language: { name: string } }[];
+}
+
 const STAT_KEYS: Record<string, keyof PokemonStats> = {
   hp: 'hp',
   attack: 'attack',
@@ -58,6 +62,13 @@ export class PokeApiService {
     return this.refs$.pipe(map((refs) => filterRefs(refs, term)));
   }
 
+  /** Descripción en español del Pokémon (de `pokemon-species`). */
+  getDescription(id: number): Observable<string> {
+    return this.http
+      .get<PokeApiSpecies>(`${this.baseUrl}/pokemon-species/${id}`)
+      .pipe(map(spanishDescription));
+  }
+
   /** Trae los datos completos de un Pokémon (1–151) listos para el formulario. */
   getById(idOrName: number | string): Observable<PokemonDraft> {
     const key = String(idOrName).trim().toLowerCase().replace(/^#/, '');
@@ -76,6 +87,14 @@ export class PokeApiService {
       }),
     );
   }
+}
+
+/** Última descripción en español de la Pokédex, sin saltos de línea raros. */
+export function spanishDescription(species: PokeApiSpecies): string {
+  const entries = species.flavor_text_entries.filter((e) => e.language.name === 'es');
+  const last = entries[entries.length - 1];
+  // `\s` también cubre los \n y \f que trae PokéAPI dentro del texto.
+  return last ? last.flavor_text.replace(/\s+/g, ' ').trim() : '';
 }
 
 function idFromUrl(url: string): number {

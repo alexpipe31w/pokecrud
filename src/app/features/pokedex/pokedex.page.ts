@@ -8,6 +8,9 @@ import {
   IonFabButton,
   IonHeader,
   IonIcon,
+  IonInfiniteScroll,
+  IonInfiniteScrollContent,
+  InfiniteScrollCustomEvent,
   IonItem,
   IonItemOption,
   IonItemOptions,
@@ -29,6 +32,7 @@ import { addIcons } from 'ionicons';
 import { add, createOutline, trashOutline } from 'ionicons/icons';
 import { finalize } from 'rxjs';
 
+import { POKEDEX_PAGE_SIZE } from '../../core/constants/app.constants';
 import { dexNumber, displayName, spriteUrl } from '../../core/utils/pokemon-defaults';
 import { Pokemon } from '../../models/pokemon.model';
 import { filterRefs } from '../../services/poke-api.service';
@@ -60,6 +64,8 @@ import { TypeChipsComponent } from '../../shared/components/type-chips/type-chip
     IonIcon,
     IonFab,
     IonFabButton,
+    IonInfiniteScroll,
+    IonInfiniteScrollContent,
     IonRefresher,
     IonRefresherContent,
     IonSpinner,
@@ -78,7 +84,12 @@ export class PokedexPage {
   protected readonly error = signal<string | null>(null);
   protected readonly term = signal('');
 
+  /** Cuántos Pokémon se muestran: 20 al inicio y 20 más con cada scroll (HU-03). */
+  protected readonly shown = signal(POKEDEX_PAGE_SIZE);
+
   protected readonly filtered = computed(() => filterRefs(this.pokemon(), this.term()));
+  protected readonly visible = computed(() => this.filtered().slice(0, this.shown()));
+  protected readonly hasMore = computed(() => this.shown() < this.filtered().length);
 
   protected readonly dexNumber = dexNumber;
   protected readonly spriteUrl = spriteUrl;
@@ -112,7 +123,13 @@ export class PokedexPage {
       });
   }
 
+  protected loadMore(event: InfiniteScrollCustomEvent): void {
+    this.shown.update((n) => n + POKEDEX_PAGE_SIZE);
+    event.target.complete();
+  }
+
   protected onSearch(event: Event): void {
+    this.shown.set(POKEDEX_PAGE_SIZE);
     this.term.set((event as CustomEvent<{ value?: string | null }>).detail.value ?? '');
   }
 

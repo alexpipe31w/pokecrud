@@ -17,10 +17,12 @@ import {
   ViewWillEnter,
 } from '@ionic/angular';
 import { addIcons } from 'ionicons';
-import { createOutline, trashOutline } from 'ionicons/icons';
+import { createOutline, heartOutline, peopleOutline, trashOutline } from 'ionicons/icons';
+import { catchError, of } from 'rxjs';
 
 import { dexNumber, displayName } from '../../core/utils/pokemon-defaults';
 import { Pokemon, PokemonStats } from '../../models/pokemon.model';
+import { PokeApiService } from '../../services/poke-api.service';
 import { PokemonService } from '../../services/pokemon.service';
 import { UiService } from '../../services/ui.service';
 import { TypeChipsComponent } from '../../shared/components/type-chips/type-chips.component';
@@ -62,6 +64,7 @@ export class PokemonDetailPage implements ViewWillEnter {
   readonly id = input<string>();
 
   private readonly pokemonService = inject(PokemonService);
+  private readonly pokeApi = inject(PokeApiService);
   private readonly ui = inject(UiService);
   private readonly router = inject(Router);
   private readonly navCtrl = inject(NavController);
@@ -69,12 +72,14 @@ export class PokemonDetailPage implements ViewWillEnter {
   protected readonly pokemon = signal<Pokemon | null>(null);
   protected readonly loading = signal(true);
   protected readonly notFound = signal(false);
+  /** `null` mientras carga; texto vacío si PokéAPI no responde. */
+  protected readonly description = signal<string | null>(null);
 
   protected readonly statLabels = STAT_LABELS;
   protected readonly dexNumber = dexNumber;
 
   constructor() {
-    addIcons({ createOutline, trashOutline });
+    addIcons({ createOutline, trashOutline, heartOutline, peopleOutline });
   }
 
   ionViewWillEnter(): void {
@@ -85,6 +90,11 @@ export class PokemonDetailPage implements ViewWillEnter {
     const id = Number(this.id());
     this.loading.set(true);
     this.notFound.set(false);
+    this.description.set(null);
+    this.pokeApi
+      .getDescription(id)
+      .pipe(catchError(() => of('')))
+      .subscribe((d) => this.description.set(d));
     this.pokemonService.getById(id).subscribe({
       next: (p) => {
         this.pokemon.set(p);

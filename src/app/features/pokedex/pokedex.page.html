@@ -5,7 +5,7 @@
   <ion-toolbar>
     <ion-searchbar
       placeholder="Buscar por número o nombre"
-      [debounce]="200"
+      [debounce]="400"
       (ionInput)="onSearch($event)"
     ></ion-searchbar>
   </ion-toolbar>
@@ -32,7 +32,7 @@
     </p>
 
     <ion-list lines="full">
-      @for (p of filtered(); track p.id) {
+      @for (p of visible(); track p.id) {
         <ion-item-sliding #sliding>
           <ion-item button detail="true" (click)="open(p)">
             <ion-thumbnail slot="start">
@@ -63,11 +63,17 @@
           @if (pokemon().length === 0) {
             <p>No hay Pokémon guardados. Pulsa + para agregar uno.</p>
           } @else {
-            <p>Ningún Pokémon coincide con «{{ term() }}».</p>
+            <p>No se encontró ningún Pokémon.</p>
           }
         </div>
       }
     </ion-list>
+
+    <ion-infinite-scroll [disabled]="!hasMore()" (ionInfinite)="loadMore($any($event))">
+      <ion-infinite-scroll-content
+        loadingText="Cargando más Pokémon…"
+      ></ion-infinite-scroll-content>
+    </ion-infinite-scroll>
   }
 
   <ion-fab slot="fixed" vertical="bottom" horizontal="end">

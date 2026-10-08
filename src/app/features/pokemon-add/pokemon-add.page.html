@@ -13,7 +13,7 @@
     <ion-toolbar>
       <ion-searchbar
         placeholder="Número (1–151) o nombre"
-        [debounce]="250"
+        [debounce]="400"
         (ionInput)="onSearch($event)"
       ></ion-searchbar>
     </ion-toolbar>
@@ -63,7 +63,7 @@
         </ion-item>
       } @empty {
         <div class="state">
-          <p>Ningún Pokémon del 1 al 151 coincide con «{{ term() }}».</p>
+          <p>No se encontró ningún Pokémon (solo del 1 al 151).</p>
         </div>
       }
     </ion-list>

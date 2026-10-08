@@ -4,7 +4,7 @@ import { TestBed } from '@angular/core/testing';
 import { firstValueFrom } from 'rxjs';
 
 import { environment } from '../../environments/environment';
-import { PokeApiService, filterRefs } from './poke-api.service';
+import { PokeApiService, filterRefs, spanishDescription } from './poke-api.service';
 
 describe('PokeApiService', () => {
   let service: PokeApiService;
@@ -100,5 +100,22 @@ describe('filterRefs', () => {
 
   it('returns everything for an empty term', () => {
     expect(filterRefs(refs, '  ')).toHaveLength(3);
+  });
+});
+
+describe('spanishDescription', () => {
+  it('takes the last Spanish entry and cleans line breaks', () => {
+    const text = spanishDescription({
+      flavor_text_entries: [
+        { flavor_text: 'Old', language: { name: 'es' } },
+        { flavor_text: 'English', language: { name: 'en' } },
+        { flavor_text: 'Fue creado\npor un\fcientífico.', language: { name: 'es' } },
+      ],
+    });
+    expect(text).toBe('Fue creado por un científico.');
+  });
+
+  it('returns an empty string when there is no Spanish entry', () => {
+    expect(spanishDescription({ flavor_text_entries: [] })).toBe('');
   });
 });

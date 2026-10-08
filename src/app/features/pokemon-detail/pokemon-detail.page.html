@@ -61,6 +61,27 @@
     </section>
 
     <section class="block">
+      <h2>Descripción</h2>
+      @if (description() === null) {
+        <ion-spinner name="dots"></ion-spinner>
+      } @else {
+        <p>{{ description() || 'Sin descripción disponible.' }}</p>
+      }
+    </section>
+
+    <section class="actions">
+      <!-- Se habilitan en el Sprint 2 (HU-08 equipos, HU-12 favoritos). -->
+      <ion-button expand="block" fill="outline" disabled>
+        <ion-icon slot="start" name="heart-outline"></ion-icon>
+        Agregar a favoritos
+      </ion-button>
+      <ion-button expand="block" fill="outline" disabled>
+        <ion-icon slot="start" name="people-outline"></ion-icon>
+        Agregar a equipo
+      </ion-button>
+    </section>
+
+    <section class="block">
       <h2>Habilidades</h2>
       <p>
         @for (a of p.abilities; track a; let last = $last) {

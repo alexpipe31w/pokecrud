@@ -70,6 +70,18 @@
   }
 }
 
+.actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  padding: 0 16px;
+
+  ion-button {
+    margin: 0;
+    font-size: 0.8rem;
+  }
+}
+
 .stat {
   display: grid;
   grid-template-columns: 100px 40px 1fr;
