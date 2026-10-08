@@ -1,6 +1,6 @@
 # PokéCRUD
 
-App móvil/web hecha con **Angular + Ionic** que consulta la [PokéAPI](https://pokeapi.co/) y permite gestionar equipos, favoritos y Pokémon personalizados sobre un backend propio con **JSON Server**.
+App móvil/web hecha con **Angular + Ionic** que consulta la [PokéAPI](https://pokeapi.co/) y gestiona los primeros 151 Pokémon (listar, buscar, agregar, editar y eliminar) sobre un backend propio con **JSON Server**.
 
 Proyecto de la asignatura Ingeniería de Software, gestionado con Scrum en Jira (proyecto `IS`).
 
@@ -91,9 +91,8 @@ pokecrud/
 | `/pokemon/nuevo`      | Agregar: buscar en PokéAPI por número o nombre y formulario prellenado | HU-03               |
 | `/pokemon/:id`        | Detalle de un Pokémon (tipo, stats, precio, stock)                     | HU-04               |
 | `/pokemon/:id/editar` | Editar un Pokémon                                                      | HU-03               |
-| `/tabs/equipos`       | Mis Equipos                                                            | HU-08 a HU-11       |
-| `/tabs/favoritos`     | Favoritos                                                              | HU-12, HU-13        |
-| `/tabs/mis-pokemon`   | Pokémon personalizados                                                 | HU-15 a HU-18       |
+
+> Las secciones **Equipos**, **Favoritos** y **Mis Pokémon** están ocultas en esta entrega: no aparecen en la app ni tienen ruta. Su código sigue en `src/app/features/` y sus endpoints en el backend, por si se activan más adelante.
 
 ## Backend propio (JSON Server)
 

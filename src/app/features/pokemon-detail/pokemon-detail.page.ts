@@ -17,7 +17,7 @@ import {
   ViewWillEnter,
 } from '@ionic/angular';
 import { addIcons } from 'ionicons';
-import { createOutline, heartOutline, peopleOutline, trashOutline } from 'ionicons/icons';
+import { createOutline, trashOutline } from 'ionicons/icons';
 import { catchError, of } from 'rxjs';
 
 import { dexNumber, displayName } from '../../core/utils/pokemon-defaults';
@@ -79,7 +79,7 @@ export class PokemonDetailPage implements ViewWillEnter {
   protected readonly dexNumber = dexNumber;
 
   constructor() {
-    addIcons({ createOutline, trashOutline, heartOutline, peopleOutline });
+    addIcons({ createOutline, trashOutline });
   }
 
   ionViewWillEnter(): void {

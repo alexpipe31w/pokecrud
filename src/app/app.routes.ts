@@ -4,9 +4,6 @@ import { Routes } from '@angular/router';
  * Rutas raíz de PokéCRUD.
  *
  *  /tabs/pokedex      → Pokédex (listado)
- *  /tabs/equipos      → Mis Equipos
- *  /tabs/favoritos    → Favoritos
- *  /tabs/mis-pokemon  → Pokémon personalizados
  *  /pokemon/nuevo     → Agregar un Pokémon (buscador PokéAPI + formulario)
  *  /pokemon/:id       → Detalle de un Pokémon
  *  /pokemon/:id/editar → Editar un Pokémon
