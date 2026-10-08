@@ -10,7 +10,7 @@ export interface PokemonStats {
 
 /**
  * Pokémon guardado en el backend propio (`/pokemon`).
- * El `id` es el número de la Pokédex (1–151) y también el id de JSON Server.
+ * El `id` es el número de la Pokédex nacional y también el id de JSON Server.
  * `price` y `stock` no existen en PokéAPI: son datos propios de la app.
  */
 export interface Pokemon {

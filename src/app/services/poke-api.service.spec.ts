@@ -21,17 +21,20 @@ describe('PokeApiService', () => {
 
   afterEach(() => http.verify());
 
-  it('lists the first 151 with ids taken from the url', async () => {
-    const result = firstValueFrom(service.list151());
-    http.expectOne(`${base}/pokemon?limit=151`).flush({
+  it('lists every species (beyond #151) and leaves out special forms', async () => {
+    const result = firstValueFrom(service.listAll());
+    http.expectOne(`${base}/pokemon?limit=2000`).flush({
       results: [
         { name: 'bulbasaur', url: `${base}/pokemon/1/` },
-        { name: 'mewtwo', url: `${base}/pokemon/150/` },
+        { name: 'lucario', url: `${base}/pokemon/448/` },
+        { name: 'pecharunt', url: `${base}/pokemon/1025/` },
+        { name: 'charizard-mega-x', url: `${base}/pokemon/10034/` },
       ],
     });
     expect(await result).toEqual([
       { id: 1, name: 'bulbasaur' },
-      { id: 150, name: 'mewtwo' },
+      { id: 448, name: 'lucario' },
+      { id: 1025, name: 'pecharunt' },
     ]);
   });
 
@@ -70,15 +73,36 @@ describe('PokeApiService', () => {
     expect(draft.stats.specialAttack).toBe(154);
   });
 
-  it('rejects ids outside 1–151 without calling the API', async () => {
-    await expect(firstValueFrom(service.getById(152))).rejects.toThrow(/1 al 151/);
-    await expect(firstValueFrom(service.getById(0))).rejects.toThrow(/1 al 151/);
+  it('accepts pokemon after #151', async () => {
+    const result = firstValueFrom(service.getById(448));
+    http.expectOne(`${base}/pokemon/448`).flush({
+      id: 448,
+      name: 'lucario',
+      height: 12,
+      weight: 540,
+      base_experience: 184,
+      types: [
+        { slot: 2, type: { name: 'steel' } },
+        { slot: 1, type: { name: 'fighting' } },
+      ],
+      abilities: [],
+      stats: [],
+      sprites: { front_default: 'l.png' },
+    });
+    expect(await result).toMatchObject({ id: 448, types: ['fighting', 'steel'], price: 18400 });
   });
 
-  it('rejects a name that resolves to a pokemon after #151', async () => {
-    const result = firstValueFrom(service.getById('chikorita'));
-    http.expectOne(`${base}/pokemon/chikorita`).flush({ id: 152 });
-    await expect(result).rejects.toThrow(/1 al 151/);
+  it('rejects an empty or invalid id without calling the API', async () => {
+    await expect(firstValueFrom(service.getById(0))).rejects.toThrow(/válido/);
+    await expect(firstValueFrom(service.getById('  '))).rejects.toThrow(/válido/);
+  });
+
+  it('explains when PokéAPI does not know the pokemon', async () => {
+    const result = firstValueFrom(service.getById('agumon'));
+    http
+      .expectOne(`${base}/pokemon/agumon`)
+      .flush('Not Found', { status: 404, statusText: 'Not Found' });
+    await expect(result).rejects.toThrow(/No se encontró «agumon»/);
   });
 });
 

@@ -24,7 +24,6 @@ import {
   IonSpinner,
   IonText,
   IonThumbnail,
-  IonTitle,
   IonToolbar,
   RefresherCustomEvent,
 } from '@ionic/angular';
@@ -40,7 +39,7 @@ import { PokemonService } from '../../services/pokemon.service';
 import { UiService } from '../../services/ui.service';
 import { TypeChipsComponent } from '../../shared/components/type-chips/type-chips.component';
 
-/** Listado de los primeros 151 Pokémon guardados en la base de datos (IS-11 · HU-03). */
+/** Listado de los Pokémon guardados en la base de datos (IS-11 · HU-03). */
 @Component({
   selector: 'app-pokedex',
   templateUrl: 'pokedex.page.html',
@@ -50,7 +49,6 @@ import { TypeChipsComponent } from '../../shared/components/type-chips/type-chip
     TitleCasePipe,
     IonHeader,
     IonToolbar,
-    IonTitle,
     IonContent,
     IonSearchbar,
     IonList,
