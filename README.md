@@ -1,6 +1,6 @@
 # PokéCRUD
 
-App móvil/web hecha con **Angular + Ionic** que consulta la [PokéAPI](https://pokeapi.co/) y gestiona un inventario de Pokémon (listar, buscar, agregar, editar y eliminar) sobre un backend propio con **JSON Server**.
+App móvil/web hecha con **Angular + Ionic** que consulta la [PokéAPI](https://pokeapi.co/) y gestiona un inventario de Pokémon (listar, buscar, filtrar por tipo, agregar, editar y eliminar) sobre un backend propio con **JSON Server**.
 
 Proyecto de la asignatura Ingeniería de Software, gestionado con Scrum en Jira (proyecto `IS`).
 
@@ -72,11 +72,13 @@ pokecrud/
 │   ├── db.seed.json          # Datos de ejemplo (para npm run api:reset)
 │   └── postman/              # Colección de Postman con todas las peticiones
 ├── scripts/seed-151.mjs      # Precarga los 151 Pokémon desde PokéAPI
-├── docs/evidencias/          # Capturas que se adjuntan en Jira
+├── docs/
+│   ├── evidencias/           # Capturas que se adjuntan en Jira
+│   └── actas/                # Actas de Review y Retrospectiva
 └── src/
     ├── environments/         # pokeApiUrl y apiUrl
     └── app/
-        ├── core/             # Layout (pestañas), constantes e interceptores
+        ├── core/             # Layout (pestañas), constantes e interceptor de errores
         ├── shared/           # Componentes reutilizables
         ├── features/         # Una carpeta por pantalla
         ├── services/         # Servicios que consumen las APIs
@@ -87,12 +89,24 @@ pokecrud/
 
 | Ruta                  | Pantalla                                                               | Historia            |
 | --------------------- | ---------------------------------------------------------------------- | ------------------- |
-| `/tabs/pokedex`       | Pokédex (lista, buscar, editar, eliminar)                              | HU-03, HU-05, HU-14 |
+| `/tabs/pokedex`       | Pokédex (lista, buscar, filtrar por tipo, editar, eliminar)            | HU-03, HU-05, HU-14 |
 | `/pokemon/nuevo`      | Agregar: buscar en PokéAPI por número o nombre y formulario prellenado | HU-03               |
 | `/pokemon/:id`        | Detalle de un Pokémon (tipo, stats, precio, stock)                     | HU-04               |
 | `/pokemon/:id/editar` | Editar un Pokémon                                                      | HU-03               |
 
 > Las secciones **Equipos**, **Favoritos** y **Mis Pokémon** están ocultas en esta entrega: no aparecen en la app ni tienen ruta. Su código sigue en `src/app/features/` y sus endpoints en el backend, por si se activan más adelante.
+
+Si una petición falla (backend apagado, sin internet, error del servidor), el interceptor de errores (HU-07) muestra un mensaje amigable.
+
+## Documentación
+
+| Documento                                              | Contenido                                                         |
+| ------------------------------------------------------ | ----------------------------------------------------------------- |
+| [Manual de usuario](docs/manual-de-usuario.md)         | Cómo usar cada pantalla, con capturas                             |
+| [Documentación técnica](docs/documentacion-tecnica.md) | Arquitectura, servicios, interceptor, validaciones y backend      |
+| [Diagramas](docs/diagramas.md)                         | Casos de uso, arquitectura, modelo de datos y secuencia (Mermaid) |
+| [Plan de pruebas](docs/plan-de-pruebas.md)             | Casos de prueba funcionales, resultados y pruebas unitarias       |
+| [Actas de los sprints](docs/actas/)                    | Review y Retrospectiva de cada sprint, y plantilla                |
 
 ## Backend propio (JSON Server)
 
