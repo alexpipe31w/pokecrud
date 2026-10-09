@@ -1,4 +1,5 @@
 import { TitleCasePipe } from '@angular/common';
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, computed, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
@@ -100,9 +101,10 @@ export class PokemonAddPage {
         this.selected.set(draft);
         this.loadingDetail.set(false);
       },
-      error: (err: Error) => {
+      error: (err: unknown) => {
         this.loadingDetail.set(false);
-        this.ui.toast(err.message || 'No se pudo consultar PokéAPI', 'danger');
+        // Los errores HTTP ya los avisa el interceptor; aquí solo «No se encontró…» y similares.
+        if (!(err instanceof HttpErrorResponse)) this.ui.toast((err as Error).message, 'danger');
       },
     });
   }
@@ -132,10 +134,8 @@ export class PokemonAddPage {
         this.ui.toast(`${displayName(p.name)} agregado a la Pokédex`);
         this.navCtrl.navigateBack('/tabs/pokedex');
       },
-      error: () => {
-        this.saving.set(false);
-        this.ui.toast('No se pudo guardar. ¿Está corriendo `npm run api`?', 'danger');
-      },
+      // El interceptor de errores ya muestra el mensaje.
+      error: () => this.saving.set(false),
     });
   }
 }

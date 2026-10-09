@@ -72,10 +72,8 @@ export class PokemonEditPage implements ViewWillEnter {
         this.ui.toast(`${displayName(p.name)} actualizado`);
         this.navCtrl.navigateBack(['/pokemon', p.id]);
       },
-      error: () => {
-        this.saving.set(false);
-        this.ui.toast('No se pudo guardar los cambios', 'danger');
-      },
+      // El interceptor de errores ya muestra el mensaje.
+      error: () => this.saving.set(false),
     });
   }
 }

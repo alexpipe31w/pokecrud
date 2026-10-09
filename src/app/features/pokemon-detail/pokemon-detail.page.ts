@@ -128,7 +128,8 @@ export class PokemonDetailPage implements ViewWillEnter {
         this.ui.toast(`${displayName(p.name)} eliminado`);
         this.navCtrl.navigateBack('/tabs/pokedex');
       },
-      error: () => this.ui.toast('No se pudo eliminar', 'danger'),
+      // El interceptor de errores ya muestra el mensaje.
+      error: () => undefined,
     });
   }
 }

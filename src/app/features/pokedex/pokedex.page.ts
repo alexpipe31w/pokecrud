@@ -136,7 +136,7 @@ export class PokedexPage {
         next: (list) => this.pokemon.set(list),
         error: () =>
           this.error.set(
-            'No se pudo conectar con la base de datos. ¿Está corriendo `npm run api`?',
+            'No se pudo conectar con la base de datos. ¿Está corriendo «npm run api»?',
           ),
       });
   }
@@ -175,7 +175,8 @@ export class PokedexPage {
     if (!ok) return;
     this.pokemonService.delete(p.id).subscribe({
       next: () => this.ui.toast(`${displayName(p.name)} eliminado`),
-      error: () => this.ui.toast('No se pudo eliminar', 'danger'),
+      // El interceptor de errores ya muestra el mensaje.
+      error: () => undefined,
     });
   }
 
