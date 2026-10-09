@@ -32,6 +32,7 @@ import { add, createOutline, trashOutline } from 'ionicons/icons';
 import { finalize } from 'rxjs';
 
 import { POKEDEX_PAGE_SIZE } from '../../core/constants/app.constants';
+import { POKEMON_TYPES, POKEMON_TYPE_KEYS } from '../../core/constants/pokemon-types';
 import { dexNumber, displayName, spriteUrl } from '../../core/utils/pokemon-defaults';
 import { Pokemon } from '../../models/pokemon.model';
 import { filterRefs } from '../../services/poke-api.service';
@@ -39,7 +40,15 @@ import { PokemonService } from '../../services/pokemon.service';
 import { UiService } from '../../services/ui.service';
 import { TypeChipsComponent } from '../../shared/components/type-chips/type-chips.component';
 
-/** Listado de los Pokémon guardados en la base de datos (IS-11 · HU-03). */
+/** Deja solo los Pokémon que tienen el tipo indicado; sin tipo devuelve la lista completa (HU-14). */
+export function filterByType<T extends Pick<Pokemon, 'types'>>(
+  list: T[],
+  type: string | null,
+): T[] {
+  return type ? list.filter((p) => p.types.includes(type)) : list;
+}
+
+/** Listado de los Pokémon guardados en la base de datos (IS-11 · HU-03, HU-14). */
 @Component({
   selector: 'app-pokedex',
   templateUrl: 'pokedex.page.html',
@@ -81,16 +90,27 @@ export class PokedexPage {
   protected readonly loading = signal(true);
   protected readonly error = signal<string | null>(null);
   protected readonly term = signal('');
+  /** Tipo elegido en el filtro; `null` = todos (HU-14). */
+  protected readonly type = signal<string | null>(null);
 
   /** Cuántos Pokémon se muestran: 20 al inicio y 20 más con cada scroll (HU-03). */
   protected readonly shown = signal(POKEDEX_PAGE_SIZE);
 
-  protected readonly filtered = computed(() => filterRefs(this.pokemon(), this.term()));
+  /** Tipos que tiene al menos un Pokémon guardado, en el orden de POKEMON_TYPES. */
+  protected readonly availableTypes = computed(() => {
+    const present = new Set(this.pokemon().flatMap((p) => p.types));
+    return POKEMON_TYPE_KEYS.filter((t) => present.has(t));
+  });
+
+  protected readonly filtered = computed(() =>
+    filterByType(filterRefs(this.pokemon(), this.term()), this.type()),
+  );
   protected readonly visible = computed(() => this.filtered().slice(0, this.shown()));
   protected readonly hasMore = computed(() => this.shown() < this.filtered().length);
 
   protected readonly dexNumber = dexNumber;
   protected readonly spriteUrl = spriteUrl;
+  protected readonly types = POKEMON_TYPES;
 
   constructor() {
     addIcons({ add, createOutline, trashOutline });
@@ -129,6 +149,12 @@ export class PokedexPage {
   protected onSearch(event: Event): void {
     this.shown.set(POKEDEX_PAGE_SIZE);
     this.term.set((event as CustomEvent<{ value?: string | null }>).detail.value ?? '');
+  }
+
+  /** Elige un tipo; tocar el tipo ya elegido quita el filtro. */
+  protected selectType(type: string | null): void {
+    this.shown.set(POKEDEX_PAGE_SIZE);
+    this.type.set(type === this.type() ? null : type);
   }
 
   protected open(p: Pokemon): void {

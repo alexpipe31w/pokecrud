@@ -6,6 +6,34 @@
       (ionInput)="onSearch($event)"
     ></ion-searchbar>
   </ion-toolbar>
+  @if (availableTypes().length) {
+    <ion-toolbar>
+      <div class="type-filter" role="group" aria-label="Filtrar por tipo">
+        <button
+          type="button"
+          class="type-filter__chip"
+          [class.active]="!type()"
+          [attr.aria-pressed]="!type()"
+          style="--chip-color: var(--ion-color-primary)"
+          (click)="selectType(null)"
+        >
+          Todos
+        </button>
+        @for (t of availableTypes(); track t) {
+          <button
+            type="button"
+            class="type-filter__chip"
+            [class.active]="type() === t"
+            [attr.aria-pressed]="type() === t"
+            [style.--chip-color]="types[t].color"
+            (click)="selectType(t)"
+          >
+            {{ types[t].label }}
+          </button>
+        }
+      </div>
+    </ion-toolbar>
+  }
 </ion-header>
 
 <ion-content [fullscreen]="true">
@@ -24,8 +52,11 @@
     </div>
   } @else {
     <p class="count">
-      {{ filtered().length }} de {{ pokemon().length }} Pokémon · desliza un Pokémon para editarlo o
-      eliminarlo
+      {{ filtered().length }} de {{ pokemon().length }} Pokémon
+      @if (type(); as t) {
+        de tipo {{ types[t].label }}
+      }
+      · desliza un Pokémon para editarlo o eliminarlo
     </p>
 
     <ion-list lines="full">

@@ -54,3 +54,47 @@ ion-label {
 ion-list {
   padding-bottom: 80px;
 }
+
+/* Filtro por tipo (HU-14): fila de chips con scroll horizontal. */
+.type-filter {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding: 0 12px 8px;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* En pantallas anchas no hay gesto de deslizar: los chips bajan de línea. */
+  @media (min-width: 768px) {
+    flex-wrap: wrap;
+    overflow-x: visible;
+  }
+}
+
+.type-filter__chip {
+  --chip-color: var(--ion-color-medium);
+
+  flex: 0 0 auto;
+  padding: 6px 12px;
+  border: 1.5px solid var(--chip-color);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ion-text-color);
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+
+  &.active {
+    background: var(--chip-color);
+    color: #fff;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--ion-color-primary);
+    outline-offset: 2px;
+  }
+}
