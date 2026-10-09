@@ -65,4 +65,50 @@ describe('PokemonFormComponent', () => {
 
     expect(emitted).toHaveLength(0);
   });
+
+  describe('validaciones', () => {
+    const api = () =>
+      component as unknown as {
+        form: { patchValue(v: object): void; get(path: string): { errors: unknown } | null };
+        submit(): void;
+      };
+    const submitWith = (patch: object) => {
+      const emitted: PokemonDraft[] = [];
+      component.save.subscribe((p) => emitted.push(p));
+      api().form.patchValue(patch);
+      api().submit();
+      return emitted;
+    };
+
+    it('requires a name', () => {
+      expect(submitWith({ name: '' })).toHaveLength(0);
+      expect(api().form.get('name')?.errors).toMatchObject({ required: true });
+    });
+
+    it('requires at least one type', () => {
+      expect(submitWith({ types: [] })).toHaveLength(0);
+    });
+
+    it('keeps the stats between 1 and 255', () => {
+      expect(submitWith({ stats: { hp: 0 } })).toHaveLength(0);
+      expect(submitWith({ stats: { hp: 1, attack: 256 } })).toHaveLength(0);
+    });
+
+    it('rejects a negative price', () => {
+      expect(submitWith({ price: -5 })).toHaveLength(0);
+    });
+
+    it('normalizes the data before emitting', () => {
+      const [p] = submitWith({
+        name: '  PIKACHU ',
+        types: ['electric', 'fairy', 'steel'],
+        abilities: ' Static ,, Lightning-Rod ',
+        stock: 7.9,
+      });
+      expect(p.name).toBe('pikachu');
+      expect(p.types).toEqual(['electric', 'fairy']);
+      expect(p.abilities).toEqual(['static', 'lightning-rod']);
+      expect(p.stock).toBe(7);
+    });
+  });
 });
