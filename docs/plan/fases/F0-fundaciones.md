@@ -1307,10 +1307,10 @@ data: { revokedAt: now } })`; si `count === 0` → buscar por `tokenHash`: si ex
 - [x] **Paso 7: interceptor funcional** `authInterceptor`: añade `Authorization: Bearer` a peticiones a
       `environment.apiUrl` (nunca a PokéAPI/Google); ante 401 refresca una vez y repite; si el refresh falla →
       `logout()` y navegar a `/login`. Registrar con `provideHttpClient(withInterceptors([authInterceptor]))` en `main.ts`.
-- [ ] **Paso 8: `authGuard`** y rutas: `/login`, `/registro` públicas; el resto protegidas.
+- [x] **Paso 8: `authGuard`** y rutas: `/login`, `/registro` públicas; el resto protegidas.
       **Excepción temporal:** las rutas de IS-11 (`/tabs/pokedex`, `/pokemon/*`) quedan públicas hasta F0-08 para
       no romper la entrega evaluada; anotarlo en el PR.
-- [ ] **Paso 9: pantallas** `features/auth/login.page.ts` y `register.page.ts` con el sistema de diseño
+- [x] **Paso 9: pantallas** `features/auth/login.page.ts` y `register.page.ts` con el sistema de diseño
       (GlassPanel + GameButton, fondo ilustrado, errores en línea bajo cada campo, botón con estado de carga,
       mensajes en español: "Correo o contraseña incorrectos", "Ese apodo ya está en uso").
 - [ ] **Paso 10: verificar** — `npm run test:all`, lint, build; con el servidor local: registrarse, cerrar

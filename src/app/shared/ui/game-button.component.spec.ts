@@ -52,4 +52,25 @@ describe('GameButtonComponent', () => {
     expect(haptics.tap).not.toHaveBeenCalled();
     expect(audio.playSfx).not.toHaveBeenCalled();
   });
+
+  it('por defecto es type="button" y puede ser "submit" para enviar formularios', () => {
+    expect(button().type).toBe('button');
+    fixture.componentRef.setInput('type', 'submit');
+    fixture.detectChanges();
+    expect(button().type).toBe('submit');
+  });
+
+  it('cargando: se bloquea, avisa a los lectores de pantalla y no emite ni da feedback', () => {
+    const spy = vi.fn();
+    fixture.componentInstance.pressed.subscribe(spy);
+    fixture.componentRef.setInput('loading', true);
+    fixture.detectChanges();
+    expect(button().disabled).toBe(true);
+    expect(button().getAttribute('aria-busy')).toBe('true');
+    expect(fixture.nativeElement.querySelector('.gb__spinner')).not.toBeNull();
+    button().click();
+    pointerDown();
+    expect(spy).not.toHaveBeenCalled();
+    expect(haptics.tap).not.toHaveBeenCalled();
+  });
 });

@@ -1,6 +1,8 @@
 import { Component, inject, signal } from '@angular/core';
+import { Router } from '@angular/router';
 import { IonContent } from '@ionic/angular';
 
+import { AuthService } from '../../core/auth/auth.service';
 import { POKEMON_TYPE_KEYS } from '../../core/constants/pokemon-types';
 import { AudioService } from '../../services/game/audio.service';
 import { DatasetService } from '../../services/game/dataset.service';
@@ -42,6 +44,21 @@ const DEMO_MAX_HP = 120;
             Dataset: {{ dataset.status() }} · {{ dataset.species().size }} especies
           </p>
         </header>
+
+        @if (auth.player(); as player) {
+          <section>
+            <h2 class="section-title">Sesión</h2>
+            <app-glass-panel>
+              <div class="row session">
+                <p class="session__who" data-testid="session-player">
+                  <strong>{{ player.nickname }}</strong> · nivel {{ player.level }} ·
+                  {{ player.xp }} XP
+                </p>
+                <app-game-button label="Cerrar sesión" variant="glass" (pressed)="logout()" />
+              </div>
+            </app-glass-panel>
+          </section>
+        }
 
         <section>
           <h2 class="section-title">Botones</h2>
@@ -219,6 +236,13 @@ const DEMO_MAX_HP = 120;
       display: grid;
       gap: var(--s-2);
     }
+    .session {
+      align-items: center;
+      justify-content: space-between;
+    }
+    .session__who {
+      margin: 0;
+    }
     .dataset {
       margin: var(--s-2) 0 0;
       font-size: 0.875rem;
@@ -242,6 +266,8 @@ const DEMO_MAX_HP = 120;
 })
 export class DevUiPage {
   protected readonly dataset = inject(DatasetService);
+  protected readonly auth = inject(AuthService);
+  private readonly router = inject(Router);
   private readonly audio = inject(AudioService);
   protected readonly cryFailed = signal(false);
   /** Pikachu tal como viene del dataset (se ve en cuanto termina de cargar). */
@@ -263,6 +289,11 @@ export class DevUiPage {
 
   protected async playCry(): Promise<void> {
     this.cryFailed.set(!(await this.audio.playCry(25)));
+  }
+
+  protected async logout(): Promise<void> {
+    await this.auth.logout();
+    await this.router.navigateByUrl('/login');
   }
 
   protected reset(): void {

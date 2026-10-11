@@ -29,11 +29,11 @@ de otro integrante: constancia en cada PR). Servidor desplegado. Libres: **F0-07
 
 ## En curso
 
-- F0-07 (@samuel) · rama `feature/F0-07-auth` · **Punto de guardado 2026-10-11 18:15**: F0-07a (servidor) HECHO, pasos 1-4: `server/src/auth/`
+- F0-07 (@samuel) · rama `feature/F0-07-auth` · **Punto de guardado 2026-10-11 18:40**: F0-07a (servidor) HECHO, pasos 1-4: `server/src/auth/`
   (registro/login/refresh/logout/me, Argon2id, JWT HS256 15 min con iss/aud, refresh rotatorio con detección de robo,
-  límite 5/min por IP + 10 fallos/15 min por cuenta, guard global `@Public()`), e2e 18/18. App: pasos 5-7 hechos
-  (`core/auth/`: token-store, auth.service, auth.interceptor, auth.guard; `environment.serverUrl` nuevo); ahora en Paso 8-9
-  (rutas y pantallas login/registro); estado: compila ✅ (app 84/84). **Antes de mezclar: añadir `JWT_SECRET` en Render** (si no, el servidor no arranca).
+  límite 5/min por IP + 10 fallos/15 min por cuenta, guard global `@Public()`), e2e 18/18. App: pasos 5-9 hechos (`core/auth/`,
+  rutas con guards, /login y /registro, `src/theme/forms.scss`, panel de sesión en /dev/ui); ahora en Paso 10 (verificar en
+  navegador con el servidor local en el 3001); estado: compila ✅ (app 92/92). **Antes de mezclar: añadir `JWT_SECRET` en Render** (si no, el servidor no arranca).
 
 ## Siguiente paso concreto
 

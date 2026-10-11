@@ -61,6 +61,9 @@
   --shadow-lg: 0 18px 48px rgb(15 26 43 / 0.28); /* paneles grandes */
   --shadow-accent: 0 6px 18px rgb(255 77 77 / 0.35); /* botón principal */
   --track: rgb(15 26 43 / 0.12); /* fondo de barras (stats, PS) */
+  --danger-ink: #b3261e; /* texto de error sobre paneles: 6,1:1 sobre --paper (--danger da 2,9:1) */
+  --field-bg: rgb(255 255 255 / 0.7); /* campos de formulario */
+  --field-border: rgb(15 26 43 / 0.18);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -70,6 +73,9 @@
     --shadow-sm: 0 2px 8px rgb(0 0 0 / 0.35);
     --shadow-lg: 0 18px 48px rgb(0 0 0 / 0.55);
     --track: rgb(251 247 238 / 0.16);
+    --danger-ink: #ff8a8d; /* 7,7:1 sobre --ink */
+    --field-bg: rgb(15 26 43 / 0.55);
+    --field-border: rgb(251 247 238 / 0.22);
   }
 }
 
