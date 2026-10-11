@@ -26,8 +26,10 @@
 
 ## En curso
 
-- F0-02 (@samuel) · rama `feature/F0-02-dataset` · **Punto de guardado 2026-10-11**: tarea reclamada;
-  siguiente: Paso 1 del plan (`shared/data/dataset.types.ts`); estado: sin código aún.
+- F0-02 (@samuel) · rama `feature/F0-02-dataset` · **Punto de guardado 2026-10-11 14:05**: hechos pasos 1-6
+  (tipos, cliente con caché, script, `npm run dataset`, test que falla, `vitest.shared.config.ts` + `test:shared`
+  copiados de F0-03 Paso 1/3); ahora en Paso 7 (`npm run dataset`, reanudable desde `.cache/`); siguiente: Paso 8;
+  estado: compila ✅ (el test de `shared/` falla a propósito hasta generar el dataset).
 
 ## Siguiente paso concreto
 

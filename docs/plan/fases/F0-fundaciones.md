@@ -76,7 +76,7 @@ conflicto al mezclar, se resuelve conservando las dos partes.
 > crea ese archivo exactamente como está en F0-03 Paso 1 y avísalo en el PR (git resolverá el duplicado
 > idéntico sin conflicto).
 
-- [ ] **Paso 1: tipos del dataset** — `shared/data/dataset.types.ts`
+- [x] **Paso 1: tipos del dataset** — `shared/data/dataset.types.ts`
 
 ```ts
 // Tipos del dataset generado por scripts/build-dataset.mjs (src/assets/data/*.json).
@@ -186,7 +186,7 @@ export interface DatasetMeta {
 }
 ```
 
-- [ ] **Paso 2: cliente HTTP con caché** — `scripts/lib/pokeapi-fetch.mjs`
+- [x] **Paso 2: cliente HTTP con caché** — `scripts/lib/pokeapi-fetch.mjs`
 
 ```js
 // fetch a PokéAPI con: caché en disco (.cache/pokeapi), timeout, reintentos con backoff+jitter
@@ -254,7 +254,7 @@ export async function mapLimit(items, limit, fn, onProgress) {
 export const idFromUrl = (url) => Number(url.split('/').filter(Boolean).pop());
 ```
 
-- [ ] **Paso 3: el script** — `scripts/build-dataset.mjs`
+- [x] **Paso 3: el script** — `scripts/build-dataset.mjs`
 
 ```js
 // Genera src/assets/data/{pokedex,moves,types,meta}.json desde PokéAPI.
@@ -477,10 +477,10 @@ main().catch((err) => {
 });
 ```
 
-- [ ] **Paso 4: script npm** — en `package.json` → `"scripts"` añadir:
+- [x] **Paso 4: script npm** — en `package.json` → `"scripts"` añadir:
       `"dataset": "node scripts/build-dataset.mjs"`
 
-- [ ] **Paso 5: test que valida el dataset (escribirlo ANTES de generar)** — `shared/data/dataset.spec.ts`
+- [x] **Paso 5: test que valida el dataset (escribirlo ANTES de generar)** — `shared/data/dataset.spec.ts`
 
 ```ts
 import { readFileSync } from 'node:fs';
@@ -542,7 +542,7 @@ describe('dataset generado', () => {
 });
 ```
 
-- [ ] **Paso 6: ver que falla** — `npm run test:shared` → FALLA (no existe `pokedex.json`).
+- [x] **Paso 6: ver que falla** — `npm run test:shared` → FALLA (no existe `pokedex.json`).
 - [ ] **Paso 7: generar** — `npm run dataset`. La salida termina en `OK · pokedex … KB · …`.
       Si se corta, volver a lanzarlo: sigue desde la caché.
 - [ ] **Paso 8: ver que pasa** — `npm run test:shared` → 5 tests verdes. Pegar la salida en la bitácora.
