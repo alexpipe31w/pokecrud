@@ -36,7 +36,8 @@
 
 ## En curso
 
-- Nadie.
+- F0-05 (@samuel) · rama `feature/F0-05-servicios-base` (sale de `feature/F0-04-sistema-diseno`; PR #8-#10 sin mezclar)
+  · **Punto de guardado 2026-10-11**: tarea reclamada; siguiente: instalar idb y Paso 1 (SettingsService).
 
 ## Siguiente paso concreto
 

@@ -26,7 +26,7 @@
       autoalojada, componentes `GameButton`, `TypeChip`, `GlassPanel`, `StatBar`, `HpBar` con estados
       `:active`, háptico y sonido de toque; página `/dev/ui` que los muestra todos.
       Dep: F0-03. Criterio: captura móvil 390×844 de `/dev/ui` en la bitácora; sin colores sueltos fuera de tokens.
-- [ ] **F0-05 · Servicios base de la app** — `DatasetService` (carga + IndexedDB + `Map`),
+- [~] **F0-05 · Servicios base de la app** (@samuel, 2026-10-11) — `DatasetService` (carga + IndexedDB + `Map`),
       `AudioService` (buses, desbloqueo, caché de gritos), `HapticsService`, `SettingsService` (volúmenes,
       reducir efectos, modo joystick) con signals.
       Dep: F0-02, F0-03. Criterio: tests unitarios; en `/dev/ui` se oye el grito de un Pokémon al pulsar.
