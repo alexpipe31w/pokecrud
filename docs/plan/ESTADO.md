@@ -7,12 +7,13 @@
 
 ## Fase actual
 
-**F0 · Fundaciones** — F0-01 en `develop`; F0-02…F0-05 hechas en PR #8 → #9 → #10 → #11 (apilados, mezclar en ese
-orden); **F0-06 hecha salvo el despliegue** (falta Alex). Libres: F0-09 (dep F0-04); F0-07 en cuanto F0-04 y F0-06 estén.
+**F0 · Fundaciones** — F0-01…F0-05 en `develop` (PR #8-#11 mezclados el 2026-10-11 por Samuel, sin revisión de otro
+integrante: constancia en cada PR). **F0-06 mezclada (PR #12) salvo el despliegue en Render, que está haciendo Samuel en
+su propia cuenta.** Libres: **F0-07** auth (dep F0-04 + F0-06 ✅) y **F0-09** APK (dep F0-04 ✅).
 
 ## Hecho
 
-- **F0-06 (Samuel, rama propia desde `develop`):** `server/` con NestJS 12 ESM + Prisma 7.10 (`PrismaPg`, pool 5),
+- **F0-06 (Samuel, PR #12):** `server/` con NestJS 12 ESM + Prisma 7.10 (`PrismaPg`, pool 5),
   migración `init` **aplicada en Supabase** (tablas `Player` y `RefreshToken`), helmet, CORS con lista blanca,
   `ValidationPipe` estricto, rate limit 120/min por IP (salvo `/health`), logs JSON con `x-request-id`,
   `/health/live` y `/health/ready` (timeout 3 s → 503). Tests: 4 unitarios + 7 e2e contra la base real. D-017.
@@ -30,15 +31,15 @@ orden); **F0-06 hecha salvo el despliegue** (falta Alex). Libres: F0-09 (dep F0-
 
 ## Siguiente paso concreto
 
-1. **Alex:** revisar y mezclar **#8 → #9 → #10 → #11** (merge commit, no squash) y el PR de F0-06.
-2. **Alex:** desplegar `server/` en Render siguiendo `server/README.md` → anotar la URL aquí y pasar F0-06 a `[x]`.
-3. Siguiente tarea: **F0-07 auth** (dep F0-04 + F0-06: sacar la rama de `develop` cuando ambos estén mezclados)
-   o **F0-09 APK** (dep F0-04).
+1. **Samuel:** terminar el despliegue en Render (`server/README.md`) → anotar aquí la URL y la cuenta, poner `apiUrl`
+   en `src/environments/environment.prod.ts` y pasar F0-06 a `[x]`. En Render, cambiar la rama a `develop`.
+2. Siguiente tarea: **F0-07 auth** o **F0-09 APK**. Ya se sacan de `develop` (todo está mezclado).
+3. (Opcional) Que Alex o Kenneth revisen a posteriori los PR #8-#12.
 
 ## Bloqueos / roto / pendiente de humanos
 
-- **Despliegue de F0-06 (Alex):** crear el Web Service en Render (pasos y variables en `server/README.md`). Sin URL
-  pública todavía: la app no puede hablar con el servidor desde el móvil hasta entonces.
+- **Despliegue de F0-06 (en curso, Samuel, su propia cuenta de Render):** Web Service `pokecrud-server` desde la rama del
+  PR #12 (cambiar a `develop`). Sin URL pública confirmada todavía.
 - **Puerto 3000:** lo usa el JSON Server del curso (`npm run api`). Mientras conviva, el servidor Nest se arranca con
   `PORT=3001`. Desaparece en F0-08 (JSON Server archivado).
 - **Google Maps — HECHO (2026-10-11):** clave `pokecrud-maps-js` en la cuenta de Google Cloud de Alex

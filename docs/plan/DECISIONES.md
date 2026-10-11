@@ -26,6 +26,7 @@ se puede sustituir JSON Server por backend propio (NestJS) conservando los endpo
 Una sola librería 3D para las tres escenas. Fijar la versión exacta al instalar (F0-03) y anotarla aquí.
 Los Pokémon se representan con su arte oficial `home` en billboard + animación procedimental, no con
 modelos 3D: no hay modelos libres de las 1025 especies y así todas se ven con la misma calidad.
+**three fijado en 0.186.1** y `@types/three` en 0.186.0, ambos con versión exacta (F0-03, Samuel, 2026-10-11).
 
 ## D-004 · Backend NestJS + Prisma + PostgreSQL + Socket.IO (2026-10-11)
 
@@ -81,6 +82,27 @@ exige `prisma.config.ts` para la URL y el adaptador `@prisma/adapter-pg`. Sustit
 Las cuentas Claude Pro se cortan sin aviso al agotar el límite. Se guarda (commit WIP permitido + push + "Punto de
 guardado" en ESTADO.md) tras cada paso del plan y como mucho cada 20 min; un hook `Stop` lo hace cumplir. Quien
 retoma una tarea `[~]` trabaja sobre la rama del compañero, no crea otra.
+
+## D-014 · Alias `@shared/*` sin `baseUrl` (2026-10-11, Samuel)
+
+TypeScript 6 marca `baseUrl` como obsoleto, así que el alias es solo `"paths": { "@shared/*": ["./shared/*"] }` en
+`tsconfig.json` (las rutas se resuelven desde ese archivo). No añadir `baseUrl`. Los `*.spec.ts` de `shared/` se excluyen
+de `tsconfig.app.json` y `tsconfig.spec.json`: los corre `npm run test:shared` en Node, no `ng test` en jsdom.
+
+## D-015 · Fuente display: Fredoka y texto de los chips de tipo según contraste (2026-10-11, Samuel)
+
+Fuente display: **Fredoka** (OFL, `@fontsource/fredoka` 5.3.0 exacto, pesos 500/600/700; el 600 lo usa `GameButton`).
+Los colores de tipo salen solo de los tokens `--t-*` (una paleta). Como varios son claros, el texto del chip no es
+siempre blanco: `POKEMON_TYPES[t].text` es `var(--accent-ink)` (blanco) en lucha, veneno, fantasma, dragón y siniestro
+y `var(--ink)` en el resto. Con texto blanco 13 de 18 tipos no llegaban a AA (eléctrico 1,5:1); así todos ≥ 5,5:1.
+
+## D-016 · En los tests de la app, dependencias externas por token de inyección, no con `vi.mock` (2026-10-11, Samuel)
+
+`ng test` reutiliza la caché de módulos entre specs del mismo worker: si otro spec carga antes el módulo real
+(p. ej. `@capacitor/haptics` vía `GameButton`), el `vi.mock` de un spec posterior no llega al servicio y el test falla
+según el orden (pasó con HapticsService: 1 de 4 corridas). Por eso plugins y APIs del navegador se inyectan con un
+`InjectionToken` con `factory` por defecto (`HAPTICS_PLUGIN`, `AUDIO_CONTEXT_FACTORY`) y el test pasa un doble con
+`providers`. `vi.stubGlobal` (p. ej. `fetch`) sí es seguro.
 
 ## D-017 · Prisma 7.10: `prisma.config.ts` usa DIRECT_URL y vulnerabilidades de la CLI aceptadas (2026-10-11, Samuel)
 

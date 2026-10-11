@@ -14,19 +14,19 @@
 
 - [x] **F0-01 · Plan detallado de F0** (@alex, 2026-10-11) — escribir `docs/plan/fases/F0-fundaciones.md` con `writing-plans`.
       Dep: —. Criterio: cubre F0-02…F0-09 con archivos, código y comandos exactos.
-- [ ] **F0-02 · Dataset completo desde PokéAPI** — `scripts/build-dataset.mjs` + `src/assets/data/`
+- [x] **F0-02 · Dataset completo desde PokéAPI** (@samuel, 2026-10-11) — `scripts/build-dataset.mjs` + `src/assets/data/`
       (`pokedex.json`, `moves.json`, `types.json`) según ARQUITECTURA §3.
       Dep: F0-01. Criterio: 1025 especies con nombre y descripción en español (fallback inglés si no hay),
       tipos, stats, captureRate, evolución, learnset; script reanudable con caché; tamaño medido y anotado;
       test que valida forma y conteo.
-- [ ] **F0-03 · `shared/` + tooling** — carpeta `shared/` con alias `@shared/*` en `tsconfig.json`,
+- [x] **F0-03 · `shared/` + tooling** (@samuel, 2026-10-11) — carpeta `shared/` con alias `@shared/*` en `tsconfig.json`,
       Vitest corriendo `shared/**/*.spec.ts`, instalar `three` (versión exacta en D-003).
       Dep: F0-01. Criterio: `npm test` ejecuta un spec de `shared/` y uno de `src/`; build OK.
-- [ ] **F0-04 · Sistema de diseño base** — `src/theme/tokens.scss` (DISENO §2), fuente display
+- [x] **F0-04 · Sistema de diseño base** (@samuel, 2026-10-11) — `src/theme/tokens.scss` (DISENO §2), fuente display
       autoalojada, componentes `GameButton`, `TypeChip`, `GlassPanel`, `StatBar`, `HpBar` con estados
       `:active`, háptico y sonido de toque; página `/dev/ui` que los muestra todos.
       Dep: F0-03. Criterio: captura móvil 390×844 de `/dev/ui` en la bitácora; sin colores sueltos fuera de tokens.
-- [ ] **F0-05 · Servicios base de la app** — `DatasetService` (carga + IndexedDB + `Map`),
+- [x] **F0-05 · Servicios base de la app** (@samuel, 2026-10-11) — `DatasetService` (carga + IndexedDB + `Map`),
       `AudioService` (buses, desbloqueo, caché de gritos), `HapticsService`, `SettingsService` (volúmenes,
       reducir efectos, modo joystick) con signals.
       Dep: F0-02, F0-03. Criterio: tests unitarios; en `/dev/ui` se oye el grito de un Pokémon al pulsar.
@@ -35,7 +35,7 @@
       `RefreshToken`. Elegir y documentar dónde se despliega (Render + Supabase propuesto).
       Dep: F0-01. Criterio: `npm run start:dev` en `server/` responde `/health`; migración aplicada; desplegado
       con URL anotada en ESTADO.md.
-      **Falta (Alex):** desplegar en Render (Paso 9; pasos exactos en `server/README.md`) y anotar la URL en ESTADO.md
+      **Falta:** desplegar en Render (Paso 9, en curso por Samuel; pasos en `server/README.md`) y anotar la URL en ESTADO.md
       y en `environment.prod.ts`. Todo lo demás está hecho y probado (ver BITACORA 2026-10-11 · F0-06).
 - [ ] **F0-07 · Auth completo** — registro/login/refresh/logout (argon2id, JWT 15 min, refresh rotatorio),
       rate limit en login, pantalla de login/registro con el sistema de diseño, guard en la app, interceptor

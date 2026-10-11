@@ -76,7 +76,7 @@ conflicto al mezclar, se resuelve conservando las dos partes.
 > crea ese archivo exactamente como está en F0-03 Paso 1 y avísalo en el PR (git resolverá el duplicado
 > idéntico sin conflicto).
 
-- [ ] **Paso 1: tipos del dataset** — `shared/data/dataset.types.ts`
+- [x] **Paso 1: tipos del dataset** — `shared/data/dataset.types.ts`
 
 ```ts
 // Tipos del dataset generado por scripts/build-dataset.mjs (src/assets/data/*.json).
@@ -186,7 +186,7 @@ export interface DatasetMeta {
 }
 ```
 
-- [ ] **Paso 2: cliente HTTP con caché** — `scripts/lib/pokeapi-fetch.mjs`
+- [x] **Paso 2: cliente HTTP con caché** — `scripts/lib/pokeapi-fetch.mjs`
 
 ```js
 // fetch a PokéAPI con: caché en disco (.cache/pokeapi), timeout, reintentos con backoff+jitter
@@ -254,7 +254,7 @@ export async function mapLimit(items, limit, fn, onProgress) {
 export const idFromUrl = (url) => Number(url.split('/').filter(Boolean).pop());
 ```
 
-- [ ] **Paso 3: el script** — `scripts/build-dataset.mjs`
+- [x] **Paso 3: el script** — `scripts/build-dataset.mjs`
 
 ```js
 // Genera src/assets/data/{pokedex,moves,types,meta}.json desde PokéAPI.
@@ -477,10 +477,10 @@ main().catch((err) => {
 });
 ```
 
-- [ ] **Paso 4: script npm** — en `package.json` → `"scripts"` añadir:
+- [x] **Paso 4: script npm** — en `package.json` → `"scripts"` añadir:
       `"dataset": "node scripts/build-dataset.mjs"`
 
-- [ ] **Paso 5: test que valida el dataset (escribirlo ANTES de generar)** — `shared/data/dataset.spec.ts`
+- [x] **Paso 5: test que valida el dataset (escribirlo ANTES de generar)** — `shared/data/dataset.spec.ts`
 
 ```ts
 import { readFileSync } from 'node:fs';
@@ -542,13 +542,13 @@ describe('dataset generado', () => {
 });
 ```
 
-- [ ] **Paso 6: ver que falla** — `npm run test:shared` → FALLA (no existe `pokedex.json`).
-- [ ] **Paso 7: generar** — `npm run dataset`. La salida termina en `OK · pokedex … KB · …`.
+- [x] **Paso 6: ver que falla** — `npm run test:shared` → FALLA (no existe `pokedex.json`).
+- [x] **Paso 7: generar** — `npm run dataset`. La salida termina en `OK · pokedex … KB · …`.
       Si se corta, volver a lanzarlo: sigue desde la caché.
-- [ ] **Paso 8: ver que pasa** — `npm run test:shared` → 5 tests verdes. Pegar la salida en la bitácora.
-- [ ] **Paso 9: tamaño** — anotar en la bitácora los KB de la línea `OK`. Si `pokedex.json` > 3 MB,
+- [x] **Paso 8: ver que pasa** — `npm run test:shared` → 5 tests verdes. Pegar la salida en la bitácora.
+- [x] **Paso 9: tamaño** — anotar en la bitácora los KB de la línea `OK`. Si `pokedex.json` > 3 MB,
       abrir tarea nueva en ROADMAP "partir dataset por generación" (ARQUITECTURA §3); no hacerlo aquí.
-- [ ] **Paso 10: commit** — `git add scripts shared/data src/assets/data package.json` y
+- [x] **Paso 10: commit** — `git add scripts shared/data src/assets/data package.json` y
       `git commit -m "F0-02: dataset de las 1025 especies desde PokéAPI"`. NO añadir `.cache/`.
 
 ---
@@ -562,7 +562,7 @@ describe('dataset generado', () => {
 (el tiempo y el azar se inyectan). Los imports relativos llevan sufijo **`.js`** (`./rng.js`): así
 compila igual en la app (bundler), en Vitest y en el servidor ESM (nodenext).
 
-- [ ] **Paso 1: config de Vitest para `shared/`** — `vitest.shared.config.ts` (raíz)
+- [x] **Paso 1: config de Vitest para `shared/`** — `vitest.shared.config.ts` (raíz)
 
 ```ts
 import { defineConfig } from 'vitest/config';
@@ -577,7 +577,7 @@ export default defineConfig({
 });
 ```
 
-- [ ] **Paso 2: `shared/tsconfig.json`** (para el editor y `tsc --noEmit`)
+- [x] **Paso 2: `shared/tsconfig.json`** (para el editor y `tsc --noEmit`)
 
 ```json
 {
@@ -589,11 +589,11 @@ export default defineConfig({
 
 Instalar tipos de Node si faltan: `npm install -D @types/node@24`.
 
-- [ ] **Paso 3: scripts** — en `package.json`:
+- [x] **Paso 3: scripts** — en `package.json`:
       `"test:shared": "vitest run --config vitest.shared.config.ts"`,
       `"test:all": "ng test --watch=false && npm run test:shared"`.
 
-- [ ] **Paso 4: test del RNG (falla primero)** — `shared/engine/rng.spec.ts`
+- [x] **Paso 4: test del RNG (falla primero)** — `shared/engine/rng.spec.ts`
 
 ```ts
 import { createRng, hashString } from './rng.js';
@@ -637,8 +637,8 @@ describe('rng', () => {
 });
 ```
 
-- [ ] **Paso 5:** `npm run test:shared` → FALLA (`rng.js` no existe).
-- [ ] **Paso 6: implementación** — `shared/engine/rng.ts`
+- [x] **Paso 5:** `npm run test:shared` → FALLA (`rng.js` no existe).
+- [x] **Paso 6: implementación** — `shared/engine/rng.ts`
 
 ```ts
 /** PRNG determinista (mulberry32). Nunca usar Math.random en shared/: el azar se siembra. */
@@ -681,12 +681,12 @@ export function hashString(input: string): number {
 }
 ```
 
-- [ ] **Paso 7:** `npm run test:shared` → verde.
-- [ ] **Paso 8: alias e inclusión en la app** — `tsconfig.json` → `compilerOptions` añadir
+- [x] **Paso 7:** `npm run test:shared` → verde.
+- [x] **Paso 8: alias e inclusión en la app** — `tsconfig.json` → `compilerOptions` añadir
       `"baseUrl": "."` y `"paths": { "@shared/*": ["shared/*"] }`.
       `tsconfig.app.json` → `"include": ["src/**/*.d.ts", "shared/**/*.ts"]` y añadir
       `"exclude": ["shared/**/*.spec.ts"]`. (Sin esto Angular da _"is missing from the TypeScript compilation"_.)
-- [ ] **Paso 9: prueba de integración del alias** — en `src/app/core/utils/pokemon-defaults.ts` NO tocar
+- [x] **Paso 9: prueba de integración del alias** — en `src/app/core/utils/pokemon-defaults.ts` NO tocar
       nada; en su lugar crear `src/app/core/utils/shared-alias.spec.ts`:
 
 ```ts
@@ -701,10 +701,10 @@ describe('alias @shared', () => {
 
 Añadir `"shared/**/*.ts"` al `include` de `tsconfig.spec.json`.
 
-- [ ] **Paso 10: three** — `npm install three@0.186.1 && npm install -D @types/three@0.186.0`.
+- [x] **Paso 10: three** — `npm install three@0.186.1 && npm install -D @types/three@0.186.0`.
       Anotar en DECISIONES D-003: "three fijado en 0.186.1 (F0-03)".
-- [ ] **Paso 11: verificar todo** — `npm run test:all`, `npm run lint`, `npm run build`. Las tres en verde.
-- [ ] **Paso 12: commit** — `F0-03: shared/ con RNG determinista, vitest de shared y alias @shared`.
+- [x] **Paso 11: verificar todo** — `npm run test:all`, `npm run lint`, `npm run build`. Las tres en verde.
+- [x] **Paso 12: commit** — `F0-03: shared/ con RNG determinista, vitest de shared y alias @shared`.
 
 ---
 
@@ -718,7 +718,7 @@ Añadir `"shared/**/*.ts"` al `include` de `tsconfig.spec.json`.
 **Lee antes `docs/plan/DISENO.md` entero.** Si tienes la skill `impeccable`, úsala para el escaparate;
 si no, DISENO.md manda.
 
-- [ ] **Paso 1: tokens** — `src/theme/tokens.scss` con el bloque `:root` de DISENO.md §2 tal cual, más:
+- [x] **Paso 1: tokens** — `src/theme/tokens.scss` con el bloque `:root` de DISENO.md §2 tal cual, más:
 
 ```scss
 :root {
@@ -745,14 +745,14 @@ si no, DISENO.md manda.
 }
 ```
 
-- [ ] **Paso 2: fuente** — `npm install @fontsource/fredoka@5.3.0`. En `src/global.scss`, tras los
+- [x] **Paso 2: fuente** — `npm install @fontsource/fredoka@5.3.0`. En `src/global.scss`, tras los
       imports de Ionic: `@import '@fontsource/fredoka/500.css'; @import '@fontsource/fredoka/700.css';
 @import './theme/tokens.scss';` y `--font-display: 'Fredoka', system-ui, sans-serif;` en `:root`.
       Anotar en DECISIONES: "Fuente display: Fredoka (OFL, @fontsource 5.3.0)".
-- [ ] **Paso 3: colores de tipo en un solo sitio** — `pokemon-types.ts` ya tiene colores (IS-11). Hacer
+- [x] **Paso 3: colores de tipo en un solo sitio** — `pokemon-types.ts` ya tiene colores (IS-11). Hacer
       que `color` lea el token: cambiar cada `color: '#…'` por `color: 'var(--t-<tipo>)'` y comprobar que los
       chips de IS-11 se siguen viendo (Pokédex). Así no hay dos paletas.
-- [ ] **Paso 4: test de GameButton (falla primero)** — `src/app/shared/ui/game-button.component.spec.ts`
+- [x] **Paso 4: test de GameButton (falla primero)** — `src/app/shared/ui/game-button.component.spec.ts`
 
 ```ts
 import { ComponentFixture, TestBed } from '@angular/core/testing';
@@ -783,7 +783,7 @@ describe('GameButtonComponent', () => {
 });
 ```
 
-- [ ] **Paso 5: GameButton** — `src/app/shared/ui/game-button.component.ts`
+- [x] **Paso 5: GameButton** — `src/app/shared/ui/game-button.component.ts`
 
 ```ts
 import { Component, input, output } from '@angular/core';
@@ -852,7 +852,7 @@ export class GameButtonComponent {
 
 (El háptico y el clic de sonido se enchufan en F0-05 Paso 9, cuando existan los servicios.)
 
-- [ ] **Paso 6: GlassPanel, StatBar, HpBar** — mismo patrón (test primero, luego componente):
+- [x] **Paso 6: GlassPanel, StatBar, HpBar** — mismo patrón (test primero, luego componente):
   - `app-glass-panel`: `<ng-content/>` con fondo `var(--surface)`, `backdrop-filter: blur(20px) saturate(160%)`,
     borde superior `1px solid rgb(255 255 255 / 0.35)`, radio `var(--r-card)`, sombra según `size` (`'sm'|'lg'`).
     Test: proyecta contenido y aplica la clase de tamaño.
@@ -860,14 +860,14 @@ export class GameButtonComponent {
     (nunca animar `width`), número con `tabular-nums`. Test: `scaleX` correcto para 128/255 y tope en 1.
   - `app-hp-bar`: inputs `current`, `max`; color verde >50 %, amarillo 20–50 %, rojo <20 %
     (`--success`/`--gold`/`--danger`); transición de `transform` 400 ms `--ease-out`. Test: color por umbral.
-- [ ] **Paso 7: escaparate `/dev/ui`** — `src/app/features/dev-ui/dev-ui.page.ts` (standalone) que muestra
+- [x] **Paso 7: escaparate `/dev/ui`** — `src/app/features/dev-ui/dev-ui.page.ts` (standalone) que muestra
       los 3 botones, un GlassPanel con StatBars de Pikachu (35/55/40/50/50/90), HpBars al 80/35/10 % y los
       chips de los 18 tipos. Ruta en `app.routes.ts`: `{ path: 'dev/ui', loadComponent: () => import(...) }`
       ANTES del `'**'`.
-- [ ] **Paso 8: verificar** — `npm run test:all`, `npm run lint`, `npm run build`; `npx ionic serve`, abrir
+- [x] **Paso 8: verificar** — `npm run test:all`, `npm run lint`, `npm run build`; `npx ionic serve`, abrir
       `http://localhost:8100/dev/ui` en vista móvil 390×844 (DevTools o skill `webapp-testing`), captura a
       `docs/evidencias/F0-04_01_dev-ui.png`. Revisar con la checklist de DISENO §4 (sin `transition: all`, sin `scale(0)`).
-- [ ] **Paso 9: commit** — `F0-04: tokens, fuente y componentes base del juego + /dev/ui`.
+- [x] **Paso 9: commit** — `F0-04: tokens, fuente y componentes base del juego + /dev/ui`.
 
 ---
 
@@ -879,7 +879,7 @@ export class GameButtonComponent {
 
 Instalar: `npm install idb@8.0.4 && npm install -D fake-indexeddb@6.2.5`.
 
-- [ ] **Paso 1: SettingsService (test → código)**
+- [x] **Paso 1: SettingsService (test → código)**
 
 ```ts
 // settings.service.ts
@@ -937,7 +937,7 @@ export class SettingsService {
 Test: valores por defecto; `update` persiste (`TestBed.flushEffects()` y leer `localStorage`);
 JSON corrupto en `localStorage` → defaults.
 
-- [ ] **Paso 2: HapticsService**
+- [x] **Paso 2: HapticsService**
 
 ```ts
 // haptics.service.ts
@@ -972,7 +972,7 @@ export class HapticsService {
 
 Test: con `haptics: false` no llama a `Haptics.impact` (`vi.mock('@capacitor/haptics', …)`).
 
-- [ ] **Paso 3: AudioService** — buses `music | sfx | cries` con `GainNode` ligado a los volúmenes de
+- [x] **Paso 3: AudioService** — buses `music | sfx | cries` con `GainNode` ligado a los volúmenes de
       `SettingsService` (un `effect`), `unlock()` que hace `ctx.resume()` en el primer `pointerdown` del
       documento, `playSfx(name)` con buffers pre-decodificados desde `assets/audio/sfx/<name>.ogg`
       (si el archivo no existe: `console.warn` una vez y seguir; F2-08 traerá los sonidos), y
@@ -983,7 +983,7 @@ Test: con `haptics: false` no llama a `Haptics.impact` (`vi.mock('@capacitor/hap
       `AUDIO_CONTEXT_FACTORY` para poder pasar un doble). Test: LRU expulsa el más antiguo al pasar de 30;
       un fallo de red en `playCry` no lanza (se registra y resuelve `false`).
 
-- [ ] **Paso 4: DatasetService**
+- [x] **Paso 4: DatasetService**
 
 ```ts
 // dataset.service.ts (esqueleto obligatorio; completar los métodos marcados)
@@ -1073,14 +1073,14 @@ Test (con `import 'fake-indexeddb/auto'` al inicio del spec y `HttpTestingContro
    `meta.json` (lee de IndexedDB); 3) `version` distinta → vuelve a descargar; 4) error HTTP → `status='error'`;
 2. dos `load()` simultáneos → una sola descarga.
 
-- [ ] **Paso 5: cargar al arrancar** — en `AppComponent` llamar `inject(DatasetService).load()` en el constructor.
-- [ ] **Paso 6: GameButton con feedback** — inyectar `HapticsService` y `AudioService`; en `(pointerdown)`
+- [x] **Paso 5: cargar al arrancar** — en `AppComponent` llamar `inject(DatasetService).load()` en el constructor.
+- [x] **Paso 6: GameButton con feedback** — inyectar `HapticsService` y `AudioService`; en `(pointerdown)`
       llamar `haptics.tap()` y `audio.playSfx('tap')` (mismo frame que el `:active`). Actualizar su spec con dobles.
-- [ ] **Paso 7: `/dev/ui`** — botón "Oír a Pikachu" → `audio.playCry(25)`; texto con
+- [x] **Paso 7: `/dev/ui`** — botón "Oír a Pikachu" → `audio.playCry(25)`; texto con
       `dataset.status()` y `dataset.species().size`.
-- [ ] **Paso 8: verificar** — `npm run test:all`, lint, build; en `/dev/ui` se oye el grito al pulsar y
+- [x] **Paso 8: verificar** — `npm run test:all`, lint, build; en `/dev/ui` se oye el grito al pulsar y
       muestra `ready · 1025`. Recargar: la segunda vez no aparecen peticiones a `pokedex.json` en la pestaña Red.
-- [ ] **Paso 9: commit** — `F0-05: servicios de dataset, audio, hápticos y ajustes`.
+- [x] **Paso 9: commit** — `F0-05: servicios de dataset, audio, hápticos y ajustes`.
 
 ---
 

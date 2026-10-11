@@ -7,6 +7,7 @@ import { Routes } from '@angular/router';
  *  /pokemon/nuevo     → Agregar un Pokémon (buscador PokéAPI + formulario)
  *  /pokemon/:id       → Detalle de un Pokémon
  *  /pokemon/:id/editar → Editar un Pokémon
+ *  /dev/ui            → Escaparate del sistema de diseño (solo desarrollo)
  */
 export const routes: Routes = [
   {
@@ -23,6 +24,10 @@ export const routes: Routes = [
     path: 'pokemon/:id',
     loadComponent: () =>
       import('./features/pokemon-detail/pokemon-detail.page').then((m) => m.PokemonDetailPage),
+  },
+  {
+    path: 'dev/ui',
+    loadComponent: () => import('./features/dev-ui/dev-ui.page').then((m) => m.DevUiPage),
   },
   {
     path: '',
