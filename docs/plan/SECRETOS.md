@@ -5,10 +5,10 @@
 
 ## Qué secretos hay y dónde van
 
-| Archivo (ruta exacta)                     | Qué contiene                                            | Plantilla sin valores                         |
-| ----------------------------------------- | ------------------------------------------------------- | --------------------------------------------- |
-| `src/environments/environment.local.ts`   | Clave de Google Maps (`googleMapsApiKey`) y Map ID      | `src/environments/environment.local.example.ts` |
-| `server/.env`                             | `DATABASE_URL` y `DIRECT_URL` de Supabase (con contraseña) | `server/.env.example`                         |
+| Archivo (ruta exacta)                   | Qué contiene                                               | Plantilla sin valores                           |
+| --------------------------------------- | ---------------------------------------------------------- | ----------------------------------------------- |
+| `src/environments/environment.local.ts` | Clave de Google Maps (`googleMapsApiKey`) y Map ID         | `src/environments/environment.local.example.ts` |
+| `server/.env`                           | `DATABASE_URL` y `DIRECT_URL` de Supabase (con contraseña) | `server/.env.example`                           |
 
 Los dos están en `.gitignore`. Alex los pasa **por privado** (WhatsApp/DM) a cada integrante.
 Nunca por el grupo, Jira, GitHub, issues, PRs ni capturas.

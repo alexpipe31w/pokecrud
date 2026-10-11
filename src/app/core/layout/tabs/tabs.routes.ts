@@ -12,20 +12,7 @@ export const routes: Routes = [
         loadComponent: () =>
           import('../../../features/pokedex/pokedex.page').then((m) => m.PokedexPage),
       },
-      {
-        path: 'equipos',
-        loadComponent: () => import('../../../features/teams/teams.page').then((m) => m.TeamsPage),
-      },
-      {
-        path: 'favoritos',
-        loadComponent: () =>
-          import('../../../features/favorites/favorites.page').then((m) => m.FavoritesPage),
-      },
-      {
-        path: 'mis-pokemon',
-        loadComponent: () =>
-          import('../../../features/my-pokemon/my-pokemon.page').then((m) => m.MyPokemonPage),
-      },
+      // Equipos, Favoritos y Mis Pokémon están ocultos en esta entrega (ver tabs.page.html).
       {
         path: '',
         redirectTo: '/tabs/pokedex',

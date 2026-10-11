@@ -1,7 +1,5 @@
 import { Component } from '@angular/core';
-import { IonIcon, IonLabel, IonTabBar, IonTabButton, IonTabs } from '@ionic/angular';
-import { addIcons } from 'ionicons';
-import { heartOutline, listOutline, peopleOutline, sparklesOutline } from 'ionicons/icons';
+import { IonTabs } from '@ionic/angular';
 
 /**
  * Contenedor de pestañas de la app.
@@ -10,10 +8,6 @@ import { heartOutline, listOutline, peopleOutline, sparklesOutline } from 'ionic
 @Component({
   selector: 'app-tabs',
   templateUrl: 'tabs.page.html',
-  imports: [IonTabs, IonTabBar, IonTabButton, IonIcon, IonLabel],
+  imports: [IonTabs],
 })
-export class TabsPage {
-  constructor() {
-    addIcons({ listOutline, peopleOutline, heartOutline, sparklesOutline });
-  }
-}
+export class TabsPage {}

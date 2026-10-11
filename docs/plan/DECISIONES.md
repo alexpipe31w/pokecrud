@@ -5,10 +5,15 @@
 
 ## D-001 · No se empieza de cero: se reaprovecha el repo y se rehace la app (2026-10-11, Alex + Claude)
 
-El repo solo tenía el esqueleto (5 pantallas placeholder, JSON Server, proceso Scrum/Git ya evaluado).
+El repo tenía el proceso Scrum/Git, JSON Server y la entrega IS-11 de Samuel (08-10): Pokédex/inventario con
+CRUD sobre `/pokemon` (151 sembrados, con `price` y `stock`), detalle, agregar desde PokéAPI, editar, búsqueda,
+scroll infinito, servicios con tests (HU-03, HU-04, HU-05). _Corrección 2026-10-11: la primera versión de esta
+decisión decía "solo placeholders" porque se revisó un `develop` local sin actualizar._
 **Decisión:** se conserva el repo, el historial, Jira, el flujo de ramas, la DoD, Angular+Ionic+Capacitor
 y el CRUD del curso; se rehace por completo la experiencia (mapa como pantalla principal, sin pestañas).
-**Por qué:** "empezar de cero" no ahorra nada (no hay código de app que tirar) y sí perdería el
+El código de IS-11 (servicios `PokeApiService`/`PokemonService`, modelo, formulario, tests) **se reutiliza**: lo
+que cambia es la presentación (DISENO.md) y la navegación.
+**Por qué:** "empezar de cero" no ahorra nada (hay código útil y probado) y sí perdería el
 historial que el profe ya vio. Lo "básico y feo" era la idea, no la base técnica.
 
 ## D-002 · Stack de la app: Angular 22 + Ionic 9 + Capacitor 8 (2026-10-11)

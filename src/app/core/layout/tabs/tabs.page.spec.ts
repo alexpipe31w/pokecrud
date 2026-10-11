@@ -20,8 +20,7 @@ describe('TabsPage', () => {
     expect(fixture.componentInstance).toBeTruthy();
   });
 
-  it('should render the 4 tabs', () => {
-    const buttons = fixture.nativeElement.querySelectorAll('ion-tab-button');
-    expect(buttons.length).toBe(4);
+  it('does not show the hidden sections (Equipos, Favoritos, Mis Pokémon)', () => {
+    expect(fixture.nativeElement.querySelectorAll('ion-tab-button').length).toBe(0);
   });
 });

@@ -1,0 +1,27 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button [defaultHref]="'/pokemon/' + id()" text="Cancelar"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Editar {{ pokemon() ? (pokemon()!.name | titlecase) : '' }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  @if (loading()) {
+    <div class="ion-padding ion-text-center"><ion-spinner name="crescent"></ion-spinner></div>
+  } @else if (pokemon(); as p) {
+    <app-pokemon-form
+      [initial]="p"
+      submitLabel="Guardar cambios"
+      [saving]="saving()"
+      (save)="save($event)"
+    ></app-pokemon-form>
+  } @else {
+    <div class="ion-padding ion-text-center">
+      <ion-text color="medium"
+        ><p>El Pokémon #{{ id() }} no está en la base de datos.</p></ion-text
+      >
+    </div>
+  }
+</ion-content>

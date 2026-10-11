@@ -218,7 +218,8 @@ servidor tenga que guardar cada spawn.
   `caught_pokemon(playerId, speciesId)`, `encounter_results(playerId, encounterId)` único, etc.
 - Timeouts en toda llamada externa (Open-Meteo 4 s, Overpass 8 s) y degradación: sin clima → clima
   "despejado"; sin Overpass → sin paradas nuevas, nunca se cae el mapa.
-- CRUD del curso (HU ya evaluadas): `/teams`, `/favorites`, `/customPokemon` se mantienen con el
+- CRUD del curso (HU ya evaluadas): `/pokemon` (inventario IS-11, modelo en `src/app/models/pokemon.model.ts`:
+  datos de PokéAPI + `price` y `stock` propios), `/teams`, `/favorites`, `/customPokemon` se mantienen con el
   **mismo contrato** que tenía JSON Server (más el filtro por jugador), y la colección de Postman se
   actualiza. Equipos: máx. 6, ahora con ids de Pokémon **capturados** (no de especie).
 - Despliegue: **[SPIKE F0-06]** Render (gratis, se duerme a los 15 min → despertarlo antes de la demo)

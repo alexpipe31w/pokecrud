@@ -40,7 +40,7 @@
       que refresca, almacenamiento seguro (D-006).
       Dep: F0-04, F0-06. Criterio: tests de servidor (login correcto, contraseña mala, refresh reutilizado
       = revocado); flujo completo probado en navegador y en móvil.
-- [ ] **F0-08 · CRUD del curso migrado** — `/teams`, `/favorites`, `/customPokemon` en Nest con el mismo
+- [ ] **F0-08 · CRUD del curso migrado** — `/pokemon` (inventario de IS-11: `price`, `stock`), `/teams`, `/favorites`, `/customPokemon` en Nest con el mismo
       contrato + filtro por jugador + paginación; Postman actualizado; `backend/` archivado (D-004).
       Dep: F0-07. Criterio: la colección de Postman pasa entera contra el servidor nuevo (captura del runner).
 - [ ] **F0-09 · Pipeline del APK** — `npx cap add android`, permisos, icono y splash provisionales,
@@ -101,7 +101,8 @@
       debilidades calculadas, cadena evolutiva, altura/peso, hábitat). Dep: F3-01.
 - [ ] **F3-05 · Evolución con caramelos** — regla de caramelos por cadena, endpoint transaccional,
       animación de evolución. Dep: F3-03.
-- [ ] **F3-06 · Equipos, favoritos y personalizados con la nueva UI** — las HU del curso (HU-08 a
+- [ ] **F3-06 · Inventario (IS-11), equipos, favoritos y personalizados con la nueva UI** — reutilizar los servicios,
+      modelo y formulario de IS-11 (HU-03 a HU-05) y las HU del curso (HU-08 a
       HU-18) rehechas con el sistema de diseño; los personalizados pueden aparecer como spawns del grupo.
       Dep: F0-08, F3-02.
 

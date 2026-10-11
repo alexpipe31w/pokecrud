@@ -34,3 +34,20 @@ No se tocó código de la app.
 **Decisiones nuevas:** D-001 a D-011.
 **El siguiente debe empezar por:** `/inicio` → coger F0-01 y escribir `docs/plan/fases/F0-fundaciones.md`
 con la skill `writing-plans`.
+
+## 2026-10-11 · @alex (Claude) · PLAN-MAESTRO (corrección) · rama `feature/plan-maestro`
+
+**Qué se hizo:** al mezclar el PR #5 apareció en `develop` la entrega **IS-11 de Samuel (08-10)**: Pokédex/inventario
+con CRUD sobre `/pokemon` (151, con `price`/`stock`), agregar desde PokéAPI, detalle, editar, búsqueda, scroll infinito
+y tests. El plan se había escrito sobre un `develop` local sin actualizar y decía "solo placeholders". Corregidos
+D-001, ESTADO, ARQUITECTURA §9 y ROADMAP F0-08/F3-06 para conservar y reutilizar IS-11. Conflicto del README resuelto
+(se mantienen el aviso del plan y la descripción nueva de Samuel). Además: Google Maps y Supabase configurados
+(ver ESTADO) y reglas de secretos en `docs/plan/SECRETOS.md` + plantillas `*.example`.
+**Archivos clave:** `docs/plan/{DECISIONES,ESTADO,ARQUITECTURA,ROADMAP,SECRETOS}.md`, `README.md`, `CLAUDE.md`,
+`server/.env.example`, `src/environments/environment.local.example.ts`.
+**Cómo se probó (salida real):** mapa de Neiva cargado con la clave en `localhost:8100` (tilt 67.5, VECTOR, 0 errores);
+conexión a Supabase `OK PostgreSQL 17.11`. `npm run lint` **no corre en el PC de Alex**: Node 24.14 < 24.15 que pide
+Angular CLI 22 (este cambio solo toca docs y plantillas).
+**Quedó a medias / roto:** Alex tiene que actualizar Node a ≥ 24.15.
+**Decisiones nuevas:** D-001 corregida.
+**El siguiente debe empezar por:** `git pull` en `develop` (¡siempre!) → `/inicio` → F0-01.

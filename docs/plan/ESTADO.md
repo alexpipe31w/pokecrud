@@ -16,8 +16,11 @@
 - Reglas de relevo en `CLAUDE.md`, comandos `/inicio` y `/cierre`, hook de arranque.
 - Skills esenciales copiadas en `.claude/skills/` (estándares de producción, planes, TDD, depuración,
   verificación, testing web, NestJS, Prisma).
-- Lo que ya existía antes del plan: esqueleto Angular 22 + Ionic 9 + Capacitor 8 con 5 pantallas
-  placeholder, JSON Server con `/teams`, `/favorites`, `/customPokemon`, Postman (36 pruebas), Scrum en Jira.
+- Lo que ya existía antes del plan: Angular 22 + Ionic 9 + Capacitor 8; JSON Server con `/teams`, `/favorites`,
+  `/customPokemon` y **`/pokemon`** (151 sembrados, con `price` y `stock`); Postman (36 pruebas); Scrum en Jira.
+  **IS-11 (Samuel, 08-10) en `develop`:** Pokédex/inventario con CRUD (listar con scroll infinito, buscar,
+  agregar cualquier Pokémon desde PokéAPI, detalle con descripción en español, editar, eliminar), con tests.
+  Equipos, Favoritos y Mis Pokémon **ocultos** en esa entrega (código en `features/`, ver `tabs.page.html`).
 
 ## En curso
 
@@ -25,12 +28,13 @@
 
 ## Siguiente paso concreto
 
-1. Mergear el PR del plan maestro a `develop` (lo revisa otro integrante, como siempre).
+1. Plan maestro ya mezclado en `develop` (PR #5).
 2. Coger **F0-01** (plan detallado de F0). Después F0-02, F0-03 y F0-06 se pueden hacer **en paralelo**
    por personas distintas (no se pisan: dataset / shared+tooling / servidor).
 
 ## Bloqueos / roto / pendiente de humanos
 
+- **Node:** Angular CLI 22 pide Node ≥ 22.22.3 o ≥ 24.15.0. El PC de Alex tiene 24.14 → `npm run lint/test/build` no arrancan ahí hasta actualizar.
 - **Google Maps — HECHO (2026-10-11):** clave `pokecrud-maps-js` en la cuenta de Google Cloud de Alex
   (prueba gratuita hasta 2027-01-10, proyecto "My First Project" `project-7bf0c639-c6d2-4cc1-aba`), restringida a
   Maps JavaScript API y a `https://localhost/*`, `http://localhost:8100/*`, `http://localhost:4200/*`.
@@ -43,7 +47,7 @@
 - **Base de datos — HECHO (2026-10-11):** Supabase proyecto `pokecrud-go` (ref `ggfnjophcsyawltmoseh`, São Paulo
   `sa-east-1`, Postgres 17, plan gratis) en la org de la cuenta **alexpipew31@gmail.com** (separada de StockUp).
   Data API (REST automática) **desactivada** (el juego entra solo por NestJS/Prisma) y RLS automático activado.
-  Conexión por *session pooler* (IPv4): `aws-1-sa-east-1.pooler.supabase.com:5432`, usuario `postgres.ggfnjophcsyawltmoseh`.
+  Conexión por _session pooler_ (IPv4): `aws-1-sa-east-1.pooler.supabase.com:5432`, usuario `postgres.ggfnjophcsyawltmoseh`.
   Probado: conexión OK desde el PC de Alex. **La contraseña NO está en el repo:** pídele a Alex su `server/.env`
   (`DATABASE_URL` y `DIRECT_URL`) por privado. Ojo: Supabase gratis pausa el proyecto tras ~7 días sin uso; si pasa,
   se reactiva desde el panel (Alex).
