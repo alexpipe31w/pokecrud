@@ -66,3 +66,38 @@ CLAUDE.md, comando `/guardar`, hook `Stop` `checkpoint-guard.js`, `/inicio` sabe
 **Quedó a medias / roto:** nada. Pendiente de decidir en F1: cómo importa `server/` el código de `shared/`.
 **Decisiones nuevas:** D-012, D-013.
 **El siguiente debe empezar por:** `/inicio F0-02 <nombre>` (o F0-03 / F0-06 en paralelo) y seguir el plan de fase.
+
+## 2026-10-11 17:45 · @samuel (Claude) · F0-06 · rama `feature/F0-06-servidor-nestjs`
+
+**Qué se hizo:** F0-06 pasos 1-8 y 10 (el 9, despliegue, necesita a Alex). Rama sacada de `develop` (independiente de
+F0-02…F0-05, cuyas entradas de bitácora están en los PR #8-#11). Scaffold Nest 12.0.8 (ESM, Vitest, oxlint) en `server/`,
+sin `@nestjs/mau` ni el "Hello World". Dependencias con versión exacta. Cambios respecto al plan:
+- `prisma.config.ts` usa `url: env('DIRECT_URL')`: en Prisma 7.10 `directUrl` no existe en la config (D-017).
+- Migración `init` generada con `prisma migrate diff --from-empty --to-schema … --script` y aplicada con
+  `prisma migrate deploy`: sin base sombra y sin riesgo de que `migrate dev` resetee la base. Antes se comprobó que
+  el esquema `public` de Supabase estaba vacío.
+- `trust proxy` en producción (si no, en Render todos los jugadores compartirían la IP del proxy en el rate limit).
+- `x-request-id` (del cliente o UUID) devuelto en la respuesta; logs `silent` en tests y legibles en desarrollo.
+- Test e2e extra del rate limit con una ruta de prueba: un 404 no pasa por el guard, así que con curl no se veía.
+- `npm audit`: 4 "high" solo en la CLI `prisma` (`mysql2`, `deepmerge-ts`), riesgo aceptado (D-017).
+- `server/README.md` en español con comandos y los pasos exactos de Render para Alex.
+**Archivos clave:** `server/prisma.config.ts`, `server/prisma/schema.prisma`, `server/prisma/migrations/*_init/`,
+`server/src/{main,app.module}.ts`, `server/src/prisma/*`, `server/src/health/*`, `server/test/*.e2e-spec.ts`,
+`server/.env.example`, `server/README.md`, `DECISIONES.md` (D-017).
+**Cómo se probó (salida real):**
+    prisma migrate deploy → "All migrations have been successfully applied."
+    prisma migrate status → "Database schema is up to date!"
+    prisma migrate diff --from-config-datasource --to-schema … --exit-code → "No difference detected." (exit 0)
+    npm test (antes del código) → "Cannot find module '../prisma/prisma.service.js'"
+    npm test → Tests 4 passed (4) · npm run test:e2e → Test Files 2 passed (2) · Tests 7 passed (7) · lint exit 0 · build exit 0
+    node dist/main.js (NODE_ENV=production, PORT=3077): /health/ready → {"status":"ok","db":"ok"} 200; helmet (CSP, HSTS,
+      nosniff, X-Frame-Options); CORS: localhost:4200 permitido, https://evil.com sin allow-origin; /no-existe → 404 JSON
+      sin stack; logs JSON con req.id; 0 líneas con la contraseña en el log.
+    PORT=3001 npm run start:dev → "Nest application successfully started"; /health/ready → 200 {"status":"ok","db":"ok"}
+    App de la raíz sin cambios: lint OK, ng test 29/29.
+**Quedó a medias / roto:** solo el despliegue en Render (Paso 9) → F0-06 sigue `[~]`. El JSON Server del curso ocupa el
+puerto 3000: arrancar Nest con `PORT=3001` hasta F0-08. Sin filtro global de excepciones propio (el de Nest no filtra
+el stack; la taxonomía de errores llega con F0-07).
+**Decisiones nuevas:** D-017.
+**El siguiente debe empezar por:** Alex despliega en Render (`server/README.md`) y pasa F0-06 a `[x]`; luego `/inicio F0-07`
+(cuando F0-04 y F0-06 estén en `develop`) o `/inicio F0-09`.

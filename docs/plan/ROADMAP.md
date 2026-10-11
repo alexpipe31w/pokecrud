@@ -35,6 +35,8 @@
       `RefreshToken`. Elegir y documentar dónde se despliega (Render + Supabase propuesto).
       Dep: F0-01. Criterio: `npm run start:dev` en `server/` responde `/health`; migración aplicada; desplegado
       con URL anotada en ESTADO.md.
+      **Falta (Alex):** desplegar en Render (Paso 9; pasos exactos en `server/README.md`) y anotar la URL en ESTADO.md
+      y en `environment.prod.ts`. Todo lo demás está hecho y probado (ver BITACORA 2026-10-11 · F0-06).
 - [ ] **F0-07 · Auth completo** — registro/login/refresh/logout (argon2id, JWT 15 min, refresh rotatorio),
       rate limit en login, pantalla de login/registro con el sistema de diseño, guard en la app, interceptor
       que refresca, almacenamiento seguro (D-006).

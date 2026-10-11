@@ -3,42 +3,44 @@
 > Se **reescribe** al cerrar cada sesión (no es histórico; el histórico es `BITACORA.md`).
 > Máximo una pantalla. Si lees esto al empezar: después lee `ROADMAP.md`.
 
-**Última actualización:** 2026-10-11 · por Alex (Claude) · rama `feature/F0-01-plan-fundaciones`
+**Última actualización:** 2026-10-11 · por Samuel (Claude) · rama `feature/F0-06-servidor-nestjs`
 
 ## Fase actual
 
-**F0 · Fundaciones** — aún no ha empezado ninguna tarea de código.
+**F0 · Fundaciones** — F0-01 en `develop`; F0-02…F0-05 hechas en PR #8 → #9 → #10 → #11 (apilados, mezclar en ese
+orden); **F0-06 hecha salvo el despliegue** (falta Alex). Libres: F0-09 (dep F0-04); F0-07 en cuanto F0-04 y F0-06 estén.
 
 ## Hecho
 
+- **F0-06 (Samuel, rama propia desde `develop`):** `server/` con NestJS 12 ESM + Prisma 7.10 (`PrismaPg`, pool 5),
+  migración `init` **aplicada en Supabase** (tablas `Player` y `RefreshToken`), helmet, CORS con lista blanca,
+  `ValidationPipe` estricto, rate limit 120/min por IP (salvo `/health`), logs JSON con `x-request-id`,
+  `/health/live` y `/health/ready` (timeout 3 s → 503). Tests: 4 unitarios + 7 e2e contra la base real. D-017.
+- **F0-02…F0-05 (Samuel, PR #8-#11):** dataset de 1025 especies, `shared/` con RNG, sistema de diseño + `/dev/ui`,
+  servicios base (dataset en IndexedDB, audio con gritos, hápticos, ajustes). Ver BITACORA y DECISIONES D-014…D-016.
+- **F0-01 hecho:** plan detallado de la fase 0. Plan maestro, reglas de relevo, `/inicio` `/guardar` `/cierre`, hooks y skills.
 - El profe aprobó sustituir JSON Server por NestJS con los mismos endpoints (D-002).
-- **F0-01 hecho:** plan detallado de la fase 0 con código y comandos verificados (Nest 12 ESM + Vitest, Prisma 7.10 con `prisma.config.ts` y `PrismaPg`).
-- **Guardado continuo:** REGLA 2b + `/guardar` + hook `Stop` que obliga a guardar si hay trabajo sin push de más de 20 min.
-- Plan maestro completo en `docs/plan/` (visión, arquitectura, diseño, roadmap, decisiones).
-- Reglas de relevo en `CLAUDE.md`, comandos `/inicio` y `/cierre`, hook de arranque.
-- Skills esenciales copiadas en `.claude/skills/` (estándares de producción, planes, TDD, depuración,
-  verificación, testing web, NestJS, Prisma).
 - Lo que ya existía antes del plan: Angular 22 + Ionic 9 + Capacitor 8; JSON Server con `/teams`, `/favorites`,
   `/customPokemon` y **`/pokemon`** (151 sembrados, con `price` y `stock`); Postman (36 pruebas); Scrum en Jira.
-  **IS-11 (Samuel, 08-10) en `develop`:** Pokédex/inventario con CRUD (listar con scroll infinito, buscar,
-  agregar cualquier Pokémon desde PokéAPI, detalle con descripción en español, editar, eliminar), con tests.
-  Equipos, Favoritos y Mis Pokémon **ocultos** en esa entrega (código en `features/`, ver `tabs.page.html`).
+  **IS-11 (Samuel, 08-10) en `develop`:** Pokédex/inventario con CRUD; Equipos, Favoritos y Mis Pokémon **ocultos**.
 
 ## En curso
 
-- F0-06 (@samuel) · rama `feature/F0-06-servidor-nestjs` (sale de `develop`: es independiente de F0-02…F0-05,
-  cuyos PR #8-#11 están pendientes de mezclar) · **Punto de guardado 2026-10-11 17:10**: hechos pasos 1-4 (scaffold, dependencias, Prisma 7, migración `init`
-  APLICADA en Supabase: tablas Player y RefreshToken); ahora en Paso 5 (PrismaService); estado: compila ✅.
+- Nadie. (F0-06 queda `[~]` solo por el despliegue, que no es código: ver Bloqueos.)
 
 ## Siguiente paso concreto
 
-1. **Relevo 2026-10-11:** Alex se quedó sin tokens. F0-01 ya está mezclado en `develop` (PR #6).
-   El siguiente compañero empieza aquí.
-2. Repartir **en paralelo** (no se pisan): **F0-02** dataset · **F0-03** shared+tooling · **F0-06** servidor.
-   Cada uno: `/inicio F0-0X <nombre>` y seguir el plan de fase paso a paso, con `/guardar` tras cada paso.
+1. **Alex:** revisar y mezclar **#8 → #9 → #10 → #11** (merge commit, no squash) y el PR de F0-06.
+2. **Alex:** desplegar `server/` en Render siguiendo `server/README.md` → anotar la URL aquí y pasar F0-06 a `[x]`.
+3. Siguiente tarea: **F0-07 auth** (dep F0-04 + F0-06: sacar la rama de `develop` cuando ambos estén mezclados)
+   o **F0-09 APK** (dep F0-04).
 
 ## Bloqueos / roto / pendiente de humanos
 
+- **Despliegue de F0-06 (Alex):** crear el Web Service en Render (pasos y variables en `server/README.md`). Sin URL
+  pública todavía: la app no puede hablar con el servidor desde el móvil hasta entonces.
+- **Puerto 3000:** lo usa el JSON Server del curso (`npm run api`). Mientras conviva, el servidor Nest se arranca con
+  `PORT=3001`. Desaparece en F0-08 (JSON Server archivado).
 - **Google Maps — HECHO (2026-10-11):** clave `pokecrud-maps-js` en la cuenta de Google Cloud de Alex
   (prueba gratuita hasta 2027-01-10, proyecto "My First Project" `project-7bf0c639-c6d2-4cc1-aba`), restringida a
   Maps JavaScript API y a `https://localhost/*`, `http://localhost:8100/*`, `http://localhost:4200/*`.

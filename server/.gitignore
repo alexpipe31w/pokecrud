@@ -2,6 +2,7 @@
 node_modules
 dist
 coverage
+*.tsbuildinfo
 
 # Cliente de Prisma generado (se regenera con `npm install` → postinstall)
 src/generated/
