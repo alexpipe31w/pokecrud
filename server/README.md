@@ -34,14 +34,21 @@ Arranque endurecido (`src/main.ts`, `src/app.module.ts`): helmet, CORS con lista
 `ValidationPipe` estricto, rate limit global de 120 peticiones/min por IP (salvo `/health`), logs JSON con
 `x-request-id` y cabeceras sensibles tapadas, `trust proxy` en producción.
 
-## Despliegue en Render (lo hace Alex: crea la cuenta y pega las variables)
+## Despliegue en Render
 
-- **New → Web Service**, repo `alexpipe31w/pokecrud`, rama `develop` (o `main` al entregar).
-- **Root Directory:** `server` · **Runtime:** Node · **Plan:** Free.
-- **Build Command:** `npm ci && npm run build`
+Lo puede hacer cualquier integrante que tenga `server/.env`, con su propia cuenta gratis de Render (entrar con
+GitHub). El repo es público, así que no hace falta ser su dueño. **Anotar en ESTADO.md en qué cuenta quedó.**
+
+- **New → Web Service → Public Git Repository:** `https://github.com/alexpipe31w/pokecrud`. Rama `develop`, o la
+  rama del PR si todavía no está mezclado. Con un repo público por URL no hay despliegue automático: tras cada
+  cambio se pulsa **Manual Deploy**.
+- **Root Directory:** `server` · **Language:** Node · **Instance Type:** Free.
+- **Build Command:** `npm ci --include=dev && npm run build`. El `--include=dev` es obligatorio: con
+  `NODE_ENV=production`, `npm ci` se salta las devDependencies (CLI de Nest y de Prisma) y el build falla.
 - **Start Command:** `npx prisma migrate deploy && npm run start:prod`
 - **Health Check Path:** `/health/ready`
-- **Variables:** `DATABASE_URL` y `DIRECT_URL` (las de `server/.env`), `NODE_ENV=production`,
+- **Variables:** `DATABASE_URL` y `DIRECT_URL` (copiar los valores de `server/.env`, sin las comillas),
+  `NODE_ENV=production`, `NODE_VERSION=24`,
   `CORS_ORIGINS=http://localhost:8100,http://localhost:4200,https://localhost` (+ el origen de la app si se publica).
 - Comprobar `https://<servicio>.onrender.com/health/ready` y anotar la URL en `docs/plan/ESTADO.md` y en
   `src/environments/environment.prod.ts` (`apiUrl`). Render gratis se duerme a los 15 min: el primer request tarda ~1 min.
