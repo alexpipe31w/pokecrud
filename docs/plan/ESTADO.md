@@ -33,7 +33,8 @@
 ## En curso
 
 - F0-04 (@samuel) · rama `feature/F0-04-sistema-diseno` (sale de `feature/F0-03-shared-tooling`; PR #8 y #9 sin mezclar)
-  · **Punto de guardado 2026-10-11**: tarea reclamada; siguiente: Paso 1 (tokens).
+  · **Punto de guardado 2026-10-11 14:45**: hechos pasos 1-3 (tokens, Fredoka, chips desde tokens con
+  texto por contraste, D-015); ahora en Paso 4 (test de GameButton); siguiente: Paso 5; estado: compila ✅ (app 30/30).
 
 ## Siguiente paso concreto
 

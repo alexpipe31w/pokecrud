@@ -88,3 +88,10 @@ retoma una tarea `[~]` trabaja sobre la rama del compañero, no crea otra.
 TypeScript 6 marca `baseUrl` como obsoleto, así que el alias es solo `"paths": { "@shared/*": ["./shared/*"] }` en
 `tsconfig.json` (las rutas se resuelven desde ese archivo). No añadir `baseUrl`. Los `*.spec.ts` de `shared/` se excluyen
 de `tsconfig.app.json` y `tsconfig.spec.json`: los corre `npm run test:shared` en Node, no `ng test` en jsdom.
+
+## D-015 · Fuente display: Fredoka y texto de los chips de tipo según contraste (2026-10-11, Samuel)
+
+Fuente display: **Fredoka** (OFL, `@fontsource/fredoka` 5.3.0 exacto, pesos 500/600/700; el 600 lo usa `GameButton`).
+Los colores de tipo salen solo de los tokens `--t-*` (una paleta). Como varios son claros, el texto del chip no es
+siempre blanco: `POKEMON_TYPES[t].text` es `var(--accent-ink)` (blanco) en lucha, veneno, fantasma, dragón y siniestro
+y `var(--ink)` en el resto. Con texto blanco 13 de 18 tipos no llegaban a AA (eléctrico 1,5:1); así todos ≥ 5,5:1.

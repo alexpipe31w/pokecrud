@@ -718,7 +718,7 @@ Añadir `"shared/**/*.ts"` al `include` de `tsconfig.spec.json`.
 **Lee antes `docs/plan/DISENO.md` entero.** Si tienes la skill `impeccable`, úsala para el escaparate;
 si no, DISENO.md manda.
 
-- [ ] **Paso 1: tokens** — `src/theme/tokens.scss` con el bloque `:root` de DISENO.md §2 tal cual, más:
+- [x] **Paso 1: tokens** — `src/theme/tokens.scss` con el bloque `:root` de DISENO.md §2 tal cual, más:
 
 ```scss
 :root {
@@ -745,11 +745,11 @@ si no, DISENO.md manda.
 }
 ```
 
-- [ ] **Paso 2: fuente** — `npm install @fontsource/fredoka@5.3.0`. En `src/global.scss`, tras los
+- [x] **Paso 2: fuente** — `npm install @fontsource/fredoka@5.3.0`. En `src/global.scss`, tras los
       imports de Ionic: `@import '@fontsource/fredoka/500.css'; @import '@fontsource/fredoka/700.css';
 @import './theme/tokens.scss';` y `--font-display: 'Fredoka', system-ui, sans-serif;` en `:root`.
       Anotar en DECISIONES: "Fuente display: Fredoka (OFL, @fontsource 5.3.0)".
-- [ ] **Paso 3: colores de tipo en un solo sitio** — `pokemon-types.ts` ya tiene colores (IS-11). Hacer
+- [x] **Paso 3: colores de tipo en un solo sitio** — `pokemon-types.ts` ya tiene colores (IS-11). Hacer
       que `color` lea el token: cambiar cada `color: '#…'` por `color: 'var(--t-<tipo>)'` y comprobar que los
       chips de IS-11 se siguen viendo (Pokédex). Así no hay dos paletas.
 - [ ] **Paso 4: test de GameButton (falla primero)** — `src/app/shared/ui/game-button.component.spec.ts`
