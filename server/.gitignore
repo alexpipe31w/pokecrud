@@ -1,0 +1,12 @@
+# Dependencias y compilado
+node_modules
+dist
+coverage
+
+# Cliente de Prisma generado (se regenera con `npm install` → postinstall)
+src/generated/
+
+# Secretos: NUNCA se suben (ver docs/plan/SECRETOS.md)
+.env
+.env.*
+!.env.example

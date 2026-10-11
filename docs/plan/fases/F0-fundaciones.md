@@ -1089,7 +1089,7 @@ Test (con `import 'fake-indexeddb/auto'` al inicio del spec y `HttpTestingContro
 **Requisito:** `server/.env` creado según `docs/plan/SECRETOS.md` (pídeselo a Alex si no lo tienes).
 Lee la skill `estandares-produccion` (modo Construir, "Día 1") y `nestjs-patterns` antes de empezar.
 
-- [ ] **Paso 1: generar el proyecto** (desde la raíz del repo; `server/` ya existe con `.env.example`):
+- [x] **Paso 1: generar el proyecto** (desde la raíz del repo; `server/` ya existe con `.env.example`):
 
 ```bash
 npx -y @nestjs/cli@12.0.8 new server --package-manager npm --skip-git --strict --directory server-tmp

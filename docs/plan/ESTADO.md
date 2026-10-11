@@ -27,7 +27,8 @@
 ## En curso
 
 - F0-06 (@samuel) · rama `feature/F0-06-servidor-nestjs` (sale de `develop`: es independiente de F0-02…F0-05,
-  cuyos PR #8-#11 están pendientes de mezclar) · **Punto de guardado 2026-10-11**: tarea reclamada; siguiente: Paso 1.
+  cuyos PR #8-#11 están pendientes de mezclar) · **Punto de guardado 2026-10-11 16:50**: hecho Paso 1 (scaffold Nest 12.0.8 ESM + Vitest en
+  `server/`, sin `@nestjs/mau`); BD `public` vacía (comprobado); ahora en Paso 2 (dependencias); estado: compila ✅.
 
 ## Siguiente paso concreto
 
