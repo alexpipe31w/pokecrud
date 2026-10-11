@@ -37,8 +37,8 @@
 ## En curso
 
 - F0-05 (@samuel) · rama `feature/F0-05-servicios-base` (sale de `feature/F0-04-sistema-diseno`; PR #8-#10 sin mezclar)
-  · **Punto de guardado 2026-10-11 15:15**: idb/fake-indexeddb instalados; hechos pasos 1-3 (Settings, Haptics,
-  AudioService con LRU de gritos, todos con tests); ahora en Paso 4 (DatasetService); siguiente: Paso 5; estado: compila ✅ (app 53/53).
+  · **Punto de guardado 2026-10-11 15:25**: hechos pasos 1-4 (Settings, Haptics, Audio con LRU, DatasetService con
+  IndexedDB y carga compartida, todos con tests); ahora en Paso 5 (cargar al arrancar); siguiente: Pasos 6-7; estado: compila ✅ (app 58/58).
 
 ## Siguiente paso concreto
 

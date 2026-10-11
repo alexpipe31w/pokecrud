@@ -983,7 +983,7 @@ Test: con `haptics: false` no llama a `Haptics.impact` (`vi.mock('@capacitor/hap
       `AUDIO_CONTEXT_FACTORY` para poder pasar un doble). Test: LRU expulsa el más antiguo al pasar de 30;
       un fallo de red en `playCry` no lanza (se registra y resuelve `false`).
 
-- [ ] **Paso 4: DatasetService**
+- [x] **Paso 4: DatasetService**
 
 ```ts
 // dataset.service.ts (esqueleto obligatorio; completar los métodos marcados)
