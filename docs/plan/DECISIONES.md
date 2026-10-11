@@ -26,6 +26,7 @@ se puede sustituir JSON Server por backend propio (NestJS) conservando los endpo
 Una sola librería 3D para las tres escenas. Fijar la versión exacta al instalar (F0-03) y anotarla aquí.
 Los Pokémon se representan con su arte oficial `home` en billboard + animación procedimental, no con
 modelos 3D: no hay modelos libres de las 1025 especies y así todas se ven con la misma calidad.
+**three fijado en 0.186.1** y `@types/three` en 0.186.0, ambos con versión exacta (F0-03, Samuel, 2026-10-11).
 
 ## D-004 · Backend NestJS + Prisma + PostgreSQL + Socket.IO (2026-10-11)
 
@@ -81,3 +82,9 @@ exige `prisma.config.ts` para la URL y el adaptador `@prisma/adapter-pg`. Sustit
 Las cuentas Claude Pro se cortan sin aviso al agotar el límite. Se guarda (commit WIP permitido + push + "Punto de
 guardado" en ESTADO.md) tras cada paso del plan y como mucho cada 20 min; un hook `Stop` lo hace cumplir. Quien
 retoma una tarea `[~]` trabaja sobre la rama del compañero, no crea otra.
+
+## D-014 · Alias `@shared/*` sin `baseUrl` (2026-10-11, Samuel)
+
+TypeScript 6 marca `baseUrl` como obsoleto, así que el alias es solo `"paths": { "@shared/*": ["./shared/*"] }` en
+`tsconfig.json` (las rutas se resuelven desde ese archivo). No añadir `baseUrl`. Los `*.spec.ts` de `shared/` se excluyen
+de `tsconfig.app.json` y `tsconfig.spec.json`: los corre `npm run test:shared` en Node, no `ng test` en jsdom.

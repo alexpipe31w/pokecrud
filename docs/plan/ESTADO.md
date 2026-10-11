@@ -3,14 +3,17 @@
 > Se **reescribe** al cerrar cada sesión (no es histórico; el histórico es `BITACORA.md`).
 > Máximo una pantalla. Si lees esto al empezar: después lee `ROADMAP.md`.
 
-**Última actualización:** 2026-10-11 · por Samuel (Claude) · rama `feature/F0-02-dataset`
+**Última actualización:** 2026-10-11 · por Samuel (Claude) · rama `feature/F0-03-shared-tooling`
 
 ## Fase actual
 
-**F0 · Fundaciones** — F0-01 y F0-02 hechas; F0-03 y F0-06 libres.
+**F0 · Fundaciones** — F0-01, F0-02 y F0-03 hechas (PR #8 y PR de F0-03 pendientes de mezclar); libres: F0-04, F0-05, F0-06.
 
 ## Hecho
 
+- **F0-03 hecho (Samuel, PR a `develop`, apilado sobre F0-02):** `shared/` con RNG determinista (`shared/engine/rng.ts`,
+  mulberry32 + hashString FNV-1a, 5 tests), `shared/tsconfig.json`, alias `@shared/*` (sin `baseUrl`: obsoleto en TS 6),
+  `npm run test:all` (app + shared), `three@0.186.1` y `@types/three@0.186.0` exactos (D-003), `@types/node@24`.
 - **F0-02 hecho (Samuel, PR a `develop`):** dataset de las 1025 especies en `src/assets/data/` (`pokedex` 972 KB,
   `moves` 706 movimientos / 209 KB, `types` 18 tipos, `meta` v`fdb512e56ff6`), tipos en `shared/data/dataset.types.ts`,
   `npm run dataset` (reanudable con `.cache/`) y `npm run test:shared` (5 tests). Gen 9 (#906-1025) sin español en PokéAPI → inglés.
@@ -33,10 +36,10 @@
 
 ## Siguiente paso concreto
 
-1. Revisar y mezclar el PR de F0-02 en `develop`.
-2. Libres en paralelo: **F0-03** shared+tooling (OJO: `vitest.shared.config.ts` y `test:shared` ya vienen en F0-02,
-   idénticos al plan; F0-03 solo añade `test:all`, `shared/tsconfig.json`, alias y RNG) · **F0-06** servidor.
-   Con F0-02 y F0-03 hechas se desbloquea **F0-05**.
+1. Mezclar **primero el PR #8 (F0-02)** y después el de F0-03 (sale de la rama de F0-02; tras mezclar #8 su diff
+   queda solo con lo de F0-03).
+2. Libres: **F0-04** sistema de diseño (dep F0-03), **F0-05** servicios base (dep F0-02 + F0-03), **F0-06** servidor.
+   Si se cogen antes de mezclar los PR, sacar la rama de `feature/F0-03-shared-tooling`.
 
 ## Bloqueos / roto / pendiente de humanos
 

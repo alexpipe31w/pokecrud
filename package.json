@@ -9,6 +9,7 @@
     "seed:151": "node scripts/seed-151.mjs",
     "dataset": "node scripts/build-dataset.mjs",
     "test:shared": "vitest run --config vitest.shared.config.ts",
+    "test:all": "ng test --watch=false && npm run test:shared",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
@@ -32,6 +33,7 @@
     "@ionic/angular": "^9.0.0",
     "ionicons": "^8.1.0",
     "rxjs": "~7.8.0",
+    "three": "0.186.1",
     "tslib": "^2.3.0"
   },
   "devDependencies": {
@@ -41,6 +43,8 @@
     "@angular/language-service": "22.1.7",
     "@capacitor/cli": "^8.5.2",
     "@ionic/angular-toolkit": "^13.0.0",
+    "@types/node": "^24.19.2",
+    "@types/three": "0.186.0",
     "angular-eslint": "22.0.0",
     "eslint": "^10.10.0",
     "eslint-config-prettier": "^10.1.8",
