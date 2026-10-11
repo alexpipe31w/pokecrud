@@ -26,7 +26,8 @@
 
 ## En curso
 
-- Nadie.
+- F0-06 (@samuel) · rama `feature/F0-06-servidor-nestjs` (sale de `develop`: es independiente de F0-02…F0-05,
+  cuyos PR #8-#11 están pendientes de mezclar) · **Punto de guardado 2026-10-11**: tarea reclamada; siguiente: Paso 1.
 
 ## Siguiente paso concreto
 

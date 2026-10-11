@@ -30,7 +30,7 @@
       `AudioService` (buses, desbloqueo, caché de gritos), `HapticsService`, `SettingsService` (volúmenes,
       reducir efectos, modo joystick) con signals.
       Dep: F0-02, F0-03. Criterio: tests unitarios; en `/dev/ui` se oye el grito de un Pokémon al pulsar.
-- [ ] **F0-06 · Servidor NestJS esqueleto** — `server/` con Nest 12, Prisma, Postgres, ValidationPipe
+- [~] **F0-06 · Servidor NestJS esqueleto** (@samuel, 2026-10-11) — `server/` con Nest 12, Prisma, Postgres, ValidationPipe
       global, throttler, helmet, logger JSON, `/health`, `.env.example`, migración inicial con `Player` y
       `RefreshToken`. Elegir y documentar dónde se despliega (Render + Supabase propuesto).
       Dep: F0-01. Criterio: `npm run start:dev` en `server/` responde `/health`; migración aplicada; desplegado
