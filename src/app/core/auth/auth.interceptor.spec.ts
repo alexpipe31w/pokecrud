@@ -42,13 +42,14 @@ describe('authInterceptor', () => {
     expect(backend.expectOne(SERVER).request.headers.get('Authorization')).toBe('Bearer acc-1');
   });
 
-  it('NO manda el token a PokéAPI ni a JSON Server', () => {
+  it('NO manda el token a PokéAPI ni a otros dominios', () => {
     const pokeApi = `${environment.pokeApiUrl}/pokemon/25`;
-    const jsonServer = `${environment.apiUrl}/pokemon`;
+    const other =
+      'https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/25.ogg';
     http.get(pokeApi).subscribe();
-    http.get(jsonServer).subscribe();
+    http.get(other).subscribe();
     expect(backend.expectOne(pokeApi).request.headers.has('Authorization')).toBe(false);
-    expect(backend.expectOne(jsonServer).request.headers.has('Authorization')).toBe(false);
+    expect(backend.expectOne(other).request.headers.has('Authorization')).toBe(false);
   });
 
   it('ante un 401 refresca una vez y repite la petición con el token nuevo', async () => {

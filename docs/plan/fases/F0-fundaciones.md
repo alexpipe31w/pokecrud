@@ -1398,7 +1398,7 @@ Añadir `CHECK` en la migración SQL generada (editar antes de `migrate deploy`)
       y `_order` (`asc|desc`), `name_like` (→ `contains`, `mode: 'insensitive'`), y paginación `_page`/`_limit`.
       Límite por defecto: `/pokemon` hasta 1025 (tabla acotada por el nº de especies, la app de IS-11 pide
       todo); el resto 50, máximo 100. `PUT` reemplaza, `PATCH` mezcla; `POST /pokemon` con id repetido → 409.
-- [ ] **Paso 5: la app** — `PokemonService` de IS-11 no cambia de URL (`environment.apiUrl`); comprobar que
+- [x] **Paso 5: la app** — `PokemonService` de IS-11 no cambia de URL (`environment.apiUrl`); comprobar que
       la Pokédex funciona igual contra Nest (`npm run start:dev` en `server/` en lugar de `npm run api`).
       Quitar la excepción temporal de rutas públicas de F0-07 Paso 8 SOLO para equipos/favoritos/personalizados.
 - [ ] **Paso 6: Postman** — actualizar `backend/postman/PokeCRUD.postman_collection.json`: variable
@@ -1440,7 +1440,7 @@ Añadir `CHECK` en la migración SQL generada (editar antes de `migrate deploy`)
       por defecto `production`), `npx cap sync android` y `gradlew.bat assembleDebug` (o `./gradlew` fuera de
       Windows) con `JAVA_HOME` apuntando al `jbr` de Android Studio si no está definido; al final imprime la ruta
       y el tamaño del APK. `package.json`: `"apk": "node scripts/apk.mjs"`.
-- [ ] **Paso 5: icono y splash provisionales** — `npx @capacitor/assets generate --android` desde
+- [x] **Paso 5: icono y splash provisionales** — `npx @capacitor/assets generate --android` desde
       `resources/icon.png` (1024×1024) y `resources/splash.png` (2732×2732): Poké Ball estilizada propia
       (no usar arte oficial). Ver skill `generar-imagen` o pedirlo al humano.
 - [ ] **Paso 6: probar en el móvil** — `npm run apk`, `adb install -r android/app/build/outputs/apk/debug/app-debug.apk`,

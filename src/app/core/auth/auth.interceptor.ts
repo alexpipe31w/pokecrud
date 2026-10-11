@@ -6,8 +6,8 @@ import { environment } from '../../../environments/environment';
 import { AuthService } from './auth.service';
 
 /**
- * Añade el access token SOLO a las peticiones al servidor del juego (nunca a PokéAPI, Google ni JSON
- * Server). Ante un 401 refresca una vez (el refresh es compartido, ver AuthService) y repite; si no hay
+ * Añade el access token SOLO a las peticiones al servidor del juego (nunca a PokéAPI ni a Google). Ante un
+ * 401 refresca una vez (el refresh es compartido, ver AuthService) y repite; si no hay
  * sesión que recuperar, cierra sesión y lleva a /login.
  */
 export const authInterceptor: HttpInterceptorFn = (req, next) => {

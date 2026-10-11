@@ -37,7 +37,7 @@ migrado (dep F0-07) y **F0-09** APK.
 
 ## En curso
 
-- **F0-08** (@kenneth, rama `feature/F0-08-crud-nest`): CRUD del curso a NestJS. Punto de guardado: pasos 1-4 hechos (migración `crud_curso` aplicada en Supabase, semilla `npm run db:seed`, módulos `/pokemon` `/teams` `/favorites` `/customPokemon` con 25 e2e en verde). Sigue: paso 5 (la app contra Nest).
+- **F0-08** (@kenneth, rama `feature/F0-08-crud-nest`): CRUD del curso a NestJS. Punto de guardado: pasos 1-4 hechos (migración `crud_curso` aplicada en Supabase, semilla `npm run db:seed`, módulos `/pokemon` `/teams` `/favorites` `/customPokemon` con 25 e2e en verde). Paso 5 hecho: `apiUrl` unificado en `serverUrl` (dev :3000), agregar/editar exigen sesión, CRUD de la Pokédex probado en el navegador contra Nest. Sigue: paso 6 (Postman).
 
 ## Siguiente paso concreto
 

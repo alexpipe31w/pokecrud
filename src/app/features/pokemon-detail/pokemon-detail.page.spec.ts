@@ -30,7 +30,7 @@ describe('PokemonDetailPage', () => {
   });
 
   it('shows the pokemon data loaded from the database', async () => {
-    http.expectOne(`${environment.apiUrl}/pokemon/25`).flush({
+    http.expectOne(`${environment.serverUrl}/pokemon/25`).flush({
       id: 25,
       name: 'pikachu',
       types: ['electric'],
@@ -56,7 +56,7 @@ describe('PokemonDetailPage', () => {
 
   it('says so when the pokemon is not in the database', async () => {
     http
-      .expectOne(`${environment.apiUrl}/pokemon/25`)
+      .expectOne(`${environment.serverUrl}/pokemon/25`)
       .flush(null, { status: 404, statusText: 'Not Found' });
     await fixture.whenStable();
     fixture.detectChanges();

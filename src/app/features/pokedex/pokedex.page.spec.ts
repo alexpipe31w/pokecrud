@@ -28,7 +28,7 @@ describe('PokedexPage', () => {
   });
 
   it('lists the pokemon from the database', async () => {
-    http.expectOne(`${environment.apiUrl}/pokemon?_sort=id&_order=asc`).flush([
+    http.expectOne(`${environment.serverUrl}/pokemon?_sort=id&_order=asc`).flush([
       { id: 1, name: 'bulbasaur', types: ['grass', 'poison'], price: 6400, stock: 12 },
       { id: 150, name: 'mewtwo', types: ['psychic'], price: 30600, stock: 5 },
     ]);
@@ -49,7 +49,7 @@ describe('PokedexPage', () => {
       price: 100,
       stock: 1,
     }));
-    http.expectOne(`${environment.apiUrl}/pokemon?_sort=id&_order=asc`).flush(all);
+    http.expectOne(`${environment.serverUrl}/pokemon?_sort=id&_order=asc`).flush(all);
     await fixture.whenStable();
     fixture.detectChanges();
     const items = () => fixture.nativeElement.querySelectorAll('ion-item-sliding').length;
