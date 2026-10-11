@@ -29,7 +29,9 @@ de otro integrante: constancia en cada PR). Servidor desplegado. Libres: **F0-07
 
 ## En curso
 
-- F0-07 (@samuel) · rama `feature/F0-07-auth` · **Punto de guardado 2026-10-11**: tarea reclamada; siguiente: Paso 1 (tests e2e de auth).
+- F0-07 (@samuel) · rama `feature/F0-07-auth` · **Punto de guardado 2026-10-11 17:10**: Paso 1 hecho (11 tests e2e en
+  `server/test/auth.e2e-spec.ts`, fallan a propósito); `@nestjs/jwt` y `argon2` instalados; `JWT_SECRET` local en `server/.env`;
+  ahora en Paso 2 (AuthService); estado: WIP ❌ (e2e de auth en rojo hasta implementar).
 
 ## Siguiente paso concreto
 

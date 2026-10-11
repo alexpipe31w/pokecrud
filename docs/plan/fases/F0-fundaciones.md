@@ -1271,7 +1271,7 @@ Contrato:
 
 `player` = `{ id, email, nickname, level, xp }` (nunca `passwordHash`).
 
-- [ ] **Paso 1: tests e2e primero** — `server/test/auth.e2e-spec.ts` con BD real y emails únicos por test
+- [x] **Paso 1: tests e2e primero** — `server/test/auth.e2e-spec.ts` con BD real y emails únicos por test
       (`test+${randomUUID()}@pokecrud.test`), limpiando en `afterAll` los players con dominio `@pokecrud.test`:
   1. registro → 201, `passwordHash` no aparece en la respuesta;
   2. email repetido → 409; nickname repetido → 409;
