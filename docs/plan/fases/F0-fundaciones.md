@@ -860,14 +860,14 @@ export class GameButtonComponent {
     (nunca animar `width`), número con `tabular-nums`. Test: `scaleX` correcto para 128/255 y tope en 1.
   - `app-hp-bar`: inputs `current`, `max`; color verde >50 %, amarillo 20–50 %, rojo <20 %
     (`--success`/`--gold`/`--danger`); transición de `transform` 400 ms `--ease-out`. Test: color por umbral.
-- [ ] **Paso 7: escaparate `/dev/ui`** — `src/app/features/dev-ui/dev-ui.page.ts` (standalone) que muestra
+- [x] **Paso 7: escaparate `/dev/ui`** — `src/app/features/dev-ui/dev-ui.page.ts` (standalone) que muestra
       los 3 botones, un GlassPanel con StatBars de Pikachu (35/55/40/50/50/90), HpBars al 80/35/10 % y los
       chips de los 18 tipos. Ruta en `app.routes.ts`: `{ path: 'dev/ui', loadComponent: () => import(...) }`
       ANTES del `'**'`.
-- [ ] **Paso 8: verificar** — `npm run test:all`, `npm run lint`, `npm run build`; `npx ionic serve`, abrir
+- [x] **Paso 8: verificar** — `npm run test:all`, `npm run lint`, `npm run build`; `npx ionic serve`, abrir
       `http://localhost:8100/dev/ui` en vista móvil 390×844 (DevTools o skill `webapp-testing`), captura a
       `docs/evidencias/F0-04_01_dev-ui.png`. Revisar con la checklist de DISENO §4 (sin `transition: all`, sin `scale(0)`).
-- [ ] **Paso 9: commit** — `F0-04: tokens, fuente y componentes base del juego + /dev/ui`.
+- [x] **Paso 9: commit** — `F0-04: tokens, fuente y componentes base del juego + /dev/ui`.
 
 ---
 

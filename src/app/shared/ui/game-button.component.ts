@@ -36,6 +36,7 @@ import { Component, input, output } from '@angular/core';
     }
     .gb:disabled {
       opacity: 0.45;
+      box-shadow: none;
     }
     .gb--primary {
       background: var(--accent);
@@ -46,6 +47,8 @@ import { Component, input, output } from '@angular/core';
       background: var(--surface);
       color: var(--surface-text);
       backdrop-filter: blur(20px) saturate(160%);
+      border-top: 1px solid var(--glass-edge);
+      box-shadow: var(--shadow-sm);
     }
     .gb--gold {
       background: var(--gold);

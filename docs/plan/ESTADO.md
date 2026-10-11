@@ -3,14 +3,18 @@
 > Se **reescribe** al cerrar cada sesión (no es histórico; el histórico es `BITACORA.md`).
 > Máximo una pantalla. Si lees esto al empezar: después lee `ROADMAP.md`.
 
-**Última actualización:** 2026-10-11 · por Samuel (Claude) · rama `feature/F0-03-shared-tooling`
+**Última actualización:** 2026-10-11 · por Samuel (Claude) · rama `feature/F0-04-sistema-diseno`
 
 ## Fase actual
 
-**F0 · Fundaciones** — F0-01, F0-02 y F0-03 hechas (PR #8 y PR de F0-03 pendientes de mezclar); libres: F0-04, F0-05, F0-06.
+**F0 · Fundaciones** — F0-01…F0-04 hechas (PR #8, #9 y el de F0-04 pendientes de mezclar, en ese orden); libres: F0-05, F0-06, F0-09.
 
 ## Hecho
 
+- **F0-04 hecho (Samuel, PR a `develop`, apilado sobre F0-03):** `src/theme/tokens.scss` (DISENO §2 + sombras, borde de
+  vidrio y `--track`), fuente Fredoka 500/600/700, chips de tipo desde los tokens con texto por contraste (D-015),
+  `GameButton`, `GlassPanel`, `StatBar`, `HpBar` en `src/app/shared/ui/` con tests y escaparate `/dev/ui`
+  (evidencia `docs/evidencias/F0-04_01_dev-ui.jpg`). Háptico/sonido del botón: se enchufan en F0-05 Paso 9.
 - **F0-03 hecho (Samuel, PR a `develop`, apilado sobre F0-02):** `shared/` con RNG determinista (`shared/engine/rng.ts`,
   mulberry32 + hashString FNV-1a, 5 tests), `shared/tsconfig.json`, alias `@shared/*` (sin `baseUrl`: obsoleto en TS 6),
   `npm run test:all` (app + shared), `three@0.186.1` y `@types/three@0.186.0` exactos (D-003), `@types/node@24`.
@@ -32,17 +36,13 @@
 
 ## En curso
 
-- F0-04 (@samuel) · rama `feature/F0-04-sistema-diseno` (sale de `feature/F0-03-shared-tooling`; PR #8 y #9 sin mezclar)
-  · **Punto de guardado 2026-10-11 14:55**: hechos pasos 1-6 (tokens + sombras/track, Fredoka, chips con
-  texto por contraste D-015, GameButton, GlassPanel, StatBar, HpBar con tests); ahora en Paso 7 (`/dev/ui`);
-  siguiente: Paso 8 (captura 390×844); estado: compila ✅ (app 40/40).
+- Nadie.
 
 ## Siguiente paso concreto
 
-1. Mezclar **primero el PR #8 (F0-02)** y después el de F0-03 (sale de la rama de F0-02; tras mezclar #8 su diff
-   queda solo con lo de F0-03).
-2. Libres: **F0-04** sistema de diseño (dep F0-03), **F0-05** servicios base (dep F0-02 + F0-03), **F0-06** servidor.
-   Si se cogen antes de mezclar los PR, sacar la rama de `feature/F0-03-shared-tooling`.
+1. Mezclar en orden: **#8 (F0-02) → #9 (F0-03) → PR de F0-04** (cada rama sale de la anterior).
+2. Libres: **F0-05** servicios base (dep F0-02 + F0-03; su Paso 9 enchufa háptico/sonido al GameButton),
+   **F0-06** servidor, **F0-09** APK (dep F0-04). Si se cogen antes de mezclar, sacar la rama de `feature/F0-04-sistema-diseno`.
 
 ## Bloqueos / roto / pendiente de humanos
 
