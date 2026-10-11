@@ -1298,10 +1298,10 @@ data: { revokedAt: now } })`; si `count === 0` → buscar por `tokenHash`: si ex
 
 **App** (`src/app/core/auth/`): `npm install @aparajita/capacitor-secure-storage@8.0.1`.
 
-- [ ] **Paso 5: `TokenStore`** — interfaz `get/set/clear` del refresh token con dos implementaciones:
+- [x] **Paso 5: `TokenStore`** — interfaz `get/set/clear` del refresh token con dos implementaciones:
       nativa (`SecureStorage` del plugin, Keystore de Android) y web (`sessionStorage`), elegida con
       `Capacitor.isNativePlatform()`. El access token vive solo en memoria (signal). Test de la web.
-- [ ] **Paso 6: `AuthService` (app)** — signals `player`, `isLoggedIn`; `register/login/logout/restore()`;
+- [x] **Paso 6: `AuthService` (app)** — signals `player`, `isLoggedIn`; `register/login/logout/restore()`;
       `restore()` al arrancar intenta un refresh con el token guardado. Un único refresh en vuelo a la vez
       (si llegan 3 peticiones con 401, se comparte la misma promesa de refresh).
 - [ ] **Paso 7: interceptor funcional** `authInterceptor`: añade `Authorization: Bearer` a peticiones a
