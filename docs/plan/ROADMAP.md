@@ -22,7 +22,7 @@
 - [x] **F0-03 · `shared/` + tooling** (@samuel, 2026-10-11) — carpeta `shared/` con alias `@shared/*` en `tsconfig.json`,
       Vitest corriendo `shared/**/*.spec.ts`, instalar `three` (versión exacta en D-003).
       Dep: F0-01. Criterio: `npm test` ejecuta un spec de `shared/` y uno de `src/`; build OK.
-- [ ] **F0-04 · Sistema de diseño base** — `src/theme/tokens.scss` (DISENO §2), fuente display
+- [~] **F0-04 · Sistema de diseño base** (@samuel, 2026-10-11) — `src/theme/tokens.scss` (DISENO §2), fuente display
       autoalojada, componentes `GameButton`, `TypeChip`, `GlassPanel`, `StatBar`, `HpBar` con estados
       `:active`, háptico y sonido de toque; página `/dev/ui` que los muestra todos.
       Dep: F0-03. Criterio: captura móvil 390×844 de `/dev/ui` en la bitácora; sin colores sueltos fuera de tokens.

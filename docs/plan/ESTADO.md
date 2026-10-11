@@ -32,7 +32,8 @@
 
 ## En curso
 
-- Nadie.
+- F0-04 (@samuel) · rama `feature/F0-04-sistema-diseno` (sale de `feature/F0-03-shared-tooling`; PR #8 y #9 sin mezclar)
+  · **Punto de guardado 2026-10-11**: tarea reclamada; siguiente: Paso 1 (tokens).
 
 ## Siguiente paso concreto
 
