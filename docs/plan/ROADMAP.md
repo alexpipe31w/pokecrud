@@ -12,7 +12,7 @@
 
 ## F0 · Fundaciones (sin esto no se puede construir nada encima)
 
-- [ ] **F0-01 · Plan detallado de F0** — escribir `docs/plan/fases/F0-fundaciones.md` con `writing-plans`.
+- [~] **F0-01 · Plan detallado de F0** (@alex, 2026-10-11) — escribir `docs/plan/fases/F0-fundaciones.md` con `writing-plans`.
       Dep: —. Criterio: cubre F0-02…F0-09 con archivos, código y comandos exactos.
 - [ ] **F0-02 · Dataset completo desde PokéAPI** — `scripts/build-dataset.mjs` + `src/assets/data/`
       (`pokedex.json`, `moves.json`, `types.json`) según ARQUITECTURA §3.

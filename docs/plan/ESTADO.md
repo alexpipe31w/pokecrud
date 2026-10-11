@@ -24,7 +24,7 @@
 
 ## En curso
 
-- Nadie.
+- F0-01 · plan detallado de F0 (@alex, rama `feature/F0-01-plan-fundaciones`).
 
 ## Siguiente paso concreto
 
