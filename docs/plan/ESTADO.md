@@ -37,7 +37,7 @@ migrado (dep F0-07) y **F0-09** APK.
 
 ## En curso
 
-- Nadie.
+- **F0-08** (@kenneth, rama `feature/F0-08-crud-nest`): CRUD del curso a NestJS. Punto de guardado: reclamada, sin código aún.
 
 ## Siguiente paso concreto
 

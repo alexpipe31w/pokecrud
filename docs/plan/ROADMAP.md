@@ -43,9 +43,9 @@
       = revocado); flujo completo probado en navegador y en móvil.
       **Hecho:** servidor (11 e2e) y app (login/registro/sesión probados en navegador 390×844). El Keystore nativo se
       prueba en un Android real con el APK (F0-09). Ampliaciones respecto al plan: D-018.
-- [ ] **F0-08 · CRUD del curso migrado** — `/pokemon` (inventario de IS-11: `price`, `stock`), `/teams`, `/favorites`, `/customPokemon` en Nest con el mismo
-      contrato + filtro por jugador + paginación; Postman actualizado; `backend/` archivado (D-004).
-      Dep: F0-07. Criterio: la colección de Postman pasa entera contra el servidor nuevo (captura del runner).
+- [~] **F0-08 · CRUD del curso migrado** (@kenneth, 2026-10-11) — `/pokemon` (inventario de IS-11: `price`, `stock`), `/teams`, `/favorites`, `/customPokemon` en Nest con el mismo
+  contrato + filtro por jugador + paginación; Postman actualizado; `backend/` archivado (D-004).
+  Dep: F0-07. Criterio: la colección de Postman pasa entera contra el servidor nuevo (captura del runner).
 - [ ] **F0-09 · Pipeline del APK** — `npx cap add android`, permisos, icono y splash provisionales,
       script `npm run apk` documentado, APK instalado en un Android real mostrando `/dev/ui`.
       Dep: F0-04. Criterio: foto/captura del móvil + tamaño del APK en la bitácora.
