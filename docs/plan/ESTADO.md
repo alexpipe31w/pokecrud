@@ -3,15 +3,21 @@
 > Se **reescribe** al cerrar cada sesión (no es histórico; el histórico es `BITACORA.md`).
 > Máximo una pantalla. Si lees esto al empezar: después lee `ROADMAP.md`.
 
-**Última actualización:** 2026-10-11 · por Samuel (Claude) · rama `feature/F0-07-estado`
+**Última actualización:** 2026-10-11 · por Kenneth (Claude) · rama `feature/F0-08-crud-nest`
 
 ## Fase actual
 
-**F0 · Fundaciones** — **F0-01…F0-07 hechas y en `develop`** (PR #8-#14). Auth en producción. Libres: **F0-08** CRUD
-migrado (dep F0-07) y **F0-09** APK.
+**F0 · Fundaciones** — **F0-01…F0-07 hechas y en `develop`** (PR #8-#14). **F0-08** `[~]` (Kenneth): código terminado y
+probado, falta solo la captura del Runner de Postman. Libres: **F0-09** APK y **F0-10** transaction pooler (nueva).
 
 ## Hecho
 
+- **F0-08 (Kenneth, rama `feature/F0-08-crud-nest`, sin PR aún):** `/pokemon` (público para leer, sesión para escribir),
+  `/teams`, `/favorites`, `/customPokemon` (por jugador; lo ajeno → 404) en Nest con el contrato de JSON Server
+  (`_sort`, `_order`, `name_like`, `_page`, `_limit`, `X-Total-Count`). Migración `crud_curso` **aplicada en Supabase**
+  (con CHECKs), semilla `cd server && npm run db:seed` (151 + demo) **ya cargada**. App: `apiUrl` → `serverUrl` (dev :3000),
+  agregar/editar con `authGuard`. JSON Server archivado en `backend/legacy/` (sin `npm run api`). Postman reescrita
+  (re-ejecutable, 79 comprobaciones). e2e en serie por el límite del pooler. D-019.
 - **Auth en producción (Render):** `JWT_SECRET` propio puesto en Render; tras mezclar #14, probado contra
   https://pokecrud-server.onrender.com: registro 201, `/auth/me` 200, refresh 200, refresh reutilizado 401 y familia
   revocada, logout 204 (cuenta de prueba borrada).
@@ -37,25 +43,30 @@ migrado (dep F0-07) y **F0-09** APK.
 
 ## En curso
 
-- **F0-08** (@kenneth, rama `feature/F0-08-crud-nest`): CRUD del curso a NestJS. Punto de guardado: pasos 1-4 hechos (migración `crud_curso` aplicada en Supabase, semilla `npm run db:seed`, módulos `/pokemon` `/teams` `/favorites` `/customPokemon` con 25 e2e en verde). Paso 5 hecho: `apiUrl` unificado en `serverUrl` (dev :3000), agregar/editar exigen sesión, CRUD de la Pokédex probado en el navegador contra Nest. Sigue: paso 6 (Postman).
+- **F0-08** (@kenneth, rama `feature/F0-08-crud-nest`). Punto de guardado: pasos 1-8 hechos y pusheados. Falta la
+  captura del Runner de Postman → marcar `[x]` y abrir PR a `develop`.
 
 ## Siguiente paso concreto
 
-1. Siguiente tarea: **F0-08** (CRUD del curso a NestJS, dep F0-07) o **F0-09** (APK, dep F0-04), desde `develop`.
-2. (Opcional) Que Alex o Kenneth revisen a posteriori los PR #8-#14.
+1. **Kenneth:** con `cd server && npm run start:dev`, importar `backend/postman/PokeCRUD.postman_collection.json` en
+   Postman, Run collection → captura `docs/evidencias/F0-08_01_postman-runner-nest.png`; F0-08 → `[x]`, PR a `develop`.
+2. Al mezclar: Render aplica la migración sola (`prisma migrate deploy` en el arranque; ya está aplicada, no hará nada).
+3. Siguiente tarea libre: **F0-10** (pooler, ver riesgo abajo) o **F0-09** (APK).
 
 ## Bloqueos / roto / pendiente de humanos
 
 - **Cada compañero necesita su propio `JWT_SECRET`** en su `server/.env` para arrancar el servidor en local (SECRETOS.md).
-- **Para probar el login en local hacen falta dos servidores:** Nest (`cd server && PORT=3001 npm run start:dev`) y la
-  app (`npm start`). La app de desarrollo apunta a `http://localhost:3001` (`environment.serverUrl`).
+- **En local hacen falta dos servidores:** Nest (`cd server && npm run start:dev`, puerto **3000**) y la app (`npm start`).
+  Si tu `server/.env` tiene `PORT=3001` de antes, cámbialo a 3000 (o bórralo).
+- **RIESGO — límite de conexiones (F0-10):** el _session pooler_ de Supabase admite **15 clientes en total**. Render (5) +
+  cada servidor local (5) los comparten: con los tres desarrollando a la vez, producción puede dar 500 (`EMAXCONNSESSION`).
+  Mientras no se haga F0-10, apagad el servidor local cuando no lo uséis.
 
 - **Render está en la cuenta de Samuel:** solo él ve los logs y cambia variables. Si hay que rotar la contraseña de la BD
   (SECRETOS.md), Samuel actualiza `DATABASE_URL` y `DIRECT_URL` en Render. Plan gratis: se duerme a los 15 min.
-- **Inventario IS-11 en producción:** `environment.prod.ts` ya apunta a Render, pero `/pokemon` no existe ahí hasta F0-08.
-  En desarrollo (`npm start` / `ionic serve` + `npm run api`) sigue funcionando igual.
-- **Puerto 3000:** lo usa el JSON Server del curso (`npm run api`). Mientras conviva, el servidor Nest se arranca con
-  `PORT=3001`. Desaparece en F0-08 (JSON Server archivado).
+- **Inventario IS-11 en producción:** `/pokemon` llega a Render al mezclar F0-08 (las tablas y la semilla ya están en la base).
+- **Vista móvil 390×844 sin comprobar en F0-08:** la ventana de Chrome no se dejó redimensionar; el CRUD se probó a ancho de
+  escritorio. La Pokédex no cambió de UI, pero conviene un vistazo en móvil antes de la demo.
 - **Google Maps — HECHO (2026-10-11):** clave `pokecrud-maps-js` en la cuenta de Google Cloud de Alex
   (prueba gratuita hasta 2027-01-10, proyecto "My First Project" `project-7bf0c639-c6d2-4cc1-aba`), restringida a
   Maps JavaScript API y a `https://localhost/*`, `http://localhost:8100/*`, `http://localhost:4200/*`.
@@ -77,4 +88,4 @@ migrado (dep F0-07) y **F0-09** APK.
 ## URLs / datos útiles
 
 - Repo: https://github.com/alexpipe31w/pokecrud (público) · rama de integración `develop`.
-- Servidor desplegado: — (se rellena en F0-06)
+- Servidor desplegado: https://pokecrud-server.onrender.com (`/health/ready`).

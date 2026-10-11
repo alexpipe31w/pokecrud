@@ -4,8 +4,6 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "api": "json-server --watch backend/db.json --port 3000",
-    "api:reset": "node -e \"require('fs').copyFileSync('backend/db.seed.json','backend/db.json')\"",
     "seed:151": "node scripts/seed-151.mjs",
     "dataset": "node scripts/build-dataset.mjs",
     "test:shared": "vitest run --config vitest.shared.config.ts",
@@ -53,7 +51,6 @@
     "eslint-config-prettier": "^10.1.8",
     "fake-indexeddb": "6.2.5",
     "jsdom": "^26.0.0",
-    "json-server": "^0.17.4",
     "prettier": "^3.9.9",
     "typescript": "~6.0.0",
     "typescript-eslint": "^8.61.0",

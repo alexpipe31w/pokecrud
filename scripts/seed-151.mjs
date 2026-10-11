@@ -1,5 +1,6 @@
 // Descarga los primeros 151 Pokémon de PokéAPI y los guarda en la colección `pokemon`
-// de backend/db.seed.json y backend/db.json (sin tocar teams, favorites ni customPokemon).
+// de backend/legacy/db.seed.json (sin tocar teams, favorites ni customPokemon). Después, `npm run db:seed` en
+// server/ los carga en la base (solo crea los que falten).
 //
 // Uso: npm run seed:151
 //
@@ -11,7 +12,7 @@ import { readFileSync, writeFileSync } from 'node:fs';
 const POKE_API_URL = 'https://pokeapi.co/api/v2';
 const TOTAL = 151;
 const CONCURRENCY = 10;
-const FILES = ['backend/db.seed.json', 'backend/db.json'];
+const FILES = ['backend/legacy/db.seed.json'];
 const NOW = new Date().toISOString();
 
 const STAT_KEYS = {

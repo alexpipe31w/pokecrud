@@ -8,7 +8,7 @@ import { PrismaPg } from '@prisma/adapter-pg';
 import * as argon2 from 'argon2';
 import { PrismaClient } from '../src/generated/prisma/client.js';
 
-const SEED_FILE = new URL('../../backend/db.seed.json', import.meta.url);
+const SEED_FILE = new URL('../../backend/legacy/db.seed.json', import.meta.url);
 
 /**
  * Dueño de los equipos/favoritos/personalizados de ejemplo. Dominio `.invalid` (RFC 2606) y NO

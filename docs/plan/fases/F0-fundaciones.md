@@ -1405,10 +1405,10 @@ Añadir `CHECK` en la migración SQL generada (editar antes de `migrate deploy`)
       `baseUrl` → `http://localhost:3000`, petición previa de login que guarda `accessToken` en una variable de
       colección y `Authorization: Bearer {{accessToken}}` en las carpetas protegidas. Ejecutar el Runner entero:
       captura `docs/evidencias/F0-08_01_postman-runner-nest.png` con todo en verde.
-- [ ] **Paso 7: archivar JSON Server** — mover `backend/db.json`, `db.seed.json` a `backend/legacy/`,
+- [x] **Paso 7: archivar JSON Server** — mover `backend/db.json`, `db.seed.json` a `backend/legacy/`,
       quitar `npm run api`/`api:reset` del `package.json` raíz y actualizar el README ("Cómo correr").
       (`seed.ts` lee de `backend/legacy/db.seed.json` desde este paso.)
-- [ ] **Paso 8: verificar** (todas las suites + Runner de Postman) y commit `F0-08: CRUD del curso en NestJS`.
+- [x] **Paso 8: verificar** (todas las suites + Runner de Postman) y commit `F0-08: CRUD del curso en NestJS`.
 
 ---
 

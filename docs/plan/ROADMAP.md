@@ -46,9 +46,15 @@
 - [~] **F0-08 · CRUD del curso migrado** (@kenneth, 2026-10-11) — `/pokemon` (inventario de IS-11: `price`, `stock`), `/teams`, `/favorites`, `/customPokemon` en Nest con el mismo
   contrato + filtro por jugador + paginación; Postman actualizado; `backend/` archivado (D-004).
   Dep: F0-07. Criterio: la colección de Postman pasa entera contra el servidor nuevo (captura del runner).
+  **Falta solo:** la captura del Runner de Postman (`docs/evidencias/F0-08_01_postman-runner-nest.png`). La colección ya
+  pasa entera con Newman (44 peticiones, 79 comprobaciones, 0 fallos: `docs/evidencias/F0-08_01_newman-runner.txt`).
 - [ ] **F0-09 · Pipeline del APK** — `npx cap add android`, permisos, icono y splash provisionales,
       script `npm run apk` documentado, APK instalado en un Android real mostrando `/dev/ui`.
       Dep: F0-04. Criterio: foto/captura del móvil + tamaño del APK en la bitácora.
+- [ ] **F0-10 · Conexiones a la base: transaction pooler** — el _session pooler_ de Supabase admite 15 clientes en total
+      y Render + cada servidor local (pool 5) los comparten (D-019). Pasar `DATABASE_URL` al _transaction pooler_ (6543,
+      `?pgbouncer=true` si Prisma lo pide) en Render y en los `.env`, dejando `DIRECT_URL` para migraciones (D-017).
+      Dep: F0-08. Criterio: e2e en paralelo + Render + 2 servidores locales a la vez sin `EMAXCONNSESSION` (salida en bitácora).
 
 ## F1 · Mapa con GPS
 

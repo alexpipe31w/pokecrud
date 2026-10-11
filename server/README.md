@@ -9,8 +9,8 @@ NestJS 12 (ESM) + Prisma 7.10 + PostgreSQL (Supabase). Arquitectura en `docs/pla
 2. `npm install` (genera el cliente de Prisma en `src/generated/`, que tampoco se sube).
 3. `npm run start:dev` → `http://localhost:3000/health/ready` debe responder `{"status":"ok","db":"ok"}`.
 
-> Mientras exista el JSON Server del curso (`npm run api` en la raíz, puerto 3000), arrancar este servidor con
-> otro puerto: `PORT=3001 npm run start:dev` (en PowerShell: `$env:PORT=3001; npm.cmd run start:dev`).
+4. `npm run db:seed` carga los 151 Pokémon del inventario y los datos de ejemplo (idempotente: solo crea lo que falte,
+   nunca pisa precios ni stock editados).
 
 ## Comandos
 
@@ -23,6 +23,7 @@ NestJS 12 (ESM) + Prisma 7.10 + PostgreSQL (Supabase). Arquitectura en `docs/pla
 | `npm run lint`                         | oxlint                                                                |
 | `npm run db:migrate -- --name <x>`     | Crea una migración nueva (OJO: en una base con datos, revisar el SQL) |
 | `npm run db:deploy`                    | Aplica las migraciones pendientes (lo que se usa en Render)           |
+| `npm run db:seed`                      | Semilla del CRUD del curso (`backend/legacy/db.seed.json`)            |
 
 ## Endpoints
 
