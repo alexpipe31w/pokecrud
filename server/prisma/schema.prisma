@@ -11,15 +11,18 @@ datasource db {
 }
 
 model Player {
-  id            String         @id @default(uuid()) @db.Uuid
-  email         String         @unique
+  id            String          @id @default(uuid()) @db.Uuid
+  email         String          @unique
   passwordHash  String
-  nickname      String         @unique
-  level         Int            @default(1)
-  xp            Int            @default(0)
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
+  nickname      String          @unique
+  level         Int             @default(1)
+  xp            Int             @default(0)
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
   refreshTokens RefreshToken[]
+  teams         Team[]
+  favorites     Favorite[]
+  customPokemon CustomPokemon[]
 }
 
 model RefreshToken {
@@ -34,4 +37,67 @@ model RefreshToken {
 
   @@index([playerId])
   @@index([familyId])
+}
+
+// ── CRUD del curso (F0-08): mismo contrato que tenía JSON Server. Ver docs/plan/fases/F0-fundaciones.md ──
+// CHECKs (stock ≥ 0, rating 1-5, máx. 6 Pokémon por equipo) en la migración `crud_curso`: Prisma no los modela.
+
+/// `/pokemon` de IS-11: inventario compartido de la clase. El id es el nº de la Pokédex (como en JSON Server).
+model InventoryPokemon {
+  id             Int      @id
+  name           String
+  types          String[]
+  abilities      String[]
+  imageUrl       String
+  height         Float
+  weight         Float
+  baseExperience Int
+  stats          Json
+  price          Int
+  stock          Int      @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([name])
+}
+
+model Team {
+  id          Int      @id @default(autoincrement())
+  playerId    String   @db.Uuid
+  player      Player   @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  name        String
+  description String   @default("")
+  pokemonIds  Int[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([playerId, id])
+}
+
+model Favorite {
+  id          Int      @id @default(autoincrement())
+  playerId    String   @db.Uuid
+  player      Player   @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  pokemonId   Int
+  pokemonName String
+  note        String   @default("")
+  rating      Int
+  createdAt   DateTime @default(now())
+
+  @@unique([playerId, pokemonId])
+  @@index([playerId, id])
+}
+
+model CustomPokemon {
+  id          Int      @id @default(autoincrement())
+  playerId    String   @db.Uuid
+  player      Player   @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  name        String
+  types       String[]
+  stats       Json
+  imageUrl    String   @default("")
+  description String   @default("")
+  createdAt   DateTime @default(now())
+
+  @@index([playerId, id])
 }
