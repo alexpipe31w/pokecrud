@@ -972,7 +972,7 @@ export class HapticsService {
 
 Test: con `haptics: false` no llama a `Haptics.impact` (`vi.mock('@capacitor/haptics', …)`).
 
-- [ ] **Paso 3: AudioService** — buses `music | sfx | cries` con `GainNode` ligado a los volúmenes de
+- [x] **Paso 3: AudioService** — buses `music | sfx | cries` con `GainNode` ligado a los volúmenes de
       `SettingsService` (un `effect`), `unlock()` que hace `ctx.resume()` en el primer `pointerdown` del
       documento, `playSfx(name)` con buffers pre-decodificados desde `assets/audio/sfx/<name>.ogg`
       (si el archivo no existe: `console.warn` una vez y seguir; F2-08 traerá los sonidos), y
