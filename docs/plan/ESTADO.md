@@ -11,6 +11,7 @@
 
 ## Hecho
 
+- El profe aprobó sustituir JSON Server por NestJS con los mismos endpoints (D-002).
 - Plan maestro completo en `docs/plan/` (visión, arquitectura, diseño, roadmap, decisiones).
 - Reglas de relevo en `CLAUDE.md`, comandos `/inicio` y `/cierre`, hook de arranque.
 - Skills esenciales copiadas en `.claude/skills/` (estándares de producción, planes, TDD, depuración,
@@ -32,8 +33,6 @@
 
 - **Google Maps API key**: alguien del equipo tiene que crearla en Google Cloud (con alerta de presupuesto)
   antes de F1-01. Hasta entonces se trabaja con el modo joystick sobre un mapa sin key (marca de agua "for development").
-- **Confirmar con el profe**: ¿se puede sustituir JSON Server por un backend propio NestJS conservando los
-  mismos endpoints? (D-002/D-004). Si dice que no, se mantiene JSON Server para el CRUD y Nest solo para el juego.
 - **Base de datos**: crear proyecto Supabase (gratis) para el equipo y compartir `DATABASE_URL` por privado
   (nunca en el repo).
 - Hay 6 capturas de evidencia HU-02 sin commitear en `docs/evidencias/` (son de Alex, no se tocaron).

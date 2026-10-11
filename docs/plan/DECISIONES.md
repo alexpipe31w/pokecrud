@@ -13,8 +13,8 @@ historial que el profe ya vio. Lo "básico y feo" era la idea, no la base técni
 
 ## D-002 · Stack de la app: Angular 22 + Ionic 9 + Capacitor 8 (2026-10-11)
 
-Se mantiene el stack del curso. Capacitor da el APK de Android. **Supuesto a confirmar con el profe:**
-que se pueda añadir backend propio (NestJS) además de / en lugar de JSON Server (ver D-004).
+Se mantiene el stack del curso. Capacitor da el APK de Android. **Confirmado por el profe (2026-10-11):**
+se puede sustituir JSON Server por backend propio (NestJS) conservando los endpoints (ver D-004).
 
 ## D-003 · three.js para todo lo 3D (mapa, AR, combate) (2026-10-11)
 
