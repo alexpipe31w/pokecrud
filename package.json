@@ -7,6 +7,8 @@
     "api": "json-server --watch backend/db.json --port 3000",
     "api:reset": "node -e \"require('fs').copyFileSync('backend/db.seed.json','backend/db.json')\"",
     "seed:151": "node scripts/seed-151.mjs",
+    "dataset": "node scripts/build-dataset.mjs",
+    "test:shared": "vitest run --config vitest.shared.config.ts",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",

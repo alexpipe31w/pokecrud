@@ -66,3 +66,25 @@ CLAUDE.md, comando `/guardar`, hook `Stop` `checkpoint-guard.js`, `/inicio` sabe
 **Quedó a medias / roto:** nada. Pendiente de decidir en F1: cómo importa `server/` el código de `shared/`.
 **Decisiones nuevas:** D-012, D-013.
 **El siguiente debe empezar por:** `/inicio F0-02 <nombre>` (o F0-03 / F0-06 en paralelo) y seguir el plan de fase.
+
+## 2026-10-11 14:10 · @samuel (Claude) · F0-02 · rama `feature/F0-02-dataset`
+
+**Qué se hizo:** relevo de Alex. Configurados `server/.env` y `environment.local.ts` (OK, ignorados por Git;
+conexión a Supabase OK). F0-02 completa siguiendo el plan de fase pasos 1-10: tipos del dataset, cliente PokéAPI con
+caché/timeout/reintentos, `scripts/build-dataset.mjs`, test y dataset generado. Dos ajustes mínimos al código del plan:
+`clean()` quita el guion suave (U+00AD) junto con el salto de línea (si no, partía palabras) y `types` se ordena sobre
+una copia. Como F0-03 no está mezclada, se crearon `vitest.shared.config.ts` y el script `test:shared` idénticos al plan.
+**Archivos clave:** `shared/data/dataset.types.ts`, `shared/data/dataset.spec.ts`, `scripts/build-dataset.mjs`,
+`scripts/lib/pokeapi-fetch.mjs`, `src/assets/data/{pokedex,moves,types,meta}.json`, `vitest.shared.config.ts`, `package.json`.
+**Cómo se probó (salida real):**
+    npm run dataset   → OK · pokedex 972 KB · moves 209 KB · types 2 KB · vfdb512e56ff6  (1025 especies, 706 movimientos)
+    npm run test:shared → Test Files 1 passed (1) · Tests 5 passed (5)
+    npm run lint      → All files pass linting.
+    ng test --watch=false → Test Files 11 passed (11) · Tests 29 passed (29)
+    npm run build     → Application bundle generation complete (www/assets/data con los 4 JSON)
+**Tamaño:** pokedex 972 KB (< 3 MB → no hace falta partir por generación).
+**Quedó a medias / roto:** nada. Nota de datos: PokéAPI no tiene español para la Gen 9 (#906-1025): nombre, género y
+descripción salen en inglés (fallback previsto). 924/1025 descripciones en español; ninguna especie sin learnset.
+**Decisiones nuevas:** ninguna.
+**El siguiente debe empezar por:** mezclar el PR de F0-02 y luego `/inicio F0-03 <nombre>` (su Paso 1 y el script
+`test:shared` ya existen; no duplicarlos) o `/inicio F0-06 <nombre>`.
