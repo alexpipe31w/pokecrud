@@ -29,7 +29,7 @@ de otro integrante: constancia en cada PR). Servidor desplegado. Libres: **F0-07
 
 ## En curso
 
-- Nadie.
+- F0-07 (@samuel) · rama `feature/F0-07-auth` · **Punto de guardado 2026-10-11**: tarea reclamada; siguiente: Paso 1 (tests e2e de auth).
 
 ## Siguiente paso concreto
 

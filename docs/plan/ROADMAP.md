@@ -36,7 +36,7 @@
       Dep: F0-01. Criterio: `npm run start:dev` en `server/` responde `/health`; migración aplicada; desplegado
       con URL anotada en ESTADO.md.
       **Desplegado:** https://pokecrud-server.onrender.com (Render, cuenta de Samuel, rama `develop`).
-- [ ] **F0-07 · Auth completo** — registro/login/refresh/logout (argon2id, JWT 15 min, refresh rotatorio),
+- [~] **F0-07 · Auth completo** (@samuel, 2026-10-11) — registro/login/refresh/logout (argon2id, JWT 15 min, refresh rotatorio),
       rate limit en login, pantalla de login/registro con el sistema de diseño, guard en la app, interceptor
       que refresca, almacenamiento seguro (D-006).
       Dep: F0-04, F0-06. Criterio: tests de servidor (login correcto, contraseña mala, refresh reutilizado
