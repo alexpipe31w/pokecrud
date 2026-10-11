@@ -3,7 +3,7 @@
 > Se **reescribe** al cerrar cada sesión (no es histórico; el histórico es `BITACORA.md`).
 > Máximo una pantalla. Si lees esto al empezar: después lee `ROADMAP.md`.
 
-**Última actualización:** 2026-10-11 · por Alex (Claude) · rama `feature/plan-maestro`
+**Última actualización:** 2026-10-11 · por Alex (Claude) · rama `feature/F0-01-plan-fundaciones`
 
 ## Fase actual
 
@@ -12,6 +12,8 @@
 ## Hecho
 
 - El profe aprobó sustituir JSON Server por NestJS con los mismos endpoints (D-002).
+- **F0-01 hecho:** plan detallado de la fase 0 con código y comandos verificados (Nest 12 ESM + Vitest, Prisma 7.10 con `prisma.config.ts` y `PrismaPg`).
+- **Guardado continuo:** REGLA 2b + `/guardar` + hook `Stop` que obliga a guardar si hay trabajo sin push de más de 20 min.
 - Plan maestro completo en `docs/plan/` (visión, arquitectura, diseño, roadmap, decisiones).
 - Reglas de relevo en `CLAUDE.md`, comandos `/inicio` y `/cierre`, hook de arranque.
 - Skills esenciales copiadas en `.claude/skills/` (estándares de producción, planes, TDD, depuración,
@@ -28,13 +30,12 @@
 
 ## Siguiente paso concreto
 
-1. Plan maestro ya mezclado en `develop` (PR #5).
-2. Coger **F0-01** (plan detallado de F0). Después F0-02, F0-03 y F0-06 se pueden hacer **en paralelo**
-   por personas distintas (no se pisan: dataset / shared+tooling / servidor).
+1. Mezclar el PR de F0-01 (plan detallado `docs/plan/fases/F0-fundaciones.md`).
+2. Repartir **en paralelo** (no se pisan): **F0-02** dataset · **F0-03** shared+tooling · **F0-06** servidor.
+   Cada uno: `/inicio F0-0X <nombre>` y seguir el plan de fase paso a paso, con `/guardar` tras cada paso.
 
 ## Bloqueos / roto / pendiente de humanos
 
-- **Node:** Angular CLI 22 pide Node ≥ 22.22.3 o ≥ 24.15.0. El PC de Alex tiene 24.14 → `npm run lint/test/build` no arrancan ahí hasta actualizar.
 - **Google Maps — HECHO (2026-10-11):** clave `pokecrud-maps-js` en la cuenta de Google Cloud de Alex
   (prueba gratuita hasta 2027-01-10, proyecto "My First Project" `project-7bf0c639-c6d2-4cc1-aba`), restringida a
   Maps JavaScript API y a `https://localhost/*`, `http://localhost:8100/*`, `http://localhost:4200/*`.

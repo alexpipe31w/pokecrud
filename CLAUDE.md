@@ -49,6 +49,25 @@ Atajo: el comando `/inicio` hace todo esto. El hook de arranque te muestra `ESTA
 
 Atajo: el comando `/cierre` hace todo esto.
 
+## REGLA 2b — Guardar DURANTE el trabajo (los tokens se acaban sin avisar)
+
+Cuando a una cuenta de Claude Pro se le acaba el límite, la sesión **se corta de golpe**: no da tiempo a
+`/cierre`. Lo que no esté **pusheado** no existe para el siguiente compañero. Por eso se guarda todo el rato:
+
+- **Cuándo hacer `/guardar`** (commit + push + línea de "En curso" en ESTADO.md con el paso exacto):
+  1. al terminar **cada paso** del plan de fase (`docs/plan/fases/…`), marcando su casilla `[x]`;
+  2. como mucho cada **20 minutos** de trabajo, aunque estés a medias (commit `WIP`, diciendo si compila);
+  3. **antes** de algo largo o arriesgado: instalar dependencias, migraciones, refactors, builds del APK;
+  4. en cuanto Claude Code avise de que te acercas al límite de uso, o el humano diga "me quedan pocos tokens";
+  5. justo antes de que se compacte la conversación (contexto largo).
+- Un commit `WIP` en tu rama `feature/...` está **bien**. Perder dos horas de trabajo, no.
+- **Red de seguridad automática:** el hook `Stop` (`.claude/hooks/checkpoint-guard.js`) no te deja terminar
+  un turno si hay cambios sin commit o sin push y el último commit tiene más de 20 min. Si salta, haz
+  `/guardar` y sigue; no lo desactives.
+- **Quien retoma** una tarea `[~]` de otro: haz `git fetch` y `git checkout` de **su rama** (no crees otra),
+  lee su "Punto de guardado" en ESTADO.md y su última entrada de bitácora, y sigue desde el paso indicado.
+  Cambia el `(@nombre)` de la tarea al tuyo y anótalo en la bitácora ("retomo de @X en el paso N").
+
 ## REGLA 3 — Calidad (el objetivo es GANAR, no "que funcione")
 
 - Lo que se entrega tiene que **verse y sentirse como un juego de verdad**: animaciones,

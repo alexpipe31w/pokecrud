@@ -17,6 +17,8 @@ process.stdout.write(
   [
     'PROYECTO POKECRUD GO — trabajo por relevos entre 3 personas con cuentas de Claude distintas.',
     'Antes de tocar código cumple la REGLA 1 de CLAUDE.md (o usa /inicio). Al terminar, REGLA 2 (o /cierre).',
+    'DURANTE el trabajo: /guardar tras cada paso y cada 20 min como mucho (REGLA 2b). Los tokens se acaban sin avisar.',
+    'Si una tarea está [~] de otro compañero y vas a retomarla: usa SU rama y su "Punto de guardado" de ESTADO.md.',
     '',
     '=== docs/plan/ESTADO.md ===',
     body,
