@@ -7,7 +7,7 @@
 
 ## Fase actual
 
-**F0 · Fundaciones** — **F0-01…F0-07 hechas y en `develop`** (PR #8-#14). **F0-08 hecha** (Kenneth, PR a `develop`
+**F0 · Fundaciones** — **F0-01…F0-07 hechas y en `develop`** (PR #8-#14). **F0-08 hecha** (Kenneth, PR #16 a `develop`
 pendiente de mezclar). Libres: **F0-09** APK y **F0-10** transaction pooler (nueva).
 
 ## Hecho
@@ -47,7 +47,7 @@ pendiente de mezclar). Libres: **F0-09** APK y **F0-10** transaction pooler (nue
 
 ## Siguiente paso concreto
 
-1. Revisar y mezclar el PR de F0-08 en `develop`. Después, comprobar en Render `GET /pokemon?_limit=1` (200).
+1. Revisar y mezclar el PR #16 (F0-08) en `develop`. Después, comprobar en Render `GET /pokemon?_limit=1` (200).
 2. Al mezclar: Render aplica la migración sola (`prisma migrate deploy` en el arranque; ya está aplicada, no hará nada).
 3. Siguiente tarea libre: **F0-10** (pooler, ver riesgo abajo) o **F0-09** (APK).
 
