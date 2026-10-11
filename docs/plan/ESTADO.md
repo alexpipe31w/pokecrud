@@ -7,12 +7,12 @@
 
 ## Fase actual
 
-**F0 · Fundaciones** — **F0-01…F0-07 hechas y en `develop`** (PR #8-#14). **F0-08** `[~]` (Kenneth): código terminado y
-probado, falta solo la captura del Runner de Postman. Libres: **F0-09** APK y **F0-10** transaction pooler (nueva).
+**F0 · Fundaciones** — **F0-01…F0-07 hechas y en `develop`** (PR #8-#14). **F0-08 hecha** (Kenneth, PR a `develop`
+pendiente de mezclar). Libres: **F0-09** APK y **F0-10** transaction pooler (nueva).
 
 ## Hecho
 
-- **F0-08 (Kenneth, rama `feature/F0-08-crud-nest`, sin PR aún):** `/pokemon` (público para leer, sesión para escribir),
+- **F0-08 (Kenneth, rama `feature/F0-08-crud-nest`, PR a `develop`):** `/pokemon` (público para leer, sesión para escribir),
   `/teams`, `/favorites`, `/customPokemon` (por jugador; lo ajeno → 404) en Nest con el contrato de JSON Server
   (`_sort`, `_order`, `name_like`, `_page`, `_limit`, `X-Total-Count`). Migración `crud_curso` **aplicada en Supabase**
   (con CHECKs), semilla `cd server && npm run db:seed` (151 + demo) **ya cargada**. App: `apiUrl` → `serverUrl` (dev :3000),
@@ -43,13 +43,11 @@ probado, falta solo la captura del Runner de Postman. Libres: **F0-09** APK y **
 
 ## En curso
 
-- **F0-08** (@kenneth, rama `feature/F0-08-crud-nest`). Punto de guardado: pasos 1-8 hechos y pusheados. Falta la
-  captura del Runner de Postman → marcar `[x]` y abrir PR a `develop`.
+- Nadie.
 
 ## Siguiente paso concreto
 
-1. **Kenneth:** con `cd server && npm run start:dev`, importar `backend/postman/PokeCRUD.postman_collection.json` en
-   Postman, Run collection → captura `docs/evidencias/F0-08_01_postman-runner-nest.png`; F0-08 → `[x]`, PR a `develop`.
+1. Revisar y mezclar el PR de F0-08 en `develop`. Después, comprobar en Render `GET /pokemon?_limit=1` (200).
 2. Al mezclar: Render aplica la migración sola (`prisma migrate deploy` en el arranque; ya está aplicada, no hará nada).
 3. Siguiente tarea libre: **F0-10** (pooler, ver riesgo abajo) o **F0-09** (APK).
 

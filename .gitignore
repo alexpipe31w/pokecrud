@@ -81,3 +81,8 @@ Thumbs.db
 *.jks
 .claude/settings.local.json
 /.playwright-mcp
+
+# Postman en modo local crea aquí su copia de trabajo (YAML + id del workspace de cada uno). La colección
+# compartida es backend/postman/PokeCRUD.postman_collection.json.
+/postman/
+/.postman/

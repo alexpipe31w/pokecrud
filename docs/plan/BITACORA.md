@@ -297,3 +297,17 @@ curl https://pokecrud-server.onrender.com/health/ready → {"status":"ok","db":"
 **El siguiente debe empezar por:** (Kenneth) `cd server && npm run start:dev`, Postman → importar
 `backend/postman/PokeCRUD.postman_collection.json` → Run collection → guardar captura como
 `docs/evidencias/F0-08_01_postman-runner-nest.png`, marcar F0-08 `[x]` y abrir el PR a `develop`.
+
+## 2026-10-11 18:50 · @kenneth (Claude) · F0-08 (cierre) · rama `feature/F0-08-crud-nest`
+
+**Qué se hizo:** Runner de Postman ejecutado por Kenneth contra Nest local → F0-08 `[x]` y PR a `develop`. Postman en
+modo local crea `postman/` y `.postman/` en la raíz del repo (copia YAML + id del workspace): añadidas al `.gitignore`.
+**Archivos clave:** `docs/evidencias/F0-08_01_postman-runner-nest.png`, `.gitignore`.
+**Cómo se probó (salida real):**
+
+    Postman Runner: All tests 79 · Passed 79 · Failed 0 · Errors 0 · 15 s (captura)
+
+**Quedó a medias / roto:** nada en F0-08. Pendiente: vista móvil 390×844 y riesgo del pooler (F0-10).
+**Decisiones nuevas:** ninguna (D-019 en la entrada anterior).
+**El siguiente debe empezar por:** mezclar el PR de F0-08, comprobar `https://pokecrud-server.onrender.com/pokemon?_limit=1`
+y luego `/inicio F0-10` (transaction pooler) o `/inicio F0-09` (APK).
