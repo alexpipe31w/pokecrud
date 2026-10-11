@@ -202,3 +202,23 @@ el stack; la taxonomía de errores llega con F0-07).
 **Decisiones nuevas:** D-017.
 **El siguiente debe empezar por:** Alex despliega en Render (`server/README.md`) y pasa F0-06 a `[x]`; luego `/inicio F0-07`
 (cuando F0-04 y F0-06 estén en `develop`) o `/inicio F0-09`.
+
+## 2026-10-11 16:40 · @samuel (Claude) · F0-06 (mezcla y despliegue) · rama `feature/F0-06-despliegue-render`
+
+**Qué se hizo:** PR #8 → #9 → #10 → #11 → #12 mezclados por Samuel (merge commit, sin revisión de otro integrante, con
+comentario de constancia en cada PR). Antes del #12 se trajo `develop` a su rama y se resolvieron los conflictos de
+`docs/plan` (ESTADO, DECISIONES, BITACORA) conservando todas las entradas. Samuel desplegó el servidor en **su propia
+cuenta de Render** (Web Service `pokecrud-server`, Free, rama `develop`, Root `server/`, build
+`npm ci --include=dev && npm run build`, start `npx prisma migrate deploy && npm run start:prod`, health `/health/ready`,
+variables `DATABASE_URL`, `DIRECT_URL`, `NODE_ENV=production`, `NODE_VERSION=24`, `CORS_ORIGINS`). Instrucciones de
+`server/README.md` corregidas antes (`--include=dev`, `NODE_VERSION`) tras simular el build de Render en local.
+`environment.prod.ts` → `apiUrl: 'https://pokecrud-server.onrender.com'`. F0-06 → `[x]`.
+**Cómo se probó (salida real):**
+    tras mezclar todo: app 63/63 · shared 10/10 · lint OK · build OK · server 4 unitarios + 7 e2e
+    Render: "Deploy succeeded | Live" (commit 7ab7d73 de develop, 1m23s)
+    curl https://pokecrud-server.onrender.com/health/ready → {"status":"ok","db":"ok"} [HTTP 200, 1.18 s]
+    /health/live 200 · HSTS, nosniff, X-Frame-Options, x-request-id · CORS localhost:4200 permitido, evil.com bloqueado
+    /no-existe → 404 JSON sin stack
+**Quedó a medias / roto:** nada. El inventario IS-11 en un build de producción no tendrá `/pokemon` hasta F0-08.
+**Decisiones nuevas:** ninguna (el despliegue en cuenta de Samuel queda anotado en ESTADO → Bloqueos).
+**El siguiente debe empezar por:** `/inicio F0-07 <nombre>` (auth) o `/inicio F0-09 <nombre>` (APK), desde `develop`.
