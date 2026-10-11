@@ -29,7 +29,8 @@
 
 ## En curso
 
-- Nadie.
+- F0-03 (@samuel) · rama `feature/F0-03-shared-tooling` (sale de `feature/F0-02-dataset` porque el PR #8 aún no está
+  mezclado) · **Punto de guardado 2026-10-11**: tarea reclamada; siguiente: Paso 2 (Paso 1 ya venía en F0-02).
 
 ## Siguiente paso concreto
 
