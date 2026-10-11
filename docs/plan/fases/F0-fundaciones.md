@@ -1325,7 +1325,7 @@ data: { revokedAt: now } })`; si `count === 0` → buscar por `tokenHash`: si ex
 contrato** de JSON Server que usan: `GET/POST/PUT/PATCH/DELETE` en `/pokemon`, `/teams`, `/favorites`,
 `/customPokemon`, `GET /pokemon?_sort=id&_order=asc` y `GET /pokemon?name_like=mew`.
 
-- [ ] **Paso 1: modelos Prisma** (migración `crud_curso`):
+- [x] **Paso 1: modelos Prisma** (migración `crud_curso`):
 
 ```prisma
 model InventoryPokemon {          // `/pokemon` de IS-11: catálogo/inventario compartido
@@ -1386,15 +1386,15 @@ Añadir `CHECK` en la migración SQL generada (editar antes de `migrate deploy`)
 `ALTER TABLE "Favorite" ADD CONSTRAINT rating_range CHECK (rating BETWEEN 1 AND 5);`
 `ALTER TABLE "Team" ADD CONSTRAINT max_six CHECK (cardinality("pokemonIds") <= 6);`
 
-- [ ] **Paso 2: semilla** — `server/prisma/seed.ts` lee `../backend/db.seed.json` y hace `upsert` por id
+- [x] **Paso 2: semilla** — `server/prisma/seed.ts` lee `../backend/db.seed.json` y hace `upsert` por id
       de los 151 de `pokemon` (idempotente: se puede correr N veces). Los `teams/favorites/customPokemon` de
       ejemplo se crean para un jugador demo `demo@pokecrud.test` (también con upsert). Script `"db:seed"`.
-- [ ] **Paso 3: reglas de acceso** (tests e2e primero, uno por regla):
+- [x] **Paso 3: reglas de acceso** (tests e2e primero, uno por regla):
   - `/pokemon`: lectura pública; escritura requiere sesión (cualquier jugador; es el inventario de la clase).
   - `/teams`, `/favorites`, `/customPokemon`: requieren sesión y **todas las consultas filtran por
     `playerId` del token**. Pedir/editar/borrar el id de otro jugador → **404** (no 403: no revelar que existe).
   - Validación con DTOs equivalentes a los de IS-11 (`pokemonIds` máx. 6, `rating` 1-5, `price ≥ 0`, `stock ≥ 0`).
-- [ ] **Paso 4: compatibilidad de consultas** — implementar SOLO lo que se usa: `_sort` (`id|name|price|stock`)
+- [x] **Paso 4: compatibilidad de consultas** — implementar SOLO lo que se usa: `_sort` (`id|name|price|stock`)
       y `_order` (`asc|desc`), `name_like` (→ `contains`, `mode: 'insensitive'`), y paginación `_page`/`_limit`.
       Límite por defecto: `/pokemon` hasta 1025 (tabla acotada por el nº de especies, la app de IS-11 pide
       todo); el resto 50, máximo 100. `PUT` reemplaza, `PATCH` mezcla; `POST /pokemon` con id repetido → 409.
@@ -1420,7 +1420,7 @@ Añadir `CHECK` en la migración SQL generada (editar antes de `migrate deploy`)
 - [ ] **Paso 1:** `npm install @capacitor/android@8.5.3 @capacitor/splash-screen@8.0.2` y
       `npx cap add android`. Commitear la carpeta `android/` (D-009) — revisar que su `.gitignore` excluye
       `build/`, `.gradle/`, `local.properties` y `*.keystore`.
-- [ ] **Paso 2: permisos** — en `android/app/src/main/AndroidManifest.xml`, dentro de `<manifest>`:
+- [x] **Paso 2: permisos** — en `android/app/src/main/AndroidManifest.xml`, dentro de `<manifest>`:
 
 ```xml
 <uses-permission android:name="android.permission.INTERNET" />
@@ -1432,11 +1432,11 @@ Añadir `CHECK` en la migración SQL generada (editar antes de `migrate deploy`)
 <uses-feature android:name="android.hardware.camera" android:required="false" />
 ```
 
-- [ ] **Paso 3: tráfico al servidor local** — en desarrollo el APK habla con `http://<IP-del-PC>:3000`
+- [x] **Paso 3: tráfico al servidor local** — en desarrollo el APK habla con `http://<IP-del-PC>:3000`
       (no `localhost`). Crear `src/environments/environment.device.ts` (sin secretos, con `apiUrl` de la IP LAN)
       y una configuración `device` en `angular.json` que lo reemplace. Como es HTTP plano, añadir en
       `capacitor.config.ts` → `server: { cleartext: true }` **solo** cuando `process.env.CAP_DEV === '1'`.
-- [ ] **Paso 4: script** — `scripts/apk.mjs`: ejecuta `ng build` (configuración indicada por argumento,
+- [x] **Paso 4: script** — `scripts/apk.mjs`: ejecuta `ng build` (configuración indicada por argumento,
       por defecto `production`), `npx cap sync android` y `gradlew.bat assembleDebug` (o `./gradlew` fuera de
       Windows) con `JAVA_HOME` apuntando al `jbr` de Android Studio si no está definido; al final imprime la ruta
       y el tamaño del APK. `package.json`: `"apk": "node scripts/apk.mjs"`.

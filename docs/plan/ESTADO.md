@@ -37,7 +37,7 @@ migrado (dep F0-07) y **F0-09** APK.
 
 ## En curso
 
-- **F0-08** (@kenneth, rama `feature/F0-08-crud-nest`): CRUD del curso a NestJS. Punto de guardado: paso 1 (modelos + migración `crud_curso` escrita, SIN aplicar aún).
+- **F0-08** (@kenneth, rama `feature/F0-08-crud-nest`): CRUD del curso a NestJS. Punto de guardado: pasos 1-4 hechos (migración `crud_curso` aplicada en Supabase, semilla `npm run db:seed`, módulos `/pokemon` `/teams` `/favorites` `/customPokemon` con 25 e2e en verde). Sigue: paso 5 (la app contra Nest).
 
 ## Siguiente paso concreto
 
