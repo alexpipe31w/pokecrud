@@ -752,7 +752,7 @@ si no, DISENO.md manda.
 - [x] **Paso 3: colores de tipo en un solo sitio** — `pokemon-types.ts` ya tiene colores (IS-11). Hacer
       que `color` lea el token: cambiar cada `color: '#…'` por `color: 'var(--t-<tipo>)'` y comprobar que los
       chips de IS-11 se siguen viendo (Pokédex). Así no hay dos paletas.
-- [ ] **Paso 4: test de GameButton (falla primero)** — `src/app/shared/ui/game-button.component.spec.ts`
+- [x] **Paso 4: test de GameButton (falla primero)** — `src/app/shared/ui/game-button.component.spec.ts`
 
 ```ts
 import { ComponentFixture, TestBed } from '@angular/core/testing';
@@ -783,7 +783,7 @@ describe('GameButtonComponent', () => {
 });
 ```
 
-- [ ] **Paso 5: GameButton** — `src/app/shared/ui/game-button.component.ts`
+- [x] **Paso 5: GameButton** — `src/app/shared/ui/game-button.component.ts`
 
 ```ts
 import { Component, input, output } from '@angular/core';
@@ -852,7 +852,7 @@ export class GameButtonComponent {
 
 (El háptico y el clic de sonido se enchufan en F0-05 Paso 9, cuando existan los servicios.)
 
-- [ ] **Paso 6: GlassPanel, StatBar, HpBar** — mismo patrón (test primero, luego componente):
+- [x] **Paso 6: GlassPanel, StatBar, HpBar** — mismo patrón (test primero, luego componente):
   - `app-glass-panel`: `<ng-content/>` con fondo `var(--surface)`, `backdrop-filter: blur(20px) saturate(160%)`,
     borde superior `1px solid rgb(255 255 255 / 0.35)`, radio `var(--r-card)`, sombra según `size` (`'sm'|'lg'`).
     Test: proyecta contenido y aplica la clase de tamaño.

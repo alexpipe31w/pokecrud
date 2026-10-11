@@ -33,8 +33,9 @@
 ## En curso
 
 - F0-04 (@samuel) · rama `feature/F0-04-sistema-diseno` (sale de `feature/F0-03-shared-tooling`; PR #8 y #9 sin mezclar)
-  · **Punto de guardado 2026-10-11 14:45**: hechos pasos 1-3 (tokens, Fredoka, chips desde tokens con
-  texto por contraste, D-015); ahora en Paso 4 (test de GameButton); siguiente: Paso 5; estado: compila ✅ (app 30/30).
+  · **Punto de guardado 2026-10-11 14:55**: hechos pasos 1-6 (tokens + sombras/track, Fredoka, chips con
+  texto por contraste D-015, GameButton, GlassPanel, StatBar, HpBar con tests); ahora en Paso 7 (`/dev/ui`);
+  siguiente: Paso 8 (captura 390×844); estado: compila ✅ (app 40/40).
 
 ## Siguiente paso concreto
 
