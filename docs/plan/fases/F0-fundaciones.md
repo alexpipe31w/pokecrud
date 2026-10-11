@@ -718,7 +718,7 @@ Añadir `"shared/**/*.ts"` al `include` de `tsconfig.spec.json`.
 **Lee antes `docs/plan/DISENO.md` entero.** Si tienes la skill `impeccable`, úsala para el escaparate;
 si no, DISENO.md manda.
 
-- [ ] **Paso 1: tokens** — `src/theme/tokens.scss` con el bloque `:root` de DISENO.md §2 tal cual, más:
+- [x] **Paso 1: tokens** — `src/theme/tokens.scss` con el bloque `:root` de DISENO.md §2 tal cual, más:
 
 ```scss
 :root {
@@ -745,14 +745,14 @@ si no, DISENO.md manda.
 }
 ```
 
-- [ ] **Paso 2: fuente** — `npm install @fontsource/fredoka@5.3.0`. En `src/global.scss`, tras los
+- [x] **Paso 2: fuente** — `npm install @fontsource/fredoka@5.3.0`. En `src/global.scss`, tras los
       imports de Ionic: `@import '@fontsource/fredoka/500.css'; @import '@fontsource/fredoka/700.css';
 @import './theme/tokens.scss';` y `--font-display: 'Fredoka', system-ui, sans-serif;` en `:root`.
       Anotar en DECISIONES: "Fuente display: Fredoka (OFL, @fontsource 5.3.0)".
-- [ ] **Paso 3: colores de tipo en un solo sitio** — `pokemon-types.ts` ya tiene colores (IS-11). Hacer
+- [x] **Paso 3: colores de tipo en un solo sitio** — `pokemon-types.ts` ya tiene colores (IS-11). Hacer
       que `color` lea el token: cambiar cada `color: '#…'` por `color: 'var(--t-<tipo>)'` y comprobar que los
       chips de IS-11 se siguen viendo (Pokédex). Así no hay dos paletas.
-- [ ] **Paso 4: test de GameButton (falla primero)** — `src/app/shared/ui/game-button.component.spec.ts`
+- [x] **Paso 4: test de GameButton (falla primero)** — `src/app/shared/ui/game-button.component.spec.ts`
 
 ```ts
 import { ComponentFixture, TestBed } from '@angular/core/testing';
@@ -783,7 +783,7 @@ describe('GameButtonComponent', () => {
 });
 ```
 
-- [ ] **Paso 5: GameButton** — `src/app/shared/ui/game-button.component.ts`
+- [x] **Paso 5: GameButton** — `src/app/shared/ui/game-button.component.ts`
 
 ```ts
 import { Component, input, output } from '@angular/core';
@@ -852,7 +852,7 @@ export class GameButtonComponent {
 
 (El háptico y el clic de sonido se enchufan en F0-05 Paso 9, cuando existan los servicios.)
 
-- [ ] **Paso 6: GlassPanel, StatBar, HpBar** — mismo patrón (test primero, luego componente):
+- [x] **Paso 6: GlassPanel, StatBar, HpBar** — mismo patrón (test primero, luego componente):
   - `app-glass-panel`: `<ng-content/>` con fondo `var(--surface)`, `backdrop-filter: blur(20px) saturate(160%)`,
     borde superior `1px solid rgb(255 255 255 / 0.35)`, radio `var(--r-card)`, sombra según `size` (`'sm'|'lg'`).
     Test: proyecta contenido y aplica la clase de tamaño.
@@ -860,14 +860,14 @@ export class GameButtonComponent {
     (nunca animar `width`), número con `tabular-nums`. Test: `scaleX` correcto para 128/255 y tope en 1.
   - `app-hp-bar`: inputs `current`, `max`; color verde >50 %, amarillo 20–50 %, rojo <20 %
     (`--success`/`--gold`/`--danger`); transición de `transform` 400 ms `--ease-out`. Test: color por umbral.
-- [ ] **Paso 7: escaparate `/dev/ui`** — `src/app/features/dev-ui/dev-ui.page.ts` (standalone) que muestra
+- [x] **Paso 7: escaparate `/dev/ui`** — `src/app/features/dev-ui/dev-ui.page.ts` (standalone) que muestra
       los 3 botones, un GlassPanel con StatBars de Pikachu (35/55/40/50/50/90), HpBars al 80/35/10 % y los
       chips de los 18 tipos. Ruta en `app.routes.ts`: `{ path: 'dev/ui', loadComponent: () => import(...) }`
       ANTES del `'**'`.
-- [ ] **Paso 8: verificar** — `npm run test:all`, `npm run lint`, `npm run build`; `npx ionic serve`, abrir
+- [x] **Paso 8: verificar** — `npm run test:all`, `npm run lint`, `npm run build`; `npx ionic serve`, abrir
       `http://localhost:8100/dev/ui` en vista móvil 390×844 (DevTools o skill `webapp-testing`), captura a
       `docs/evidencias/F0-04_01_dev-ui.png`. Revisar con la checklist de DISENO §4 (sin `transition: all`, sin `scale(0)`).
-- [ ] **Paso 9: commit** — `F0-04: tokens, fuente y componentes base del juego + /dev/ui`.
+- [x] **Paso 9: commit** — `F0-04: tokens, fuente y componentes base del juego + /dev/ui`.
 
 ---
 

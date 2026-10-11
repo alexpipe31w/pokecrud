@@ -35,3 +35,13 @@
 /* @import "@ionic/angular/css/palettes/dark.always.css"; */
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
 @import '@ionic/angular/css/palettes/dark.system.css';
+
+/* Sistema de diseño del juego (docs/plan/DISENO.md): fuente display Fredoka y tokens. */
+@import '@fontsource/fredoka/500.css';
+@import '@fontsource/fredoka/600.css';
+@import '@fontsource/fredoka/700.css';
+@import './theme/tokens.scss';
+
+:root {
+  --font-display: 'Fredoka', system-ui, sans-serif;
+}

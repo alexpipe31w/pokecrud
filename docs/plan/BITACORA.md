@@ -108,3 +108,28 @@ para no chocar en `package.json` ni en los docs. `shared/engine/rng.ts` (mulberr
 **Decisiones nuevas:** D-014; D-003 completada con la versión de three.
 **El siguiente debe empezar por:** mezclar PR #8 y luego el de F0-03; después `/inicio F0-05 <nombre>` (servicios base,
 ya desbloqueada) o F0-04 / F0-06.
+
+## 2026-10-11 14:50 · @samuel (Claude) · F0-04 · rama `feature/F0-04-sistema-diseno`
+
+**Qué se hizo:** F0-04 completa, pasos 1-9. Rama sacada de `feature/F0-03-shared-tooling` (PR #8 y #9 sin mezclar).
+Tokens de DISENO §2 + `--surface`, red de `prefers-reduced-motion` y, para no dejar colores sueltos, `--glass-edge`,
+`--shadow-sm/lg/accent` y `--track` (con valores de modo oscuro). Fredoka 500/600/700 (`@fontsource` 5.3.0 exacto; el 600
+porque `GameButton` lo usa). `pokemon-types.ts` lee `var(--t-*)` y añade `text` por contraste (D-015): con texto blanco
+13/18 tipos no llegaban a AA. `GameButton` (plan + borde/sombra en la variante vidrio, que no se veía sobre otro vidrio, y sin
+sombra cuando está deshabilitado), `GlassPanel`, `StatBar`, `HpBar` (con `role="meter"`), todos con test primero. Escaparate
+`/dev/ui` con demo interactiva (Atacar/Poción/Reiniciar mueven una HpBar).
+**Archivos clave:** `src/theme/tokens.scss`, `src/global.scss`, `src/app/shared/ui/*`, `src/app/features/dev-ui/dev-ui.page.ts`,
+`src/app/app.routes.ts`, `src/app/core/constants/pokemon-types.ts`, `src/app/shared/components/type-chips/type-chips.component.ts`.
+**Cómo se probó (salida real):**
+    ng test (antes de los componentes) → Could not resolve "./game-button.component" / glass-panel / hp-bar / stat-bar
+    npm run test:all → app: Test Files 16 passed (16) · Tests 40 passed (40) | shared: Tests 10 passed (10)
+    npm run lint     → All files pass linting.
+    npm run build    → Application bundle generation complete (Initial total 1.13 MB / 213.68 kB transfer)
+    /dev/ui en 390×844, modo oscuro y claro: sin errores de consola; Atacar ×3 → 45/120 amarilla, ×4 → 20/120 roja.
+    /tabs/pokedex (IS-11): chips con los colores nuevos, legibles.
+    Checklist DISENO §4: sin `transition: all`, sin `scale(0)`, sin hex/rgb fuera de tokens.
+**Evidencia:** `docs/evidencias/F0-04_01_dev-ui.jpg` (390×844, oscuro). En .jpg y no .png: Chrome headless no baja de
+~500 px de ancho, así que la captura es del navegador integrado.
+**Quedó a medias / roto:** nada. Háptico y sonido del botón quedan para F0-05 Paso 9 (como dice el plan).
+**Decisiones nuevas:** D-015.
+**El siguiente debe empezar por:** mezclar #8 → #9 → PR de F0-04; luego `/inicio F0-05 <nombre>` (o F0-06 / F0-09).

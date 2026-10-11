@@ -1,23 +1,30 @@
-/** Tipos de Pokémon con su nombre en español y color de chip. */
-export const POKEMON_TYPES: Record<string, { label: string; color: string }> = {
-  normal: { label: 'Normal', color: '#a8a77a' },
-  fire: { label: 'Fuego', color: '#ee8130' },
-  water: { label: 'Agua', color: '#6390f0' },
-  electric: { label: 'Eléctrico', color: '#d4a90b' },
-  grass: { label: 'Planta', color: '#5fa83a' },
-  ice: { label: 'Hielo', color: '#5fbfbb' },
-  fighting: { label: 'Lucha', color: '#c22e28' },
-  poison: { label: 'Veneno', color: '#a33ea1' },
-  ground: { label: 'Tierra', color: '#c4a245' },
-  flying: { label: 'Volador', color: '#8f7fd8' },
-  psychic: { label: 'Psíquico', color: '#f95587' },
-  bug: { label: 'Bicho', color: '#8a9a1b' },
-  rock: { label: 'Roca', color: '#a8932e' },
-  ghost: { label: 'Fantasma', color: '#735797' },
-  dragon: { label: 'Dragón', color: '#6f35fc' },
-  dark: { label: 'Siniestro', color: '#705746' },
-  steel: { label: 'Acero', color: '#8f8fa8' },
-  fairy: { label: 'Hada', color: '#d685ad' },
+/**
+ * Tipos de Pokémon con su nombre en español, color de chip y color de texto.
+ * Los colores salen de los tokens de src/theme/tokens.scss (una sola paleta). El texto es blanco solo
+ * en los tipos oscuros; en el resto es tinta para llegar al contraste AA (DECISIONES D-015).
+ */
+const TEXT_ON_LIGHT = 'var(--ink)';
+const TEXT_ON_DARK = 'var(--accent-ink)';
+
+export const POKEMON_TYPES: Record<string, { label: string; color: string; text: string }> = {
+  normal: { label: 'Normal', color: 'var(--t-normal)', text: TEXT_ON_LIGHT },
+  fire: { label: 'Fuego', color: 'var(--t-fire)', text: TEXT_ON_LIGHT },
+  water: { label: 'Agua', color: 'var(--t-water)', text: TEXT_ON_LIGHT },
+  electric: { label: 'Eléctrico', color: 'var(--t-electric)', text: TEXT_ON_LIGHT },
+  grass: { label: 'Planta', color: 'var(--t-grass)', text: TEXT_ON_LIGHT },
+  ice: { label: 'Hielo', color: 'var(--t-ice)', text: TEXT_ON_LIGHT },
+  fighting: { label: 'Lucha', color: 'var(--t-fighting)', text: TEXT_ON_DARK },
+  poison: { label: 'Veneno', color: 'var(--t-poison)', text: TEXT_ON_DARK },
+  ground: { label: 'Tierra', color: 'var(--t-ground)', text: TEXT_ON_LIGHT },
+  flying: { label: 'Volador', color: 'var(--t-flying)', text: TEXT_ON_LIGHT },
+  psychic: { label: 'Psíquico', color: 'var(--t-psychic)', text: TEXT_ON_LIGHT },
+  bug: { label: 'Bicho', color: 'var(--t-bug)', text: TEXT_ON_LIGHT },
+  rock: { label: 'Roca', color: 'var(--t-rock)', text: TEXT_ON_LIGHT },
+  ghost: { label: 'Fantasma', color: 'var(--t-ghost)', text: TEXT_ON_DARK },
+  dragon: { label: 'Dragón', color: 'var(--t-dragon)', text: TEXT_ON_DARK },
+  dark: { label: 'Siniestro', color: 'var(--t-dark)', text: TEXT_ON_DARK },
+  steel: { label: 'Acero', color: 'var(--t-steel)', text: TEXT_ON_LIGHT },
+  fairy: { label: 'Hada', color: 'var(--t-fairy)', text: TEXT_ON_LIGHT },
 };
 
 export const POKEMON_TYPE_KEYS = Object.keys(POKEMON_TYPES);
