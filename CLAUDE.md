@@ -67,8 +67,11 @@ Atajo: el comando `/cierre` hace todo esto.
 
 - No cambiar el stack ni la estructura de carpetas sin anotarlo en `DECISIONES.md` y avisar al humano.
 - No push directo a `main` ni a `develop`. Rama `feature/<ID>-…` → PR a `develop`.
-- No subir secretos (API key de Google Maps, contraseñas de BD). Van en `.env` / `environment.local.ts`,
-  que están en `.gitignore`. Ver ARQUITECTURA → "Secretos".
+- **El repo es PÚBLICO. No subir secretos** (clave de Google Maps, contraseña de la BD). Van en
+  `src/environments/environment.local.ts` y `server/.env` (en `.gitignore`). **Si el humano te pasa esos
+  valores, sigue `docs/plan/SECRETOS.md` al pie de la letra**: crear el archivo en la ruta exacta, comprobar
+  que Git lo ignora, probar sin imprimir el secreto y nunca repetirlo en chat, docs, commits ni bitácora.
+  Si al empezar la sesión faltan esos archivos y la tarea los necesita, pídeselos al humano (Alex los reparte por privado).
 - No borrar ni reescribir entradas de la bitácora de otros. Solo se añade al final.
 - No reclamar más de una tarea a la vez por persona.
 - No refactorizar "de paso" lo que no es de tu tarea: anótalo en ROADMAP como tarea nueva.
