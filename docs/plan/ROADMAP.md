@@ -19,7 +19,7 @@
       Dep: F0-01. Criterio: 1025 especies con nombre y descripción en español (fallback inglés si no hay),
       tipos, stats, captureRate, evolución, learnset; script reanudable con caché; tamaño medido y anotado;
       test que valida forma y conteo.
-- [~] **F0-03 · `shared/` + tooling** (@samuel, 2026-10-11) — carpeta `shared/` con alias `@shared/*` en `tsconfig.json`,
+- [x] **F0-03 · `shared/` + tooling** (@samuel, 2026-10-11) — carpeta `shared/` con alias `@shared/*` en `tsconfig.json`,
       Vitest corriendo `shared/**/*.spec.ts`, instalar `three` (versión exacta en D-003).
       Dep: F0-01. Criterio: `npm test` ejecuta un spec de `shared/` y uno de `src/`; build OK.
 - [ ] **F0-04 · Sistema de diseño base** — `src/theme/tokens.scss` (DISENO §2), fuente display

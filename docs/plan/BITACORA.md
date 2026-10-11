@@ -88,3 +88,23 @@ descripción salen en inglés (fallback previsto). 924/1025 descripciones en esp
 **Decisiones nuevas:** ninguna.
 **El siguiente debe empezar por:** mezclar el PR de F0-02 y luego `/inicio F0-03 <nombre>` (su Paso 1 y el script
 `test:shared` ya existen; no duplicarlos) o `/inicio F0-06 <nombre>`.
+
+## 2026-10-11 14:35 · @samuel (Claude) · F0-03 · rama `feature/F0-03-shared-tooling`
+
+**Qué se hizo:** F0-03 completa, pasos 1-12 del plan de fase. Rama sacada de `feature/F0-02-dataset` (PR #8 sin mezclar)
+para no chocar en `package.json` ni en los docs. `shared/engine/rng.ts` (mulberry32 + hashString) con TDD (falló primero),
+`shared/tsconfig.json`, `@types/node@24`, scripts `test:all`, alias `@shared/*` en la app con spec de integración,
+`three@0.186.1` + `@types/three@0.186.0` exactos. Cambio respecto al plan: sin `baseUrl` (obsoleto en TS 6, D-014) y el
+`exclude` de specs de `shared/` también en `tsconfig.spec.json` (si no, `ng test` intentaría correr el test del dataset en jsdom).
+**Archivos clave:** `shared/engine/rng.ts`, `shared/engine/rng.spec.ts`, `shared/tsconfig.json`, `tsconfig.json`,
+`tsconfig.app.json`, `tsconfig.spec.json`, `src/app/core/utils/shared-alias.spec.ts`, `package.json`, `DECISIONES.md`.
+**Cómo se probó (salida real):**
+    npm run test:shared (antes de rng.ts) → FAIL Cannot find module './rng.js'
+    npm run test:all  → app: Test Files 12 passed (12) · Tests 30 passed (30) | shared: Test Files 2 passed (2) · Tests 10 passed (10)
+    npm run lint      → All files pass linting.
+    npm run build     → Application bundle generation complete.
+    npx tsc -p shared/tsconfig.json → sin errores
+**Quedó a medias / roto:** nada.
+**Decisiones nuevas:** D-014; D-003 completada con la versión de three.
+**El siguiente debe empezar por:** mezclar PR #8 y luego el de F0-03; después `/inicio F0-05 <nombre>` (servicios base,
+ya desbloqueada) o F0-04 / F0-06.

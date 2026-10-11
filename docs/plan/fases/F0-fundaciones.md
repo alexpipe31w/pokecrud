@@ -682,11 +682,11 @@ export function hashString(input: string): number {
 ```
 
 - [x] **Paso 7:** `npm run test:shared` → verde.
-- [ ] **Paso 8: alias e inclusión en la app** — `tsconfig.json` → `compilerOptions` añadir
+- [x] **Paso 8: alias e inclusión en la app** — `tsconfig.json` → `compilerOptions` añadir
       `"baseUrl": "."` y `"paths": { "@shared/*": ["shared/*"] }`.
       `tsconfig.app.json` → `"include": ["src/**/*.d.ts", "shared/**/*.ts"]` y añadir
       `"exclude": ["shared/**/*.spec.ts"]`. (Sin esto Angular da _"is missing from the TypeScript compilation"_.)
-- [ ] **Paso 9: prueba de integración del alias** — en `src/app/core/utils/pokemon-defaults.ts` NO tocar
+- [x] **Paso 9: prueba de integración del alias** — en `src/app/core/utils/pokemon-defaults.ts` NO tocar
       nada; en su lugar crear `src/app/core/utils/shared-alias.spec.ts`:
 
 ```ts
@@ -701,10 +701,10 @@ describe('alias @shared', () => {
 
 Añadir `"shared/**/*.ts"` al `include` de `tsconfig.spec.json`.
 
-- [ ] **Paso 10: three** — `npm install three@0.186.1 && npm install -D @types/three@0.186.0`.
+- [x] **Paso 10: three** — `npm install three@0.186.1 && npm install -D @types/three@0.186.0`.
       Anotar en DECISIONES D-003: "three fijado en 0.186.1 (F0-03)".
-- [ ] **Paso 11: verificar todo** — `npm run test:all`, `npm run lint`, `npm run build`. Las tres en verde.
-- [ ] **Paso 12: commit** — `F0-03: shared/ con RNG determinista, vitest de shared y alias @shared`.
+- [x] **Paso 11: verificar todo** — `npm run test:all`, `npm run lint`, `npm run build`. Las tres en verde.
+- [x] **Paso 12: commit** — `F0-03: shared/ con RNG determinista, vitest de shared y alias @shared`.
 
 ---
 
