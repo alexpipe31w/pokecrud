@@ -1271,7 +1271,7 @@ Contrato:
 
 `player` = `{ id, email, nickname, level, xp }` (nunca `passwordHash`).
 
-- [ ] **Paso 1: tests e2e primero** — `server/test/auth.e2e-spec.ts` con BD real y emails únicos por test
+- [x] **Paso 1: tests e2e primero** — `server/test/auth.e2e-spec.ts` con BD real y emails únicos por test
       (`test+${randomUUID()}@pokecrud.test`), limpiando en `afterAll` los players con dominio `@pokecrud.test`:
   1. registro → 201, `passwordHash` no aparece en la respuesta;
   2. email repetido → 409; nickname repetido → 409;
@@ -1281,7 +1281,7 @@ Contrato:
      (el refresh nuevo también deja de valer);
   6. logout dos veces → 204 las dos;
   7. dos `refresh` simultáneos con el mismo token → exactamente uno 200 y otro 401.
-- [ ] **Paso 2: `AuthService`** — reglas que el código debe cumplir (cada una con su línea, no intención):
+- [x] **Paso 2: `AuthService`** — reglas que el código debe cumplir (cada una con su línea, no intención):
   - `argon2.hash(password, { type: argon2.argon2id })`; en login con email inexistente, igualmente
     ejecutar un `argon2.verify` contra un hash fijo para no revelar por tiempo qué emails existen.
   - email normalizado (`trim().toLowerCase()`); unicidad por `@unique` en BD → capturar `P2002` → 409.
@@ -1292,28 +1292,28 @@ data: { revokedAt: now } })`; si `count === 0` → buscar por `tokenHash`: si ex
     existe → 401. Si `count === 1` → crear el nuevo token con el mismo `familyId`. Todo en `$transaction`.
   - access JWT: `{ sub: player.id }`, `expiresIn: JWT_TTL`, algoritmo HS256 explícito.
   - logs: `auth.login.ok|fail`, `auth.refresh.reuse` con `playerId`/`familyId`, nunca tokens ni emails completos.
-- [ ] **Paso 3:** DTOs con `class-validator`, `JwtAuthGuard` (global con decorador `@Public()` para
+- [x] **Paso 3:** DTOs con `class-validator`, `JwtAuthGuard` (global con decorador `@Public()` para
       `/auth/*` y `/health/*`), `@Throttle({ default: { limit: 5, ttl: 60_000 } })` en register/login.
-- [ ] **Paso 4:** `npm test && npm run test:e2e` verdes. Commit `F0-07a: auth en servidor`.
+- [x] **Paso 4:** `npm test && npm run test:e2e` verdes. Commit `F0-07a: auth en servidor`.
 
 **App** (`src/app/core/auth/`): `npm install @aparajita/capacitor-secure-storage@8.0.1`.
 
-- [ ] **Paso 5: `TokenStore`** — interfaz `get/set/clear` del refresh token con dos implementaciones:
+- [x] **Paso 5: `TokenStore`** — interfaz `get/set/clear` del refresh token con dos implementaciones:
       nativa (`SecureStorage` del plugin, Keystore de Android) y web (`sessionStorage`), elegida con
       `Capacitor.isNativePlatform()`. El access token vive solo en memoria (signal). Test de la web.
-- [ ] **Paso 6: `AuthService` (app)** — signals `player`, `isLoggedIn`; `register/login/logout/restore()`;
+- [x] **Paso 6: `AuthService` (app)** — signals `player`, `isLoggedIn`; `register/login/logout/restore()`;
       `restore()` al arrancar intenta un refresh con el token guardado. Un único refresh en vuelo a la vez
       (si llegan 3 peticiones con 401, se comparte la misma promesa de refresh).
-- [ ] **Paso 7: interceptor funcional** `authInterceptor`: añade `Authorization: Bearer` a peticiones a
+- [x] **Paso 7: interceptor funcional** `authInterceptor`: añade `Authorization: Bearer` a peticiones a
       `environment.apiUrl` (nunca a PokéAPI/Google); ante 401 refresca una vez y repite; si el refresh falla →
       `logout()` y navegar a `/login`. Registrar con `provideHttpClient(withInterceptors([authInterceptor]))` en `main.ts`.
-- [ ] **Paso 8: `authGuard`** y rutas: `/login`, `/registro` públicas; el resto protegidas.
+- [x] **Paso 8: `authGuard`** y rutas: `/login`, `/registro` públicas; el resto protegidas.
       **Excepción temporal:** las rutas de IS-11 (`/tabs/pokedex`, `/pokemon/*`) quedan públicas hasta F0-08 para
       no romper la entrega evaluada; anotarlo en el PR.
-- [ ] **Paso 9: pantallas** `features/auth/login.page.ts` y `register.page.ts` con el sistema de diseño
+- [x] **Paso 9: pantallas** `features/auth/login.page.ts` y `register.page.ts` con el sistema de diseño
       (GlassPanel + GameButton, fondo ilustrado, errores en línea bajo cada campo, botón con estado de carga,
       mensajes en español: "Correo o contraseña incorrectos", "Ese apodo ya está en uso").
-- [ ] **Paso 10: verificar** — `npm run test:all`, lint, build; con el servidor local: registrarse, cerrar
+- [x] **Paso 10: verificar** — `npm run test:all`, lint, build; con el servidor local: registrarse, cerrar
       la app, abrirla y seguir logueado; manipular el access en memoria → se refresca solo. Capturas en
       `docs/evidencias/F0-07_*.png`. Commit `F0-07b: sesión en la app`.
 

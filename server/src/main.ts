@@ -1,4 +1,3 @@
-import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import helmet from 'helmet';
@@ -23,13 +22,6 @@ async function bootstrap(): Promise<void> {
       .map((s) => s.trim()),
     credentials: false,
   });
-  app.useGlobalPipes(
-    new ValidationPipe({
-      whitelist: true,
-      forbidNonWhitelisted: true,
-      transform: true,
-    }),
-  );
   app.enableShutdownHooks();
   await app.listen(Number(process.env['PORT'] ?? 3000), '0.0.0.0');
 }

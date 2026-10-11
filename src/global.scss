@@ -11,6 +11,7 @@
 
 /* Tokens del sistema de diseño (docs/plan/DISENO.md). @use va antes que cualquier otra regla. */
 @use './theme/tokens';
+@use './theme/forms';
 
 /* Core CSS required for Ionic components to work properly */
 @import '@ionic/angular/css/core.css';

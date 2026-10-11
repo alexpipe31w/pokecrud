@@ -9,8 +9,9 @@
 | --------------------------------------- | ---------------------------------------------------------- | ----------------------------------------------- |
 | `src/environments/environment.local.ts` | Clave de Google Maps (`googleMapsApiKey`) y Map ID         | `src/environments/environment.local.example.ts` |
 | `server/.env`                           | `DATABASE_URL` y `DIRECT_URL` de Supabase (con contraseña) | `server/.env.example`                           |
+| `server/.env` (y Render)                | `JWT_SECRET` (firma los access tokens, F0-07)              | `server/.env.example`                           |
 
-Los dos están en `.gitignore`. Alex los pasa **por privado** (WhatsApp/DM) a cada integrante.
+Los dos están en `.gitignore`. **`JWT_SECRET` no se reparte:** cada entorno genera el suyo (`node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))"`), uno en cada PC y otro distinto en Render. Si se filtra, se genera otro: solo obliga a volver a iniciar sesión. Alex los pasa **por privado** (WhatsApp/DM) a cada integrante.
 Nunca por el grupo, Jira, GitHub, issues, PRs ni capturas.
 
 ## Lo que tiene que hacer la IA cuando el humano le pasa esos valores

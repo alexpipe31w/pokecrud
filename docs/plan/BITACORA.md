@@ -77,11 +77,11 @@ una copia. Como F0-03 no está mezclada, se crearon `vitest.shared.config.ts` y 
 **Archivos clave:** `shared/data/dataset.types.ts`, `shared/data/dataset.spec.ts`, `scripts/build-dataset.mjs`,
 `scripts/lib/pokeapi-fetch.mjs`, `src/assets/data/{pokedex,moves,types,meta}.json`, `vitest.shared.config.ts`, `package.json`.
 **Cómo se probó (salida real):**
-    npm run dataset   → OK · pokedex 972 KB · moves 209 KB · types 2 KB · vfdb512e56ff6  (1025 especies, 706 movimientos)
-    npm run test:shared → Test Files 1 passed (1) · Tests 5 passed (5)
-    npm run lint      → All files pass linting.
-    ng test --watch=false → Test Files 11 passed (11) · Tests 29 passed (29)
-    npm run build     → Application bundle generation complete (www/assets/data con los 4 JSON)
+npm run dataset → OK · pokedex 972 KB · moves 209 KB · types 2 KB · vfdb512e56ff6 (1025 especies, 706 movimientos)
+npm run test:shared → Test Files 1 passed (1) · Tests 5 passed (5)
+npm run lint → All files pass linting.
+ng test --watch=false → Test Files 11 passed (11) · Tests 29 passed (29)
+npm run build → Application bundle generation complete (www/assets/data con los 4 JSON)
 **Tamaño:** pokedex 972 KB (< 3 MB → no hace falta partir por generación).
 **Quedó a medias / roto:** nada. Nota de datos: PokéAPI no tiene español para la Gen 9 (#906-1025): nombre, género y
 descripción salen en inglés (fallback previsto). 924/1025 descripciones en español; ninguna especie sin learnset.
@@ -99,11 +99,11 @@ para no chocar en `package.json` ni en los docs. `shared/engine/rng.ts` (mulberr
 **Archivos clave:** `shared/engine/rng.ts`, `shared/engine/rng.spec.ts`, `shared/tsconfig.json`, `tsconfig.json`,
 `tsconfig.app.json`, `tsconfig.spec.json`, `src/app/core/utils/shared-alias.spec.ts`, `package.json`, `DECISIONES.md`.
 **Cómo se probó (salida real):**
-    npm run test:shared (antes de rng.ts) → FAIL Cannot find module './rng.js'
-    npm run test:all  → app: Test Files 12 passed (12) · Tests 30 passed (30) | shared: Test Files 2 passed (2) · Tests 10 passed (10)
-    npm run lint      → All files pass linting.
-    npm run build     → Application bundle generation complete.
-    npx tsc -p shared/tsconfig.json → sin errores
+npm run test:shared (antes de rng.ts) → FAIL Cannot find module './rng.js'
+npm run test:all → app: Test Files 12 passed (12) · Tests 30 passed (30) | shared: Test Files 2 passed (2) · Tests 10 passed (10)
+npm run lint → All files pass linting.
+npm run build → Application bundle generation complete.
+npx tsc -p shared/tsconfig.json → sin errores
 **Quedó a medias / roto:** nada.
 **Decisiones nuevas:** D-014; D-003 completada con la versión de three.
 **El siguiente debe empezar por:** mezclar PR #8 y luego el de F0-03; después `/inicio F0-05 <nombre>` (servicios base,
@@ -121,13 +121,13 @@ sombra cuando está deshabilitado), `GlassPanel`, `StatBar`, `HpBar` (con `role=
 **Archivos clave:** `src/theme/tokens.scss`, `src/global.scss`, `src/app/shared/ui/*`, `src/app/features/dev-ui/dev-ui.page.ts`,
 `src/app/app.routes.ts`, `src/app/core/constants/pokemon-types.ts`, `src/app/shared/components/type-chips/type-chips.component.ts`.
 **Cómo se probó (salida real):**
-    ng test (antes de los componentes) → Could not resolve "./game-button.component" / glass-panel / hp-bar / stat-bar
-    npm run test:all → app: Test Files 16 passed (16) · Tests 40 passed (40) | shared: Tests 10 passed (10)
-    npm run lint     → All files pass linting.
-    npm run build    → Application bundle generation complete (Initial total 1.13 MB / 213.68 kB transfer)
-    /dev/ui en 390×844, modo oscuro y claro: sin errores de consola; Atacar ×3 → 45/120 amarilla, ×4 → 20/120 roja.
-    /tabs/pokedex (IS-11): chips con los colores nuevos, legibles.
-    Checklist DISENO §4: sin `transition: all`, sin `scale(0)`, sin hex/rgb fuera de tokens.
+ng test (antes de los componentes) → Could not resolve "./game-button.component" / glass-panel / hp-bar / stat-bar
+npm run test:all → app: Test Files 16 passed (16) · Tests 40 passed (40) | shared: Tests 10 passed (10)
+npm run lint → All files pass linting.
+npm run build → Application bundle generation complete (Initial total 1.13 MB / 213.68 kB transfer)
+/dev/ui en 390×844, modo oscuro y claro: sin errores de consola; Atacar ×3 → 45/120 amarilla, ×4 → 20/120 roja.
+/tabs/pokedex (IS-11): chips con los colores nuevos, legibles.
+Checklist DISENO §4: sin `transition: all`, sin `scale(0)`, sin hex/rgb fuera de tokens.
 **Evidencia:** `docs/evidencias/F0-04_01_dev-ui.jpg` (390×844, oscuro). En .jpg y no .png: Chrome headless no baja de
 ~500 px de ancho, así que la captura es del navegador integrado.
 **Quedó a medias / roto:** nada. Háptico y sonido del botón quedan para F0-05 Paso 9 (como dice el plan).
@@ -139,6 +139,7 @@ sombra cuando está deshabilitado), `GlassPanel`, `StatBar`, `HpBar` (con `role=
 **Qué se hizo:** F0-05 completa, pasos 1-9, todo con test primero. Rama sacada de `feature/F0-04-sistema-diseno`.
 `idb@8.0.4` y `fake-indexeddb@6.2.5` exactos. Servicios en `src/app/services/game/`: Settings (localStorage), Haptics,
 Audio y Dataset. Cambios respecto al plan:
+
 - `DatasetService.load()` comparte la promesa en curso (el criterio 5 pide una sola descarga con dos `load()`
   simultáneos y que ambos esperen) y tras un error se puede reintentar.
 - `HapticsService` recibe el plugin por el token `HAPTICS_PLUGIN`: con `vi.mock` el test fallaba según el orden de los
@@ -146,21 +147,21 @@ Audio y Dataset. Cambios respecto al plan:
 - `AudioService` solo pide efectos que estén en `SFX_CATALOG` (token, vacío hasta F2-08): pedir `tap.ogg` inexistente
   dejaba un 404 como **error** en consola.
 - `global.scss`: `@use './theme/tokens'` en vez de `@import` (aviso de obsoleto de Sass que venía de F0-04).
-**Archivos clave:** `src/app/services/game/{settings,haptics,audio,dataset}.service.ts` (+ specs), `app.component.ts`,
-`shared/ui/game-button.component.ts`, `features/dev-ui/dev-ui.page.ts`, `src/global.scss`, `DECISIONES.md` (D-016).
-**Cómo se probó (salida real):**
-    cada servicio: ng test → "Could not resolve './x.service'" antes de escribirlo
-    ng test ×6 seguidas (tras arreglar haptics) → Tests 61 passed (61) las 6
-    npm run test:all → app: Test Files 20 passed (20) · Tests 63 passed (63) | shared: Tests 10 passed (10)
-    npm run lint     → All files pass linting.
-    npm run build    → Application bundle generation complete (sin WARNING)
-    /dev/ui (390×844): "Dataset: ready · 1025 especies", género "Pokémon Ratón" desde el dataset.
-    Sin caché: pide meta + pokedex + moves + types. Recarga: solo meta.json (performance entries).
-    "Oír a Pikachu": cries/pokemon/latest/25.ogg → 200, decodificado sin error (no puedo oírlo: pendiente de oído humano).
-    Consola tras pulsar botones: solo `[warn] [audio] el efecto "tap" aún no existe (llega en F2-08)`, 0 errores.
-**Quedó a medias / roto:** nada. Falta que un humano confirme que el grito se OYE (y el háptico en un Android real, F0-09).
-**Decisiones nuevas:** D-016.
-**El siguiente debe empezar por:** mezclar #8 → #9 → #10 → PR de F0-05; luego `/inicio F0-06 <nombre>` o `/inicio F0-09 <nombre>`.
+  **Archivos clave:** `src/app/services/game/{settings,haptics,audio,dataset}.service.ts` (+ specs), `app.component.ts`,
+  `shared/ui/game-button.component.ts`, `features/dev-ui/dev-ui.page.ts`, `src/global.scss`, `DECISIONES.md` (D-016).
+  **Cómo se probó (salida real):**
+  cada servicio: ng test → "Could not resolve './x.service'" antes de escribirlo
+  ng test ×6 seguidas (tras arreglar haptics) → Tests 61 passed (61) las 6
+  npm run test:all → app: Test Files 20 passed (20) · Tests 63 passed (63) | shared: Tests 10 passed (10)
+  npm run lint → All files pass linting.
+  npm run build → Application bundle generation complete (sin WARNING)
+  /dev/ui (390×844): "Dataset: ready · 1025 especies", género "Pokémon Ratón" desde el dataset.
+  Sin caché: pide meta + pokedex + moves + types. Recarga: solo meta.json (performance entries).
+  "Oír a Pikachu": cries/pokemon/latest/25.ogg → 200, decodificado sin error (no puedo oírlo: pendiente de oído humano).
+  Consola tras pulsar botones: solo `[warn] [audio] el efecto "tap" aún no existe (llega en F2-08)`, 0 errores.
+  **Quedó a medias / roto:** nada. Falta que un humano confirme que el grito se OYE (y el háptico en un Android real, F0-09).
+  **Decisiones nuevas:** D-016.
+  **El siguiente debe empezar por:** mezclar #8 → #9 → #10 → PR de F0-05; luego `/inicio F0-06 <nombre>` o `/inicio F0-09 <nombre>`.
 
 ## 2026-10-11 16:35 · @samuel · F0-05 (confirmación) · rama `feature/F0-05-servicios-base`
 
@@ -173,6 +174,7 @@ Audio y Dataset. Cambios respecto al plan:
 **Qué se hizo:** F0-06 pasos 1-8 y 10 (el 9, despliegue, necesita a Alex). Rama sacada de `develop` (independiente de
 F0-02…F0-05, cuyas entradas de bitácora están en los PR #8-#11). Scaffold Nest 12.0.8 (ESM, Vitest, oxlint) en `server/`,
 sin `@nestjs/mau` ni el "Hello World". Dependencias con versión exacta. Cambios respecto al plan:
+
 - `prisma.config.ts` usa `url: env('DIRECT_URL')`: en Prisma 7.10 `directUrl` no existe en la config (D-017).
 - Migración `init` generada con `prisma migrate diff --from-empty --to-schema … --script` y aplicada con
   `prisma migrate deploy`: sin base sombra y sin riesgo de que `migrate dev` resetee la base. Antes se comprobó que
@@ -182,26 +184,26 @@ sin `@nestjs/mau` ni el "Hello World". Dependencias con versión exacta. Cambios
 - Test e2e extra del rate limit con una ruta de prueba: un 404 no pasa por el guard, así que con curl no se veía.
 - `npm audit`: 4 "high" solo en la CLI `prisma` (`mysql2`, `deepmerge-ts`), riesgo aceptado (D-017).
 - `server/README.md` en español con comandos y los pasos exactos de Render para Alex.
-**Archivos clave:** `server/prisma.config.ts`, `server/prisma/schema.prisma`, `server/prisma/migrations/*_init/`,
-`server/src/{main,app.module}.ts`, `server/src/prisma/*`, `server/src/health/*`, `server/test/*.e2e-spec.ts`,
-`server/.env.example`, `server/README.md`, `DECISIONES.md` (D-017).
-**Cómo se probó (salida real):**
-    prisma migrate deploy → "All migrations have been successfully applied."
-    prisma migrate status → "Database schema is up to date!"
-    prisma migrate diff --from-config-datasource --to-schema … --exit-code → "No difference detected." (exit 0)
-    npm test (antes del código) → "Cannot find module '../prisma/prisma.service.js'"
-    npm test → Tests 4 passed (4) · npm run test:e2e → Test Files 2 passed (2) · Tests 7 passed (7) · lint exit 0 · build exit 0
-    node dist/main.js (NODE_ENV=production, PORT=3077): /health/ready → {"status":"ok","db":"ok"} 200; helmet (CSP, HSTS,
-      nosniff, X-Frame-Options); CORS: localhost:4200 permitido, https://evil.com sin allow-origin; /no-existe → 404 JSON
-      sin stack; logs JSON con req.id; 0 líneas con la contraseña en el log.
-    PORT=3001 npm run start:dev → "Nest application successfully started"; /health/ready → 200 {"status":"ok","db":"ok"}
-    App de la raíz sin cambios: lint OK, ng test 29/29.
-**Quedó a medias / roto:** solo el despliegue en Render (Paso 9) → F0-06 sigue `[~]`. El JSON Server del curso ocupa el
-puerto 3000: arrancar Nest con `PORT=3001` hasta F0-08. Sin filtro global de excepciones propio (el de Nest no filtra
-el stack; la taxonomía de errores llega con F0-07).
-**Decisiones nuevas:** D-017.
-**El siguiente debe empezar por:** Alex despliega en Render (`server/README.md`) y pasa F0-06 a `[x]`; luego `/inicio F0-07`
-(cuando F0-04 y F0-06 estén en `develop`) o `/inicio F0-09`.
+  **Archivos clave:** `server/prisma.config.ts`, `server/prisma/schema.prisma`, `server/prisma/migrations/*_init/`,
+  `server/src/{main,app.module}.ts`, `server/src/prisma/*`, `server/src/health/*`, `server/test/*.e2e-spec.ts`,
+  `server/.env.example`, `server/README.md`, `DECISIONES.md` (D-017).
+  **Cómo se probó (salida real):**
+  prisma migrate deploy → "All migrations have been successfully applied."
+  prisma migrate status → "Database schema is up to date!"
+  prisma migrate diff --from-config-datasource --to-schema … --exit-code → "No difference detected." (exit 0)
+  npm test (antes del código) → "Cannot find module '../prisma/prisma.service.js'"
+  npm test → Tests 4 passed (4) · npm run test:e2e → Test Files 2 passed (2) · Tests 7 passed (7) · lint exit 0 · build exit 0
+  node dist/main.js (NODE_ENV=production, PORT=3077): /health/ready → {"status":"ok","db":"ok"} 200; helmet (CSP, HSTS,
+  nosniff, X-Frame-Options); CORS: localhost:4200 permitido, https://evil.com sin allow-origin; /no-existe → 404 JSON
+  sin stack; logs JSON con req.id; 0 líneas con la contraseña en el log.
+  PORT=3001 npm run start:dev → "Nest application successfully started"; /health/ready → 200 {"status":"ok","db":"ok"}
+  App de la raíz sin cambios: lint OK, ng test 29/29.
+  **Quedó a medias / roto:** solo el despliegue en Render (Paso 9) → F0-06 sigue `[~]`. El JSON Server del curso ocupa el
+  puerto 3000: arrancar Nest con `PORT=3001` hasta F0-08. Sin filtro global de excepciones propio (el de Nest no filtra
+  el stack; la taxonomía de errores llega con F0-07).
+  **Decisiones nuevas:** D-017.
+  **El siguiente debe empezar por:** Alex despliega en Render (`server/README.md`) y pasa F0-06 a `[x]`; luego `/inicio F0-07`
+  (cuando F0-04 y F0-06 estén en `develop`) o `/inicio F0-09`.
 
 ## 2026-10-11 16:40 · @samuel (Claude) · F0-06 (mezcla y despliegue) · rama `feature/F0-06-despliegue-render`
 
@@ -214,11 +216,43 @@ variables `DATABASE_URL`, `DIRECT_URL`, `NODE_ENV=production`, `NODE_VERSION=24`
 `server/README.md` corregidas antes (`--include=dev`, `NODE_VERSION`) tras simular el build de Render en local.
 `environment.prod.ts` → `apiUrl: 'https://pokecrud-server.onrender.com'`. F0-06 → `[x]`.
 **Cómo se probó (salida real):**
-    tras mezclar todo: app 63/63 · shared 10/10 · lint OK · build OK · server 4 unitarios + 7 e2e
-    Render: "Deploy succeeded | Live" (commit 7ab7d73 de develop, 1m23s)
-    curl https://pokecrud-server.onrender.com/health/ready → {"status":"ok","db":"ok"} [HTTP 200, 1.18 s]
-    /health/live 200 · HSTS, nosniff, X-Frame-Options, x-request-id · CORS localhost:4200 permitido, evil.com bloqueado
-    /no-existe → 404 JSON sin stack
+tras mezclar todo: app 63/63 · shared 10/10 · lint OK · build OK · server 4 unitarios + 7 e2e
+Render: "Deploy succeeded | Live" (commit 7ab7d73 de develop, 1m23s)
+curl https://pokecrud-server.onrender.com/health/ready → {"status":"ok","db":"ok"} [HTTP 200, 1.18 s]
+/health/live 200 · HSTS, nosniff, X-Frame-Options, x-request-id · CORS localhost:4200 permitido, evil.com bloqueado
+/no-existe → 404 JSON sin stack
 **Quedó a medias / roto:** nada. El inventario IS-11 en un build de producción no tendrá `/pokemon` hasta F0-08.
 **Decisiones nuevas:** ninguna (el despliegue en cuenta de Samuel queda anotado en ESTADO → Bloqueos).
 **El siguiente debe empezar por:** `/inicio F0-07 <nombre>` (auth) o `/inicio F0-09 <nombre>` (APK), desde `develop`.
+
+## 2026-10-11 18:55 · @samuel (Claude) · F0-07 · rama `feature/F0-07-auth`
+
+**Qué se hizo:** F0-07 completa, pasos 1-10, test primero en cada pieza. Leídas `autenticacion.md` y
+`api-endurecimiento.md`; lo añadido al plan está en D-018.
+
+- **Servidor (F0-07a):** `server/src/auth/` (controller, service, DTOs, guard JWT global con `@Public()`, límite por
+  cuenta), `server/src/config/env.validation.ts`, `ValidationPipe` como `APP_PIPE`, 429 en español. `@nestjs/jwt@12.0.2`,
+  `argon2@0.45.1`. `JWT_SECRET` local generado en `server/.env` (no se imprimió).
+- **App (F0-07b):** `src/app/core/auth/` (token-store, auth.service, auth.interceptor, auth.guard), `features/auth/`
+  (login, registro, `AuthForm` común), `src/theme/forms.scss` global, tokens `--danger-ink`/`--field-*`, `GameButton`
+  con `type` y `loading`, `environment.serverUrl`, `AppComponent` hace `restore()` al arrancar, panel de sesión y botón
+  "Comprobar sesión" en `/dev/ui`. `@aparajita/capacitor-secure-storage@8.0.1`.
+  **Cómo se probó (salida real):**
+  server: npm test → Tests 11 passed (11) · npm run test:e2e ×3 → Tests 18 passed (18) · lint 0 · build 0
+  tras los e2e: Player con @pokecrud.test = 0, RefreshToken = 0
+  app: npm run test:all → app 92/92 (25 archivos) · shared 10/10 · lint OK · build sin avisos · prettier OK
+  navegador 390×844 (Nest local :3001 + app :4200), oscuro y claro:
+  /dev/ui sin sesión → /login?redirect=%2Fdev%2Fui · formulario vacío → errores bajo cada campo
+  registro con Enter → /dev/ui con "entrenador_demo · nivel 1 · 0 XP"; refresh en sessionStorage, 0 en localStorage
+  recargar → sigue con sesión (refresh + /auth/me)
+  access estropeado a mano + "Comprobar sesión" → /auth/me 401 → /auth/refresh 200 → /auth/me 200, "Sesión válida"
+  cerrar sesión → /login, sessionStorage vacío, /dev/ui vuelve a pedir login
+  contraseña mala → "Correo o contraseña incorrectos" · contraseña buena → vuelve a /dev/ui
+  logs del servidor: 0 contraseñas, 0 correos, 0 tokens; authorization "[Redacted]"; eventos auth.* con req.id
+  cuenta de prueba borrada al final (Player = 0, RefreshToken = 0)
+  **Evidencias:** `docs/evidencias/F0-07_01_login.jpg`, `_02_registro.jpg`, `_03_sesion-tras-recargar.jpg`, `_04_login-error.jpg`.
+  **Quedó a medias / roto:** nada en código. Pendiente: `JWT_SECRET` en Render **antes** de mezclar (si no, el redeploy no
+  arranca). Keystore nativo sin probar hasta tener el APK (F0-09). Deuda anotada en D-018.
+  **Decisiones nuevas:** D-018.
+  **El siguiente debe empezar por:** poner `JWT_SECRET` en Render, mezclar el PR de F0-07 y comprobar
+  `https://pokecrud-server.onrender.com/health/ready`; luego `/inicio F0-08` o `/inicio F0-09`.

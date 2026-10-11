@@ -1,0 +1,80 @@
+// Estilos comunes de /login y /registro (DISENO.md). Solo tokens: nada de colores sueltos.
+
+// Fondo: dos halos de color sobre la base del tema. En oscuro solo cambian el segundo halo y la base.
+ion-content {
+  --glow-a: color-mix(in srgb, var(--accent) 26%, transparent);
+  --glow-b: color-mix(in srgb, var(--t-water) 35%, transparent);
+  --base: var(--paper-2);
+  --background:
+    radial-gradient(120% 55% at 100% 0%, var(--glow-a), transparent 60%),
+    radial-gradient(110% 50% at 0% 100%, var(--glow-b), transparent 60%), var(--base);
+}
+
+@media (prefers-color-scheme: dark) {
+  ion-content {
+    --glow-b: color-mix(in srgb, var(--t-dragon) 35%, transparent);
+    --base: var(--ink);
+  }
+}
+
+.auth {
+  position: relative;
+  min-height: 100%;
+  max-width: 440px;
+  margin: 0 auto;
+  padding: var(--s-8) var(--s-4);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--s-6);
+  color: var(--surface-text);
+}
+
+// Poké Ball decorativa de fondo: gira muy despacio (la red de prefers-reduced-motion la detiene).
+.auth__ball {
+  position: fixed;
+  top: -12vh;
+  right: -30vw;
+  width: min(120vw, 560px);
+  color: var(--accent);
+  opacity: 0.14;
+  pointer-events: none;
+  animation: ball-spin 90s linear infinite;
+}
+
+@keyframes ball-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.auth__head {
+  position: relative;
+}
+
+.eyebrow {
+  margin: 0 0 var(--s-1);
+  font-size: 0.9375rem;
+  opacity: 0.8;
+}
+
+.display {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 2.5rem;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+}
+
+.switch {
+  margin: var(--s-4) 0 0;
+  text-align: center;
+  font-size: 0.9375rem;
+}
+
+.switch a {
+  color: var(--surface-text);
+  font-weight: 700;
+  text-underline-offset: 3px;
+}

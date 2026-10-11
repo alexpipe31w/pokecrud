@@ -5,6 +5,7 @@ import {
   ServiceUnavailableException,
 } from '@nestjs/common';
 import { SkipThrottle } from '@nestjs/throttler';
+import { Public } from '../auth/auth.decorators.js';
 import { PrismaService } from '../prisma/prisma.service.js';
 
 /** Tiempo máximo que espera /health/ready a la base de datos. */
@@ -12,8 +13,9 @@ export const READY_TIMEOUT_MS = 3000;
 
 /**
  * Salud del servidor. `live` = el proceso responde (no toca la BD); `ready` = puede atender
- * peticiones (la BD contesta). Fuera del rate limit: lo consultan el balanceador y los monitores.
+ * peticiones (la BD contesta). Pública y fuera del rate limit: la consultan el balanceador y los monitores.
  */
+@Public()
 @SkipThrottle()
 @Controller('health')
 export class HealthController {

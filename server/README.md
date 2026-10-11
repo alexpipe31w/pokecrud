@@ -4,7 +4,8 @@ NestJS 12 (ESM) + Prisma 7.10 + PostgreSQL (Supabase). Arquitectura en `docs/pla
 
 ## Puesta en marcha
 
-1. Crear `server/.env` según `docs/plan/SECRETOS.md` (Alex pasa los valores por privado). **Nunca se sube.**
+1. Crear `server/.env` según `docs/plan/SECRETOS.md` (Alex pasa los valores de la BD por privado; `JWT_SECRET` lo genera
+   cada uno). **Nunca se sube.**
 2. `npm install` (genera el cliente de Prisma en `src/generated/`, que tampoco se sube).
 3. `npm run start:dev` → `http://localhost:3000/health/ready` debe responder `{"status":"ok","db":"ok"}`.
 
@@ -25,10 +26,11 @@ NestJS 12 (ESM) + Prisma 7.10 + PostgreSQL (Supabase). Arquitectura en `docs/pla
 
 ## Endpoints
 
-| Ruta                | Qué responde                                                                      |
-| ------------------- | --------------------------------------------------------------------------------- |
-| `GET /health/live`  | `200 {status:'ok'}` si el proceso vive (no toca la base)                          |
-| `GET /health/ready` | `200 {status:'ok', db:'ok'}` o `503 {status:'error', db:'down'}` (timeout de 3 s) |
+| Ruta                                                                                      | Qué responde                                                                      |
+| ----------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| `GET /health/live`                                                                        | `200 {status:'ok'}` si el proceso vive (no toca la base)                          |
+| `GET /health/ready`                                                                       | `200 {status:'ok', db:'ok'}` o `503 {status:'error', db:'down'}` (timeout de 3 s) |
+| `POST /auth/register` · `/auth/login` · `/auth/refresh` · `/auth/logout` · `GET /auth/me` | Auth (F0-07): contrato en `docs/plan/fases/F0-fundaciones.md` → F0-07             |
 
 Arranque endurecido (`src/main.ts`, `src/app.module.ts`): helmet, CORS con lista blanca (`CORS_ORIGINS`),
 `ValidationPipe` estricto, rate limit global de 120 peticiones/min por IP (salvo `/health`), logs JSON con
@@ -48,7 +50,8 @@ GitHub). El repo es público, así que no hace falta ser su dueño. **Anotar en 
 - **Start Command:** `npx prisma migrate deploy && npm run start:prod`
 - **Health Check Path:** `/health/ready`
 - **Variables:** `DATABASE_URL` y `DIRECT_URL` (copiar los valores de `server/.env`, sin las comillas),
-  `NODE_ENV=production`, `NODE_VERSION=24`,
+  `JWT_SECRET` (uno PROPIO de Render, ≥ 32 caracteres, distinto del local: ver SECRETOS.md; sin él el servidor no
+  arranca), `NODE_ENV=production`, `NODE_VERSION=24`,
   `CORS_ORIGINS=http://localhost:8100,http://localhost:4200,https://localhost` (+ el origen de la app si se publica).
 - Comprobar `https://<servicio>.onrender.com/health/ready` y anotar la URL en `docs/plan/ESTADO.md` y en
   `src/environments/environment.prod.ts` (`apiUrl`). Render gratis se duerme a los 15 min: el primer request tarda ~1 min.

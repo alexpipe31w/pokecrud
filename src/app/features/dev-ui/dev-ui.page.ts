@@ -1,6 +1,11 @@
+import { HttpClient } from '@angular/common/http';
 import { Component, inject, signal } from '@angular/core';
+import { Router } from '@angular/router';
 import { IonContent } from '@ionic/angular';
 
+import { firstValueFrom } from 'rxjs';
+import { environment } from '../../../environments/environment';
+import { AuthService } from '../../core/auth/auth.service';
 import { POKEMON_TYPE_KEYS } from '../../core/constants/pokemon-types';
 import { AudioService } from '../../services/game/audio.service';
 import { DatasetService } from '../../services/game/dataset.service';
@@ -42,6 +47,29 @@ const DEMO_MAX_HP = 120;
             Dataset: {{ dataset.status() }} · {{ dataset.species().size }} especies
           </p>
         </header>
+
+        @if (auth.player(); as player) {
+          <section>
+            <h2 class="section-title">Sesión</h2>
+            <app-glass-panel>
+              <div class="row session">
+                <p class="session__who" data-testid="session-player">
+                  <strong>{{ player.nickname }}</strong> · nivel {{ player.level }} ·
+                  {{ player.xp }} XP
+                </p>
+                <app-game-button label="Cerrar sesión" variant="glass" (pressed)="logout()" />
+                <app-game-button
+                  label="Comprobar sesión"
+                  variant="gold"
+                  (pressed)="checkSession()"
+                />
+              </div>
+              @if (sessionCheck(); as check) {
+                <p class="session__check" data-testid="session-check">{{ check }}</p>
+              }
+            </app-glass-panel>
+          </section>
+        }
 
         <section>
           <h2 class="section-title">Botones</h2>
@@ -219,6 +247,17 @@ const DEMO_MAX_HP = 120;
       display: grid;
       gap: var(--s-2);
     }
+    .session {
+      align-items: center;
+      justify-content: space-between;
+    }
+    .session__who {
+      margin: 0;
+    }
+    .session__check {
+      margin: var(--s-3) 0 0;
+      font-size: 0.875rem;
+    }
     .dataset {
       margin: var(--s-2) 0 0;
       font-size: 0.875rem;
@@ -242,6 +281,10 @@ const DEMO_MAX_HP = 120;
 })
 export class DevUiPage {
   protected readonly dataset = inject(DatasetService);
+  protected readonly auth = inject(AuthService);
+  private readonly router = inject(Router);
+  private readonly http = inject(HttpClient);
+  protected readonly sessionCheck = signal<string | null>(null);
   private readonly audio = inject(AudioService);
   protected readonly cryFailed = signal(false);
   /** Pikachu tal como viene del dataset (se ve en cuanto termina de cargar). */
@@ -263,6 +306,23 @@ export class DevUiPage {
 
   protected async playCry(): Promise<void> {
     this.cryFailed.set(!(await this.audio.playCry(25)));
+  }
+
+  /** Pide /auth/me por el HttpClient normal (con authInterceptor): si el access no vale, se refresca solo. */
+  protected async checkSession(): Promise<void> {
+    try {
+      const { player } = await firstValueFrom(
+        this.http.get<{ player: { nickname: string } }>(`${environment.serverUrl}/auth/me`),
+      );
+      this.sessionCheck.set(`Sesión válida: el servidor te reconoce como ${player.nickname}.`);
+    } catch {
+      this.sessionCheck.set('La sesión no es válida.');
+    }
+  }
+
+  protected async logout(): Promise<void> {
+    await this.auth.logout();
+    await this.router.navigateByUrl('/login');
   }
 
   protected reset(): void {
