@@ -3,14 +3,17 @@
 > Se **reescribe** al cerrar cada sesión (no es histórico; el histórico es `BITACORA.md`).
 > Máximo una pantalla. Si lees esto al empezar: después lee `ROADMAP.md`.
 
-**Última actualización:** 2026-10-11 · por Alex (Claude) · rama `feature/F0-01-plan-fundaciones`
+**Última actualización:** 2026-10-11 · por Samuel (Claude) · rama `feature/F0-02-dataset`
 
 ## Fase actual
 
-**F0 · Fundaciones** — aún no ha empezado ninguna tarea de código.
+**F0 · Fundaciones** — F0-01 y F0-02 hechas; F0-03 y F0-06 libres.
 
 ## Hecho
 
+- **F0-02 hecho (Samuel, PR a `develop`):** dataset de las 1025 especies en `src/assets/data/` (`pokedex` 972 KB,
+  `moves` 706 movimientos / 209 KB, `types` 18 tipos, `meta` v`fdb512e56ff6`), tipos en `shared/data/dataset.types.ts`,
+  `npm run dataset` (reanudable con `.cache/`) y `npm run test:shared` (5 tests). Gen 9 (#906-1025) sin español en PokéAPI → inglés.
 - El profe aprobó sustituir JSON Server por NestJS con los mismos endpoints (D-002).
 - **F0-01 hecho:** plan detallado de la fase 0 con código y comandos verificados (Nest 12 ESM + Vitest, Prisma 7.10 con `prisma.config.ts` y `PrismaPg`).
 - **Guardado continuo:** REGLA 2b + `/guardar` + hook `Stop` que obliga a guardar si hay trabajo sin push de más de 20 min.
@@ -26,17 +29,14 @@
 
 ## En curso
 
-- F0-02 (@samuel) · rama `feature/F0-02-dataset` · **Punto de guardado 2026-10-11 14:05**: hechos pasos 1-6
-  (tipos, cliente con caché, script, `npm run dataset`, test que falla, `vitest.shared.config.ts` + `test:shared`
-  copiados de F0-03 Paso 1/3); ahora en Paso 7 (`npm run dataset`, reanudable desde `.cache/`); siguiente: Paso 8;
-  estado: compila ✅ (el test de `shared/` falla a propósito hasta generar el dataset).
+- Nadie.
 
 ## Siguiente paso concreto
 
-1. **Relevo 2026-10-11:** Alex se quedó sin tokens. F0-01 ya está mezclado en `develop` (PR #6).
-   El siguiente compañero empieza aquí.
-2. Repartir **en paralelo** (no se pisan): **F0-02** dataset · **F0-03** shared+tooling · **F0-06** servidor.
-   Cada uno: `/inicio F0-0X <nombre>` y seguir el plan de fase paso a paso, con `/guardar` tras cada paso.
+1. Revisar y mezclar el PR de F0-02 en `develop`.
+2. Libres en paralelo: **F0-03** shared+tooling (OJO: `vitest.shared.config.ts` y `test:shared` ya vienen en F0-02,
+   idénticos al plan; F0-03 solo añade `test:all`, `shared/tsconfig.json`, alias y RNG) · **F0-06** servidor.
+   Con F0-02 y F0-03 hechas se desbloquea **F0-05**.
 
 ## Bloqueos / roto / pendiente de humanos
 
