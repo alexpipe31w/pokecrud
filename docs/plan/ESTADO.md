@@ -3,16 +3,18 @@
 > Se **reescribe** al cerrar cada sesión (no es histórico; el histórico es `BITACORA.md`).
 > Máximo una pantalla. Si lees esto al empezar: después lee `ROADMAP.md`.
 
-**Última actualización:** 2026-10-11 · por Samuel (Claude) · rama `feature/F0-06-servidor-nestjs`
+**Última actualización:** 2026-10-11 · por Samuel (Claude) · rama `feature/F0-06-despliegue-render`
 
 ## Fase actual
 
-**F0 · Fundaciones** — F0-01…F0-05 en `develop` (PR #8-#11 mezclados el 2026-10-11 por Samuel, sin revisión de otro
-integrante: constancia en cada PR). **F0-06 mezclada (PR #12) salvo el despliegue en Render, que está haciendo Samuel en
-su propia cuenta.** Libres: **F0-07** auth (dep F0-04 + F0-06 ✅) y **F0-09** APK (dep F0-04 ✅).
+**F0 · Fundaciones** — **F0-01…F0-06 hechas y en `develop`** (PR #8-#12 mezclados el 2026-10-11 por Samuel, sin revisión
+de otro integrante: constancia en cada PR). Servidor desplegado. Libres: **F0-07** auth y **F0-09** APK.
 
 ## Hecho
 
+- **Servidor desplegado:** https://pokecrud-server.onrender.com (Render Free, **cuenta de Samuel**, rama `develop`,
+  despliegue automático al mezclar en `develop`). `/health/ready` → `{"status":"ok","db":"ok"}` desde internet.
+  `apiUrl` de `environment.prod.ts` apunta ahí.
 - **F0-06 (Samuel, PR #12):** `server/` con NestJS 12 ESM + Prisma 7.10 (`PrismaPg`, pool 5),
   migración `init` **aplicada en Supabase** (tablas `Player` y `RefreshToken`), helmet, CORS con lista blanca,
   `ValidationPipe` estricto, rate limit 120/min por IP (salvo `/health`), logs JSON con `x-request-id`,
@@ -27,19 +29,19 @@ su propia cuenta.** Libres: **F0-07** auth (dep F0-04 + F0-06 ✅) y **F0-09** A
 
 ## En curso
 
-- Nadie. (F0-06 queda `[~]` solo por el despliegue, que no es código: ver Bloqueos.)
+- Nadie.
 
 ## Siguiente paso concreto
 
-1. **Samuel:** terminar el despliegue en Render (`server/README.md`) → anotar aquí la URL y la cuenta, poner `apiUrl`
-   en `src/environments/environment.prod.ts` y pasar F0-06 a `[x]`. En Render, cambiar la rama a `develop`.
-2. Siguiente tarea: **F0-07 auth** o **F0-09 APK**. Ya se sacan de `develop` (todo está mezclado).
-3. (Opcional) Que Alex o Kenneth revisen a posteriori los PR #8-#12.
+1. Siguiente tarea: **F0-07 auth** (registro/login, dep F0-04 + F0-06 ✅) o **F0-09 APK** (dep F0-04 ✅), desde `develop`.
+2. (Opcional) Que Alex o Kenneth revisen a posteriori los PR #8-#12.
 
 ## Bloqueos / roto / pendiente de humanos
 
-- **Despliegue de F0-06 (en curso, Samuel, su propia cuenta de Render):** Web Service `pokecrud-server` desde la rama del
-  PR #12 (cambiar a `develop`). Sin URL pública confirmada todavía.
+- **Render está en la cuenta de Samuel:** solo él ve los logs y cambia variables. Si hay que rotar la contraseña de la BD
+  (SECRETOS.md), Samuel actualiza `DATABASE_URL` y `DIRECT_URL` en Render. Plan gratis: se duerme a los 15 min.
+- **Inventario IS-11 en producción:** `environment.prod.ts` ya apunta a Render, pero `/pokemon` no existe ahí hasta F0-08.
+  En desarrollo (`npm start` / `ionic serve` + `npm run api`) sigue funcionando igual.
 - **Puerto 3000:** lo usa el JSON Server del curso (`npm run api`). Mientras conviva, el servidor Nest se arranca con
   `PORT=3001`. Desaparece en F0-08 (JSON Server archivado).
 - **Google Maps — HECHO (2026-10-11):** clave `pokecrud-maps-js` en la cuenta de Google Cloud de Alex

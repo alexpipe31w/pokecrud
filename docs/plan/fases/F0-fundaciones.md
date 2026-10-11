@@ -1239,7 +1239,7 @@ Añadir a `server/.env.example`: `PORT=3000`, `CORS_ORIGINS=http://localhost:810
 con`@SkipThrottle()`.
 - [x] **Paso 8: verificar** — `npm run lint`, `npm test`, `npm run test:e2e`, `npm run build`,
       `npm run start:dev` y `curl http://localhost:3000/health/ready`. Pegar salidas.
-- [ ] **Paso 9: despliegue (necesita a Alex: crea la cuenta y pega las variables él)** — propuesta Render
+- [x] **Paso 9: despliegue (necesita a Alex: crea la cuenta y pega las variables él)** — propuesta Render
       (gratis): Web Service, _Root Directory_ `server`, _Build_ `npm ci && npm run build`,
       _Start_ `npx prisma migrate deploy && npm run start:prod`, variables `DATABASE_URL`, `DIRECT_URL`,
       `CORS_ORIGINS`, `NODE_ENV=production`. Comprobar `https://<servicio>.onrender.com/health/ready`. Anotar la URL
