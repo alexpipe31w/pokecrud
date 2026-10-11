@@ -115,8 +115,11 @@ evolution{chainId, from, to[{id, minLevel, item, trigger}]}, learnset[{moveId, l
 - **Modo demo / sin GPS**: joystick en pantalla para mover el avatar (imprescindible para presentar en
   un aula y para probar en el PC). Activable en ajustes y automático si se deniega el permiso.
 - Secreto: la API key va en `src/environments/environment.local.ts` (gitignored) y se restringe en
-  Google Cloud por **aplicación Android (package `co.edu.fet.pokecrud` + SHA-1)** y por referrer
-  `http://localhost:*` para desarrollo. Cada compañero puede usar la misma key restringida.
+  Google Cloud por **referrer HTTP** (la Maps JavaScript API NO admite restricción por app Android;
+  eso es solo para el SDK nativo): `https://localhost/*` (así carga Capacitor la app dentro del APK),
+  `http://localhost:8100/*` y `http://localhost:4200/*` (desarrollo), y restricción de API a
+  "Maps JavaScript API". Una clave de navegador siempre es visible en el APK: la protección real es
+  la restricción + el tope de cuota diario + la alerta de presupuesto. Todo el equipo usa la misma clave.
   Coste: con la cuota gratuita mensual de Maps JS sobra para un proyecto de clase (verificar la cifra
   vigente en la consola antes de la demo; poner alerta de presupuesto a 1 USD).
 
