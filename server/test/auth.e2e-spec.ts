@@ -21,7 +21,13 @@ const nextIp = (): string => {
 interface Session {
   accessToken: string;
   refreshToken: string;
-  player: { id: string; email: string; nickname: string; level: number; xp: number };
+  player: {
+    id: string;
+    email: string;
+    nickname: string;
+    level: number;
+    xp: number;
+  };
 }
 
 describe('Auth (e2e)', () => {
@@ -34,10 +40,15 @@ describe('Auth (e2e)', () => {
     nickname: `t_${randomUUID().slice(0, 8)}`,
   });
   const post = (url: string, body: object, ip = nextIp()) =>
-    request(app.getHttpServer()).post(url).set('X-Forwarded-For', ip).send(body);
+    request(app.getHttpServer())
+      .post(url)
+      .set('X-Forwarded-For', ip)
+      .send(body);
   const me = (accessToken?: string) => {
     const req = request(app.getHttpServer()).get('/auth/me');
-    return accessToken ? req.set('Authorization', `Bearer ${accessToken}`) : req;
+    return accessToken
+      ? req.set('Authorization', `Bearer ${accessToken}`)
+      : req;
   };
   const register = async (user = newUser()) => {
     const res = await post('/auth/register', user).expect(201);
@@ -98,9 +109,17 @@ describe('Auth (e2e)', () => {
   });
 
   it('datos inválidos o campos de más → 400', async () => {
-    await post('/auth/register', { ...newUser(), password: 'corta' }).expect(400);
-    await post('/auth/register', { ...newUser(), nickname: 'no válido!' }).expect(400);
-    await post('/auth/register', { ...newUser(), email: 'no-es-correo' }).expect(400);
+    await post('/auth/register', { ...newUser(), password: 'corta' }).expect(
+      400,
+    );
+    await post('/auth/register', {
+      ...newUser(),
+      nickname: 'no válido!',
+    }).expect(400);
+    await post('/auth/register', {
+      ...newUser(),
+      email: 'no-es-correo',
+    }).expect(400);
     await post('/auth/register', { ...newUser(), level: 99 }).expect(400);
   });
 
@@ -132,7 +151,9 @@ describe('Auth (e2e)', () => {
 
     await me().expect(401);
     const [header, payload, signature] = session.accessToken.split('.');
-    const otherSig = signature.startsWith('A') ? `B${signature.slice(1)}` : `A${signature.slice(1)}`;
+    const otherSig = signature.startsWith('A')
+      ? `B${signature.slice(1)}`
+      : `A${signature.slice(1)}`;
     await me(`${header}.${payload}.${otherSig}`).expect(401);
     const unsigned = `${Buffer.from('{"alg":"none","typ":"JWT"}').toString('base64url')}.${payload}.`;
     await me(unsigned).expect(401);
@@ -147,15 +168,25 @@ describe('Auth (e2e)', () => {
     await me(first.body.accessToken).expect(200);
 
     // Alguien usa el refresh viejo (robado) → 401, y el nuevo también deja de valer.
-    await post('/auth/refresh', { refreshToken: session.refreshToken }).expect(401);
-    await post('/auth/refresh', { refreshToken: first.body.refreshToken }).expect(401);
+    await post('/auth/refresh', { refreshToken: session.refreshToken }).expect(
+      401,
+    );
+    await post('/auth/refresh', {
+      refreshToken: first.body.refreshToken,
+    }).expect(401);
   });
 
   it('logout es idempotente (204 dos veces) y el refresh deja de valer', async () => {
     const { session } = await register();
-    await post('/auth/logout', { refreshToken: session.refreshToken }).expect(204);
-    await post('/auth/logout', { refreshToken: session.refreshToken }).expect(204);
-    await post('/auth/refresh', { refreshToken: session.refreshToken }).expect(401);
+    await post('/auth/logout', { refreshToken: session.refreshToken }).expect(
+      204,
+    );
+    await post('/auth/logout', { refreshToken: session.refreshToken }).expect(
+      204,
+    );
+    await post('/auth/refresh', { refreshToken: session.refreshToken }).expect(
+      401,
+    );
   });
 
   it('dos refresh simultáneos con el mismo token → exactamente uno 200 y otro 401', async () => {
@@ -171,16 +202,29 @@ describe('Auth (e2e)', () => {
     const { user } = await register();
     const ip = nextIp();
     for (let i = 0; i < 5; i++) {
-      await post('/auth/login', { email: user.email, password: PASSWORD }, ip).expect(200);
+      await post(
+        '/auth/login',
+        { email: user.email, password: PASSWORD },
+        ip,
+      ).expect(200);
     }
-    await post('/auth/login', { email: user.email, password: PASSWORD }, ip).expect(429);
+    await post(
+      '/auth/login',
+      { email: user.email, password: PASSWORD },
+      ip,
+    ).expect(429);
   });
 
   it('login: tras 10 fallos en una cuenta (desde IP distintas) se bloquea aunque la clave sea buena', async () => {
     const { user } = await register();
     for (let i = 0; i < 10; i++) {
-      await post('/auth/login', { email: user.email, password: 'mala-clave-123' }).expect(401);
+      await post('/auth/login', {
+        email: user.email,
+        password: 'mala-clave-123',
+      }).expect(401);
     }
-    await post('/auth/login', { email: user.email, password: PASSWORD }).expect(429);
+    await post('/auth/login', { email: user.email, password: PASSWORD }).expect(
+      429,
+    );
   });
 });

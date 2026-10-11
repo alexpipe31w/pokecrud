@@ -1,10 +1,12 @@
 import { randomUUID } from 'node:crypto';
 import type { IncomingMessage, ServerResponse } from 'node:http';
-import { Module } from '@nestjs/common';
+import { Module, ValidationPipe } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { APP_GUARD } from '@nestjs/core';
+import { APP_GUARD, APP_PIPE } from '@nestjs/core';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { LoggerModule } from 'nestjs-pino';
+import { AuthModule } from './auth/auth.module.js';
+import { validateEnv } from './config/env.validation.js';
 import { HealthModule } from './health/health.module.js';
 import { PrismaModule } from './prisma/prisma.module.js';
 
@@ -24,7 +26,8 @@ function requestId(req: IncomingMessage, res: ServerResponse): string {
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true }),
+    // Sin JWT_SECRET (≥ 32) o DATABASE_URL el servidor no arranca (ver config/env.validation.ts).
+    ConfigModule.forRoot({ isGlobal: true, validate: validateEnv }),
     LoggerModule.forRoot({
       pinoHttp: {
         // JSON en producción; legible en desarrollo; silencio en los tests.
@@ -37,15 +40,32 @@ function requestId(req: IncomingMessage, res: ServerResponse): string {
           'req.headers.authorization',
           'req.headers.cookie',
           'req.body.password',
+          'req.body.refreshToken',
         ],
         genReqId: requestId,
       },
     }),
-    // Límite global por IP (almacén en memoria: un solo proceso, D-005). Login tendrá uno propio (F0-07).
-    ThrottlerModule.forRoot([{ ttl: 60_000, limit: 120 }]),
+    // Límite global por IP (almacén en memoria: un solo proceso, D-005). Las rutas de auth tienen el suyo.
+    ThrottlerModule.forRoot({
+      throttlers: [{ ttl: 60_000, limit: 120 }],
+      errorMessage:
+        'Demasiadas peticiones. Espera un momento e inténtalo de nuevo.',
+    }),
     PrismaModule,
     HealthModule,
+    AuthModule,
   ],
-  providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
+  providers: [
+    { provide: APP_GUARD, useClass: ThrottlerGuard },
+    // Validación global de DTOs. Aquí (y no en main.ts) para que también aplique en los tests e2e.
+    {
+      provide: APP_PIPE,
+      useValue: new ValidationPipe({
+        whitelist: true,
+        forbidNonWhitelisted: true,
+        transform: true,
+      }),
+    },
+  ],
 })
 export class AppModule {}

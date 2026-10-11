@@ -3,8 +3,10 @@ import { Test } from '@nestjs/testing';
 import request from 'supertest';
 import { App } from 'supertest/types.js';
 import { AppModule } from '../src/app.module.js';
+import { Public } from '../src/auth/auth.decorators.js';
 
 /** Ruta de prueba: el guard global solo actúa sobre rutas que existen (un 404 no cuenta). */
+@Public()
 @Controller('ping')
 class PingController {
   @Get()

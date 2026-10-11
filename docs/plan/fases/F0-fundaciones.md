@@ -1281,7 +1281,7 @@ Contrato:
      (el refresh nuevo también deja de valer);
   6. logout dos veces → 204 las dos;
   7. dos `refresh` simultáneos con el mismo token → exactamente uno 200 y otro 401.
-- [ ] **Paso 2: `AuthService`** — reglas que el código debe cumplir (cada una con su línea, no intención):
+- [x] **Paso 2: `AuthService`** — reglas que el código debe cumplir (cada una con su línea, no intención):
   - `argon2.hash(password, { type: argon2.argon2id })`; en login con email inexistente, igualmente
     ejecutar un `argon2.verify` contra un hash fijo para no revelar por tiempo qué emails existen.
   - email normalizado (`trim().toLowerCase()`); unicidad por `@unique` en BD → capturar `P2002` → 409.
@@ -1292,9 +1292,9 @@ data: { revokedAt: now } })`; si `count === 0` → buscar por `tokenHash`: si ex
     existe → 401. Si `count === 1` → crear el nuevo token con el mismo `familyId`. Todo en `$transaction`.
   - access JWT: `{ sub: player.id }`, `expiresIn: JWT_TTL`, algoritmo HS256 explícito.
   - logs: `auth.login.ok|fail`, `auth.refresh.reuse` con `playerId`/`familyId`, nunca tokens ni emails completos.
-- [ ] **Paso 3:** DTOs con `class-validator`, `JwtAuthGuard` (global con decorador `@Public()` para
+- [x] **Paso 3:** DTOs con `class-validator`, `JwtAuthGuard` (global con decorador `@Public()` para
       `/auth/*` y `/health/*`), `@Throttle({ default: { limit: 5, ttl: 60_000 } })` en register/login.
-- [ ] **Paso 4:** `npm test && npm run test:e2e` verdes. Commit `F0-07a: auth en servidor`.
+- [x] **Paso 4:** `npm test && npm run test:e2e` verdes. Commit `F0-07a: auth en servidor`.
 
 **App** (`src/app/core/auth/`): `npm install @aparajita/capacitor-secure-storage@8.0.1`.
 
