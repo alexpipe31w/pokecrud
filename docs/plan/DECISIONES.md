@@ -26,7 +26,7 @@ modelos 3D: no hay modelos libres de las 1025 especies y así todas se ven con l
 
 JSON Server no puede hacer combates en tiempo real ni impedir trampas. Se crea `server/` y se migran
 `/teams`, `/favorites`, `/customPokemon` con el mismo contrato. JSON Server queda en `backend/` hasta
-que el nuevo servidor cubra esos endpoints (F0-07) y luego se archiva.
+que el nuevo servidor cubra esos endpoints (F0-08) y luego se archiva.
 
 ## D-005 · Salas de combate en memoria de un único proceso (2026-10-11)
 

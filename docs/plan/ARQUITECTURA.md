@@ -56,7 +56,7 @@ pokecrud/
 ├── server/                    ← NestJS (package.json propio)
 │   ├── prisma/schema.prisma + migrations/
 │   └── src/<modulo>/…
-├── backend/                   ← JSON Server ORIGINAL (se conserva hasta F0-07, luego se archiva)
+├── backend/                   ← JSON Server ORIGINAL (se conserva hasta F0-08, luego se archiva)
 └── src/                       ← App Angular/Ionic (se mantiene en la raíz para no romper angular.json)
     ├── assets/
     │   ├── data/              ← pokedex.json, moves.json, types.json (generados, commiteados)
