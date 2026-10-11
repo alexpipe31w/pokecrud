@@ -1,5 +1,8 @@
 # PokéCRUD
 
+> **🚧 En transformación a PokéCRUD GO** (mapa con GPS, captura en realidad aumentada, combates en tiempo real y torneos).
+> El plan, el estado y las reglas de trabajo del equipo están en [`docs/plan/`](docs/plan/) y [`CLAUDE.md`](CLAUDE.md). **Empieza por [`docs/plan/ESTADO.md`](docs/plan/ESTADO.md).**
+
 App móvil/web hecha con **Angular + Ionic** que consulta la [PokéAPI](https://pokeapi.co/) y permite gestionar equipos, favoritos y Pokémon personalizados sobre un backend propio con **JSON Server**.
 
 Proyecto de la asignatura Ingeniería de Software, gestionado con Scrum en Jira (proyecto `IS`).

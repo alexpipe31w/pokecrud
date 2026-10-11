@@ -68,3 +68,15 @@ testem.log
 # System files
 .DS_Store
 Thumbs.db
+
+# PokéCRUD GO
+/.cache
+/server/node_modules
+/server/dist
+.env
+.env.*
+!.env.example
+/src/environments/environment.local.ts
+*.keystore
+*.jks
+.claude/settings.local.json
