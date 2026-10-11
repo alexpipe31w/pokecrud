@@ -562,7 +562,7 @@ describe('dataset generado', () => {
 (el tiempo y el azar se inyectan). Los imports relativos llevan sufijo **`.js`** (`./rng.js`): así
 compila igual en la app (bundler), en Vitest y en el servidor ESM (nodenext).
 
-- [ ] **Paso 1: config de Vitest para `shared/`** — `vitest.shared.config.ts` (raíz)
+- [x] **Paso 1: config de Vitest para `shared/`** — `vitest.shared.config.ts` (raíz)
 
 ```ts
 import { defineConfig } from 'vitest/config';
@@ -577,7 +577,7 @@ export default defineConfig({
 });
 ```
 
-- [ ] **Paso 2: `shared/tsconfig.json`** (para el editor y `tsc --noEmit`)
+- [x] **Paso 2: `shared/tsconfig.json`** (para el editor y `tsc --noEmit`)
 
 ```json
 {
@@ -589,11 +589,11 @@ export default defineConfig({
 
 Instalar tipos de Node si faltan: `npm install -D @types/node@24`.
 
-- [ ] **Paso 3: scripts** — en `package.json`:
+- [x] **Paso 3: scripts** — en `package.json`:
       `"test:shared": "vitest run --config vitest.shared.config.ts"`,
       `"test:all": "ng test --watch=false && npm run test:shared"`.
 
-- [ ] **Paso 4: test del RNG (falla primero)** — `shared/engine/rng.spec.ts`
+- [x] **Paso 4: test del RNG (falla primero)** — `shared/engine/rng.spec.ts`
 
 ```ts
 import { createRng, hashString } from './rng.js';
@@ -637,8 +637,8 @@ describe('rng', () => {
 });
 ```
 
-- [ ] **Paso 5:** `npm run test:shared` → FALLA (`rng.js` no existe).
-- [ ] **Paso 6: implementación** — `shared/engine/rng.ts`
+- [x] **Paso 5:** `npm run test:shared` → FALLA (`rng.js` no existe).
+- [x] **Paso 6: implementación** — `shared/engine/rng.ts`
 
 ```ts
 /** PRNG determinista (mulberry32). Nunca usar Math.random en shared/: el azar se siembra. */
@@ -681,7 +681,7 @@ export function hashString(input: string): number {
 }
 ```
 
-- [ ] **Paso 7:** `npm run test:shared` → verde.
+- [x] **Paso 7:** `npm run test:shared` → verde.
 - [ ] **Paso 8: alias e inclusión en la app** — `tsconfig.json` → `compilerOptions` añadir
       `"baseUrl": "."` y `"paths": { "@shared/*": ["shared/*"] }`.
       `tsconfig.app.json` → `"include": ["src/**/*.d.ts", "shared/**/*.ts"]` y añadir

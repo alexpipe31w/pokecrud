@@ -30,7 +30,9 @@
 ## En curso
 
 - F0-03 (@samuel) · rama `feature/F0-03-shared-tooling` (sale de `feature/F0-02-dataset` porque el PR #8 aún no está
-  mezclado) · **Punto de guardado 2026-10-11**: tarea reclamada; siguiente: Paso 2 (Paso 1 ya venía en F0-02).
+  mezclado) · **Punto de guardado 2026-10-11 14:30**: hechos pasos 1-7 (`shared/tsconfig.json`,
+  `@types/node@24`, `test:all`, RNG mulberry32 + hashString con 5 tests); ahora en Paso 8 (alias `@shared/*`);
+  siguiente: Paso 9; estado: compila ✅ (`test:shared` 10/10).
 
 ## Siguiente paso concreto
 
