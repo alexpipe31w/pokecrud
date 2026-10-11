@@ -81,3 +81,13 @@ exige `prisma.config.ts` para la URL y el adaptador `@prisma/adapter-pg`. Sustit
 Las cuentas Claude Pro se cortan sin aviso al agotar el límite. Se guarda (commit WIP permitido + push + "Punto de
 guardado" en ESTADO.md) tras cada paso del plan y como mucho cada 20 min; un hook `Stop` lo hace cumplir. Quien
 retoma una tarea `[~]` trabaja sobre la rama del compañero, no crea otra.
+
+## D-017 · Prisma 7.10: `prisma.config.ts` usa DIRECT_URL y vulnerabilidades de la CLI aceptadas (2026-10-11, Samuel)
+
+- En Prisma 7.10 el `datasource` de `prisma.config.ts` solo admite `url` (y `shadowDatabaseUrl`): **no** existe
+  `directUrl` (el plan de F0-06 lo traía; no compila). Esa URL solo la usa la CLI (migraciones) → `env('DIRECT_URL')`.
+  La app se conecta con `DATABASE_URL` vía `PrismaPg`. Hoy las dos apuntan al session pooler; si algún día
+  `DATABASE_URL` pasa al _transaction pooler_ (6543), las migraciones siguen yendo por `DIRECT_URL`.
+- `npm audit` marca 4 "high" (`mysql2`, `deepmerge-ts`) que vienen **solo** de la CLI `prisma@7.10.0`. El servidor nunca
+  carga `mysql2` (usamos Postgres) y `deepmerge-ts` solo fusiona la config local de la CLI, sin datos de usuarios.
+  La única corrección que ofrece npm es bajar a Prisma 6 (contradice D-012): riesgo aceptado. Revisar al salir Prisma 7.11+.

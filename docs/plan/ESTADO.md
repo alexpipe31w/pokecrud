@@ -27,8 +27,8 @@
 ## En curso
 
 - F0-06 (@samuel) · rama `feature/F0-06-servidor-nestjs` (sale de `develop`: es independiente de F0-02…F0-05,
-  cuyos PR #8-#11 están pendientes de mezclar) · **Punto de guardado 2026-10-11 16:50**: hecho Paso 1 (scaffold Nest 12.0.8 ESM + Vitest en
-  `server/`, sin `@nestjs/mau`); BD `public` vacía (comprobado); ahora en Paso 2 (dependencias); estado: compila ✅.
+  cuyos PR #8-#11 están pendientes de mezclar) · **Punto de guardado 2026-10-11 17:00**: hechos pasos 1-3 (scaffold, dependencias exactas, prisma.config con
+  DIRECT_URL y schema Player/RefreshToken, D-017); BD `public` vacía; ahora en Paso 4 (migración init); estado: compila ✅.
 
 ## Siguiente paso concreto
 

@@ -1099,7 +1099,7 @@ Mover el contenido de `server-tmp/` a `server/` (sin pisar `server/.env` ni `ser
 `server-tmp/`. Comprobar: `server/package.json` tiene `"type": "module"`; `cd server && npm test` → verde.
 `server/.gitignore` del scaffold: comprobar que ignora `node_modules`, `dist` y `.env`.
 
-- [ ] **Paso 2: dependencias**
+- [x] **Paso 2: dependencias**
 
 ```bash
 cd server
@@ -1109,7 +1109,7 @@ npm install @nestjs/config@12.0.1 @nestjs/throttler@6.7.1 helmet@8.3.0 class-val
 npm install -D prisma@7.10.0 pino-pretty
 ```
 
-- [ ] **Paso 3: Prisma 7** — `server/prisma.config.ts`
+- [x] **Paso 3: Prisma 7** — `server/prisma.config.ts`
 
 ```ts
 import 'dotenv/config';
