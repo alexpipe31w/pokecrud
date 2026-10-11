@@ -879,7 +879,7 @@ export class GameButtonComponent {
 
 Instalar: `npm install idb@8.0.4 && npm install -D fake-indexeddb@6.2.5`.
 
-- [ ] **Paso 1: SettingsService (test → código)**
+- [x] **Paso 1: SettingsService (test → código)**
 
 ```ts
 // settings.service.ts
@@ -937,7 +937,7 @@ export class SettingsService {
 Test: valores por defecto; `update` persiste (`TestBed.flushEffects()` y leer `localStorage`);
 JSON corrupto en `localStorage` → defaults.
 
-- [ ] **Paso 2: HapticsService**
+- [x] **Paso 2: HapticsService**
 
 ```ts
 // haptics.service.ts
