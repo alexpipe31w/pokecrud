@@ -30,11 +30,13 @@
       `AudioService` (buses, desbloqueo, caché de gritos), `HapticsService`, `SettingsService` (volúmenes,
       reducir efectos, modo joystick) con signals.
       Dep: F0-02, F0-03. Criterio: tests unitarios; en `/dev/ui` se oye el grito de un Pokémon al pulsar.
-- [ ] **F0-06 · Servidor NestJS esqueleto** — `server/` con Nest 12, Prisma, Postgres, ValidationPipe
+- [~] **F0-06 · Servidor NestJS esqueleto** (@samuel, 2026-10-11) — `server/` con Nest 12, Prisma, Postgres, ValidationPipe
       global, throttler, helmet, logger JSON, `/health`, `.env.example`, migración inicial con `Player` y
       `RefreshToken`. Elegir y documentar dónde se despliega (Render + Supabase propuesto).
       Dep: F0-01. Criterio: `npm run start:dev` en `server/` responde `/health`; migración aplicada; desplegado
       con URL anotada en ESTADO.md.
+      **Falta:** desplegar en Render (Paso 9, en curso por Samuel; pasos en `server/README.md`) y anotar la URL en ESTADO.md
+      y en `environment.prod.ts`. Todo lo demás está hecho y probado (ver BITACORA 2026-10-11 · F0-06).
 - [ ] **F0-07 · Auth completo** — registro/login/refresh/logout (argon2id, JWT 15 min, refresh rotatorio),
       rate limit en login, pantalla de login/registro con el sistema de diseño, guard en la app, interceptor
       que refresca, almacenamiento seguro (D-006).

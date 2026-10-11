@@ -3,53 +3,45 @@
 > Se **reescribe** al cerrar cada sesión (no es histórico; el histórico es `BITACORA.md`).
 > Máximo una pantalla. Si lees esto al empezar: después lee `ROADMAP.md`.
 
-**Última actualización:** 2026-10-11 · por Samuel (Claude) · rama `feature/F0-05-servicios-base`
+**Última actualización:** 2026-10-11 · por Samuel (Claude) · rama `feature/F0-06-servidor-nestjs`
 
 ## Fase actual
 
-**F0 · Fundaciones** — F0-01…F0-05 hechas (PR #8, #9, #10 y el de F0-05 pendientes de mezclar, en ese orden); libres: F0-06, F0-09.
+**F0 · Fundaciones** — F0-01…F0-05 en `develop` (PR #8-#11 mezclados el 2026-10-11 por Samuel, sin revisión de otro
+integrante: constancia en cada PR). **F0-06 mezclada (PR #12) salvo el despliegue en Render, que está haciendo Samuel en
+su propia cuenta.** Libres: **F0-07** auth (dep F0-04 + F0-06 ✅) y **F0-09** APK (dep F0-04 ✅).
 
 ## Hecho
 
-- **F0-05 hecho (Samuel, PR a `develop`, apilado sobre F0-04):** `src/app/services/game/` con `SettingsService`
-  (localStorage), `HapticsService` (plugin por token, D-016), `AudioService` (buses música/efectos/gritos, desbloqueo,
-  LRU de 30 gritos, catálogo `SFX_CATALOG` vacío hasta F2-08) y `DatasetService` (assets → IndexedDB, carga compartida).
-  El dataset se carga al arrancar; `GameButton` vibra/suena en pointerdown; `/dev/ui` muestra `ready · 1025` y el grito.
-- **F0-04 hecho (Samuel, PR a `develop`, apilado sobre F0-03):** `src/theme/tokens.scss` (DISENO §2 + sombras, borde de
-  vidrio y `--track`), fuente Fredoka 500/600/700, chips de tipo desde los tokens con texto por contraste (D-015),
-  `GameButton`, `GlassPanel`, `StatBar`, `HpBar` en `src/app/shared/ui/` con tests y escaparate `/dev/ui`
-  (evidencia `docs/evidencias/F0-04_01_dev-ui.jpg`). Háptico/sonido del botón: se enchufan en F0-05 Paso 9.
-- **F0-03 hecho (Samuel, PR a `develop`, apilado sobre F0-02):** `shared/` con RNG determinista (`shared/engine/rng.ts`,
-  mulberry32 + hashString FNV-1a, 5 tests), `shared/tsconfig.json`, alias `@shared/*` (sin `baseUrl`: obsoleto en TS 6),
-  `npm run test:all` (app + shared), `three@0.186.1` y `@types/three@0.186.0` exactos (D-003), `@types/node@24`.
-- **F0-02 hecho (Samuel, PR a `develop`):** dataset de las 1025 especies en `src/assets/data/` (`pokedex` 972 KB,
-  `moves` 706 movimientos / 209 KB, `types` 18 tipos, `meta` v`fdb512e56ff6`), tipos en `shared/data/dataset.types.ts`,
-  `npm run dataset` (reanudable con `.cache/`) y `npm run test:shared` (5 tests). Gen 9 (#906-1025) sin español en PokéAPI → inglés.
+- **F0-06 (Samuel, PR #12):** `server/` con NestJS 12 ESM + Prisma 7.10 (`PrismaPg`, pool 5),
+  migración `init` **aplicada en Supabase** (tablas `Player` y `RefreshToken`), helmet, CORS con lista blanca,
+  `ValidationPipe` estricto, rate limit 120/min por IP (salvo `/health`), logs JSON con `x-request-id`,
+  `/health/live` y `/health/ready` (timeout 3 s → 503). Tests: 4 unitarios + 7 e2e contra la base real. D-017.
+- **F0-02…F0-05 (Samuel, PR #8-#11):** dataset de 1025 especies, `shared/` con RNG, sistema de diseño + `/dev/ui`,
+  servicios base (dataset en IndexedDB, audio con gritos, hápticos, ajustes). Ver BITACORA y DECISIONES D-014…D-016.
+- **F0-01 hecho:** plan detallado de la fase 0. Plan maestro, reglas de relevo, `/inicio` `/guardar` `/cierre`, hooks y skills.
 - El profe aprobó sustituir JSON Server por NestJS con los mismos endpoints (D-002).
-- **F0-01 hecho:** plan detallado de la fase 0 con código y comandos verificados (Nest 12 ESM + Vitest, Prisma 7.10 con `prisma.config.ts` y `PrismaPg`).
-- **Guardado continuo:** REGLA 2b + `/guardar` + hook `Stop` que obliga a guardar si hay trabajo sin push de más de 20 min.
-- Plan maestro completo en `docs/plan/` (visión, arquitectura, diseño, roadmap, decisiones).
-- Reglas de relevo en `CLAUDE.md`, comandos `/inicio` y `/cierre`, hook de arranque.
-- Skills esenciales copiadas en `.claude/skills/` (estándares de producción, planes, TDD, depuración,
-  verificación, testing web, NestJS, Prisma).
 - Lo que ya existía antes del plan: Angular 22 + Ionic 9 + Capacitor 8; JSON Server con `/teams`, `/favorites`,
   `/customPokemon` y **`/pokemon`** (151 sembrados, con `price` y `stock`); Postman (36 pruebas); Scrum en Jira.
-  **IS-11 (Samuel, 08-10) en `develop`:** Pokédex/inventario con CRUD (listar con scroll infinito, buscar,
-  agregar cualquier Pokémon desde PokéAPI, detalle con descripción en español, editar, eliminar), con tests.
-  Equipos, Favoritos y Mis Pokémon **ocultos** en esa entrega (código en `features/`, ver `tabs.page.html`).
+  **IS-11 (Samuel, 08-10) en `develop`:** Pokédex/inventario con CRUD; Equipos, Favoritos y Mis Pokémon **ocultos**.
 
 ## En curso
 
-- Nadie.
+- Nadie. (F0-06 queda `[~]` solo por el despliegue, que no es código: ver Bloqueos.)
 
 ## Siguiente paso concreto
 
-1. Mezclar en orden: **#8 (F0-02) → #9 (F0-03) → #10 (F0-04) → PR de F0-05** (cada rama sale de la anterior).
-2. Libres: **F0-06** servidor NestJS (dep F0-01; desbloquea F0-07 auth) y **F0-09** APK (dep F0-04).
-   Si se cogen antes de mezclar, sacar la rama de `feature/F0-05-servicios-base`.
+1. **Samuel:** terminar el despliegue en Render (`server/README.md`) → anotar aquí la URL y la cuenta, poner `apiUrl`
+   en `src/environments/environment.prod.ts` y pasar F0-06 a `[x]`. En Render, cambiar la rama a `develop`.
+2. Siguiente tarea: **F0-07 auth** o **F0-09 APK**. Ya se sacan de `develop` (todo está mezclado).
+3. (Opcional) Que Alex o Kenneth revisen a posteriori los PR #8-#12.
 
 ## Bloqueos / roto / pendiente de humanos
 
+- **Despliegue de F0-06 (en curso, Samuel, su propia cuenta de Render):** Web Service `pokecrud-server` desde la rama del
+  PR #12 (cambiar a `develop`). Sin URL pública confirmada todavía.
+- **Puerto 3000:** lo usa el JSON Server del curso (`npm run api`). Mientras conviva, el servidor Nest se arranca con
+  `PORT=3001`. Desaparece en F0-08 (JSON Server archivado).
 - **Google Maps — HECHO (2026-10-11):** clave `pokecrud-maps-js` en la cuenta de Google Cloud de Alex
   (prueba gratuita hasta 2027-01-10, proyecto "My First Project" `project-7bf0c639-c6d2-4cc1-aba`), restringida a
   Maps JavaScript API y a `https://localhost/*`, `http://localhost:8100/*`, `http://localhost:4200/*`.

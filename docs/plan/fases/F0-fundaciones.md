@@ -1089,7 +1089,7 @@ Test (con `import 'fake-indexeddb/auto'` al inicio del spec y `HttpTestingContro
 **Requisito:** `server/.env` creado según `docs/plan/SECRETOS.md` (pídeselo a Alex si no lo tienes).
 Lee la skill `estandares-produccion` (modo Construir, "Día 1") y `nestjs-patterns` antes de empezar.
 
-- [ ] **Paso 1: generar el proyecto** (desde la raíz del repo; `server/` ya existe con `.env.example`):
+- [x] **Paso 1: generar el proyecto** (desde la raíz del repo; `server/` ya existe con `.env.example`):
 
 ```bash
 npx -y @nestjs/cli@12.0.8 new server --package-manager npm --skip-git --strict --directory server-tmp
@@ -1099,7 +1099,7 @@ Mover el contenido de `server-tmp/` a `server/` (sin pisar `server/.env` ni `ser
 `server-tmp/`. Comprobar: `server/package.json` tiene `"type": "module"`; `cd server && npm test` → verde.
 `server/.gitignore` del scaffold: comprobar que ignora `node_modules`, `dist` y `.env`.
 
-- [ ] **Paso 2: dependencias**
+- [x] **Paso 2: dependencias**
 
 ```bash
 cd server
@@ -1109,7 +1109,7 @@ npm install @nestjs/config@12.0.1 @nestjs/throttler@6.7.1 helmet@8.3.0 class-val
 npm install -D prisma@7.10.0 pino-pretty
 ```
 
-- [ ] **Paso 3: Prisma 7** — `server/prisma.config.ts`
+- [x] **Paso 3: Prisma 7** — `server/prisma.config.ts`
 
 ```ts
 import 'dotenv/config';
@@ -1165,12 +1165,12 @@ Añadir `src/generated/` a `server/.gitignore`. Scripts en `server/package.json`
 `"prisma:generate": "prisma generate"`, `"db:migrate": "prisma migrate dev"`,
 `"db:deploy": "prisma migrate deploy"`, y `"postinstall": "prisma generate"`.
 
-- [ ] **Paso 4: migración inicial**: `npx prisma migrate dev --name init` → crea
+- [x] **Paso 4: migración inicial**: `npx prisma migrate dev --name init` → crea
       `prisma/migrations/<fecha>_init/migration.sql` y la aplica en Supabase. Si falla por la _shadow database_
       (permisos), usar `npx prisma migrate dev --name init --create-only` y luego `npx prisma migrate deploy`.
       Comprobar con `npx prisma migrate status` → "Database schema is up to date". Pegar la salida en la bitácora.
 
-- [ ] **Paso 5: PrismaService** — `server/src/prisma/prisma.service.ts` + `prisma.module.ts` (`@Global()`):
+- [x] **Paso 5: PrismaService** — `server/src/prisma/prisma.service.ts` + `prisma.module.ts` (`@Global()`):
 
 ```ts
 import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
@@ -1196,7 +1196,7 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
 }
 ```
 
-- [ ] **Paso 6: arranque endurecido** — `server/src/main.ts`
+- [x] **Paso 6: arranque endurecido** — `server/src/main.ts`
 
 ```ts
 import { ValidationPipe } from '@nestjs/common';
@@ -1233,11 +1233,11 @@ await bootstrap();
 `PrismaModule`, `HealthModule`.
 Añadir a `server/.env.example`: `PORT=3000`, `CORS_ORIGINS=http://localhost:8100,http://localhost:4200,https://localhost`.
 
-- [ ] **Paso 7: health (test e2e primero)** — `server/test/health.e2e-spec.ts`: `GET /health/live` → 200
+- [x] **Paso 7: health (test e2e primero)** — `server/test/health.e2e-spec.ts`: `GET /health/live` → 200
       `{status:'ok'}`; `GET /health/ready` → 200 `{status:'ok', db:'ok'}` con BD real. Implementación:
       `HealthController` con `live()` (no toca BD) y `ready()` (`await prisma.$queryRaw\`SELECT 1\``con`Promise.race`de 3 s; si falla →`503 {status:'error', db:'down'}`). Excluir `/health/*`del throttler
 con`@SkipThrottle()`.
-- [ ] **Paso 8: verificar** — `npm run lint`, `npm test`, `npm run test:e2e`, `npm run build`,
+- [x] **Paso 8: verificar** — `npm run lint`, `npm test`, `npm run test:e2e`, `npm run build`,
       `npm run start:dev` y `curl http://localhost:3000/health/ready`. Pegar salidas.
 - [ ] **Paso 9: despliegue (necesita a Alex: crea la cuenta y pega las variables él)** — propuesta Render
       (gratis): Web Service, _Root Directory_ `server`, _Build_ `npm ci && npm run build`,
@@ -1245,7 +1245,7 @@ con`@SkipThrottle()`.
       `CORS_ORIGINS`, `NODE_ENV=production`. Comprobar `https://<servicio>.onrender.com/health/ready`. Anotar la URL
       en ESTADO.md (no es secreto) y en `src/environments/environment.prod.ts` (`apiUrl`). Recordar: Render gratis
       se duerme a los 15 min; el primer request tarda ~1 min.
-- [ ] **Paso 10: commit** — `F0-06: servidor NestJS 12 con Prisma 7, health y arranque endurecido`.
+- [x] **Paso 10: commit** — `F0-06: servidor NestJS 12 con Prisma 7, health y arranque endurecido`.
 
 ---
 
