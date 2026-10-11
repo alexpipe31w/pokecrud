@@ -69,3 +69,15 @@ efectos: solo libres o propios (créditos en `src/assets/audio/CREDITOS.md`).
 Cada integrante usa su propia cuenta de Claude. Reglas en `CLAUDE.md`, comandos `/inicio` y `/cierre`
 en `.claude/commands/`, hook de arranque que muestra `ESTADO.md`, y las skills esenciales copiadas en
 `.claude/skills/` para que las tres IAs trabajen con los mismos estándares.
+
+## D-012 · Versiones del servidor: NestJS 12 (ESM + Vitest) y Prisma 7.10.0 exacto (2026-10-11)
+
+`nest new` 12.0.8 genera proyecto ESM (`"type": "module"`, imports con `.js`), tests con Vitest y lint con oxlint;
+se acepta tal cual. Prisma se fija en **7.10.0** porque el tag `latest` de npm apunta a una RC de la 8. Prisma 7
+exige `prisma.config.ts` para la URL y el adaptador `@prisma/adapter-pg`. Sustituye la mención a "NestJS 11".
+
+## D-013 · Guardado continuo obligatorio (2026-10-11, pedido de Alex)
+
+Las cuentas Claude Pro se cortan sin aviso al agotar el límite. Se guarda (commit WIP permitido + push + "Punto de
+guardado" en ESTADO.md) tras cada paso del plan y como mucho cada 20 min; un hook `Stop` lo hace cumplir. Quien
+retoma una tarea `[~]` trabaja sobre la rama del compañero, no crea otra.

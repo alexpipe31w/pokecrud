@@ -18,7 +18,7 @@
 └──────────────┬───────────────────────────────┬────────────────────────────┘
                │ HTTPS REST (JWT)              │ WebSocket (Socket.IO, JWT)
 ┌──────────────▼───────────────────────────────▼────────────────────────────┐
-│ server/  NestJS 11 + Socket.IO + Prisma                                    │
+│ server/  NestJS 12 + Socket.IO + Prisma                                    │
 │  auth · players · pokemon (colección) · spawns · encounters (captura)     │
 │  teams/favorites/customPokemon (el CRUD del curso) · battles · tournaments│
 │  shared/ engine (fórmulas puras) ← el MISMO código que usa el cliente      │
@@ -204,7 +204,7 @@ servidor tenga que guardar cada spawn.
 
 ## 9. Backend (server/)
 
-- NestJS 11, Prisma, PostgreSQL (Supabase gratis), Socket.IO, `class-validator` en todos los DTOs
+- NestJS 12, Prisma, PostgreSQL (Supabase gratis), Socket.IO, `class-validator` en todos los DTOs
   (`ValidationPipe` global con `whitelist` y `forbidNonWhitelisted`), `@nestjs/throttler` global y más
   estricto en login/registro, `helmet`, logger JSON con id de petición, `/health`.
 - Auth: email + contraseña (argon2id), access JWT 15 min + refresh token rotatorio (hash en BD,

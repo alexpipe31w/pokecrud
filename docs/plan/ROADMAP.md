@@ -12,7 +12,7 @@
 
 ## F0 · Fundaciones (sin esto no se puede construir nada encima)
 
-- [~] **F0-01 · Plan detallado de F0** (@alex, 2026-10-11) — escribir `docs/plan/fases/F0-fundaciones.md` con `writing-plans`.
+- [x] **F0-01 · Plan detallado de F0** (@alex, 2026-10-11) — escribir `docs/plan/fases/F0-fundaciones.md` con `writing-plans`.
       Dep: —. Criterio: cubre F0-02…F0-09 con archivos, código y comandos exactos.
 - [ ] **F0-02 · Dataset completo desde PokéAPI** — `scripts/build-dataset.mjs` + `src/assets/data/`
       (`pokedex.json`, `moves.json`, `types.json`) según ARQUITECTURA §3.
@@ -30,7 +30,7 @@
       `AudioService` (buses, desbloqueo, caché de gritos), `HapticsService`, `SettingsService` (volúmenes,
       reducir efectos, modo joystick) con signals.
       Dep: F0-02, F0-03. Criterio: tests unitarios; en `/dev/ui` se oye el grito de un Pokémon al pulsar.
-- [ ] **F0-06 · Servidor NestJS esqueleto** — `server/` con Nest 11, Prisma, Postgres, ValidationPipe
+- [ ] **F0-06 · Servidor NestJS esqueleto** — `server/` con Nest 12, Prisma, Postgres, ValidationPipe
       global, throttler, helmet, logger JSON, `/health`, `.env.example`, migración inicial con `Player` y
       `RefreshToken`. Elegir y documentar dónde se despliega (Render + Supabase propuesto).
       Dep: F0-01. Criterio: `npm run start:dev` en `server/` responde `/health`; migración aplicada; desplegado
