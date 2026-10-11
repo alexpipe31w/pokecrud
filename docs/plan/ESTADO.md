@@ -31,8 +31,15 @@
 
 ## Bloqueos / roto / pendiente de humanos
 
-- **Google Maps API key**: alguien del equipo tiene que crearla en Google Cloud (con alerta de presupuesto)
-  antes de F1-01. Hasta entonces se trabaja con el modo joystick sobre un mapa sin key (marca de agua "for development").
+- **Google Maps — HECHO (2026-10-11):** clave `pokecrud-maps-js` en la cuenta de Google Cloud de Alex
+  (prueba gratuita hasta 2027-01-10, proyecto "My First Project" `project-7bf0c639-c6d2-4cc1-aba`), restringida a
+  Maps JavaScript API y a `https://localhost/*`, `http://localhost:8100/*`, `http://localhost:4200/*`.
+  Map ID vectorial con inclinación y rotación: `5309ecf69efbfe12f3ecbc4c`. Presupuesto `pokecrud-tope` 5.000 COP con
+  alertas 50/90/100 %. Probado: mapa de Neiva cargado en `localhost:8100` con tilt 67.5 y render VECTOR, sin errores.
+  **La clave NO está en el repo:** pídesela a Alex por privado y créate `src/environments/environment.local.ts`:
+  `export const localEnv = { googleMapsApiKey: '…', googleMapsMapId: '5309ecf69efbfe12f3ecbc4c' };`
+- **Pendiente antes del 2027-01-10:** la consola no deja poner tope diario a "Map loads per day" ("La cuota no se
+  puede modificar"). Mientras dure la prueba no hay cobro posible; antes de que termine, revisar el tope o pasar a MapLibre.
 - **Base de datos**: crear proyecto Supabase (gratis) para el equipo y compartir `DATABASE_URL` por privado
   (nunca en el repo).
 - Hay 6 capturas de evidencia HU-02 sin commitear en `docs/evidencias/` (son de Alex, no se tocaron).

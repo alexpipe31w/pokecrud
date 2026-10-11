@@ -80,3 +80,4 @@ Thumbs.db
 *.keystore
 *.jks
 .claude/settings.local.json
+/.playwright-mcp
