@@ -161,3 +161,9 @@ Audio y Dataset. Cambios respecto al plan:
 **Quedó a medias / roto:** nada. Falta que un humano confirme que el grito se OYE (y el háptico en un Android real, F0-09).
 **Decisiones nuevas:** D-016.
 **El siguiente debe empezar por:** mezclar #8 → #9 → #10 → PR de F0-05; luego `/inicio F0-06 <nombre>` o `/inicio F0-09 <nombre>`.
+
+## 2026-10-11 16:35 · @samuel · F0-05 (confirmación) · rama `feature/F0-05-servicios-base`
+
+**Qué se hizo:** Samuel confirmó **de oído** que en `/dev/ui` se oye el grito de Pikachu al pulsar "Oír a Pikachu"
+(Chrome, `localhost:4200`). F0-05 queda verificada por completo salvo el háptico, que se prueba en Android real (F0-09).
+**El siguiente debe empezar por:** lo mismo que la entrada anterior.
