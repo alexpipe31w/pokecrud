@@ -1073,10 +1073,10 @@ Test (con `import 'fake-indexeddb/auto'` al inicio del spec y `HttpTestingContro
    `meta.json` (lee de IndexedDB); 3) `version` distinta → vuelve a descargar; 4) error HTTP → `status='error'`;
 2. dos `load()` simultáneos → una sola descarga.
 
-- [ ] **Paso 5: cargar al arrancar** — en `AppComponent` llamar `inject(DatasetService).load()` en el constructor.
-- [ ] **Paso 6: GameButton con feedback** — inyectar `HapticsService` y `AudioService`; en `(pointerdown)`
+- [x] **Paso 5: cargar al arrancar** — en `AppComponent` llamar `inject(DatasetService).load()` en el constructor.
+- [x] **Paso 6: GameButton con feedback** — inyectar `HapticsService` y `AudioService`; en `(pointerdown)`
       llamar `haptics.tap()` y `audio.playSfx('tap')` (mismo frame que el `:active`). Actualizar su spec con dobles.
-- [ ] **Paso 7: `/dev/ui`** — botón "Oír a Pikachu" → `audio.playCry(25)`; texto con
+- [x] **Paso 7: `/dev/ui`** — botón "Oír a Pikachu" → `audio.playCry(25)`; texto con
       `dataset.status()` y `dataset.species().size`.
 - [ ] **Paso 8: verificar** — `npm run test:all`, lint, build; en `/dev/ui` se oye el grito al pulsar y
       muestra `ready · 1025`. Recargar: la segunda vez no aparecen peticiones a `pokedex.json` en la pestaña Red.

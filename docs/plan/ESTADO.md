@@ -37,8 +37,9 @@
 ## En curso
 
 - F0-05 (@samuel) · rama `feature/F0-05-servicios-base` (sale de `feature/F0-04-sistema-diseno`; PR #8-#10 sin mezclar)
-  · **Punto de guardado 2026-10-11 15:25**: hechos pasos 1-4 (Settings, Haptics, Audio con LRU, DatasetService con
-  IndexedDB y carga compartida, todos con tests); ahora en Paso 5 (cargar al arrancar); siguiente: Pasos 6-7; estado: compila ✅ (app 58/58).
+  · **Punto de guardado 2026-10-11 15:45**: hechos pasos 1-7 (servicios con tests, dataset al arrancar, feedback del
+  GameButton, grito en /dev/ui; flake de haptics resuelto, D-016); ahora en Paso 8 (verificar en navegador);
+  siguiente: Paso 9; estado: compila ✅ (app 61/61, 6 corridas seguidas).
 
 ## Siguiente paso concreto
 

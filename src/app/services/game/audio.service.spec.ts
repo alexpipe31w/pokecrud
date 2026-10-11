@@ -32,7 +32,11 @@ function fakeContext() {
 }
 
 const okResponse = () =>
-  Promise.resolve({ ok: true, status: 200, arrayBuffer: () => Promise.resolve(new ArrayBuffer(8)) });
+  Promise.resolve({
+    ok: true,
+    status: 200,
+    arrayBuffer: () => Promise.resolve(new ArrayBuffer(8)),
+  });
 
 describe('AudioService', () => {
   let fake: ReturnType<typeof fakeContext>;

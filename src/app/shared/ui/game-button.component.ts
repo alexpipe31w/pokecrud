@@ -1,6 +1,12 @@
-import { Component, input, output } from '@angular/core';
+import { Component, inject, input, output } from '@angular/core';
 
-/** Botón del juego: respuesta en pointer-down (scale 0.97), variantes y tamaño táctil ≥ 44 px. */
+import { AudioService } from '../../services/game/audio.service';
+import { HapticsService } from '../../services/game/haptics.service';
+
+/**
+ * Botón del juego: respuesta en pointer-down (scale 0.97 + háptico + clic, en el mismo frame),
+ * variantes y tamaño táctil ≥ 44 px.
+ */
 @Component({
   selector: 'app-game-button',
   template: `
@@ -8,6 +14,7 @@ import { Component, input, output } from '@angular/core';
       type="button"
       [class]="'gb gb--' + variant()"
       [disabled]="disabled()"
+      (pointerdown)="feedback()"
       (click)="pressed.emit()"
       [attr.aria-label]="ariaLabel() || null"
     >
@@ -62,4 +69,13 @@ export class GameButtonComponent {
   readonly disabled = input(false);
   readonly ariaLabel = input<string>('');
   readonly pressed = output<void>();
+
+  private readonly haptics = inject(HapticsService);
+  private readonly audio = inject(AudioService);
+
+  protected feedback(): void {
+    if (this.disabled()) return;
+    this.haptics.tap();
+    void this.audio.playSfx('tap');
+  }
 }

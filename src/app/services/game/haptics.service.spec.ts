@@ -1,27 +1,27 @@
 import { TestBed } from '@angular/core/testing';
-import { Haptics } from '@capacitor/haptics';
-import { HapticsService } from './haptics.service';
+import { ImpactStyle, NotificationType } from '@capacitor/haptics';
+import { HAPTICS_PLUGIN, HapticsService } from './haptics.service';
 import { SettingsService } from './settings.service';
 
-vi.mock('@capacitor/haptics', () => ({
-  Haptics: {
+describe('HapticsService', () => {
+  const plugin = {
     impact: vi.fn(() => Promise.resolve()),
     notification: vi.fn(() => Promise.resolve()),
-  },
-  ImpactStyle: { Light: 'LIGHT', Medium: 'MEDIUM', Heavy: 'HEAVY' },
-  NotificationType: { Success: 'SUCCESS' },
-}));
+  };
 
-describe('HapticsService', () => {
   beforeEach(() => {
     localStorage.clear();
-    vi.mocked(Haptics.impact).mockClear();
-    vi.mocked(Haptics.notification).mockClear();
+    plugin.impact.mockClear();
+    plugin.notification.mockClear();
+    TestBed.configureTestingModule({ providers: [{ provide: HAPTICS_PLUGIN, useValue: plugin }] });
   });
 
   it('vibra cuando los hápticos están activados', () => {
-    TestBed.inject(HapticsService).tap();
-    expect(Haptics.impact).toHaveBeenCalledWith({ style: 'LIGHT' });
+    const haptics = TestBed.inject(HapticsService);
+    haptics.tap();
+    haptics.success();
+    expect(plugin.impact).toHaveBeenCalledWith({ style: ImpactStyle.Light });
+    expect(plugin.notification).toHaveBeenCalledWith({ type: NotificationType.Success });
   });
 
   it('no vibra si el jugador los desactivó', () => {
@@ -30,12 +30,12 @@ describe('HapticsService', () => {
     haptics.tap();
     haptics.shake();
     haptics.success();
-    expect(Haptics.impact).not.toHaveBeenCalled();
-    expect(Haptics.notification).not.toHaveBeenCalled();
+    expect(plugin.impact).not.toHaveBeenCalled();
+    expect(plugin.notification).not.toHaveBeenCalled();
   });
 
   it('un fallo del plugin no lanza', async () => {
-    vi.mocked(Haptics.impact).mockRejectedValueOnce(new Error('sin vibrador'));
+    plugin.impact.mockRejectedValueOnce(new Error('sin vibrador'));
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
     expect(() => TestBed.inject(HapticsService).throw()).not.toThrow();
     await Promise.resolve();

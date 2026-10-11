@@ -25,7 +25,10 @@ describe('SettingsService', () => {
     TestBed.tick();
     expect(service.settings().haptics).toBe(false);
     expect(service.settings().musicVolume).toBe(0.6);
-    expect(JSON.parse(localStorage.getItem(KEY)!)).toMatchObject({ haptics: false, sfxVolume: 0.3 });
+    expect(JSON.parse(localStorage.getItem(KEY)!)).toMatchObject({
+      haptics: false,
+      sfxVolume: 0.3,
+    });
   });
 
   it('lee lo guardado al crearse', () => {

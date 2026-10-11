@@ -1,7 +1,9 @@
-import { Component, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { IonContent } from '@ionic/angular';
 
 import { POKEMON_TYPE_KEYS } from '../../core/constants/pokemon-types';
+import { AudioService } from '../../services/game/audio.service';
+import { DatasetService } from '../../services/game/dataset.service';
 import { TypeChipsComponent } from '../../shared/components/type-chips/type-chips.component';
 import { GameButtonComponent } from '../../shared/ui/game-button.component';
 import { GlassPanelComponent } from '../../shared/ui/glass-panel.component';
@@ -19,7 +21,7 @@ const PIKACHU_STATS = [
 
 const DEMO_MAX_HP = 120;
 
-/** Escaparate del sistema de diseño (F0-04). Solo para desarrollo: /dev/ui. */
+/** Escaparate del sistema de diseño (F0-04) y de los servicios base (F0-05). Solo para desarrollo: /dev/ui. */
 @Component({
   selector: 'app-dev-ui',
   imports: [
@@ -36,6 +38,9 @@ const DEMO_MAX_HP = 120;
         <header class="page__head">
           <p class="eyebrow">Sistema de diseño</p>
           <h1 class="display">PokéCRUD GO</h1>
+          <p class="dataset" data-testid="dataset-status">
+            Dataset: {{ dataset.status() }} · {{ dataset.species().size }} especies
+          </p>
         </header>
 
         <section>
@@ -72,11 +77,20 @@ const DEMO_MAX_HP = 120;
                 <p class="mon__dex">#025</p>
                 <h3 class="display mon__name">Pikachu</h3>
                 <app-type-chips [types]="['electric']" />
+                @if (pikachu(); as p) {
+                  <p class="mon__genus">{{ p.genus }}</p>
+                }
               </div>
             </div>
             <div class="stats">
               @for (s of stats; track s.label) {
                 <app-stat-bar [label]="s.label" [value]="s.value" color="var(--t-electric)" />
+              }
+            </div>
+            <div class="row cry">
+              <app-game-button label="Oír a Pikachu" variant="gold" (pressed)="playCry()" />
+              @if (cryFailed()) {
+                <span class="cry__error">No se pudo cargar el grito (¿sin conexión?)</span>
               }
             </div>
           </app-glass-panel>
@@ -205,9 +219,34 @@ const DEMO_MAX_HP = 120;
       display: grid;
       gap: var(--s-2);
     }
+    .dataset {
+      margin: var(--s-2) 0 0;
+      font-size: 0.875rem;
+      opacity: 0.75;
+      font-variant-numeric: tabular-nums;
+    }
+    .mon__genus {
+      margin: var(--s-2) 0 0;
+      font-size: 0.875rem;
+      opacity: 0.75;
+    }
+    .cry {
+      align-items: center;
+      margin-top: var(--s-4);
+    }
+    .cry__error {
+      font-size: 0.875rem;
+      color: var(--danger);
+    }
   `,
 })
 export class DevUiPage {
+  protected readonly dataset = inject(DatasetService);
+  private readonly audio = inject(AudioService);
+  protected readonly cryFailed = signal(false);
+  /** Pikachu tal como viene del dataset (se ve en cuanto termina de cargar). */
+  protected readonly pikachu = () => this.dataset.species().get(25);
+
   protected readonly stats = PIKACHU_STATS;
   protected readonly hpSamples = [80, 35, 10];
   protected readonly types = POKEMON_TYPE_KEYS;
@@ -220,6 +259,10 @@ export class DevUiPage {
 
   protected heal(): void {
     this.demoHp.update((hp) => Math.min(DEMO_MAX_HP, hp + 20));
+  }
+
+  protected async playCry(): Promise<void> {
+    this.cryFailed.set(!(await this.audio.playCry(25)));
   }
 
   protected reset(): void {

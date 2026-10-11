@@ -5,10 +5,13 @@ import { GameSettings, SettingsService } from './settings.service';
 export type AudioBus = 'music' | 'sfx' | 'cries';
 
 /** Crea el AudioContext. Es un token para poder pasar un doble en los tests (jsdom no tiene Web Audio). */
-export const AUDIO_CONTEXT_FACTORY = new InjectionToken<() => AudioContext>('AUDIO_CONTEXT_FACTORY', {
-  providedIn: 'root',
-  factory: () => () => new AudioContext(),
-});
+export const AUDIO_CONTEXT_FACTORY = new InjectionToken<() => AudioContext>(
+  'AUDIO_CONTEXT_FACTORY',
+  {
+    providedIn: 'root',
+    factory: () => () => new AudioContext(),
+  },
+);
 
 /** Gritos decodificados que se guardan en memoria (LRU). */
 export const CRY_CACHE_SIZE = 30;

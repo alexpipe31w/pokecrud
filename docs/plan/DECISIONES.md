@@ -95,3 +95,11 @@ Fuente display: **Fredoka** (OFL, `@fontsource/fredoka` 5.3.0 exacto, pesos 500/
 Los colores de tipo salen solo de los tokens `--t-*` (una paleta). Como varios son claros, el texto del chip no es
 siempre blanco: `POKEMON_TYPES[t].text` es `var(--accent-ink)` (blanco) en lucha, veneno, fantasma, dragón y siniestro
 y `var(--ink)` en el resto. Con texto blanco 13 de 18 tipos no llegaban a AA (eléctrico 1,5:1); así todos ≥ 5,5:1.
+
+## D-016 · En los tests de la app, dependencias externas por token de inyección, no con `vi.mock` (2026-10-11, Samuel)
+
+`ng test` reutiliza la caché de módulos entre specs del mismo worker: si otro spec carga antes el módulo real
+(p. ej. `@capacitor/haptics` vía `GameButton`), el `vi.mock` de un spec posterior no llega al servicio y el test falla
+según el orden (pasó con HapticsService: 1 de 4 corridas). Por eso plugins y APIs del navegador se inyectan con un
+`InjectionToken` con `factory` por defecto (`HAPTICS_PLUGIN`, `AUDIO_CONTEXT_FACTORY`) y el test pasa un doble con
+`providers`. `vi.stubGlobal` (p. ej. `fetch`) sí es seguro.
