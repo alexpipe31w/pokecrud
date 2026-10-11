@@ -879,7 +879,7 @@ export class GameButtonComponent {
 
 Instalar: `npm install idb@8.0.4 && npm install -D fake-indexeddb@6.2.5`.
 
-- [ ] **Paso 1: SettingsService (test → código)**
+- [x] **Paso 1: SettingsService (test → código)**
 
 ```ts
 // settings.service.ts
@@ -937,7 +937,7 @@ export class SettingsService {
 Test: valores por defecto; `update` persiste (`TestBed.flushEffects()` y leer `localStorage`);
 JSON corrupto en `localStorage` → defaults.
 
-- [ ] **Paso 2: HapticsService**
+- [x] **Paso 2: HapticsService**
 
 ```ts
 // haptics.service.ts
@@ -972,7 +972,7 @@ export class HapticsService {
 
 Test: con `haptics: false` no llama a `Haptics.impact` (`vi.mock('@capacitor/haptics', …)`).
 
-- [ ] **Paso 3: AudioService** — buses `music | sfx | cries` con `GainNode` ligado a los volúmenes de
+- [x] **Paso 3: AudioService** — buses `music | sfx | cries` con `GainNode` ligado a los volúmenes de
       `SettingsService` (un `effect`), `unlock()` que hace `ctx.resume()` en el primer `pointerdown` del
       documento, `playSfx(name)` con buffers pre-decodificados desde `assets/audio/sfx/<name>.ogg`
       (si el archivo no existe: `console.warn` una vez y seguir; F2-08 traerá los sonidos), y
@@ -983,7 +983,7 @@ Test: con `haptics: false` no llama a `Haptics.impact` (`vi.mock('@capacitor/hap
       `AUDIO_CONTEXT_FACTORY` para poder pasar un doble). Test: LRU expulsa el más antiguo al pasar de 30;
       un fallo de red en `playCry` no lanza (se registra y resuelve `false`).
 
-- [ ] **Paso 4: DatasetService**
+- [x] **Paso 4: DatasetService**
 
 ```ts
 // dataset.service.ts (esqueleto obligatorio; completar los métodos marcados)
@@ -1073,14 +1073,14 @@ Test (con `import 'fake-indexeddb/auto'` al inicio del spec y `HttpTestingContro
    `meta.json` (lee de IndexedDB); 3) `version` distinta → vuelve a descargar; 4) error HTTP → `status='error'`;
 2. dos `load()` simultáneos → una sola descarga.
 
-- [ ] **Paso 5: cargar al arrancar** — en `AppComponent` llamar `inject(DatasetService).load()` en el constructor.
-- [ ] **Paso 6: GameButton con feedback** — inyectar `HapticsService` y `AudioService`; en `(pointerdown)`
+- [x] **Paso 5: cargar al arrancar** — en `AppComponent` llamar `inject(DatasetService).load()` en el constructor.
+- [x] **Paso 6: GameButton con feedback** — inyectar `HapticsService` y `AudioService`; en `(pointerdown)`
       llamar `haptics.tap()` y `audio.playSfx('tap')` (mismo frame que el `:active`). Actualizar su spec con dobles.
-- [ ] **Paso 7: `/dev/ui`** — botón "Oír a Pikachu" → `audio.playCry(25)`; texto con
+- [x] **Paso 7: `/dev/ui`** — botón "Oír a Pikachu" → `audio.playCry(25)`; texto con
       `dataset.status()` y `dataset.species().size`.
-- [ ] **Paso 8: verificar** — `npm run test:all`, lint, build; en `/dev/ui` se oye el grito al pulsar y
+- [x] **Paso 8: verificar** — `npm run test:all`, lint, build; en `/dev/ui` se oye el grito al pulsar y
       muestra `ready · 1025`. Recargar: la segunda vez no aparecen peticiones a `pokedex.json` en la pestaña Red.
-- [ ] **Paso 9: commit** — `F0-05: servicios de dataset, audio, hápticos y ajustes`.
+- [x] **Paso 9: commit** — `F0-05: servicios de dataset, audio, hápticos y ajustes`.
 
 ---
 

@@ -3,14 +3,18 @@
 > Se **reescribe** al cerrar cada sesión (no es histórico; el histórico es `BITACORA.md`).
 > Máximo una pantalla. Si lees esto al empezar: después lee `ROADMAP.md`.
 
-**Última actualización:** 2026-10-11 · por Samuel (Claude) · rama `feature/F0-04-sistema-diseno`
+**Última actualización:** 2026-10-11 · por Samuel (Claude) · rama `feature/F0-05-servicios-base`
 
 ## Fase actual
 
-**F0 · Fundaciones** — F0-01…F0-04 hechas (PR #8, #9 y el de F0-04 pendientes de mezclar, en ese orden); libres: F0-05, F0-06, F0-09.
+**F0 · Fundaciones** — F0-01…F0-05 hechas (PR #8, #9, #10 y el de F0-05 pendientes de mezclar, en ese orden); libres: F0-06, F0-09.
 
 ## Hecho
 
+- **F0-05 hecho (Samuel, PR a `develop`, apilado sobre F0-04):** `src/app/services/game/` con `SettingsService`
+  (localStorage), `HapticsService` (plugin por token, D-016), `AudioService` (buses música/efectos/gritos, desbloqueo,
+  LRU de 30 gritos, catálogo `SFX_CATALOG` vacío hasta F2-08) y `DatasetService` (assets → IndexedDB, carga compartida).
+  El dataset se carga al arrancar; `GameButton` vibra/suena en pointerdown; `/dev/ui` muestra `ready · 1025` y el grito.
 - **F0-04 hecho (Samuel, PR a `develop`, apilado sobre F0-03):** `src/theme/tokens.scss` (DISENO §2 + sombras, borde de
   vidrio y `--track`), fuente Fredoka 500/600/700, chips de tipo desde los tokens con texto por contraste (D-015),
   `GameButton`, `GlassPanel`, `StatBar`, `HpBar` en `src/app/shared/ui/` con tests y escaparate `/dev/ui`
@@ -40,9 +44,9 @@
 
 ## Siguiente paso concreto
 
-1. Mezclar en orden: **#8 (F0-02) → #9 (F0-03) → PR de F0-04** (cada rama sale de la anterior).
-2. Libres: **F0-05** servicios base (dep F0-02 + F0-03; su Paso 9 enchufa háptico/sonido al GameButton),
-   **F0-06** servidor, **F0-09** APK (dep F0-04). Si se cogen antes de mezclar, sacar la rama de `feature/F0-04-sistema-diseno`.
+1. Mezclar en orden: **#8 (F0-02) → #9 (F0-03) → #10 (F0-04) → PR de F0-05** (cada rama sale de la anterior).
+2. Libres: **F0-06** servidor NestJS (dep F0-01; desbloquea F0-07 auth) y **F0-09** APK (dep F0-04).
+   Si se cogen antes de mezclar, sacar la rama de `feature/F0-05-servicios-base`.
 
 ## Bloqueos / roto / pendiente de humanos
 
