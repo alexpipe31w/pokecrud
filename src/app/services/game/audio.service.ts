@@ -21,6 +21,15 @@ const cryUrl = (id: number) =>
 const sfxUrl = (name: string) => `assets/audio/sfx/${name}.ogg`;
 
 /**
+ * Efectos que existen en assets/audio/sfx/. Solo se piden esos: pedir uno que no existe deja un 404 como error
+ * en la consola. Vacío hasta que F2-08 traiga los sonidos (entonces se añaden aquí sus nombres).
+ */
+export const SFX_CATALOG = new InjectionToken<ReadonlySet<string>>('SFX_CATALOG', {
+  providedIn: 'root',
+  factory: () => new Set<string>(),
+});
+
+/**
  * Audio del juego con tres buses (música, efectos, gritos) cuyo volumen sigue a SettingsService.
  * El AudioContext se crea perezosamente y se reanuda con el primer toque (política de autoplay).
  */
@@ -28,6 +37,7 @@ const sfxUrl = (name: string) => `assets/audio/sfx/${name}.ogg`;
 export class AudioService {
   private readonly settings = inject(SettingsService);
   private readonly createContext = inject(AUDIO_CONTEXT_FACTORY);
+  private readonly sfxCatalog = inject(SFX_CATALOG);
   private ctx: AudioContext | null = null;
   private buses: Record<AudioBus, GainNode> | null = null;
 
@@ -106,10 +116,15 @@ export class AudioService {
   private loadSfx(name: string): Promise<AudioBuffer | null> {
     let pending = this.sfx.get(name);
     if (!pending) {
-      pending = this.fetchBuffer(sfxUrl(name)).catch((err: unknown) => {
-        console.warn(`[audio] falta el efecto "${name}" (llega en F2-08)`, err);
-        return null;
-      });
+      if (!this.sfxCatalog.has(name)) {
+        console.warn(`[audio] el efecto "${name}" aún no existe (llega en F2-08)`);
+        pending = Promise.resolve(null);
+      } else {
+        pending = this.fetchBuffer(sfxUrl(name)).catch((err: unknown) => {
+          console.warn(`[audio] no se pudo cargar el efecto "${name}"`, err);
+          return null;
+        });
+      }
       this.sfx.set(name, pending);
     }
     return pending;

@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { AUDIO_CONTEXT_FACTORY, AudioService, CRY_CACHE_SIZE } from './audio.service';
+import { AUDIO_CONTEXT_FACTORY, AudioService, CRY_CACHE_SIZE, SFX_CATALOG } from './audio.service';
 import { SettingsService } from './settings.service';
 
 /** Doble mínimo de AudioContext: registra ganancias y sonidos reproducidos. */
@@ -49,7 +49,10 @@ describe('AudioService', () => {
     fetchMock = vi.fn(okResponse);
     vi.stubGlobal('fetch', fetchMock);
     TestBed.configureTestingModule({
-      providers: [{ provide: AUDIO_CONTEXT_FACTORY, useValue: () => fake.ctx }],
+      providers: [
+        { provide: AUDIO_CONTEXT_FACTORY, useValue: () => fake.ctx },
+        { provide: SFX_CATALOG, useValue: new Set(['throw', 'roto']) },
+      ],
     });
     service = TestBed.inject(AudioService);
   });
@@ -86,11 +89,29 @@ describe('AudioService', () => {
     warn.mockRestore();
   });
 
-  it('playSfx sin archivo avisa una sola vez y no rompe', async () => {
+  it('playSfx de un efecto que no está en el catálogo avisa una vez y no lo pide', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    await service.playSfx('tap');
+    await service.playSfx('tap');
+    expect(warn).toHaveBeenCalledTimes(1);
+    expect(fetchMock).not.toHaveBeenCalled();
+    expect(fake.started).toHaveLength(0);
+    warn.mockRestore();
+  });
+
+  it('playSfx de un efecto del catálogo lo descarga una vez y lo reproduce', async () => {
+    await service.playSfx('throw');
+    await service.playSfx('throw');
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(fetchMock.mock.calls[0][0]).toBe('assets/audio/sfx/throw.ogg');
+    expect(fake.started).toHaveLength(2);
+  });
+
+  it('si un efecto del catálogo falla al cargar, avisa una vez y sigue en silencio', async () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
     fetchMock.mockResolvedValue({ ok: false, status: 404 });
-    await service.playSfx('tap');
-    await service.playSfx('tap');
+    await service.playSfx('roto');
+    await service.playSfx('roto');
     expect(warn).toHaveBeenCalledTimes(1);
     expect(fake.started).toHaveLength(0);
     warn.mockRestore();

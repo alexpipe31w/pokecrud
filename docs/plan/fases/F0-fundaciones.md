@@ -1078,9 +1078,9 @@ Test (con `import 'fake-indexeddb/auto'` al inicio del spec y `HttpTestingContro
       llamar `haptics.tap()` y `audio.playSfx('tap')` (mismo frame que el `:active`). Actualizar su spec con dobles.
 - [x] **Paso 7: `/dev/ui`** — botón "Oír a Pikachu" → `audio.playCry(25)`; texto con
       `dataset.status()` y `dataset.species().size`.
-- [ ] **Paso 8: verificar** — `npm run test:all`, lint, build; en `/dev/ui` se oye el grito al pulsar y
+- [x] **Paso 8: verificar** — `npm run test:all`, lint, build; en `/dev/ui` se oye el grito al pulsar y
       muestra `ready · 1025`. Recargar: la segunda vez no aparecen peticiones a `pokedex.json` en la pestaña Red.
-- [ ] **Paso 9: commit** — `F0-05: servicios de dataset, audio, hápticos y ajustes`.
+- [x] **Paso 9: commit** — `F0-05: servicios de dataset, audio, hápticos y ajustes`.
 
 ---
 

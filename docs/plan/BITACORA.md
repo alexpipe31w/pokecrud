@@ -133,3 +133,31 @@ sombra cuando está deshabilitado), `GlassPanel`, `StatBar`, `HpBar` (con `role=
 **Quedó a medias / roto:** nada. Háptico y sonido del botón quedan para F0-05 Paso 9 (como dice el plan).
 **Decisiones nuevas:** D-015.
 **El siguiente debe empezar por:** mezclar #8 → #9 → PR de F0-04; luego `/inicio F0-05 <nombre>` (o F0-06 / F0-09).
+
+## 2026-10-11 16:20 · @samuel (Claude) · F0-05 · rama `feature/F0-05-servicios-base`
+
+**Qué se hizo:** F0-05 completa, pasos 1-9, todo con test primero. Rama sacada de `feature/F0-04-sistema-diseno`.
+`idb@8.0.4` y `fake-indexeddb@6.2.5` exactos. Servicios en `src/app/services/game/`: Settings (localStorage), Haptics,
+Audio y Dataset. Cambios respecto al plan:
+- `DatasetService.load()` comparte la promesa en curso (el criterio 5 pide una sola descarga con dos `load()`
+  simultáneos y que ambos esperen) y tras un error se puede reintentar.
+- `HapticsService` recibe el plugin por el token `HAPTICS_PLUGIN`: con `vi.mock` el test fallaba según el orden de los
+  specs (1 de 4 corridas; causa: caché de módulos compartida con `game-button.spec`). D-016.
+- `AudioService` solo pide efectos que estén en `SFX_CATALOG` (token, vacío hasta F2-08): pedir `tap.ogg` inexistente
+  dejaba un 404 como **error** en consola.
+- `global.scss`: `@use './theme/tokens'` en vez de `@import` (aviso de obsoleto de Sass que venía de F0-04).
+**Archivos clave:** `src/app/services/game/{settings,haptics,audio,dataset}.service.ts` (+ specs), `app.component.ts`,
+`shared/ui/game-button.component.ts`, `features/dev-ui/dev-ui.page.ts`, `src/global.scss`, `DECISIONES.md` (D-016).
+**Cómo se probó (salida real):**
+    cada servicio: ng test → "Could not resolve './x.service'" antes de escribirlo
+    ng test ×6 seguidas (tras arreglar haptics) → Tests 61 passed (61) las 6
+    npm run test:all → app: Test Files 20 passed (20) · Tests 63 passed (63) | shared: Tests 10 passed (10)
+    npm run lint     → All files pass linting.
+    npm run build    → Application bundle generation complete (sin WARNING)
+    /dev/ui (390×844): "Dataset: ready · 1025 especies", género "Pokémon Ratón" desde el dataset.
+    Sin caché: pide meta + pokedex + moves + types. Recarga: solo meta.json (performance entries).
+    "Oír a Pikachu": cries/pokemon/latest/25.ogg → 200, decodificado sin error (no puedo oírlo: pendiente de oído humano).
+    Consola tras pulsar botones: solo `[warn] [audio] el efecto "tap" aún no existe (llega en F2-08)`, 0 errores.
+**Quedó a medias / roto:** nada. Falta que un humano confirme que el grito se OYE (y el háptico en un Android real, F0-09).
+**Decisiones nuevas:** D-016.
+**El siguiente debe empezar por:** mezclar #8 → #9 → #10 → PR de F0-05; luego `/inicio F0-06 <nombre>` o `/inicio F0-09 <nombre>`.
