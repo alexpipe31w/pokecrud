@@ -222,3 +222,34 @@ variables `DATABASE_URL`, `DIRECT_URL`, `NODE_ENV=production`, `NODE_VERSION=24`
 **Quedó a medias / roto:** nada. El inventario IS-11 en un build de producción no tendrá `/pokemon` hasta F0-08.
 **Decisiones nuevas:** ninguna (el despliegue en cuenta de Samuel queda anotado en ESTADO → Bloqueos).
 **El siguiente debe empezar por:** `/inicio F0-07 <nombre>` (auth) o `/inicio F0-09 <nombre>` (APK), desde `develop`.
+
+## 2026-10-11 18:55 · @samuel (Claude) · F0-07 · rama `feature/F0-07-auth`
+
+**Qué se hizo:** F0-07 completa, pasos 1-10, test primero en cada pieza. Leídas `autenticacion.md` y
+`api-endurecimiento.md`; lo añadido al plan está en D-018.
+- **Servidor (F0-07a):** `server/src/auth/` (controller, service, DTOs, guard JWT global con `@Public()`, límite por
+  cuenta), `server/src/config/env.validation.ts`, `ValidationPipe` como `APP_PIPE`, 429 en español. `@nestjs/jwt@12.0.2`,
+  `argon2@0.45.1`. `JWT_SECRET` local generado en `server/.env` (no se imprimió).
+- **App (F0-07b):** `src/app/core/auth/` (token-store, auth.service, auth.interceptor, auth.guard), `features/auth/`
+  (login, registro, `AuthForm` común), `src/theme/forms.scss` global, tokens `--danger-ink`/`--field-*`, `GameButton`
+  con `type` y `loading`, `environment.serverUrl`, `AppComponent` hace `restore()` al arrancar, panel de sesión y botón
+  "Comprobar sesión" en `/dev/ui`. `@aparajita/capacitor-secure-storage@8.0.1`.
+**Cómo se probó (salida real):**
+    server: npm test → Tests 11 passed (11) · npm run test:e2e ×3 → Tests 18 passed (18) · lint 0 · build 0
+    tras los e2e: Player con @pokecrud.test = 0, RefreshToken = 0
+    app: npm run test:all → app 92/92 (25 archivos) · shared 10/10 · lint OK · build sin avisos · prettier OK
+    navegador 390×844 (Nest local :3001 + app :4200), oscuro y claro:
+      /dev/ui sin sesión → /login?redirect=%2Fdev%2Fui · formulario vacío → errores bajo cada campo
+      registro con Enter → /dev/ui con "entrenador_demo · nivel 1 · 0 XP"; refresh en sessionStorage, 0 en localStorage
+      recargar → sigue con sesión (refresh + /auth/me)
+      access estropeado a mano + "Comprobar sesión" → /auth/me 401 → /auth/refresh 200 → /auth/me 200, "Sesión válida"
+      cerrar sesión → /login, sessionStorage vacío, /dev/ui vuelve a pedir login
+      contraseña mala → "Correo o contraseña incorrectos" · contraseña buena → vuelve a /dev/ui
+      logs del servidor: 0 contraseñas, 0 correos, 0 tokens; authorization "[Redacted]"; eventos auth.* con req.id
+    cuenta de prueba borrada al final (Player = 0, RefreshToken = 0)
+**Evidencias:** `docs/evidencias/F0-07_01_login.jpg`, `_02_registro.jpg`, `_03_sesion-tras-recargar.jpg`, `_04_login-error.jpg`.
+**Quedó a medias / roto:** nada en código. Pendiente: `JWT_SECRET` en Render **antes** de mezclar (si no, el redeploy no
+arranca). Keystore nativo sin probar hasta tener el APK (F0-09). Deuda anotada en D-018.
+**Decisiones nuevas:** D-018.
+**El siguiente debe empezar por:** poner `JWT_SECRET` en Render, mezclar el PR de F0-07 y comprobar
+`https://pokecrud-server.onrender.com/health/ready`; luego `/inicio F0-08` o `/inicio F0-09`.

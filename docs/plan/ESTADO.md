@@ -3,15 +3,20 @@
 > Se **reescribe** al cerrar cada sesión (no es histórico; el histórico es `BITACORA.md`).
 > Máximo una pantalla. Si lees esto al empezar: después lee `ROADMAP.md`.
 
-**Última actualización:** 2026-10-11 · por Samuel (Claude) · rama `feature/F0-06-despliegue-render`
+**Última actualización:** 2026-10-11 · por Samuel (Claude) · rama `feature/F0-07-auth`
 
 ## Fase actual
 
-**F0 · Fundaciones** — **F0-01…F0-06 hechas y en `develop`** (PR #8-#12 mezclados el 2026-10-11 por Samuel, sin revisión
-de otro integrante: constancia en cada PR). Servidor desplegado. Libres: **F0-07** auth y **F0-09** APK.
+**F0 · Fundaciones** — F0-01…F0-06 en `develop`; **F0-07 hecha en su PR** (pendiente de mezclar: antes hay que poner
+`JWT_SECRET` en Render). Libres: **F0-08** CRUD migrado (dep F0-07) y **F0-09** APK.
 
 ## Hecho
 
+- **F0-07 (Samuel):** auth completa. Servidor `server/src/auth/` (registro, login, refresh rotatorio con detección de
+  robo, logout, `/auth/me`; Argon2id; JWT HS256 15 min con iss/aud; guard global con `@Public()`; límite 5/min por IP y
+  10 fallos/15 min por cuenta). App `src/app/core/auth/` (TokenStore Keystore/sessionStorage, AuthService con refresh
+  compartido, interceptor, guards) y pantallas `/login` y `/registro`. `/dev/ui` exige sesión. Rutas IS-11 públicas
+  hasta F0-08. D-018. Evidencias `docs/evidencias/F0-07_*.jpg`.
 - **Servidor desplegado:** https://pokecrud-server.onrender.com (Render Free, **cuenta de Samuel**, rama `develop`,
   despliegue automático al mezclar en `develop`). `/health/ready` → `{"status":"ok","db":"ok"}` desde internet.
   `apiUrl` de `environment.prod.ts` apunta ahí.
@@ -29,18 +34,20 @@ de otro integrante: constancia en cada PR). Servidor desplegado. Libres: **F0-07
 
 ## En curso
 
-- F0-07 (@samuel) · rama `feature/F0-07-auth` · **Punto de guardado 2026-10-11 18:40**: F0-07a (servidor) HECHO, pasos 1-4: `server/src/auth/`
-  (registro/login/refresh/logout/me, Argon2id, JWT HS256 15 min con iss/aud, refresh rotatorio con detección de robo,
-  límite 5/min por IP + 10 fallos/15 min por cuenta, guard global `@Public()`), e2e 18/18. App: pasos 5-9 hechos (`core/auth/`,
-  rutas con guards, /login y /registro, `src/theme/forms.scss`, panel de sesión en /dev/ui); ahora en Paso 10 (verificar en
-  navegador con el servidor local en el 3001); estado: compila ✅ (app 92/92). **Antes de mezclar: añadir `JWT_SECRET` en Render** (si no, el servidor no arranca).
+- Nadie.
 
 ## Siguiente paso concreto
 
-1. Siguiente tarea: **F0-07 auth** (registro/login, dep F0-04 + F0-06 ✅) o **F0-09 APK** (dep F0-04 ✅), desde `develop`.
-2. (Opcional) Que Alex o Kenneth revisen a posteriori los PR #8-#12.
+1. **Samuel:** añadir `JWT_SECRET` (uno nuevo, propio de Render) en Render → Environment. **Después** mezclar el PR de
+   F0-07: al mezclar, Render redespliega y sin esa variable el servidor no arranca.
+2. Siguiente tarea: **F0-08** (CRUD del curso a NestJS, dep F0-07) o **F0-09** (APK, dep F0-04), desde `develop`.
+3. (Opcional) Que Alex o Kenneth revisen a posteriori los PR #8-#13.
 
 ## Bloqueos / roto / pendiente de humanos
+
+- **Cada compañero necesita su propio `JWT_SECRET`** en su `server/.env` para arrancar el servidor en local (SECRETOS.md).
+- **Para probar el login en local hacen falta dos servidores:** Nest (`cd server && PORT=3001 npm run start:dev`) y la
+  app (`npm start`). La app de desarrollo apunta a `http://localhost:3001` (`environment.serverUrl`).
 
 - **Render está en la cuenta de Samuel:** solo él ve los logs y cambia variables. Si hay que rotar la contraseña de la BD
   (SECRETOS.md), Samuel actualiza `DATABASE_URL` y `DIRECT_URL` en Render. Plan gratis: se duerme a los 15 min.

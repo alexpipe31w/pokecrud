@@ -113,3 +113,23 @@ según el orden (pasó con HapticsService: 1 de 4 corridas). Por eso plugins y A
 - `npm audit` marca 4 "high" (`mysql2`, `deepmerge-ts`) que vienen **solo** de la CLI `prisma@7.10.0`. El servidor nunca
   carga `mysql2` (usamos Postgres) y `deepmerge-ts` solo fusiona la config local de la CLI, sin datos de usuarios.
   La única corrección que ofrece npm es bajar a Prisma 6 (contradice D-012): riesgo aceptado. Revisar al salir Prisma 7.11+.
+
+## D-018 · Auth (F0-07): lo que se añadió al plan y por qué (2026-10-11, Samuel)
+
+- **`environment.serverUrl` separado de `apiUrl`.** `apiUrl` sigue siendo el JSON Server de IS-11 (dev: 3000) y
+  `serverUrl` es NestJS (dev: 3001, prod: Render). El interceptor solo pone el token en `serverUrl`. En F0-08, cuando
+  `/pokemon` pase a Nest, las dos se unifican.
+- **Límite de intentos también por CUENTA** (10 fallos / 15 min, en memoria por D-005), además del 5/min por IP del
+  plan: con muchas IP el de IP se esquiva (estándar del equipo: "cuenta por dos claves"). Aplica igual a correos
+  inexistentes para no delatar cuáles existen.
+- **JWT con `iss`/`aud` fijos y `algorithms: ['HS256']`** al verificar; `sub` debe ser un UUID.
+- **Argon2id con parámetros OWASP** (19 MiB, t=2, p=1) en vez de los de por defecto (64 MiB): Render gratis tiene 512 MB.
+- **`ValidationPipe` como `APP_PIPE`** en `AppModule` (antes en `main.ts`): así valida también en los tests e2e.
+- **El servidor no arranca** si falta `JWT_SECRET` (≥ 32) o `DATABASE_URL` (`config/env.validation.ts`).
+- **Refresh reutilizado → se revoca toda la familia.** Consecuencia aceptada: dos refresh simultáneos del mismo
+  cliente cierran su sesión; por eso la app comparte un único refresh en vuelo (AuthService).
+- **Estilos de formulario globales** en `src/theme/forms.scss` (`.form`, `.field__*`), tokens `--danger-ink`
+  (texto de error con contraste AA) y `--field-bg/--field-border`.
+- **Deuda conocida:** el registro responde 409 "Ese correo ya está registrado" (el plan lo pide; revela qué correos
+  existen, aceptado en un juego). Apodos únicos distinguiendo mayúsculas ("Ash" ≠ "ash"). Los `RefreshToken`
+  caducados no se borran todavía (tarea de limpieza futura).

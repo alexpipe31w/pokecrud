@@ -1,7 +1,10 @@
+import { HttpClient } from '@angular/common/http';
 import { Component, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { IonContent } from '@ionic/angular';
 
+import { firstValueFrom } from 'rxjs';
+import { environment } from '../../../environments/environment';
 import { AuthService } from '../../core/auth/auth.service';
 import { POKEMON_TYPE_KEYS } from '../../core/constants/pokemon-types';
 import { AudioService } from '../../services/game/audio.service';
@@ -55,7 +58,15 @@ const DEMO_MAX_HP = 120;
                   {{ player.xp }} XP
                 </p>
                 <app-game-button label="Cerrar sesión" variant="glass" (pressed)="logout()" />
+                <app-game-button
+                  label="Comprobar sesión"
+                  variant="gold"
+                  (pressed)="checkSession()"
+                />
               </div>
+              @if (sessionCheck(); as check) {
+                <p class="session__check" data-testid="session-check">{{ check }}</p>
+              }
             </app-glass-panel>
           </section>
         }
@@ -243,6 +254,10 @@ const DEMO_MAX_HP = 120;
     .session__who {
       margin: 0;
     }
+    .session__check {
+      margin: var(--s-3) 0 0;
+      font-size: 0.875rem;
+    }
     .dataset {
       margin: var(--s-2) 0 0;
       font-size: 0.875rem;
@@ -268,6 +283,8 @@ export class DevUiPage {
   protected readonly dataset = inject(DatasetService);
   protected readonly auth = inject(AuthService);
   private readonly router = inject(Router);
+  private readonly http = inject(HttpClient);
+  protected readonly sessionCheck = signal<string | null>(null);
   private readonly audio = inject(AudioService);
   protected readonly cryFailed = signal(false);
   /** Pikachu tal como viene del dataset (se ve en cuanto termina de cargar). */
@@ -289,6 +306,18 @@ export class DevUiPage {
 
   protected async playCry(): Promise<void> {
     this.cryFailed.set(!(await this.audio.playCry(25)));
+  }
+
+  /** Pide /auth/me por el HttpClient normal (con authInterceptor): si el access no vale, se refresca solo. */
+  protected async checkSession(): Promise<void> {
+    try {
+      const { player } = await firstValueFrom(
+        this.http.get<{ player: { nickname: string } }>(`${environment.serverUrl}/auth/me`),
+      );
+      this.sessionCheck.set(`Sesión válida: el servidor te reconoce como ${player.nickname}.`);
+    } catch {
+      this.sessionCheck.set('La sesión no es válida.');
+    }
   }
 
   protected async logout(): Promise<void> {

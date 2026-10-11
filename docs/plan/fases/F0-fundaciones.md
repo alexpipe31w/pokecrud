@@ -1313,7 +1313,7 @@ data: { revokedAt: now } })`; si `count === 0` → buscar por `tokenHash`: si ex
 - [x] **Paso 9: pantallas** `features/auth/login.page.ts` y `register.page.ts` con el sistema de diseño
       (GlassPanel + GameButton, fondo ilustrado, errores en línea bajo cada campo, botón con estado de carga,
       mensajes en español: "Correo o contraseña incorrectos", "Ese apodo ya está en uso").
-- [ ] **Paso 10: verificar** — `npm run test:all`, lint, build; con el servidor local: registrarse, cerrar
+- [x] **Paso 10: verificar** — `npm run test:all`, lint, build; con el servidor local: registrarse, cerrar
       la app, abrirla y seguir logueado; manipular el access en memoria → se refresca solo. Capturas en
       `docs/evidencias/F0-07_*.png`. Commit `F0-07b: sesión en la app`.
 
