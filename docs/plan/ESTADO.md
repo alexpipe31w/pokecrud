@@ -27,8 +27,8 @@
 ## En curso
 
 - F0-06 (@samuel) · rama `feature/F0-06-servidor-nestjs` (sale de `develop`: es independiente de F0-02…F0-05,
-  cuyos PR #8-#11 están pendientes de mezclar) · **Punto de guardado 2026-10-11 17:00**: hechos pasos 1-3 (scaffold, dependencias exactas, prisma.config con
-  DIRECT_URL y schema Player/RefreshToken, D-017); BD `public` vacía; ahora en Paso 4 (migración init); estado: compila ✅.
+  cuyos PR #8-#11 están pendientes de mezclar) · **Punto de guardado 2026-10-11 17:10**: hechos pasos 1-4 (scaffold, dependencias, Prisma 7, migración `init`
+  APLICADA en Supabase: tablas Player y RefreshToken); ahora en Paso 5 (PrismaService); estado: compila ✅.
 
 ## Siguiente paso concreto
 

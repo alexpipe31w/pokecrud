@@ -1165,7 +1165,7 @@ Añadir `src/generated/` a `server/.gitignore`. Scripts en `server/package.json`
 `"prisma:generate": "prisma generate"`, `"db:migrate": "prisma migrate dev"`,
 `"db:deploy": "prisma migrate deploy"`, y `"postinstall": "prisma generate"`.
 
-- [ ] **Paso 4: migración inicial**: `npx prisma migrate dev --name init` → crea
+- [x] **Paso 4: migración inicial**: `npx prisma migrate dev --name init` → crea
       `prisma/migrations/<fecha>_init/migration.sql` y la aplica en Supabase. Si falla por la _shadow database_
       (permisos), usar `npx prisma migrate dev --name init --create-only` y luego `npx prisma migrate deploy`.
       Comprobar con `npx prisma migrate status` → "Database schema is up to date". Pegar la salida en la bitácora.
