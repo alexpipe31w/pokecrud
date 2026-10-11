@@ -30,7 +30,8 @@
 
 ## Siguiente paso concreto
 
-1. Mezclar el PR de F0-01 (plan detallado `docs/plan/fases/F0-fundaciones.md`).
+1. **Relevo 2026-10-11:** Alex se quedó sin tokens. F0-01 ya está mezclado en `develop` (PR #6).
+   El siguiente compañero empieza aquí.
 2. Repartir **en paralelo** (no se pisan): **F0-02** dataset · **F0-03** shared+tooling · **F0-06** servidor.
    Cada uno: `/inicio F0-0X <nombre>` y seguir el plan de fase paso a paso, con `/guardar` tras cada paso.
 
