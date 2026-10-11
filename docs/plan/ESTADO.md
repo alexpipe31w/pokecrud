@@ -3,16 +3,19 @@
 > Se **reescribe** al cerrar cada sesión (no es histórico; el histórico es `BITACORA.md`).
 > Máximo una pantalla. Si lees esto al empezar: después lee `ROADMAP.md`.
 
-**Última actualización:** 2026-10-11 · por Samuel (Claude) · rama `feature/F0-07-auth`
+**Última actualización:** 2026-10-11 · por Samuel (Claude) · rama `feature/F0-07-estado`
 
 ## Fase actual
 
-**F0 · Fundaciones** — F0-01…F0-06 en `develop`; **F0-07 hecha en su PR** (pendiente de mezclar: antes hay que poner
-`JWT_SECRET` en Render). Libres: **F0-08** CRUD migrado (dep F0-07) y **F0-09** APK.
+**F0 · Fundaciones** — **F0-01…F0-07 hechas y en `develop`** (PR #8-#14). Auth en producción. Libres: **F0-08** CRUD
+migrado (dep F0-07) y **F0-09** APK.
 
 ## Hecho
 
-- **F0-07 (Samuel):** auth completa. Servidor `server/src/auth/` (registro, login, refresh rotatorio con detección de
+- **Auth en producción (Render):** `JWT_SECRET` propio puesto en Render; tras mezclar #14, probado contra
+  https://pokecrud-server.onrender.com: registro 201, `/auth/me` 200, refresh 200, refresh reutilizado 401 y familia
+  revocada, logout 204 (cuenta de prueba borrada).
+- **F0-07 (Samuel, PR #14):** auth completa. Servidor `server/src/auth/` (registro, login, refresh rotatorio con detección de
   robo, logout, `/auth/me`; Argon2id; JWT HS256 15 min con iss/aud; guard global con `@Public()`; límite 5/min por IP y
   10 fallos/15 min por cuenta). App `src/app/core/auth/` (TokenStore Keystore/sessionStorage, AuthService con refresh
   compartido, interceptor, guards) y pantallas `/login` y `/registro`. `/dev/ui` exige sesión. Rutas IS-11 públicas
@@ -38,10 +41,8 @@
 
 ## Siguiente paso concreto
 
-1. **Samuel:** añadir `JWT_SECRET` (uno nuevo, propio de Render) en Render → Environment. **Después** mezclar el PR de
-   F0-07: al mezclar, Render redespliega y sin esa variable el servidor no arranca.
-2. Siguiente tarea: **F0-08** (CRUD del curso a NestJS, dep F0-07) o **F0-09** (APK, dep F0-04), desde `develop`.
-3. (Opcional) Que Alex o Kenneth revisen a posteriori los PR #8-#13.
+1. Siguiente tarea: **F0-08** (CRUD del curso a NestJS, dep F0-07) o **F0-09** (APK, dep F0-04), desde `develop`.
+2. (Opcional) Que Alex o Kenneth revisen a posteriori los PR #8-#14.
 
 ## Bloqueos / roto / pendiente de humanos
 
