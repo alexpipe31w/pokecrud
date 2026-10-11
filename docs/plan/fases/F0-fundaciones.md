@@ -1304,7 +1304,7 @@ data: { revokedAt: now } })`; si `count === 0` → buscar por `tokenHash`: si ex
 - [x] **Paso 6: `AuthService` (app)** — signals `player`, `isLoggedIn`; `register/login/logout/restore()`;
       `restore()` al arrancar intenta un refresh con el token guardado. Un único refresh en vuelo a la vez
       (si llegan 3 peticiones con 401, se comparte la misma promesa de refresh).
-- [ ] **Paso 7: interceptor funcional** `authInterceptor`: añade `Authorization: Bearer` a peticiones a
+- [x] **Paso 7: interceptor funcional** `authInterceptor`: añade `Authorization: Bearer` a peticiones a
       `environment.apiUrl` (nunca a PokéAPI/Google); ante 401 refresca una vez y repite; si el refresh falla →
       `logout()` y navegar a `/login`. Registrar con `provideHttpClient(withInterceptors([authInterceptor]))` en `main.ts`.
 - [ ] **Paso 8: `authGuard`** y rutas: `/login`, `/registro` públicas; el resto protegidas.

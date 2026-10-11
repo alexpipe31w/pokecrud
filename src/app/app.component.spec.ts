@@ -2,16 +2,23 @@ import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 
 import { AppComponent } from './app.component';
+import { AuthService } from './core/auth/auth.service';
 import { DatasetService } from './services/game/dataset.service';
 
 describe('AppComponent', () => {
   const dataset = { load: vi.fn(() => Promise.resolve()) };
+  const auth = { restore: vi.fn(() => Promise.resolve()) };
 
   beforeEach(async () => {
     dataset.load.mockClear();
+    auth.restore.mockClear();
     await TestBed.configureTestingModule({
       imports: [AppComponent],
-      providers: [provideRouter([]), { provide: DatasetService, useValue: dataset }],
+      providers: [
+        provideRouter([]),
+        { provide: DatasetService, useValue: dataset },
+        { provide: AuthService, useValue: auth },
+      ],
     }).compileComponents();
   });
 
@@ -20,8 +27,9 @@ describe('AppComponent', () => {
     expect(fixture.componentInstance).toBeTruthy();
   });
 
-  it('carga el dataset al arrancar', () => {
+  it('carga el dataset y recupera la sesión al arrancar', () => {
     TestBed.createComponent(AppComponent);
     expect(dataset.load).toHaveBeenCalledTimes(1);
+    expect(auth.restore).toHaveBeenCalledTimes(1);
   });
 });
