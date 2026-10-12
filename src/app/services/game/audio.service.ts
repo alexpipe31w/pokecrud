@@ -1,6 +1,7 @@
 import { DOCUMENT } from '@angular/common';
 import { Injectable, InjectionToken, effect, inject } from '@angular/core';
 import { GameSettings, SettingsService } from './settings.service';
+import { SFX_RECIPES, isSfxName, renderSfx } from './sfx-synth';
 
 export type AudioBus = 'music' | 'sfx' | 'cries';
 
@@ -16,13 +17,18 @@ export const AUDIO_CONTEXT_FACTORY = new InjectionToken<() => AudioContext>(
 /** Gritos decodificados que se guardan en memoria (LRU). */
 export const CRY_CACHE_SIZE = 30;
 const CRY_TIMEOUT_MS = 6000;
+/**
+ * La precarga no bloquea a nadie: puede esperar más. Con datos móviles un grito tardó > 6 s y no sonó en el primer
+ * combate (Kenneth, Samsung A36): precargando al empezar el combate ya está listo cuando toca.
+ */
+const CRY_PRELOAD_TIMEOUT_MS = 20_000;
 const cryUrl = (id: number) =>
   `https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/${id}.ogg`;
 const sfxUrl = (name: string) => `assets/audio/sfx/${name}.ogg`;
 
 /**
- * Efectos que existen en assets/audio/sfx/. Solo se piden esos: pedir uno que no existe deja un 404 como error
- * en la consola. Vacío hasta que F2-08 traiga los sonidos (entonces se añaden aquí sus nombres).
+ * Efectos en ARCHIVO que existen en assets/audio/sfx/ (pedir uno que no existe deja un 404 en la consola). Los
+ * efectos del juego se GENERAN (`sfx-synth.ts`, F2-08): este catálogo queda para sonidos grabados que lleguen más tarde.
  */
 export const SFX_CATALOG = new InjectionToken<ReadonlySet<string>>('SFX_CATALOG', {
   providedIn: 'root',
@@ -70,6 +76,19 @@ export class AudioService {
   async playSfx(name: string): Promise<void> {
     const buffer = await this.loadSfx(name);
     if (buffer) this.play(buffer, 'sfx');
+  }
+
+  /**
+   * Descarga y decodifica estos gritos ya, sin sonar, con más margen de tiempo que al reproducir. Para cuando se sabe
+   * qué va a sonar (al empezar un combate). Nunca lanza.
+   */
+  preloadCries(speciesIds: readonly number[]): void {
+    for (const id of new Set(speciesIds)) {
+      if (this.cries.has(id) || this.pendingCries.has(id)) continue;
+      this.loadCry(id, CRY_PRELOAD_TIMEOUT_MS).catch((err: unknown) =>
+        console.warn(`[audio] no se pudo precargar el grito #${id}`, err),
+      );
+    }
   }
 
   /**
@@ -125,8 +144,10 @@ export class AudioService {
   private loadSfx(name: string): Promise<AudioBuffer | null> {
     let pending = this.sfx.get(name);
     if (!pending) {
-      if (!this.sfxCatalog.has(name)) {
-        console.warn(`[audio] el efecto "${name}" aún no existe (llega en F2-08)`);
+      if (isSfxName(name)) {
+        pending = Promise.resolve(this.synth(name));
+      } else if (!this.sfxCatalog.has(name)) {
+        console.warn(`[audio] el efecto "${name}" no existe`);
         pending = Promise.resolve(null);
       } else {
         pending = this.fetchBuffer(sfxUrl(name)).catch((err: unknown) => {
@@ -139,7 +160,16 @@ export class AudioService {
     return pending;
   }
 
-  private async loadCry(id: number): Promise<AudioBuffer> {
+  /** Efecto generado: se calcula una vez por nombre y se guarda (son unos pocos KB cada uno). */
+  private synth(name: keyof typeof SFX_RECIPES): AudioBuffer {
+    const ctx = this.context();
+    const samples = renderSfx(SFX_RECIPES[name], ctx.sampleRate);
+    const buffer = ctx.createBuffer(1, samples.length, ctx.sampleRate);
+    buffer.copyToChannel(samples, 0);
+    return buffer;
+  }
+
+  private async loadCry(id: number, timeoutMs = CRY_TIMEOUT_MS): Promise<AudioBuffer> {
     const cached = this.cries.get(id);
     if (cached) {
       this.cries.delete(id); // reinsertar = marcar como el más reciente
@@ -148,7 +178,7 @@ export class AudioService {
     }
     let pending = this.pendingCries.get(id);
     if (!pending) {
-      pending = this.fetchBuffer(cryUrl(id), AbortSignal.timeout(CRY_TIMEOUT_MS));
+      pending = this.fetchBuffer(cryUrl(id), AbortSignal.timeout(timeoutMs));
       this.pendingCries.set(id, pending);
     }
     try {

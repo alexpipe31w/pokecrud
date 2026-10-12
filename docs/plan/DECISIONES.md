@@ -530,3 +530,12 @@ la sesión por perdida y mandaba a `/login` (con el token aún válido guardado)
 rinde con un 401; si el servidor no responde reintenta con espera creciente (`RESTORE_RETRY`: 2, 4, 8, 15 s… hasta
 2 min) y expone `waking`/`wakeAttempt` para la pantalla `app-server-waking` (en `app.component.html`, encima de todo).
 Pasados los 2 min se queda en anónimo SIN borrar el token. Los tests usan `RESTORE_RETRY` con esperas a 0.
+
+## D-044 · Los efectos de sonido se generan en el juego, no son archivos (F2-08) (2026-10-12, Alex)
+
+`sfx-synth.ts` guarda cada efecto como una receta de voces (onda o ruido, barrido de frecuencia, envolvente) y
+`AudioService` la convierte en un `AudioBuffer` la primera vez que suena (unos KB, en memoria). Por qué: (1) sin
+licencias de terceros (D-010: libres o propios → son propios); (2) nada que descargar, así que con datos móviles
+suenan al instante (los gritos tardaban > 6 s); (3) en el PC no hay codificador de audio para preparar archivos.
+Para cambiar un sonido se toca su receta (y se regeneran los .wav de `docs/evidencias/F2-08_sfx/` para oírlo).
+Sigue existiendo `SFX_CATALOG` para sonidos grabados que lleguen más tarde (en `assets/audio/sfx/*.ogg`).

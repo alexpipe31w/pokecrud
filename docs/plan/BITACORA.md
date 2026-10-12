@@ -1053,3 +1053,20 @@ en la raíz de `MapPage` (`host`). El resto de pantallas sigue con `prefers-colo
 **Quedó a medias / roto:** nada.
 **El siguiente debe empezar por:** sin Android, F5-01 (plan del PvP) o F2-08 (audio). Con Android: 7b de F1-07, 3b de
 F1-05 y F2-01.
+
+## 2026-10-12 19:40 · @alex (Claude) · F2-08 · rama `feature/F2-08-audio`
+
+**Qué se hizo:** 12 efectos generados en el juego (`sfx-synth.ts`, D-044), sonidos del combate (`battle-sfx.ts` +
+`battle.controller.ts`), `AudioService.preloadCries` (gritos del combate precargados con 20 s de margen),
+`playSfx` usa los generados, `src/assets/audio/CREDITOS.md`, .wav para escuchar en `docs/evidencias/F2-08_sfx/`.
+Música separada en F2-10.
+**Cómo se probó (salida real):**
+
+    lint OK · ng test: 55 archivos, 261 passed (exit 0) · build OK
+    combate real en el navegador contra Excursionista Roco (cuenta f208-prueba@pokecrud.test, borrada): contados los
+      sonidos que arrancan → 29: gritos 1,35 s y 0,93 s; Gruñido → stat-down 0,30 s; golpes 0,18 s; crítico 0,27 s;
+      debilitado 0,85 s + grito. Sin avisos [audio] en consola.
+
+**Quedó a medias / roto:** nada de F2-08. Música = F2-10.
+**Decisiones nuevas:** D-044.
+**El siguiente debe empezar por:** leer el RELEVO de ESTADO (Samuel).
