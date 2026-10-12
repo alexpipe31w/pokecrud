@@ -32,7 +32,8 @@ import { LocationGateComponent } from './location-gate.component';
 import { MapCompassComponent } from './map-compass.component';
 import { WeatherChipComponent } from './weather-chip.component';
 
-const ZOOM = 18;
+/** Zoom 19 como el spike medido (D-035): a 18 el avatar provisional casi no se veía. El pellizco deja 17-20. */
+const ZOOM = 19;
 const TILT = 67.5;
 /** Cada cuánto se mira si se ha cruzado las 19:00 o las 6:00 (el esquema de color solo se fija al crear el mapa). */
 const NIGHT_CHECK_MS = 60_000;

@@ -9,6 +9,8 @@ export const REANCHOR_M = 1000;
 /** El anillo de alcance "respira" entre estas opacidades con este periodo. */
 const RING_OPACITY: [number, number] = [0.5, 0.8];
 const RING_PERIOD_MS = 1600;
+/** El avatar provisional a escala 1 casi no se ve a zoom 19 con la cámara inclinada (F1-04, Kenneth): ×1,8 hasta F1-05. */
+const AVATAR_SCALE = 1.8;
 
 /** Luces del día (= las que pone `ThreeJSOverlayView` por defecto) y de la noche (más frías y tenues). */
 const LIGHTS = {
@@ -49,6 +51,7 @@ export class MapScene {
     nose.rotation.x = -Math.PI / 2;
     nose.position.set(0, 7, -1.9);
     this.avatar.add(body, head, nose);
+    this.avatar.scale.setScalar(AVATAR_SCALE);
 
     const shadow = new THREE.Mesh(
       this.track(new THREE.CircleGeometry(2.4, 24)),
@@ -58,6 +61,7 @@ export class MapScene {
     );
     shadow.rotation.x = -Math.PI / 2;
     shadow.position.y = 0.2;
+    shadow.scale.setScalar(AVATAR_SCALE);
 
     this.ringMaterial = this.track(
       new THREE.MeshBasicMaterial({

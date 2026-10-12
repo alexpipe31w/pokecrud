@@ -998,7 +998,7 @@ this.overlay.setMap(this.map);
 
 ### Paso 8 — Prueba y evidencias
 
-- [ ] **8a.** Navegador 390×844 con joystick (sin GPS en el PC): login → `/mapa`; moverse, girar la brújula del HUD,
+- [x] **8a.** Navegador 390×844 con joystick (sin GPS en el PC): login → `/mapa`; moverse, girar la brújula del HUD,
   abrir el menú. **Capturas de día y de noche** (para la de noche, cambiar temporalmente la hora del PC o forzar
   `night` con `?noche=1` solo en desarrollo) → `docs/evidencias/F1-04_0{1,2}_*.png`.
 - [ ] **8b.** Android real: caminar, girar; medir fps con `FpsMeter` (añadir el contador oculto tras un toque largo en
