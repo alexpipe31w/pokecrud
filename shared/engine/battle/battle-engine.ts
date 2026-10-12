@@ -46,7 +46,7 @@ const ZERO_STAGES: Stages = {
 };
 
 /** Nombres de stat de PokéAPI → etapa del motor. */
-const STAGE_OF: Readonly<Record<string, StageStat>> = {
+export const STAGE_OF: Readonly<Record<string, StageStat>> = {
   attack: 'attack',
   defense: 'defense',
   'special-attack': 'specialAttack',
