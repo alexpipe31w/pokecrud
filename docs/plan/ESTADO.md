@@ -3,7 +3,7 @@
 > Se **reescribe** al cerrar cada sesión (no es histórico; el histórico es `BITACORA.md`).
 > Máximo una pantalla. Si lees esto al empezar: después lee `ROADMAP.md`.
 
-**Última actualización:** 2026-10-11 · por Kenneth (Claude) · rama `develop` (tras mezclar #19)
+**Última actualización:** 2026-10-11 · por Alex (Claude) · rama `feature/F1-06-spawns` (PR abierto)
 
 ## Fase actual
 
@@ -11,6 +11,11 @@
 
 ## Hecho
 
+- **F1-06 (Alex, rama `feature/F1-06-spawns`, PR abierto):** spawns deterministas. Motor puro
+  `shared/engine/spawns.ts` (celdas de ~78 m, franjas de 10 min, pesos por rareza/clima/noche) y `GET /spawns?lat&lng`
+  (sesión, ≤ 200 m, solo `{id, speciesId, lat, lng}`). Semilla HMAC con `SPAWN_SALT` (solo servidor), clima de
+  Open-Meteo por celda de 0,1° y franja (timeout 4 s → "despejado"). **El servidor ahora compila `shared/`:** sale en
+  `dist/server/src/main.js` (D-024). D-025.
 - **F0-11 (Kenneth, rama `feature/F0-11-zona-segura`):** zona segura global para pantallas sin `ion-header`
   (`src/global.scss`, D-022). Probado en el Samsung A36: `/dev/ui`, login y registro sin solapes; Pokédex sin cambios.
 - **F0-10 (Kenneth, rama `feature/F0-10-transaction-pooler`):** `DATABASE_URL` por el _transaction pooler_ (6543),
@@ -51,18 +56,20 @@
 
 ## En curso
 
-- **F1-06 (Alex, rama `feature/F1-06-spawns`):** spawns deterministas (`shared/engine/spawns.ts` + `GET /spawns`).
-- **F1-01 → PENDIENTE DE KENNETH** (medir en Android): rama `feature/F1-01-spike-mapa-3d`, instrucciones en su bitácora.
-- F0-12 (Alex) espera revisión: PR #21.
+- Nadie. **F1-06 hecha** (Alex, PR abierto) y **F0-12 hecha** (Alex, PR #21): esperan revisión.
+- **F1-01 → PENDIENTE DE KENNETH** (medir fps en su Android): rama `feature/F1-01-spike-mapa-3d`, instrucciones
+  exactas en la última entrada de F1-01 de la bitácora.
 
 ## Siguiente paso concreto
 
-1. **Alex y Samuel:** puerto de `DATABASE_URL` → 6543 en su `.env`;
-   **Samuel:** también en Render (ver Bloqueos).
-2. Siguiente: **F1-01** (spike Google Maps 3D + overlay three.js, medir fps en Android real; dep F0-09 ✔). Necesita
-   `environment.local.ts` con la clave de Maps (Alex: la clave es suya) y un móvil Android con Depuración USB. OJO: mapa a pantalla completa →
-   anular la zona segura en su `ion-content` (D-022).
-3. Para generar el APK en otro PC: instalar JDK 21 (`winget install Microsoft.OpenJDK.21`) y `npm run apk`.
+1. **Revisar y mezclar los PR de F0-12 (#21) y F1-06.** Tras mezclar, Samuel: Manual Deploy en Render.
+2. **`SPAWN_SALT` (F1-06):** cada uno la añade a su `server/.env` (≥ 32 caracteres aleatorios:
+   `node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))"`); **Samuel, también en Render**
+   antes del deploy. Sin ella `/spawns` da 503 y el resto funciona. Alex ya la tiene.
+3. **Kenneth:** cerrar F1-01 (medición en Android + decisión A/B). Desbloquea F1-02…F1-05.
+4. Siguiente tarea libre sin móvil: **F1-08** (inventario y XP básicos, dep F0-07 ✔).
+5. Samuel: puerto de `DATABASE_URL` → 6543 en su `.env` y en Render (Alex ya lo hizo).
+6. Para generar el APK en otro PC: JDK 21 (`winget install Microsoft.OpenJDK.21`) y `npm run apk`.
 
 ## Bloqueos / roto / pendiente de humanos
 
