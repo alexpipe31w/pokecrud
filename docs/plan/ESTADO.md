@@ -3,7 +3,7 @@
 > Se **reescribe** al cerrar cada sesión (no es histórico; el histórico es `BITACORA.md`).
 > Máximo una pantalla. Si lees esto al empezar: después lee `ROADMAP.md`.
 
-**Última actualización:** 2026-10-11 · por Alex (Claude) · rama `feature/F1-08-inventario-xp` (PR abierto)
+**Última actualización:** 2026-10-11 · por Alex (Claude) · rama `feature/F2-03-formula-captura` (PR abierto)
 
 ## Fase actual
 
@@ -11,6 +11,9 @@
 
 ## Hecho
 
+- **F2-03 (Alex, rama `feature/F2-03-formula-captura`, PR abierto; sale de F1-08):** `shared/engine/capture.ts`:
+  fórmula de captura Gen III+ (bola, baya, lanzamiento, curva, PS), huida por rareza/velocidad y `resolveThrow` con
+  RNG inyectado (el servidor tira en F2-06). D-027.
 - **F1-08 (Alex, rama `feature/F1-08-inventario-xp`, PR abierto; sale de F1-06):** mochila (`Inventory`, `GET /bag`,
   kit 30 Poké / 5 Super / 0 Ultra / 5 Frambu al registrarse y a los existentes; migración `inventory` **ya aplicada en
   Supabase**), curva de nivel en `shared/engine/progression.ts` y `ProgressionService.addXp` (sin endpoint, para F2).
@@ -60,7 +63,7 @@
 
 ## En curso
 
-- Nadie. Esperan revisión, **en este orden**: F0-12 (PR #21), F1-06 (PR #22) y F1-08 (sale de F1-06).
+- Nadie. Esperan revisión **en orden** (ver PENDIENTES DE HUMANOS): #21 → #22 → #23 → F2-03.
 - **F1-01 → PENDIENTE DE KENNETH** (medir fps en su Android): rama `feature/F1-01-spike-mapa-3d`, instrucciones
   exactas en la última entrada de F1-01 de la bitácora.
 
@@ -77,6 +80,32 @@
 6. Para generar el APK en otro PC: JDK 21 (`winget install Microsoft.OpenJDK.21`) y `npm run apk`.
 
 ## Bloqueos / roto / pendiente de humanos
+
+### PENDIENTES DE HUMANOS — lista única (quien termine algo, lo marca `[x]`; cada tarea nueva añade aquí lo suyo)
+
+**Kenneth o Samuel (revisión):**
+- [ ] Revisar y mezclar **en este orden**: #21 (F0-12 admin) → #22 (F1-06 spawns) → #23 (F1-08 mochila) → PR de F2-03.
+  Cada uno sale del anterior: al mezclar uno, GitHub reapunta el siguiente a `develop`.
+
+**Samuel (Render, solo él tiene acceso):**
+- [ ] `DATABASE_URL` → puerto **6543** en Render (F0-10, D-021).
+- [ ] Añadir **`SPAWN_SALT`** en Render (≥ 32 caracteres aleatorios, propia de Render) ANTES de desplegar F1-06.
+- [ ] **Manual Deploy** después de cada mezcla en `develop` (con repo público por URL NO es automático).
+- [ ] Su `server/.env`: puerto 6543, `JWT_SECRET` y `SPAWN_SALT` propios.
+
+**Kenneth:**
+- [ ] **F1-01:** medir fps en su Android y escribir la decisión plan A/B (rama `feature/F1-01-spike-mapa-3d`,
+  instrucciones en su bitácora). Bloquea F1-02…F1-05.
+- [ ] Su `server/.env`: `SPAWN_SALT` propia.
+
+**Alex:**
+- [ ] Nombrarse ADMIN del inventario tras mezclar #21: registrarse en la app y `cd server && npm run admin -- grant <correo>`.
+- [ ] Postman (tras #21): poner `adminEmail`/`adminPassword` en SU entorno local de Postman.
+- [ ] Antes del **2027-01-10**: tope de Google Maps o pasar a MapLibre (ver más abajo).
+- [ ] Decidir qué hacer con las 6 capturas `docs/evidencias/HU-02_*.jpg` sin commitear.
+- [ ] (Recomendado en la revisión de F0) Proteger `develop` y añadir CI con lint + test + build obligatorios:
+  hoy los 23 PR se han mezclado sin revisión.
+- [x] `server/.env` en 6543, `JWT_SECRET` y `SPAWN_SALT` locales; JDK 21 instalado (2026-10-11).
 
 - **Cada compañero necesita su propio `JWT_SECRET`** en su `server/.env` para arrancar el servidor en local (SECRETOS.md).
 - **En local hacen falta dos servidores:** Nest (`cd server && npm run start:dev`, puerto **3000**) y la app (`npm start`).

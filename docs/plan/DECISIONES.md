@@ -245,3 +245,18 @@ el comando de arranque no cambia (`npm run start:prod`).
   sumas concurrentes). Rechaza n ≤ 0, no entero o > 100.000.
 - La placa del jugador (`app-player-hud`) está en `/dev/ui` hasta que F1-04 la ponga arriba a la izquierda del mapa.
 
+## D-027 · Fórmula de captura y huida (F2-03) (2026-10-11, Alex)
+
+- `shared/engine/capture.ts` implementa ARQUITECTURA §6 tal cual: `a = ((3·PSmax − 2·PSact)·captureRate·bola·baya·
+  lanzamiento·curva)/(3·PSmax)`, `b = floor(65536/(255/a)^0,1875)`, 4 comprobaciones con enteros en [0, 65535]
+  (`a ≥ 255` → segura). Bonus: Poké 1 · Super 1,5 · Ultra 2 · Frambu 1,5 · Bien 1,3 · Genial 1,7 · Excelente 2 ·
+  **curva 1,7** (ARQUITECTURA no lo fijaba; es el de Pokémon GO). Referencias: captureRate 45 sin ayudas = 11,9 %;
+  legendario (3) = 1,6 % y con todo 8,9 %; captureRate 255 con Super + Excelente + curva = 100 %.
+- **Huida** tras fallar: 5 % + 15 %·(1 − captureRate/255) + 10 %·min(velocidad,180)/180 (+10 % legendario/mítico),
+  tope 35 %. Nunca huye si se captura.
+- `resolveThrow(captura, huida, rng)` consume **siempre 5 tiradas** (4 sacudidas + huida), pase lo que pase: la
+  secuencia del RNG no depende del resultado. Cambiar el orden o el número de tiradas cambia resultados: anotarlo aquí.
+- Las entradas imposibles (captureRate fuera de 1-255, PS > máximo, una baya como bola…) lanzan `RangeError`: el
+  servidor (F2-06) valida antes con DTO, y esto es la segunda red.
+- Sin modificador por nivel del Pokémon por ahora (los spawns son 1-25); si F3 liga niveles al jugador, se revisa.
+

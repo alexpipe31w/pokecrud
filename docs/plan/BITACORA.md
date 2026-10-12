@@ -444,3 +444,27 @@ en `/dev/ui`. La rama se mezcló con `feature/F1-06-spawns` porque necesita que 
 **Decisiones nuevas:** D-026.
 **El siguiente debe empezar por:** mezclar en orden #21, #22 y el PR de F1-08 (Samuel: `SPAWN_SALT` en Render +
 Manual Deploy). Luego F1-02 en cuanto Kenneth cierre F1-01.
+
+## 2026-10-11 21:50 · @alex (Claude) · F2-03 · rama `feature/F2-03-formula-captura` (sale de F1-08)
+
+**Qué se hizo:** `shared/engine/capture.ts`: `captureValue`, `shakeThreshold`, `captureChance`, `fleeChance` y
+`resolveThrow` (RNG inyectado, siempre 5 tiradas). Tipos `BallId`/`BerryId` sacados de `items.ts`. En ESTADO, nueva
+sección **"PENDIENTES DE HUMANOS — lista única"** con responsable y casilla: quien termine algo lo marca, y cada tarea
+añade ahí lo suyo.
+**Archivos clave:** `shared/engine/capture.ts`, `shared/engine/capture.spec.ts`.
+**Cómo se probó (salida real):**
+
+    npm run test:shared → 39/39 (12 nuevos de captura)
+      captureRate 45, vida llena, Poké: a = 15, b = 38527, p = 11,95 %
+      legendario (3): 1,57 % sin ayudas · 8,94 % con Ultra + Frambu + Excelente + curva (a = 10,2, b = 35839)
+      captureRate 255 + Super + Excelente + curva → 100 %
+      40.000 lanzamientos × 3 casos: frecuencia observada = captureChance (2 decimales); huida observada = fleeChance
+      entradas imposibles → RangeError (7 casos)
+    server: npm run build → dist/shared/engine/capture.js · app: ng build OK
+
+(Un primer test fallaba porque yo había calculado mal a mano el 21 % del legendario; la fórmula daba 8,9 % y era
+la correcta: se corrigió el test, no el código.)
+**Quedó a medias / roto:** nada.
+**Decisiones nuevas:** D-027.
+**El siguiente debe empezar por:** mezclar en orden #21 → #22 → #23 → este. Siguiente tarea libre sin móvil:
+**F2-06** (captura autoritativa en servidor: sus deps F2-03, F1-06 y F1-08 ya están hechas), F4-01 o F2-08.
