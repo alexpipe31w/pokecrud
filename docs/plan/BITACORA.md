@@ -1035,3 +1035,21 @@ estado, sombra y hierba; fuera `SpriteTextures`, cilindros de toque, `isTap` y `
 **Quedó a medias / roto:** nada.
 **Decisiones nuevas:** D-043.
 **El siguiente debe empezar por:** F1-10 (el HUD sigue al día/noche del mapa) sin Android; con Android, 7b/3b y F2-01.
+
+## 2026-10-12 19:15 · @alex (Claude) · F1-10 · rama `feature/F1-10-hud-dia-noche`
+
+**Qué se hizo:** el HUD, el menú y los avisos del mapa siguen al día/noche del MAPA (DISENO §1), no al modo oscuro
+del sistema: mixins `surfaces-day`/`surfaces-night` en `src/theme/tokens.scss` + clases `.theme-day`/`.theme-night`
+en la raíz de `MapPage` (`host`). El resto de pantallas sigue con `prefers-color-scheme`.
+**Cómo se probó (salida real):**
+
+    lint OK · ng test: 53 archivos, 240 passed (exit 0) · build OK
+    Playwright (cuentas @pokecrud.test borradas: "borradas 2"):
+      colorScheme dark + Bogotá (día): login --surface rgba(15,26,43,0.72) (sigue al sistema) · /mapa class "theme-day",
+        --surface-opaque rgba(251,247,238,0.94) → HUD claro (F1-10_01)
+      colorScheme light + Kolkata (noche): login rgba(251,247,238,0.78) · /mapa "theme-night", rgba(15,26,43,0.92) →
+        HUD oscuro (F1-10_02)
+
+**Quedó a medias / roto:** nada.
+**El siguiente debe empezar por:** sin Android, F5-01 (plan del PvP) o F2-08 (audio). Con Android: 7b de F1-07, 3b de
+F1-05 y F2-01.

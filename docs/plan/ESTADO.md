@@ -34,6 +34,7 @@ fórmula (F2-03) y captura en servidor (F2-06) hechas; lo visual del encuentro e
 
 ## Hecho
 
+- **F1-10 (Alex, mezclado):** el HUD del mapa sigue al día/noche del mapa, no al modo oscuro del móvil.
 - **F1-09 (Alex, mezclado):** con Render dormido ya no hay pantalla en blanco ni se pierde la sesión: reintentos con
   espera creciente y pantalla "servidor despertando" (D-043).
 - **F1-07 (Alex, mezclado; falta 7b en Android):** Pokémon salvajes en `/mapa`: feed de `/spawns` (cuándo pedir,
