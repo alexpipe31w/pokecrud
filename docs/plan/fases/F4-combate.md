@@ -176,7 +176,7 @@ paralelo (la escena juega contra una IA "elige al azar" hasta que llegue F4-06).
   clara desventaja de tipos; ruido según dificultad (fácil 40 % al azar, normal 15 %, difícil 0 %).
 - [ ] **Paso 2:** 3 entrenadores de prueba en `shared/data/trainers.ts` (equipos de 3 con especies del dataset).
 - [ ] **Paso 3:** test: la IA "difícil" gana ≥ 70 % contra la "fácil" con equipos espejo en 500 combates con semilla.
-- [ ] **Paso 4:** conectar en la escena de F4-05. REGLA 2.
+- [ ] **Paso 4:** ~~conectar en la escena de F4-05~~ → se hace en F4-05 (paso 1), que ya tendrá la IA. REGLA 2.
 
 ## Riesgos
 
