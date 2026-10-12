@@ -99,7 +99,7 @@
       `app-joystick`, `app-location-gate` y modo "Sígueme" en `/dev/mapa` (app 150 tests, shared 140). Samsung A36
       caminando por Neiva: `walk` 0,6-1,2 m/s, `run` 3,3 m/s, ±3-5 m, el mapa gira con la brújula; sin permiso →
       pantalla de permisos; joystick con el dedo `walk`/`run` 4 m/s/`idle`. Evidencias `F1-03_0{1..7}_*`. D-037.
-- [ ] **F1-04 · Pantalla Mapa** — mapa como ruta principal (`/mapa`), estilo día/noche, cámara que sigue
+- [~] **F1-04 · Pantalla Mapa** (@kenneth, 2026-10-12) — mapa como ruta principal (`/mapa`), estilo día/noche, cámara que sigue
       al avatar y rota con la brújula, HUD (avatar/nivel, brújula, clima, botón Poké Ball → menú).
       Quitar las pestañas de Ionic. Dep: F1-03, F0-07. Criterio: DISENO §1 cumplido; captura de día y de noche.
 - [ ] **F1-05 · Avatar 3D** — personaje que camina/corre/se queda quieto según velocidad, sombra,

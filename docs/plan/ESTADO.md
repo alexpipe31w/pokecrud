@@ -7,7 +7,7 @@
 
 ## 👉 RELEVO DE KENNETH (2026-10-12)
 
-1. ✅ **F1-03 hecha** (PR abierto a `develop`, falta mezclarlo): GPS filtrado, brújula, joystick, pantalla de permisos
+1. ✅ **F1-03 hecha** (PR #36 mezclado en `develop`): GPS filtrado, brújula, joystick, pantalla de permisos
    y `AvatarMotion`, probados caminando por Neiva con el Samsung A36. Detalle en "Hecho" y en la bitácora. D-037.
 2. **Siguiente tarea: F1-04** (pantalla `/mapa` principal, HUD, menú de la Poké Ball, fuera las pestañas). Sigue
    `docs/plan/fases/F1-mapa.md` → F1-04 (empieza por el paso 1: contrato de `/spawns` en `shared/protocol`). Lee
@@ -120,11 +120,11 @@ servidor (F2-06) hechas; lo visual del encuentro espera al spike F2-01 (cámara 
 
 ## En curso
 
-- Nadie. Siguiente: **F1-04** (ver "Siguiente paso concreto").
+- **F1-04 (Kenneth, rama `feature/F1-04-pantalla-mapa`)**: reclamada 2026-10-12. Sigue `docs/plan/fases/F1-mapa.md` → F1-04.
+  **Punto de guardado:** paso 1 (contrato de `/spawns` en `shared/protocol`) sin empezar.
 
 ## Siguiente paso concreto
 
-1. **Kenneth o Samuel:** revisar y mezclar el PR de F1-03 (`feature/F1-03-ubicacion-brujula` → `develop`).
 2. **Siguiente tarea libre: F1-04** (pantalla `/mapa`; sigue `docs/plan/fases/F1-mapa.md`, criterio con capturas de
    día y de noche). Con Android también → F2-01 (spike de cámara y giroscopio). Sin móvil → F5-01 o F2-08.
 3. **Alex:** nombrarse ADMIN del inventario (`cd server && npm run admin -- grant <correo>`); hoy hay 0 ADMIN. Y el
@@ -140,7 +140,7 @@ servidor (F2-06) hechas; lo visual del encuentro espera al spike F2-01 (cámara 
 
 - [x] (Samuel, 2026-10-12) Revisar y mezclar #21…#31: primero la cadena #22 → #31 y #21 al final (único con
       conflictos). GitHub NO reapuntó solo (el repo no borra las ramas mezcladas): la base se cambió a `develop` a mano.
-- [ ] Revisar y mezclar el PR de **F1-03** (`feature/F1-03-ubicacion-brujula`).
+- [x] Mezclar el PR #36 de **F1-03** (Kenneth, 2026-10-12).
 
 **Samuel (Render, solo él tiene acceso):**
 
