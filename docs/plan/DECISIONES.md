@@ -310,3 +310,22 @@ son del usuario salvo Lumina Crash y Bomba Jarabe (rival). En 1 vs 1, `user-and-
   curación). Al capturar, `CaughtPokemon.moves` = `defaultMoves` de shared/ (los 4 últimos SOPORTADOS; si no hay,
   Placaje). El servidor carga `moves.json` junto a `pokedex.json`. Ditto (solo Transformación) → Placaje.
 
+## D-031 · Motor de combate: firma y reglas concretas del reducer (F4-04) (2026-10-11, Alex)
+
+- **Firma:** `resolveTurn(ctx, estado, [acciónLado0, acciónLado1], rng) → { state, events }` y `createBattle(ctx, lados)`.
+  `ctx = { moves: Map<id, Move>, chart }` (datos fijos; el plan no lo tenía). Clona con `structuredClone` y nunca muta la
+  entrada; nada de estado de módulo.
+- **Debilitado:** `state.pendingSwitch[lado] = true` + evento `needs-switch`. El siguiente `resolveTurn` SOLO acepta
+  `switch` (o `forfeit`) de los lados pendientes (`null` para el otro) y no cuenta como turno.
+- **Sueño:** 1-3 turnos (`statusTurns`); el turno en que te duermen cuenta si aún no te habías movido (como los juegos).
+  **Confusión:** 2-5 turnos, 1/3 de golpearse (40 de poder, sin tipo). **Congelado:** 20 % de descongelarse al intentar
+  moverse; un ataque de Fuego lo descongela. **Tóxico:** n/16 creciente (tope 15) y se reinicia al cambiar.
+  **Inmunidades:** Fuego/quemado, Eléctrico/parálisis, Veneno-Acero/veneno, Hielo/congelado; Onda Trueno respeta la
+  inmunidad de Tierra.
+- **Efectos:** estados secundarios con su probabilidad (`ailmentChance`; 0 en los de estado = siempre), cambios de stats
+  a quien diga `statChangeTarget` (D-029), drenaje/retroceso sobre el daño hecho (mín. 1), multigolpe 35/35/15/15,
+  retroceso del rival solo si el que ataca va primero. **Forcejeo** (no está en el dataset): poder 50 sin tipo y 1/4 de
+  retroceso, solo si no queda PP en nada.
+- **Doble KO** (retroceso/Forcejeo): pierde el último en debilitarse. **Rendirse:** gana el otro.
+- Eventos: lista cerrada en `types.ts` (`BattleEvent`); los textos en español los pone la UI.
+
