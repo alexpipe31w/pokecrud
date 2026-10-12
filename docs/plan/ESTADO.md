@@ -137,8 +137,8 @@ fórmula (F2-03) y captura en servidor (F2-06) hechas; lo visual del encuentro e
 
 ## En curso
 
-- **F1-07 (Pokémon en el mapa) — @alex, 2026-10-12**, rama `feature/F1-07-pokemon-mapa`. Punto de guardado: pasos 1, 2 y 4 HECHOS
-  (`spawn-diff`, `refetch`, `appear`, puros con tests). Siguiente: paso 3 (`SpawnFeedService`). Plan: `docs/plan/fases/F1-mapa.md` → F1-07.
+- **F1-07 (Pokémon en el mapa) — @alex, 2026-10-12**, rama `feature/F1-07-pokemon-mapa`. Punto de guardado: pasos 1-4 HECHOS
+  (`spawn-diff`, `refetch`, `appear`, `SpawnFeedService`). Siguiente: paso 5 (texturas y `SpawnLayer`). Plan: `docs/plan/fases/F1-mapa.md` → F1-07.
 - F1-05 solo espera la prueba en Android (paso 3b).
 
 ## Siguiente paso concreto

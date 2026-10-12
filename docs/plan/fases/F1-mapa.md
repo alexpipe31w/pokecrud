@@ -1266,12 +1266,12 @@ export function shouldRefetch(s: FetchState, now: number, pos: LatLng): boolean 
 
 **Files:** Create `src/app/services/game/spawn-feed.service.ts` + spec
 
-- [ ] **3a.** Servicio con `HttpClient` (el interceptor pone el token): `readonly spawns = signal<VisibleSpawn[]>([])`,
+- [x] **3a.** Servicio con `HttpClient` (el interceptor pone el token): `readonly spawns = signal<VisibleSpawn[]>([])`,
   `weather`, `night`, `error = signal<string | null>`. `tick(now, pos)` (lo llama la pantalla cada ~1 s) → si
   `shouldRefetch(...)` hace `GET ${environment.serverUrl}/spawns?lat=…&lng=…` (lat/lng redondeados a 6 decimales,
   `timeout(70_000)` como `BagService` por Render dormido). 401 → lo maneja el interceptor; 503 → `error` "Los Pokémon
   salvajes no están disponibles ahora mismo" (sin borrar los que hay); 429 → cuenta como fallo (espera).
-- [ ] **3b. Tests** con `provideHttpClientTesting`: (1) primer `tick` hace una petición con `lat`/`lng` y publica
+- [x] **3b. Tests** con `provideHttpClientTesting`: (1) primer `tick` hace una petición con `lat`/`lng` y publica
   `spawns`, `weather`, `night`; (2) un segundo `tick` inmediato en el mismo sitio no pide; (3) un 503 deja `error` y
   conserva la lista anterior. Commit + `/guardar`.
 
