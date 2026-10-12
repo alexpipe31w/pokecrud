@@ -119,9 +119,13 @@
       reintenta con espera 2-4-8-15 s hasta 2 min (`RESTORE_RETRY`), sin mandar al login ni borrar el token; pasados
       1,5 s marca `waking` y `app-server-waking` enseña una Poké Ball que se tambalea, mensajes que se turnan y el
       intento. Probado apagando y encendiendo el servidor local (F1-09_01…03). D-043.
-- [~] **F1-10 · El HUD sigue al mapa (día/noche), no al modo oscuro del sistema** — hoy los tokens cambian con
+- [x] **F1-10 · El HUD sigue al mapa (día/noche), no al modo oscuro del sistema** — hoy los tokens cambian con
       `prefers-color-scheme`: con el móvil en modo oscuro el HUD sale oscuro sobre el mapa de día (DISENO §1: "la UI sigue
       al mapa"). Dep: F1-04. (@alex, 2026-10-12)
+      **Hecho:** colores de superficie de día y de noche como mixins en `tokens.scss`, usados con
+      `prefers-color-scheme` (resto de pantallas, sin cambios) y como clases `.theme-day`/`.theme-night`, que `MapPage`
+      pone en su raíz según `night()`. Probado: móvil oscuro + mapa de día → HUD claro; móvil claro + mapa de noche →
+      HUD oscuro; el login sigue al sistema (F1-10_01/02).
 - [~] **F1-05 · Avatar 3D** (@alex, 2026-10-12) — personaje que camina/corre/se queda quieto según velocidad, sombra,
       círculo de alcance. Dep: F1-04.
       **Falta solo 3b:** probarlo en un Android real (andar y trotar, ≥ 55 fps). Código mezclado en `develop`.

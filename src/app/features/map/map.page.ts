@@ -66,6 +66,8 @@ const TOO_FAR_MS = 1500;
  */
 @Component({
   selector: 'app-map',
+  // F1-10: el HUD, el menú y los avisos siguen al día/noche del MAPA, no al modo oscuro del sistema (tokens.scss).
+  host: { '[class.theme-day]': '!night()', '[class.theme-night]': 'night()' },
   imports: [
     IonContent,
     BallMenuComponent,
