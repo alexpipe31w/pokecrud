@@ -7,7 +7,7 @@
 
 ## Fase actual
 
-**F0 · Fundaciones** — **F0-01…F0-09 en `develop`** (PR #8-#17). **F0-10 hecha** (Kenneth, PR pendiente de mezclar).
+**F0 · Fundaciones** — **F0-01…F0-09 en `develop`** (PR #8-#17). **F0-10 hecha** (Kenneth, PR #18 pendiente de mezclar).
 Queda **F0-11** (zona segura Android 15+). Después, F1 (mapa).
 
 ## Hecho
@@ -54,7 +54,7 @@ Queda **F0-11** (zona segura Android 15+). Después, F1 (mapa).
 
 ## Siguiente paso concreto
 
-1. Revisar y mezclar el PR de F0-10 en `develop`. **Alex y Samuel:** puerto de `DATABASE_URL` → 6543 en su `.env`;
+1. Revisar y mezclar el PR #18 (F0-10) en `develop`. **Alex y Samuel:** puerto de `DATABASE_URL` → 6543 en su `.env`;
    **Samuel:** también en Render (ver Bloqueos).
 2. Siguiente tarea libre: **F0-11** (zona segura Android 15+). Luego F1 (mapa): F1-01 ya tiene su dependencia (F0-09)
    y necesita el APK para medir fps en un Android real.
