@@ -86,7 +86,7 @@
       móviles en el mismo sitio ven lo mismo.
 - [ ] **F1-07 · Pokémon en el mapa** — sprites en el overlay, hierba agitándose, aparición/desaparición
       animada, grito bajito por cercanía, toque → encuentro. Dep: F1-05, F1-06.
-- [ ] **F1-08 · Inventario y XP básicos** — modelo `Inventory`, bolas iniciales, nivel/XP del jugador en
+- [~] **F1-08 · Inventario y XP básicos** (@alex, 2026-10-11) — modelo `Inventory`, bolas iniciales, nivel/XP del jugador en
       el HUD. Dep: F0-07.
 
 ## F2 · Encuentro en AR y captura

@@ -51,7 +51,9 @@
 
 ## En curso
 
-- Nadie.
+- **F1-08 (Alex, rama `feature/F1-08-inventario-xp`):** inventario, bolas iniciales, nivel/XP y HUD.
+- **F1-01 → PENDIENTE DE KENNETH** (medir en Android): rama `feature/F1-01-spike-mapa-3d`.
+- F0-12 (PR #21) y F1-06 (PR #22) de Alex esperan revisión.
 
 ## Siguiente paso concreto
 
