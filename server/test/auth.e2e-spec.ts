@@ -4,6 +4,7 @@ import { Test } from '@nestjs/testing';
 import request from 'supertest';
 import { AppModule } from '../src/app.module.js';
 import { PrismaService } from '../src/prisma/prisma.service.js';
+import { cleanupTestPlayers } from './support/cleanup.js';
 
 // e2e contra la base de datos REAL (server/.env). Todo lo que crea usa el dominio @pokecrud.test
 // y se borra en afterAll.
@@ -66,7 +67,7 @@ describe('Auth (e2e)', () => {
   });
 
   afterAll(async () => {
-    await prisma.player.deleteMany({ where: { email: { endsWith: DOMAIN } } });
+    await cleanupTestPlayers(prisma, 'test+');
     await app.close();
   });
 

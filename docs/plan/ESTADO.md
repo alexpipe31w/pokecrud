@@ -47,7 +47,7 @@ Quedan **F0-10** (transaction pooler) y **F0-11** (zona segura Android 15+), amb
 
 ## En curso
 
-- **F0-10** (@kenneth, rama `feature/F0-10-transaction-pooler`): transaction pooler. Punto de guardado: reclamada, sin código aún.
+- **F0-10** (@kenneth, rama `feature/F0-10-transaction-pooler`): transaction pooler. Punto de guardado: medido que el pooler en modo transacción (6543) admite 40+ clientes y que Prisma (PrismaPg) funciona ahí; arreglado el borrado cruzado entre archivos e2e (cada uno limpia solo sus jugadores). e2e en paralelo contra 6543: 8/8. Sigue: cambiar `DATABASE_URL` a 6543 en `.env`, `.env.example` y SECRETOS.
 
 ## Siguiente paso concreto
 
