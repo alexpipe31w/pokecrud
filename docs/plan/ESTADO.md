@@ -193,10 +193,12 @@ fórmula (F2-03) y captura en servidor (F2-06) hechas; lo visual del encuentro e
 
 **Alex:**
 
-- [ ] Estilo del Map ID `5309ecf69efbfe12f3ecbc4c` en Google Cloud: **sin POI comerciales** (en `/mapa` siguen saliendo
-      restaurantes y tiendas). La noche ya funciona: `/mapa` usa `colorScheme: DARK` y Google aplica su oscuro por defecto;
-      una variante oscura propia en el estilo es opcional.
-- [ ] Nombrarse ADMIN del inventario tras mezclar #21: registrarse en la app y `cd server && npm run admin -- grant <correo>`.
+- [x] (2026-10-12) Estilo del Map ID `5309ecf69efbfe12f3ecbc4c` sin POI comerciales: estilos `pokecrud-juego` (claro,
+      edificios 3D, densidad de POI "Dispersa") y `pokecrud-juego-noche` (oscuro) con Comida y bebida, Venta minorista,
+      Servicio, Alojamiento y Entretenimiento ocultos; asignados al modo claro y al oscuro del Map ID. Ojo: los estilos
+      nuevos nacen con **Edificios 2D** (se cambia en el engranaje del editor, solo en el claro) y hay que **Publicar**
+      tras Guardar; tarda unos minutos en llegar a la app.
+- [x] (2026-10-12) Alex registrado y ADMIN (`npm run admin -- list` → alexpipe31w@gmail.com y samu1630).
 - [ ] Postman (tras #21): poner `adminEmail`/`adminPassword` en SU entorno local de Postman.
 - [ ] Antes del **2027-01-10**: tope de Google Maps o pasar a MapLibre (ver más abajo).
 - [ ] Decidir qué hacer con las 6 capturas `docs/evidencias/HU-02_*.jpg` sin commitear.
