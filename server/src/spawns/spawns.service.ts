@@ -1,0 +1,170 @@
+import { createHmac } from 'node:crypto';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+import {
+  Injectable,
+  Logger,
+  ServiceUnavailableException,
+} from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import type { Species } from '../../../shared/data/dataset.types.js';
+import {
+  type SpawnSpecies,
+  type SpawnTable,
+  type Weather,
+  type WildSpawn,
+  buildSpawnTable,
+  cellBounds,
+  cellsWithin,
+  isNightAt,
+  slotEndsAt,
+  slotFor,
+  spawnsForCell,
+} from '../../../shared/engine/spawns.js';
+import { WeatherService, weatherCellOf } from './weather.service.js';
+
+/** Radio en el que el jugador ve Pokémon (ROADMAP F1-06: celdas a ≤ 200 m). */
+export const VIEW_RADIUS_M = 200;
+/** Versión del algoritmo en la semilla: si cambia `spawnsForCell`, se sube y no se mezclan spawns viejos (D-025). */
+const SEED_VERSION = 'v1';
+const M_PER_DEG_LAT = 111_320;
+
+/** Lo que ve el cliente en el mapa. Nivel, IVs, naturaleza, sexo y shiny NO salen hasta el encuentro (F2). */
+export interface VisibleSpawn {
+  id: string;
+  speciesId: number;
+  lat: number;
+  lng: number;
+}
+
+export interface NearbySpawns {
+  slot: number;
+  /** Fin de la franja: el cliente vuelve a pedir a partir de aquí. */
+  expiresAt: string;
+  spawns: VisibleSpawn[];
+}
+
+const round6 = (n: number): number => Math.round(n * 1e6) / 1e6;
+
+/**
+ * Spawns deterministas (F1-06, D-025). Nada se guarda: para (celda, franja) la semilla es
+ * HMAC-SHA256(SPAWN_SALT, versión:celda:franja) y `spawnsForCell` (shared/) hace el resto. Sin `SPAWN_SALT` o sin
+ * dataset, `/spawns` responde 503 y el resto del servidor sigue funcionando.
+ */
+@Injectable()
+export class SpawnsService {
+  private readonly logger = new Logger(SpawnsService.name);
+  private readonly salt: string | undefined;
+  private species: SpawnSpecies[] | null = null;
+  private readonly tables = new Map<string, SpawnTable>();
+
+  constructor(
+    config: ConfigService,
+    private readonly weather: WeatherService,
+  ) {
+    this.salt = config.get<string>('SPAWN_SALT') || undefined;
+    if (!this.salt) {
+      this.logger.error(
+        'SPAWN_SALT no está definida: /spawns responderá 503 (ver server/.env.example)',
+      );
+    }
+    const datasetPath = resolve(
+      config.get<string>('DATASET_PATH') ??
+        resolve(process.cwd(), '../src/assets/data/pokedex.json'),
+    );
+    try {
+      const all = JSON.parse(readFileSync(datasetPath, 'utf8')) as Species[];
+      // Solo lo que usa el sorteo: no se guardan en memoria los learnsets ni los textos.
+      this.species = all.map((s) => ({
+        id: s.id,
+        types: s.types,
+        captureRate: s.captureRate,
+        baseExp: s.baseExp,
+        genderRate: s.genderRate,
+        isLegendary: s.isLegendary,
+        isMythical: s.isMythical,
+        isBaby: s.isBaby,
+      }));
+    } catch (err) {
+      this.logger.error({
+        msg: 'spawns.dataset_unavailable',
+        datasetPath,
+        reason: err instanceof Error ? err.message : String(err),
+      });
+    }
+  }
+
+  /** Pokémon visibles a ≤ VIEW_RADIUS_M del punto en la franja actual. */
+  async near(
+    lat: number,
+    lng: number,
+    now = Date.now(),
+  ): Promise<NearbySpawns> {
+    const slot = slotFor(now);
+    const cells = cellsWithin(lat, lng, VIEW_RADIUS_M);
+    const all = (
+      await Promise.all(cells.map((cellId) => this.cellSpawns(cellId, slot)))
+    ).flat();
+
+    const mPerDegLng = M_PER_DEG_LAT * Math.cos((lat * Math.PI) / 180);
+    const visible = all.filter((s) => {
+      const dy = (s.lat - lat) * M_PER_DEG_LAT;
+      const dx = (s.lng - lng) * mPerDegLng;
+      return dx * dx + dy * dy <= VIEW_RADIUS_M * VIEW_RADIUS_M;
+    });
+    return {
+      slot,
+      expiresAt: new Date(slotEndsAt(slot)).toISOString(),
+      spawns: visible.map((s) => ({
+        id: s.id,
+        speciesId: s.speciesId,
+        lat: round6(s.lat),
+        lng: round6(s.lng),
+      })),
+    };
+  }
+
+  /**
+   * Todos los datos de los Pokémon de una celda (incluidos los ocultos al cliente). Lo usarán el encuentro y la
+   * captura (F2) para recalcular un spawn a partir de su id sin haberlo guardado.
+   */
+  async cellSpawns(cellId: string, slot: number): Promise<WildSpawn[]> {
+    if (!this.salt || !this.species) {
+      throw new ServiceUnavailableException(
+        'Los Pokémon salvajes no están disponibles ahora mismo',
+      );
+    }
+    const b = cellBounds(cellId);
+    const centerLat = (b.south + b.north) / 2;
+    const centerLng = (b.west + b.east) / 2;
+    // Clima y noche dependen de la CELDA y la franja, nunca de dónde está el jugador: así todos ven lo mismo.
+    const weather = await this.weather.weatherFor(
+      weatherCellOf(centerLat, centerLng),
+      slot,
+    );
+    const night = isNightAt(slotEndsAt(slot - 1), centerLng);
+    return spawnsForCell(
+      cellId,
+      slot,
+      this.seed(cellId, slot),
+      this.table(weather, night),
+    );
+  }
+
+  private seed(cellId: string, slot: number): number {
+    return createHmac('sha256', this.salt as string)
+      .update(`${SEED_VERSION}:${cellId}:${slot}`)
+      .digest()
+      .readUInt32BE(0);
+  }
+
+  private table(weather: Weather, night: boolean): SpawnTable {
+    const key = `${weather}:${night}`;
+    let table = this.tables.get(key);
+    if (!table) {
+      table = buildSpawnTable(this.species as SpawnSpecies[], weather, night);
+      this.tables.set(key, table);
+    }
+    return table;
+  }
+}

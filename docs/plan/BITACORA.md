@@ -393,3 +393,26 @@ login/registro (tiene que volver a entrar).
 **Decisiones nuevas:** D-022.
 **El siguiente debe empezar por:** mezclar el PR de F0-11; luego `/inicio F1-01` (spike Google Maps 3D + three.js en
 Android real) — antes, leer ARQUITECTURA §4 y D-022 (el mapa anula la zona segura en su `ion-content`).
+
+## 2026-10-11 21:15 · @alex (Claude) · F1-06 · rama `feature/F1-06-spawns`
+
+**Qué se hizo:** motor de spawns puro `shared/engine/spawns.ts` (`cellIdFor`, `cellsWithin`, `slotFor`, `isNightAt`,
+`buildSpawnTable`, `spawnsForCell`, `parseSpawnId`) y módulo `server/src/spawns/` (`GET /spawns`, `SpawnsService`,
+`WeatherService`). El servidor compila `shared/` por primera vez (D-024: `rootDir ..`, salida `dist/server/src/main.js`,
+`shared/package.json` ESM). Semilla HMAC con `SPAWN_SALT`, clima por celda de 0,1° y franja, datos ocultos hasta el
+encuentro, 503 si falta la sal (D-025). `SPAWN_SALT` añadida a `.env.example`, SECRETOS y validación (opcional, ≥ 32).
+**Archivos clave:** `shared/engine/spawns.ts`, `server/src/spawns/*`, `server/tsconfig.build.json`, `server/package.json`.
+**Cómo se probó (salida real):**
+
+    npm run test:shared → 3 archivos, 22/22 (12 nuevos; dataset real: 0 legendarios/míticos en 20.000 celdas, >400 especies)
+    server: npm test → 21/21 (10 nuevos) · npm run test:e2e → Test Files 5 passed · Tests 46 passed
+      (spawns: 401 sin sesión; 400 sin lng / lat 95 / lat abc / parámetro extra; dos jugadores → respuesta idéntica)
+    lint server: solo el aviso previo de auth.e2e-spec · app: ng build OK
+    npm run start:prod (dist/server/src/main) + Open-Meteo real, Neiva 2.9273,-75.2819:
+      200 1.02 s · slot 2986283 · expira 2026-10-12T02:00:00Z · 10 Pokémon
+      200 0.21 s · misma respuesta (clima en caché) · sin "weather.fallback" en el log
+
+**Quedó a medias / roto:** nada en código. Pendiente de humanos: `SPAWN_SALT` en el `server/.env` de cada uno y en
+Render (Samuel) antes del deploy. Los niveles (1-25) se ligarán al nivel del jugador en F3.
+**Decisiones nuevas:** D-024, D-025.
+**El siguiente debe empezar por:** revisar el PR de F1-06; luego `/inicio F1-08` (o F1-02 si Kenneth ya cerró F1-01).

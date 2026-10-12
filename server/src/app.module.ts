@@ -12,6 +12,7 @@ import { validateEnv } from './config/env.validation.js';
 import { HealthModule } from './health/health.module.js';
 import { InventoryModule } from './inventory/inventory.module.js';
 import { PrismaModule } from './prisma/prisma.module.js';
+import { SpawnsModule } from './spawns/spawns.module.js';
 import { TeamsModule } from './teams/teams.module.js';
 
 const isProd = process.env['NODE_ENV'] === 'production';
@@ -63,6 +64,8 @@ function requestId(req: IncomingMessage, res: ServerResponse): string {
     TeamsModule,
     FavoritesModule,
     CustomPokemonModule,
+    // Juego (F1-06): Pokémon salvajes deterministas.
+    SpawnsModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: ThrottlerGuard },
