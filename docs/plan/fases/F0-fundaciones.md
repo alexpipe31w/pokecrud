@@ -1420,7 +1420,7 @@ Añadir `CHECK` en la migración SQL generada (editar antes de `migrate deploy`)
 - [ ] **Paso 1:** `npm install @capacitor/android@8.5.3 @capacitor/splash-screen@8.0.2` y
       `npx cap add android`. Commitear la carpeta `android/` (D-009) — revisar que su `.gitignore` excluye
       `build/`, `.gradle/`, `local.properties` y `*.keystore`.
-- [x] **Paso 2: permisos** — en `android/app/src/main/AndroidManifest.xml`, dentro de `<manifest>`:
+- [ ] **Paso 2: permisos** — en `android/app/src/main/AndroidManifest.xml`, dentro de `<manifest>`:
 
 ```xml
 <uses-permission android:name="android.permission.INTERNET" />
@@ -1432,18 +1432,18 @@ Añadir `CHECK` en la migración SQL generada (editar antes de `migrate deploy`)
 <uses-feature android:name="android.hardware.camera" android:required="false" />
 ```
 
-- [x] **Paso 3: tráfico al servidor local** — en desarrollo el APK habla con `http://<IP-del-PC>:3000`
+- [ ] **Paso 3: tráfico al servidor local** — en desarrollo el APK habla con `http://<IP-del-PC>:3000`
       (no `localhost`). Crear `src/environments/environment.device.ts` (sin secretos, con `apiUrl` de la IP LAN)
       y una configuración `device` en `angular.json` que lo reemplace. Como es HTTP plano, añadir en
       `capacitor.config.ts` → `server: { cleartext: true }` **solo** cuando `process.env.CAP_DEV === '1'`.
-- [x] **Paso 4: script** — `scripts/apk.mjs`: ejecuta `ng build` (configuración indicada por argumento,
+- [ ] **Paso 4: script** — `scripts/apk.mjs`: ejecuta `ng build` (configuración indicada por argumento,
       por defecto `production`), `npx cap sync android` y `gradlew.bat assembleDebug` (o `./gradlew` fuera de
       Windows) con `JAVA_HOME` apuntando al `jbr` de Android Studio si no está definido; al final imprime la ruta
       y el tamaño del APK. `package.json`: `"apk": "node scripts/apk.mjs"`.
-- [x] **Paso 5: icono y splash provisionales** — `npx @capacitor/assets generate --android` desde
+- [ ] **Paso 5: icono y splash provisionales** — `npx @capacitor/assets generate --android` desde
       `resources/icon.png` (1024×1024) y `resources/splash.png` (2732×2732): Poké Ball estilizada propia
       (no usar arte oficial). Ver skill `generar-imagen` o pedirlo al humano.
-- [x] **Paso 6: probar en el móvil** — `npm run apk`, `adb install -r android/app/build/outputs/apk/debug/app-debug.apk`,
+- [ ] **Paso 6: probar en el móvil** — `npm run apk`, `adb install -r android/app/build/outputs/apk/debug/app-debug.apk`,
       abrir, navegar a `/dev/ui`, oír el grito y ver la vibración. Depurar en `chrome://inspect`.
       Foto o captura en `docs/evidencias/F0-09_01_apk-movil.jpg` y tamaño del APK en la bitácora.
 - [ ] **Paso 7:** actualizar ARQUITECTURA §11 si algo cambió y commit `F0-09: pipeline del APK`.
