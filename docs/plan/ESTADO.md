@@ -63,8 +63,6 @@ pendiente de mezclar). Libres: **F0-09** APK y **F0-10** transaction pooler (nue
 - **Render está en la cuenta de Samuel:** solo él ve los logs y cambia variables. Si hay que rotar la contraseña de la BD
   (SECRETOS.md), Samuel actualiza `DATABASE_URL` y `DIRECT_URL` en Render. Plan gratis: se duerme a los 15 min.
 - **Inventario IS-11 en producción:** `/pokemon` llega a Render al mezclar F0-08 (las tablas y la semilla ya están en la base).
-- **Vista móvil 390×844 sin comprobar en F0-08:** la ventana de Chrome no se dejó redimensionar; el CRUD se probó a ancho de
-  escritorio. La Pokédex no cambió de UI, pero conviene un vistazo en móvil antes de la demo.
 - **Google Maps — HECHO (2026-10-11):** clave `pokecrud-maps-js` en la cuenta de Google Cloud de Alex
   (prueba gratuita hasta 2027-01-10, proyecto "My First Project" `project-7bf0c639-c6d2-4cc1-aba`), restringida a
   Maps JavaScript API y a `https://localhost/*`, `http://localhost:8100/*`, `http://localhost:4200/*`.
