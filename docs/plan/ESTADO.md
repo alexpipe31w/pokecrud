@@ -3,7 +3,7 @@
 > Se **reescribe** al cerrar cada sesión (no es histórico; el histórico es `BITACORA.md`).
 > Máximo una pantalla. Si lees esto al empezar: después lee `ROADMAP.md`.
 
-**Última actualización:** 2026-10-12 · por Samuel (Claude) · rama `feature/F1-02-plan-mapa` (F1-02 hecha, PR abierto)
+**Última actualización:** 2026-10-12 · por Samuel (Claude) · `develop` (#32, #33 y #34 mezclados)
 
 ## 👉 RELEVO DE ALEX A SAMUEL — HECHO (2026-10-12)
 
@@ -32,7 +32,7 @@ visual del mapa ya tiene vía libre (**F1-01 hecha: plan A, D-035**); el del enc
 
 ## Hecho
 
-- **F1-02 (Samuel, PR pendiente):** plan de la fase del mapa en `docs/plan/fases/F1-mapa.md`: F1-03 (GPS filtrado,
+- **F1-02 (Samuel, PR #34 mezclado):** plan de la fase del mapa en `docs/plan/fases/F1-mapa.md`: F1-03 (GPS filtrado,
   brújula, joystick, permisos), F1-04 (`/mapa` como pantalla principal, HUD, menú de la Poké Ball, adiós pestañas,
   clima en `GET /spawns`), F1-05 (avatar 3D procedural) y F1-07 (Pokémon con hierba, grito por cercanía, toque).
 - **F0-13 (Samuel, PR #33 mezclado):** los `.js` que aparecían en `shared/` salen de compilar el servidor con la config
@@ -115,7 +115,7 @@ visual del mapa ya tiene vía libre (**F1-01 hecha: plan A, D-035**); el del enc
 
 ## En curso
 
-- Nadie (F1-02 terminada; su PR espera revisión/mezcla).
+- Nadie. Siguiente: **F1-03** (ver "Siguiente paso concreto").
 
 ## Siguiente paso concreto
 
