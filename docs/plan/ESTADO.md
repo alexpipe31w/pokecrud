@@ -51,7 +51,9 @@
 
 ## En curso
 
-- Nadie.
+- **F1-06 (Alex, rama `feature/F1-06-spawns`):** spawns deterministas (`shared/engine/spawns.ts` + `GET /spawns`).
+- **F1-01 → PENDIENTE DE KENNETH** (medir en Android): rama `feature/F1-01-spike-mapa-3d`, instrucciones en su bitácora.
+- F0-12 (Alex) espera revisión: PR #21.
 
 ## Siguiente paso concreto
 
