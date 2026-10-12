@@ -22,7 +22,8 @@ describe('appear', () => {
   });
 
   it('nunca escala desde 0', () => {
-    for (let t = 0; t <= APPEAR_MS; t += 50) expect(appearPose(t).scale).toBeGreaterThanOrEqual(0.95);
+    for (let t = 0; t <= APPEAR_MS; t += 50)
+      expect(appearPose(t).scale).toBeGreaterThanOrEqual(0.95);
   });
 
   it('desaparecer termina invisible', () => {

@@ -3,10 +3,17 @@ import { fromLocalM } from '@shared/engine/geo';
 import { REFETCH_MOVE_M, backoffMs, shouldRefetch, type FetchState } from './refetch';
 
 const O = { lat: 2.9273, lng: -75.2819 };
-const base: FetchState = { inFlight: false, lastAt: 100_000, lastPos: O, expiresAt: 400_000, failures: 0 };
+const base: FetchState = {
+  inFlight: false,
+  lastAt: 100_000,
+  lastPos: O,
+  expiresAt: 400_000,
+  failures: 0,
+};
 
 describe('shouldRefetch', () => {
-  it('la primera vez, sí', () => expect(shouldRefetch({ ...base, lastAt: null, lastPos: null }, 0, O)).toBe(true));
+  it('la primera vez, sí', () =>
+    expect(shouldRefetch({ ...base, lastAt: null, lastPos: null }, 0, O)).toBe(true));
 
   it('nunca con una petición en vuelo', () =>
     expect(shouldRefetch({ ...base, inFlight: true, lastAt: null }, 0, O)).toBe(false));

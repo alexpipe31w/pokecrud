@@ -1353,11 +1353,11 @@ export function disappearPose(ms: number): SpritePose {
 
 **Files:** Create `src/app/game/map-scene/sprite-textures.ts`, `spawn-layer.ts`; Modify `map-scene.ts`
 
-- [ ] **5a. `SpriteTextures`:** `get(speciesId): THREE.Texture` con caché LRU (máx. 40; al expulsar → `dispose()`).
+- [x] **5a. `SpriteTextures`:** `get(speciesId): THREE.Texture` con caché LRU (máx. 40; al expulsar → `dispose()`).
   Carga con `THREE.TextureLoader().setCrossOrigin('anonymous')` probando en orden (footgun de CLAUDE.md):
   `…/sprites/pokemon/other/home/{id}.png` → `…/other/official-artwork/{id}.png` → `…/sprites/pokemon/{id}.png`; si
   todas fallan, un círculo "?" dibujado en un `CanvasTexture`. `colorSpace = SRGBColorSpace`.
-- [ ] **5b. `SpawnLayer`** (a partir del spike, que ya está medido):
+- [x] **5b. `SpawnLayer`** (a partir del spike, que ya está medido):
   - `sync(drawn: VisibleSpawn[], origin, nowMs)`: con `diffSpawns` contra los que tiene → los nuevos nacen con
     `bornAt = nowMs` (si es la **primera** sincronización tras entrar al mapa, `bornAt = nowMs − APPEAR_MS`: los que ya
     estaban no "brotan" todos a la vez); los que sobran pasan a `dyingAt` y se borran tras `DISAPPEAR_MS`.
@@ -1367,7 +1367,7 @@ export function disappearPose(ms: number): SpritePose {
     con `grassAmp`.
   - `pick(ndc: THREE.Vector2): string | null` → `overlay.raycast(ndc, sprites)` → id del spawn tocado.
   - `reposition(origin)` tras un re-anclaje.
-- [ ] **5c.** Lint + build. Commit + `/guardar`.
+- [x] **5c.** Lint + build. Commit + `/guardar`.
 
 ### Paso 6 — Conectarlo en `MapPage`: aparición, grito y toque
 

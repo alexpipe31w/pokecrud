@@ -29,7 +29,11 @@ describe('SpawnFeedService', () => {
   beforeEach(() => {
     player.set({ id: 'p1' });
     TestBed.configureTestingModule({
-      providers: [provideHttpClient(), provideHttpClientTesting(), { provide: AuthService, useValue: { player } }],
+      providers: [
+        provideHttpClient(),
+        provideHttpClientTesting(),
+        { provide: AuthService, useValue: { player } },
+      ],
     });
     feed = TestBed.inject(SpawnFeedService);
     http = TestBed.inject(HttpTestingController);
@@ -47,7 +51,9 @@ describe('SpawnFeedService', () => {
   it('el primer tick pide con lat/lng (6 decimales) y publica spawns, clima y noche', async () => {
     const done = feed.tick({ lat: O.lat + 1.23456789e-7, lng: O.lng }, T0);
     const req = http.expectOne((r) => r.url === url);
-    expect(req.request.params.get('lat')).toBe(String(Math.round((O.lat + 1.23456789e-7) * 1e6) / 1e6));
+    expect(req.request.params.get('lat')).toBe(
+      String(Math.round((O.lat + 1.23456789e-7) * 1e6) / 1e6),
+    );
     expect(req.request.params.get('lng')).toBe(String(O.lng));
     req.flush(body());
     await done;
@@ -72,7 +78,9 @@ describe('SpawnFeedService', () => {
   it('un 503 deja el error y conserva la lista anterior; luego espera antes de reintentar', async () => {
     await respond(feed.tick(O, T0));
     const done = feed.tick(O, T0 + 302_000);
-    http.expectOne((r) => r.url === url).flush('caído', { status: 503, statusText: 'Service Unavailable' });
+    http
+      .expectOne((r) => r.url === url)
+      .flush('caído', { status: 503, statusText: 'Service Unavailable' });
     await done;
     expect(feed.error()).toBe('Los Pokémon salvajes no están disponibles ahora mismo.');
     expect(feed.spawns().map((s) => s.id)).toEqual(['a']);

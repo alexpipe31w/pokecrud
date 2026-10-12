@@ -18,7 +18,8 @@ export interface FetchState {
 }
 
 /** Espera tras `failures` fallos seguidos: 5 s, 10, 20… hasta 60 s (servidor dormido, DISENO §6). */
-export const backoffMs = (failures: number): number => Math.min(60_000, 5_000 * 2 ** (failures - 1));
+export const backoffMs = (failures: number): number =>
+  Math.min(60_000, 5_000 * 2 ** (failures - 1));
 
 /**
  * ¿Toca pedir `GET /spawns`? La primera vez; al acabar la franja; o tras moverse > REFETCH_MOVE_M (con MIN_GAP_MS

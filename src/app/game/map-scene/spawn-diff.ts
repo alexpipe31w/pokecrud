@@ -17,7 +17,11 @@ export function diffSpawns(
 }
 
 /** Los `n` spawns más cercanos a `origin`, del más cercano al más lejano. */
-export function nearestN(list: readonly VisibleSpawn[], origin: LatLng, n = MAX_DRAWN): VisibleSpawn[] {
+export function nearestN(
+  list: readonly VisibleSpawn[],
+  origin: LatLng,
+  n = MAX_DRAWN,
+): VisibleSpawn[] {
   return list
     .map((x) => ({ x, d: distanceM(origin, x) }))
     .sort((a, b) => a.d - b.d)

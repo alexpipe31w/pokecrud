@@ -14,7 +14,13 @@ const SPAWNS_TIMEOUT_MS = 70_000;
 const UNAVAILABLE = 'Los Pokémon salvajes no están disponibles ahora mismo.';
 
 const round6 = (x: number): number => Math.round(x * 1e6) / 1e6;
-const emptyState = (): FetchState => ({ inFlight: false, lastAt: null, lastPos: null, expiresAt: null, failures: 0 });
+const emptyState = (): FetchState => ({
+  inFlight: false,
+  lastAt: null,
+  lastPos: null,
+  expiresAt: null,
+  failures: 0,
+});
 
 /**
  * Pokémon salvajes alrededor del jugador (F1-07): `GET /spawns` cuando toca según `shouldRefetch` (primera vez, fin
@@ -55,7 +61,9 @@ export class SpawnFeedService {
     try {
       const res = await firstValueFrom(
         this.http
-          .get<NearbySpawns>(`${environment.serverUrl}/spawns`, { params: { lat: at.lat, lng: at.lng } })
+          .get<NearbySpawns>(`${environment.serverUrl}/spawns`, {
+            params: { lat: at.lat, lng: at.lng },
+          })
           .pipe(timeout(SPAWNS_TIMEOUT_MS)),
       );
       this._spawns.set(res.spawns);
@@ -73,7 +81,10 @@ export class SpawnFeedService {
       };
     } catch (err) {
       const status = err instanceof HttpErrorResponse ? err.status : undefined;
-      console.warn('[spawns] no se pudieron pedir los Pokémon salvajes', { status, failures: this.state.failures + 1 });
+      console.warn('[spawns] no se pudieron pedir los Pokémon salvajes', {
+        status,
+        failures: this.state.failures + 1,
+      });
       // 401 lo resuelve el interceptor (refresh o login); el resto se enseña. En todos los casos, se espera y reintenta.
       if (status !== 401) this._error.set(UNAVAILABLE);
       this.state = { ...this.state, inFlight: false, failures: this.state.failures + 1 };

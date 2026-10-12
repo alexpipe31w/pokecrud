@@ -2,6 +2,7 @@ import * as THREE from 'three';
 
 import { Avatar3D } from './avatar-3d';
 import type { AvatarFrame } from './avatar-motion';
+import { SpawnLayer } from './spawn-layer';
 
 /** Alcance del jugador (solo UX: el servidor permite lanzar hasta 80 m, D-028). */
 export const REACH_RADIUS_M = 40;
@@ -21,13 +22,15 @@ const LIGHTS = {
 
 /**
  * Escena three.js del mapa (ARQUITECTURA §2: motor de presentación, sin Angular). Metros locales respecto al origen
- * (= ancla del overlay): x = este, z = −norte, y = arriba. Por ahora solo el jugador (`Avatar3D`, F1-05); los Pokémon
- * llegan en F1-07. Sin sombras proyectadas: las sombras son discos semitransparentes (lo medido en D-035).
+ * (= ancla del overlay): x = este, z = −norte, y = arriba. El jugador es `Avatar3D` (F1-05) y los Pokémon van en
+ * `spawns` (`SpawnLayer`, F1-07). Sin sombras proyectadas: las sombras son discos semitransparentes (D-035).
  */
 export class MapScene {
   readonly scene = new THREE.Scene();
   /** Avatar + sombra + círculo de alcance: se mueven juntos. */
   readonly player = new THREE.Group();
+  /** Pokémon salvajes (F1-07). */
+  readonly spawns = new SpawnLayer();
   private readonly avatar = new Avatar3D();
   private readonly ringMaterial: THREE.MeshBasicMaterial;
   private readonly hemi = new THREE.HemisphereLight();
@@ -37,7 +40,7 @@ export class MapScene {
   constructor() {
     this.hemi.position.set(0, -0.2, 1).normalize();
     this.sun.position.set(0, 10, 100);
-    this.scene.add(this.hemi, this.sun, this.player);
+    this.scene.add(this.hemi, this.sun, this.spawns.group, this.player);
     this.setNight(false);
 
     this.avatar.root.scale.setScalar(AVATAR_SCALE);
@@ -82,6 +85,7 @@ export class MapScene {
 
   dispose(): void {
     this.avatar.dispose();
+    this.spawns.dispose();
     for (const d of this.disposables) d.dispose();
     this.scene.clear();
   }
