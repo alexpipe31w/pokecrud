@@ -80,10 +80,14 @@
       Quitar las pestañas de Ionic. Dep: F1-03, F0-07. Criterio: DISENO §1 cumplido; captura de día y de noche.
 - [ ] **F1-05 · Avatar 3D** — personaje que camina/corre/se queda quieto según velocidad, sombra,
       círculo de alcance. Dep: F1-04.
-- [ ] **F1-06 · Spawns deterministas** — `shared/engine/spawns.ts` + `rng.ts` con tests; endpoint
+- [x] **F1-06 · Spawns deterministas** (@alex, 2026-10-11) — `shared/engine/spawns.ts` + `rng.ts` con tests; endpoint
       `GET /spawns?lat&lng` (celdas a ≤ 200 m, salt solo en servidor, clima Open-Meteo con timeout y
       caché por celda 15 min). Dep: F0-06, F0-02. Criterio: misma entrada → mismos spawns (test); dos
       móviles en el mismo sitio ven lo mismo.
+      **Hecho:** shared 22/22 (12 de spawns, con el dataset real: 0 legendarios en 20.000 celdas, >400 especies);
+      server unit 21/21, e2e 46/46 (dos jugadores en el mismo sitio → respuesta idéntica). Probado en vivo con Open-Meteo
+      real: 10 Pokémon a 200 m en Neiva. D-024, D-025. **Pendiente de humanos:** `SPAWN_SALT` en Render (Samuel) +
+      Manual Deploy; sin ella `/spawns` da 503 y lo demás sigue igual.
 - [ ] **F1-07 · Pokémon en el mapa** — sprites en el overlay, hierba agitándose, aparición/desaparición
       animada, grito bajito por cercanía, toque → encuentro. Dep: F1-05, F1-06.
 - [~] **F1-08 · Inventario y XP básicos** (@alex, 2026-10-11) — modelo `Inventory`, bolas iniciales, nivel/XP del jugador en

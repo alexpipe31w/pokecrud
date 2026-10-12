@@ -198,3 +198,33 @@ cubiertas solas. Las que llevan `ion-header` no cambian (Ionic ya lo resuelve). 
 arriba / 15 px abajo; sin scroll extra en login y registro. **Una pantalla que deba ir a pantalla completa de verdad
 (mapa F1, encuentro AR F2) anula `--padding-top/bottom` en su `ion-content`** y coloca sus controles con
 `var(--ion-safe-area-*)`. `:has()` existe desde Chrome 105: en un WebView más viejo simplemente no se aplica (como antes).
+
+## D-024 · El servidor compila `shared/` (F1-06) (2026-10-11, Alex)
+
+F1-06 es lo primero del servidor que usa el motor puro. **Decisión:** `server/tsconfig.build.json` con `rootDir: ".."` e
+`include: ["src", "../shared/**/*.ts"]` (sin los `*.spec.ts`). La salida pasa a ser `dist/server/src/main.js` +
+`dist/shared/…`: `start:prod` es `node dist/server/src/main` y `nest-cli.json` lleva `entryFile: server/src/main`.
+`shared/package.json` con `"type": "module"` para que `module: nodenext` lo trate como ESM (la raíz no tiene `type`).
+El servidor importa con ruta relativa y extensión: `../../../shared/engine/spawns.js`. En `shared/` las importaciones
+internas llevan `.js` (vale para Angular, Vitest y Node). Render clona el repo entero, así que `../shared` existe allí;
+el comando de arranque no cambia (`npm run start:prod`).
+
+## D-025 · Spawns: semilla HMAC, clima por celda y franja, datos ocultos hasta el encuentro (F1-06) (2026-10-11, Alex)
+
+- **Semilla** de (celda, franja) = primeros 4 bytes de `HMAC-SHA256(SPAWN_SALT, "v1:<cellId>:<slot>")`, calculada SOLO
+  en el servidor. `shared/engine/spawns.ts` recibe la semilla ya hecha: el cliente tiene el algoritmo pero no puede
+  predecir nada. FNV + sal (lo que decía ARQUITECTURA) se descartó: no es criptográfico. Si cambia `spawnsForCell`
+  (incluido el ORDEN de las tiradas), se sube `SEED_VERSION` en `spawns.service.ts`.
+- **Clima** (Open-Meteo, timeout 4 s) por celda de **0,1°** y **franja**: se pide una vez y se guarda hasta que acaba
+  la franja (máx. 2.000 entradas). Si falla → "despejado" toda la franja. Así el clima nunca hace que dos jugadores
+  vean cosas distintas, ni que los spawns cambien a mitad de franja. **Noche** = hora solar de la celda al EMPEZAR
+  la franja (18:00-6:00), sin red ni zonas horarias.
+- `GET /spawns?lat&lng` (con sesión, 20/min por IP) devuelve solo `{id, speciesId, lat, lng}` a ≤ 200 m + `slot` y
+  `expiresAt`. Nivel, IVs, naturaleza, sexo y shiny se recalculan en el servidor a partir del `id`
+  (`SpawnsService.cellSpawns`) cuando haya encuentro (F2): nada de spawns en la BD.
+- **Degradación:** sin `SPAWN_SALT` (o sin dataset) solo `/spawns` responde 503; el servidor arranca igual. Si
+  `SPAWN_SALT` se define, debe tener ≥ 32 caracteres. Cambiarla cambia todos los spawns.
+- Pesos: `captureRate/255 × min(1,5; 100/baseExp)`, bebés × 0,3, legendarios y míticos 0; tipos del clima × 2,5;
+  fantasma/siniestro/psíquico de noche × 2. Celda: 0-3 Pokémon (60/28/10/2 %, ~10-20 a 200 m). Niveles 1-25 (más
+  bajos más frecuentes) hasta que F3 los ligue al nivel del jugador. Shiny 1/512. Constantes en `shared/engine/spawns.ts`.
+

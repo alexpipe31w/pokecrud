@@ -130,14 +130,15 @@ servidor tenga que guardar cada spawn.
 
 - Celda: rejilla de ~70 m (`cellId = floor(lat/0.0007)_floor(lng/0.0007)`; se puede pasar a S2 si hace falta).
 - Franja de tiempo: 10 min (`slot = floor(epochMinutes/10)`).
-- `spawnsForCell(cellId, slot, SPAWN_SALT)` en `shared/engine/spawns.ts`: semilla = hash(cellId, slot,
-  salt) → 0-3 Pokémon con especie, posición dentro de la celda, nivel, IVs, naturaleza, género, shiny.
+- `spawnsForCell(cellId, slot, seed, tabla)` en `shared/engine/spawns.ts`; la semilla la calcula el servidor con
+  `HMAC-SHA256(SPAWN_SALT, versión:cellId:slot)` (D-025) → 0-3 Pokémon con especie, posición dentro de la celda, nivel, IVs, naturaleza, género, shiny.
 - Pesos de especie: rareza inversa a `captureRate`/`baseExp`; legendarios y míticos casi nulos (solo
   eventos/incursiones); `isBaby` raros; **clima real** (Open-Meteo: lluvia → Agua/Eléctrico/Bicho,
   despejado → Fuego/Planta/Tierra, viento → Volador/Dragón/Psíquico, nieve → Hielo/Acero, niebla →
   Fantasma/Siniestro, nublado → Hada/Lucha/Veneno) y **hora** (noche → Fantasma/Siniestro/Psíquico).
 - El `SPAWN_SALT` vive solo en el servidor. El servidor manda al cliente la lista de spawns de las
-  celdas cercanas (`GET /spawns?lat&lng`), así nadie puede calcular spawns de lejos.
+  celdas cercanas (`GET /spawns?lat&lng` → `{slot, expiresAt, spawns: [{id, speciesId, lat, lng}]}` a ≤ 200 m),
+  así nadie puede calcular spawns de lejos. Clima por celda de 0,1° y franja (D-025).
 
 ## 6. Encuentro y captura
 
