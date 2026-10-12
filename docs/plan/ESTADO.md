@@ -144,7 +144,8 @@ fórmula (F2-03) y captura en servidor (F2-06) hechas; lo visual del encuentro e
 
 ## En curso
 
-- Nadie. F1-05 (3b) y F1-07 (7b) solo esperan la prueba en Android.
+- **F2-08 (audio) — @alex, 2026-10-12**, rama `feature/F2-08-audio`.
+- F1-05 (3b) y F1-07 (7b) solo esperan la prueba en Android.
 
 ## Siguiente paso concreto
 

@@ -168,7 +168,7 @@
       antitrampa de precisión, validación). D-028.
 - [ ] **F2-07 · Secuencia de captura/escape y shiny** — absorción, sacudidas, fanfarria, recompensas,
       pantalla de "¡Capturado!" con datos del individuo. Dep: F2-05, F2-06.
-- [ ] **F2-08 · Audio del juego** — buscar/crear SFX y música libres, `CREDITOS.md`, mezcla y volúmenes.
+- [~] **F2-08 · Audio del juego** (@alex, 2026-10-12) — buscar/crear SFX y música libres, `CREDITOS.md`, mezcla y volúmenes.
       Dep: F0-05.
 
 ## F3 · Colección y Pokédex
