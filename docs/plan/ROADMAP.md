@@ -151,7 +151,7 @@
 - [x] **F4-04 · Estados y cambios de stats** (@alex, 2026-10-11) — dentro de `battle-engine.ts` (reducer puro) con tests. Dep: F4-03.
       **Hecho:** `createBattle` + `resolveTurn` (puro, determinista); 27 tests por regla + 1.000 combates aleatorios que
       terminan sin errores + instantánea de un combate completo. shared 126/126. D-031.
-- [ ] **F4-05 · Escena de combate** — UI de turnos, selección de movimiento con tipo/PP/efectividad
+- [~] **F4-05 · Escena de combate** (@alex, 2026-10-11) — UI de turnos, selección de movimiento con tipo/PP/efectividad
       prevista, animaciones por tipo, cola de eventos, textos en español, cambio de Pokémon. Dep: F4-04, F0-04.
 - [x] **F4-06 · IA rival** (@alex, 2026-10-11) — elige el movimiento con mejor daño esperado con algo de aleatoriedad;
       entrenadores de prueba. Dep: F4-05.

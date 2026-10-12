@@ -82,6 +82,7 @@
 
 ## En curso
 
+- **F4-05 (Alex, rama `feature/F4-05-escena-combate`, sale de F4-06):** escena de combate `/combate/prueba` contra la IA.
 - Esperan revisión **en orden** (ver PENDIENTES DE HUMANOS): #21 → #22 → #23 → #24 → #25 → #26 → #27 → #28 → #29 → #30.
 - **F1-01 → PENDIENTE DE KENNETH** (medir fps en su Android): rama `feature/F1-01-spike-mapa-3d`, instrucciones
   exactas en la última entrada de F1-01 de la bitácora.
