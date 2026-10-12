@@ -101,7 +101,7 @@
 - [ ] **F2-01 · [SPIKE] Cámara + giroscopio en el WebView** — getUserMedia vs camera-preview, AR por
       giroscopio, fps. Decisión en DECISIONES. Dep: F0-09.
 - [ ] **F2-02 · Plan detallado de F2** (`docs/plan/fases/F2-captura.md`). Dep: F2-01.
-- [ ] **F2-03 · Fórmula de captura** — `shared/engine/capture.ts` (+ huida) con tests de casos conocidos.
+- [~] **F2-03 · Fórmula de captura** (@alex, 2026-10-11) — `shared/engine/capture.ts` (+ huida) con tests de casos conocidos.
       Dep: F0-03.
 - [ ] **F2-04 · Escena de encuentro** — cámara/fondo ilustrado, Pokémon a tamaño real con XS/XL,
       animación idle/esquiva por velocidad, efectos por tipo, transición desde el mapa (DISENO §5).

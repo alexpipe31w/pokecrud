@@ -60,7 +60,8 @@
 
 ## En curso
 
-- Nadie. Esperan revisión, **en este orden**: F0-12 (PR #21), F1-06 (PR #22) y F1-08 (sale de F1-06).
+- **F2-03 (Alex, rama `feature/F2-03-formula-captura`, sale de F1-08):** `shared/engine/capture.ts` + huida.
+- Esperan revisión, **en este orden**: F0-12 (PR #21), F1-06 (PR #22), F1-08 (PR #23).
 - **F1-01 → PENDIENTE DE KENNETH** (medir fps en su Android): rama `feature/F1-01-spike-mapa-3d`, instrucciones
   exactas en la última entrada de F1-01 de la bitácora.
 
