@@ -13,7 +13,8 @@
     "test": "ng test",
     "lint": "ng lint",
     "format": "prettier --write \"src/**/*.{ts,html,scss}\" \"backend/**/*.json\"",
-    "format:check": "prettier --check \"src/**/*.{ts,html,scss}\" \"backend/**/*.json\""
+    "format:check": "prettier --check \"src/**/*.{ts,html,scss}\" \"backend/**/*.json\"",
+    "apk": "node scripts/apk.mjs"
   },
   "private": true,
   "dependencies": {

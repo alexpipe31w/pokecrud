@@ -1432,11 +1432,11 @@ Añadir `CHECK` en la migración SQL generada (editar antes de `migrate deploy`)
 <uses-feature android:name="android.hardware.camera" android:required="false" />
 ```
 
-- [ ] **Paso 3: tráfico al servidor local** — en desarrollo el APK habla con `http://<IP-del-PC>:3000`
+- [x] **Paso 3: tráfico al servidor local** — en desarrollo el APK habla con `http://<IP-del-PC>:3000`
       (no `localhost`). Crear `src/environments/environment.device.ts` (sin secretos, con `apiUrl` de la IP LAN)
       y una configuración `device` en `angular.json` que lo reemplace. Como es HTTP plano, añadir en
       `capacitor.config.ts` → `server: { cleartext: true }` **solo** cuando `process.env.CAP_DEV === '1'`.
-- [ ] **Paso 4: script** — `scripts/apk.mjs`: ejecuta `ng build` (configuración indicada por argumento,
+- [x] **Paso 4: script** — `scripts/apk.mjs`: ejecuta `ng build` (configuración indicada por argumento,
       por defecto `production`), `npx cap sync android` y `gradlew.bat assembleDebug` (o `./gradlew` fuera de
       Windows) con `JAVA_HOME` apuntando al `jbr` de Android Studio si no está definido; al final imprime la ruta
       y el tamaño del APK. `package.json`: `"apk": "node scripts/apk.mjs"`.

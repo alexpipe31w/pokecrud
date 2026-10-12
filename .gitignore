@@ -86,3 +86,5 @@ Thumbs.db
 # compartida es backend/postman/PokeCRUD.postman_collection.json.
 /postman/
 /.postman/
+# Lo genera scripts/apk.mjs con la IP LAN de cada PC (npm run apk -- device). Ver ARQUITECTURA §11.
+/src/environments/environment.device.ts
