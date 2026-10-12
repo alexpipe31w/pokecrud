@@ -14,6 +14,9 @@ export const GEOLOCATION_PLUGIN = new InjectionToken<GeoPlugin>('GEOLOCATION_PLU
   factory: () => Geolocation,
 });
 
+/** Dónde arranca el modo joystick si nunca hubo GPS: Parque Santander, Neiva (el del spike F1-01). */
+export const DEFAULT_CENTER: LatLng = { lat: 2.9273, lng: -75.2819 };
+
 /** idle → (prompt) → searching → ok/weak; denied/unavailable → modo joystick; joystick = posición virtual. */
 export type LocationStatus = 'idle' | 'prompt' | 'searching' | 'ok' | 'weak' | 'denied' | 'unavailable' | 'joystick';
 

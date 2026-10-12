@@ -780,7 +780,7 @@ export class AvatarMotion {
 
 **Files:** Create `src/app/features/map/location-gate.component.ts`
 
-- [ ] **7a.** Componente que cubre el mapa según `location.status()` (vidrio sobre un fondo ilustrado con los tokens,
+- [x] **7a.** Componente que cubre el mapa según `location.status()` (vidrio sobre un fondo ilustrado con los tokens,
   título en Fredoka, `app-game-button`):
   - `idle`/`prompt` → "Necesitamos tu ubicación para que aparezcan Pokémon a tu alrededor" + "Permitir ubicación"
     (llama `location.start()`) + "Jugar con joystick" (secundario).
