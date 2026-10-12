@@ -522,3 +522,11 @@ siguen en three.js, en el suelo (pueden quedar detrás de una casa; es lo natura
 - **Rendimiento:** ≤ 30 imágenes con `transform` por fotograma (el spike midió 52 fps con los markers HTML de Google,
   más pesados). Medir en Android en el 7b de F1-07; si hiciera falta, no actualizar las que no cambian de sitio.
 - Tipos: `src/types/googlemaps-three.d.ts` declara ahora `protected readonly camera`.
+
+## D-043 · Recuperar la sesión con el servidor dormido: reintentar, no mandar al login (F1-09) (2026-10-12, Alex)
+
+Antes, si `/auth/refresh` fallaba por algo que no fuera 401 (Render despertando devuelve 502 o tarda), la app daba
+la sesión por perdida y mandaba a `/login` (con el token aún válido guardado). Ahora `AuthService.restore()` solo se
+rinde con un 401; si el servidor no responde reintenta con espera creciente (`RESTORE_RETRY`: 2, 4, 8, 15 s… hasta
+2 min) y expone `waking`/`wakeAttempt` para la pantalla `app-server-waking` (en `app.component.html`, encima de todo).
+Pasados los 2 min se queda en anónimo SIN borrar el token. Los tests usan `RESTORE_RETRY` con esperas a 0.
