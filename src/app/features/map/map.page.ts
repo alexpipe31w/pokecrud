@@ -212,6 +212,8 @@ export class MapPage implements ViewDidEnter, ViewWillLeave, OnDestroy {
   private readonly cries = new CryThrottle();
   private pointerDown: PointerMark | null = null;
   private tooFarTimer?: ReturnType<typeof setTimeout>;
+  /** Abriendo un encuentro (un segundo toque mientras tanto no hace nada). */
+  private opening = false;
   private readonly onPointerDown = (e: PointerEvent): void => {
     this.pointerDown = e.isPrimary ? { x: e.clientX, y: e.clientY, t: e.timeStamp } : null;
   };
@@ -527,13 +529,30 @@ export class MapPage implements ViewDidEnter, ViewWillLeave, OnDestroy {
     if (!id || !spawn) return;
     if (distanceM(this.avatarPos, spawn) <= REACH_RADIUS_M) {
       this.haptics.tap();
-      void this.router.navigateByUrl(`/encuentro/${encodeURIComponent(id)}`);
+      void this.openEncounter(id);
       return;
     }
     this.mapScene.spawns.hop(id, performance.now());
     this.tooFar.set(true);
     clearTimeout(this.tooFarTimer);
     this.tooFarTimer = setTimeout(() => this.tooFar.set(false), TOO_FAR_MS);
+  }
+
+  /**
+   * Antes de abrir el encuentro se le dice al servidor dónde está el jugador AHORA: mide la distancia desde la última
+   * posición de `GET /spawns` y el feed solo la renueva cada 60 m (si no, 403 "demasiado lejos" tras acercarse).
+   * Si falla igual se abre: la pantalla del encuentro enseña el error del servidor.
+   */
+  private async openEncounter(id: string): Promise<void> {
+    const pos = this.location.position();
+    if (this.opening || !pos) return;
+    this.opening = true;
+    try {
+      await this.spawnFeed.reportPosition({ lat: pos.lat, lng: pos.lng });
+      await this.router.navigateByUrl(`/encuentro/${encodeURIComponent(id)}`);
+    } finally {
+      this.opening = false;
+    }
   }
 
   /** Dónde poner la cámara al crear el mapa: el avatar si ya hay posición, si no el centro por defecto. */

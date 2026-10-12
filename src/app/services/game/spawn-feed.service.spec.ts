@@ -90,6 +90,37 @@ describe('SpawnFeedService', () => {
     expect(feed.error()).toBeNull();
   });
 
+  it('reportPosition pide aunque no "toque" (para que el servidor sepa dónde está antes del encuentro)', async () => {
+    await respond(feed.tick(O, T0));
+    const near = fromLocalM(O, 0, 30); // < 60 m: tick no pediría
+    await feed.tick(near, T0 + 1000);
+    http.expectNone((r) => r.url === url);
+    const done = feed.reportPosition(near, T0 + 2000);
+    const req = http.expectOne((r) => r.url === url);
+    expect(Number(req.request.params.get('lat'))).toBeCloseTo(near.lat, 6);
+    req.flush(body());
+    expect(await done).toBe(true);
+  });
+
+  it('reportPosition espera a la petición en vuelo y no lanza dos a la vez', async () => {
+    const first = feed.tick(O, T0);
+    const report = feed.reportPosition(fromLocalM(O, 0, 30), T0 + 100);
+    const reqs = http.match((r) => r.url === url);
+    expect(reqs).toHaveLength(1);
+    reqs[0].flush(body());
+    await first;
+    await Promise.resolve();
+    await new Promise((r) => setTimeout(r, 0));
+    http.expectOne((r) => r.url === url).flush(body());
+    expect(await report).toBe(true);
+  });
+
+  it('reportPosition dice false si el servidor falla', async () => {
+    const done = feed.reportPosition(O, T0);
+    http.expectOne((r) => r.url === url).flush('caído', { status: 503, statusText: 'x' });
+    expect(await done).toBe(false);
+  });
+
   it('al cambiar de jugador se vacía', async () => {
     await respond(feed.tick(O, T0));
     player.set({ id: 'p2' });

@@ -35,6 +35,8 @@ export class SpawnFeedService {
   private readonly _night = signal<boolean | null>(null);
   private readonly _error = signal<string | null>(null);
   private state = emptyState();
+  /** La petición en vuelo (para que `reportPosition` no lance otra a la vez). */
+  private pending: Promise<boolean> | null = null;
 
   readonly spawns = this._spawns.asReadonly();
   readonly weather = this._weather.asReadonly();
@@ -56,6 +58,28 @@ export class SpawnFeedService {
   /** Lo llama la pantalla del mapa (~1 vez por segundo). `now` = `Date.now()` (se compara con el fin de franja). */
   async tick(pos: LatLng, now = Date.now()): Promise<void> {
     if (!shouldRefetch(this.state, now, pos)) return;
+    await this.fetch(pos, now);
+  }
+
+  /**
+   * Manda YA la posición al servidor (un `GET /spawns` fuera de turno) y dice si lo consiguió. El servidor mide la
+   * distancia a un Pokémon desde la última posición que recibió por aquí (D-028), y el feed solo la renueva cada 60 m
+   * o al cambiar de franja: sin esto, abrir un encuentro tras caminar hacia el Pokémon daba 403 "demasiado lejos".
+   */
+  async reportPosition(pos: LatLng, now = Date.now()): Promise<boolean> {
+    if (this.pending) await this.pending;
+    return this.fetch(pos, now);
+  }
+
+  private fetch(pos: LatLng, now: number): Promise<boolean> {
+    const run = this.request(pos, now).finally(() => {
+      if (this.pending === run) this.pending = null;
+    });
+    this.pending = run;
+    return run;
+  }
+
+  private async request(pos: LatLng, now: number): Promise<boolean> {
     this.state = { ...this.state, inFlight: true, lastAttemptAt: now };
     const at = { lat: round6(pos.lat), lng: round6(pos.lng) };
     try {
@@ -79,6 +103,7 @@ export class SpawnFeedService {
         failures: 0,
         lastAttemptAt: now,
       };
+      return true;
     } catch (err) {
       const status = err instanceof HttpErrorResponse ? err.status : undefined;
       console.warn('[spawns] no se pudieron pedir los Pokémon salvajes', {
@@ -88,6 +113,7 @@ export class SpawnFeedService {
       // 401 lo resuelve el interceptor (refresh o login); el resto se enseña. En todos los casos, se espera y reintenta.
       if (status !== 401) this._error.set(UNAVAILABLE);
       this.state = { ...this.state, inFlight: false, failures: this.state.failures + 1 };
+      return false;
     }
   }
 

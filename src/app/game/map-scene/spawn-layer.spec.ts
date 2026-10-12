@@ -88,6 +88,22 @@ describe('SpawnLayer', () => {
     expect(sprites(layer)[0].position.y).toBeLessThan(rest + 1);
   });
 
+  it('sombra, hierba y sprite se pintan en ese orden, sin taparse entre ellos', () => {
+    layer.sync([at('a', 10, 0)], O, 0);
+    const sprite = sprites(layer)[0];
+    const grass = layer.group.children.find(
+      (c) => c instanceof THREE.InstancedMesh,
+    ) as THREE.InstancedMesh;
+    const shadow = layer.group.children.find(
+      (c) => c instanceof THREE.Mesh && c.geometry instanceof THREE.CircleGeometry,
+    ) as THREE.Mesh<THREE.BufferGeometry, THREE.Material>;
+    for (const m of [sprite.material, grass.material as THREE.Material, shadow.material]) {
+      expect(m.depthTest).toBe(false);
+    }
+    expect(shadow.renderOrder).toBeLessThan(grass.renderOrder);
+    expect(grass.renderOrder).toBeLessThan(sprite.renderOrder);
+  });
+
   it('re-anclar recoloca sin cambiar qué hay', () => {
     layer.sync([at('a', 10, 0)], O, 0);
     layer.reposition(fromLocalM(O, 10, 0));

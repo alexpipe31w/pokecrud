@@ -3,13 +3,12 @@ import type { VisibleSpawn } from '@shared/protocol/spawns';
 import * as THREE from 'three';
 
 import { APPEAR_MS, DISAPPEAR_MS, appearPose, disappearPose } from './appear';
+import { BLADES_PER_TUFT, bladeGeometry, tuftBlades, type BladeSpec } from './grass-tuft';
 import { MAX_DRAWN, diffSpawns } from './spawn-diff';
 import { SpriteTextures } from './sprite-textures';
 
 /** Tamaño del sprite: exagerado como en el spike (a zoom 19 un metro son pocos píxeles). */
 export const SPRITE_M = 12;
-const BLADES = 10;
-const BLADE_RING_M = 4.5;
 /** Hueco en la hierba: los que se van siguen dibujándose DISAPPEAR_MS mientras entran los nuevos. */
 const MAX_SLOTS = MAX_DRAWN * 2;
 /** Saltito al tocar uno que está lejos ("Acércate más"). */
@@ -17,6 +16,12 @@ const HOP_MS = 450;
 const HOP_M = 3;
 /** Volumen de toque: más ancho que el dibujo para acertar con el dedo. */
 const HIT_RADIUS_M = SPRITE_M * 0.5;
+/**
+ * Orden de dibujo: sombra → hierba → sprite, sin prueba de profundidad entre ellos (la hierba nunca tapa al Pokémon).
+ * OJO: los edificios 3D de Google se pintan DESPUÉS de la capa three.js y la tapan igual; ni `depthTest: false` ni
+ * escribir `gl_FragDepth = 0` lo evitan (probado en F1-07). La única salida es el estilo del mapa (D-041).
+ */
+const ORDER = { shadow: 1, grass: 2, sprite: 3 };
 
 interface Entry {
   spawn: VisibleSpawn;
@@ -27,6 +32,7 @@ interface Entry {
   x: number;
   z: number;
   phase: number;
+  blades: BladeSpec[];
   bornAt: number;
   dyingAt: number | null;
   hopAt: number | null;
@@ -48,6 +54,7 @@ export class SpawnLayer {
     transparent: true,
     opacity: 0.25,
     depthWrite: false,
+    depthTest: false,
   });
   private readonly hitGeo = new THREE.CylinderGeometry(
     HIT_RADIUS_M,
@@ -56,17 +63,24 @@ export class SpawnLayer {
     8,
   );
   private readonly hitMat = new THREE.MeshBasicMaterial();
-  private readonly bladeGeo = new THREE.ConeGeometry(0.6, 3.5, 4);
-  private readonly bladeMat = new THREE.MeshLambertMaterial({ color: 0x3fae4f });
+  private readonly bladeGeo = bladeGeometry();
+  /** Colores de vértice (base oscura, punta clara) × color de cada brizna; las dos caras (hoja plana). */
+  private readonly bladeMat = new THREE.MeshLambertMaterial({
+    vertexColors: true,
+    side: THREE.DoubleSide,
+    depthTest: false,
+    depthWrite: false,
+  });
   private readonly tmp = new THREE.Object3D();
   /** Los que ya estaban al entrar al mapa no brotan todos a la vez: la primera sincronización con Pokémon los pone en reposo. */
   private settled = false;
 
   constructor(private readonly textures = new SpriteTextures()) {
-    this.bladeGeo.translate(0, 1.75, 0); // que gire desde la base
-    this.grass = new THREE.InstancedMesh(this.bladeGeo, this.bladeMat, MAX_SLOTS * BLADES);
+    this.tmp.rotation.order = 'YXZ'; // primero hacia dónde mira la brizna, luego cuánto se inclina
+    this.grass = new THREE.InstancedMesh(this.bladeGeo, this.bladeMat, MAX_SLOTS * BLADES_PER_TUFT);
     this.grass.count = 0;
     this.grass.frustumCulled = false;
+    this.grass.renderOrder = ORDER.grass;
     this.group.add(this.grass);
   }
 
@@ -121,26 +135,26 @@ export class SpawnLayer {
       e.material.opacity = pose.opacity;
       e.shadow.scale.setScalar(0.6 + 0.4 * pose.opacity);
       if (slot < MAX_SLOTS) {
-        // La hierba: balanceo suave en reposo, agitado fuerte al brotar.
-        const amp = 0.15 + pose.grassAmp * 0.9;
-        const freq = 3 + pose.grassAmp * 9;
-        for (let b = 0; b < BLADES; b++) {
-          const a = (b / BLADES) * Math.PI * 2 + e.phase;
-          this.tmp.position.set(
-            e.x + Math.cos(a) * BLADE_RING_M,
-            0,
-            e.z + Math.sin(a) * BLADE_RING_M,
-          );
-          this.tmp.rotation.set(0, a, Math.sin(t * freq + e.phase + b) * amp);
-          this.tmp.scale.setScalar(e.dyingAt !== null ? pose.opacity : 1);
+        // La hierba: balanceo suave en reposo, agitado fuerte al brotar (DISENO §5).
+        const amp = 0.08 + pose.grassAmp * 0.7;
+        const freq = 2.2 + pose.grassAmp * 10;
+        const fade = e.dyingAt !== null ? pose.opacity : 1;
+        for (let b = 0; b < BLADES_PER_TUFT; b++) {
+          const blade = e.blades[b];
+          const i = slot * BLADES_PER_TUFT + b;
+          this.tmp.position.set(e.x + blade.dx, 0, e.z + blade.dz);
+          this.tmp.rotation.set(blade.lean + Math.sin(t * freq + blade.sway) * amp, blade.yaw, 0);
+          this.tmp.scale.set(blade.width * fade, blade.height * fade, blade.width * fade);
           this.tmp.updateMatrix();
-          this.grass.setMatrixAt(slot * BLADES + b, this.tmp.matrix);
+          this.grass.setMatrixAt(i, this.tmp.matrix);
+          this.grass.setColorAt(i, blade.color);
         }
         slot++;
       }
     }
-    this.grass.count = slot * BLADES;
+    this.grass.count = slot * BLADES_PER_TUFT;
     this.grass.instanceMatrix.needsUpdate = true;
+    if (this.grass.instanceColor) this.grass.instanceColor.needsUpdate = true;
   }
 
   /** Volúmenes de toque de los Pokémon vivos (para `ThreeJSOverlayView.raycast`). */
@@ -196,10 +210,13 @@ export class SpawnLayer {
       transparent: true,
       opacity: 0,
       depthWrite: false,
+      depthTest: false,
     });
     const sprite = new THREE.Sprite(material);
     sprite.center.set(0.5, 0);
+    sprite.renderOrder = ORDER.sprite;
     const shadow = new THREE.Mesh(this.shadowGeo, this.shadowMat);
+    shadow.renderOrder = ORDER.shadow;
     shadow.rotation.x = -Math.PI / 2;
     shadow.position.y = 0.2;
     const hit = new THREE.Mesh(this.hitGeo, this.hitMat);
@@ -213,7 +230,8 @@ export class SpawnLayer {
       hit,
       x: 0,
       z: 0,
-      phase: phaseOf(spawn.id),
+      phase: (seedOf(spawn.id) % 6283) / 1000,
+      blades: tuftBlades(seedOf(spawn.id)),
       bornAt,
       dyingAt: null,
       hopAt: null,
@@ -241,9 +259,9 @@ export class SpawnLayer {
   }
 }
 
-/** Fase estable por id: cada Pokémon se balancea a su ritmo y no cambia al volver a sincronizar. */
-function phaseOf(id: string): number {
+/** Semilla estable por id: cada Pokémon se balancea a su ritmo y su mata no cambia al volver a sincronizar. */
+function seedOf(id: string): number {
   let h = 0;
   for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) | 0;
-  return ((h >>> 0) % 6283) / 1000;
+  return h >>> 0;
 }
