@@ -911,7 +911,7 @@ export interface NearbySpawns {
 
 **Files:** Create `src/app/game/map-scene/map-scene.ts`
 
-- [ ] **4a.** Clase `MapScene` que encapsula lo que hoy está en `SpikeScene` para el juego de verdad:
+- [x] **4a.** Clase `MapScene` que encapsula lo que hoy está en `SpikeScene` para el juego de verdad:
 
 ```ts
 export const REACH_RADIUS_M = 40; // UX: el servidor permite 80 m (D-028)
@@ -931,7 +931,7 @@ export class MapScene {
 
   Geometrías y materiales compartidos, `MeshLambertMaterial`, sin sombras proyectadas (sombras = discos
   semitransparentes, como el spike medido en D-035).
-- [ ] **4b.** Lint + build. Commit + `/guardar`.
+- [x] **4b.** Lint + build. Commit + `/guardar`.
 
 ### Paso 5 — `MapPage`: mapa, overlay, bucle y cámara
 
