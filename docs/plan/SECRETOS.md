@@ -14,6 +14,10 @@
 Los dos están en `.gitignore`. **`JWT_SECRET` no se reparte:** cada entorno genera el suyo (`node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))"`), uno en cada PC y otro distinto en Render. Si se filtra, se genera otro: solo obliga a volver a iniciar sesión. Alex los pasa **por privado** (WhatsApp/DM) a cada integrante.
 Nunca por el grupo, Jira, GitHub, issues, PRs ni capturas.
 
+**Puertos (F0-10):** `DATABASE_URL` va al _transaction pooler_ (**6543**) y `DIRECT_URL` al _session pooler_ (**5432**),
+con la misma contraseña. Quien tenga un `server/.env` anterior con las dos en 5432: cambiar solo el puerto de
+`DATABASE_URL` a 6543 (y en Render, la variable `DATABASE_URL`). Ver D-021.
+
 ## Lo que tiene que hacer la IA cuando el humano le pasa esos valores
 
 Si el humano pega en el chat el contenido de uno de estos archivos (o dice "toma la clave / el .env"):

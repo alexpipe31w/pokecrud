@@ -344,3 +344,30 @@ de estado → tarea nueva F0-11. Arte de icono/splash provisional.
 **Decisiones nuevas:** D-020.
 **El siguiente debe empezar por:** mezclar el PR de F0-09; luego `/inicio F0-10` (transaction pooler, riesgo en
 producción) o `/inicio F0-11` (zona segura). Para el APK en otro PC: `winget install Microsoft.OpenJDK.21` y `npm run apk`.
+
+## 2026-10-11 20:00 · @kenneth (Claude) · F0-10 · rama `feature/F0-10-transaction-pooler`
+
+**Qué se hizo:** mezclado el PR #17 (F0-09) con el visto bueno de Kenneth. F0-10: medido el transaction pooler,
+`DATABASE_URL` → 6543 en `server/.env` de Kenneth (configurado `server/.env` (OK); `DIRECT_URL` sigue en 5432),
+`.env.example` y SECRETOS.md actualizados. Al probar los e2e en paralelo apareció un 500 intermitente: log real
+`PrismaClientKnownRequestError … refreshToken.create … ForeignKeyConstraintViolation` → cada archivo borraba en su
+`afterAll` todos los `@pokecrud.test` y se llevaba los jugadores de los demás. Arreglado con `test/support/cleanup.ts`
+(cada archivo borra su prefijo + los de prueba con > 1 h).
+**Archivos clave:** `server/test/support/cleanup.ts`, `server/test/{auth,crud}.e2e-spec.ts`, `server/vitest.config.e2e.ts`,
+`server/.env.example`, `docs/plan/SECRETOS.md`.
+**Cómo se probó (salida real):**
+
+    pg Pool por 6543: 20 conexiones → 20 ok / 0 fallos · 40 conexiones → 40 ok / 0 fallos (por 5432: 15 ok / 5 EMAXCONNSESSION)
+    e2e en paralelo por 6543, antes del arreglo: 1 fallo intermitente (FK, ver arriba) · después: 8/8 corridas 43/43
+    2 servidores locales (:3000, :3001) + Render + e2e en paralelo a la vez, 35 s:
+      localhost:3000 ok 1030 / fail 0 · localhost:3001 ok 1026 / fail 0 · Render ok 460 / fail 0 · e2e 43/43
+      logs de los dos servidores: 0 EMAXCONN, 0 ERROR
+    server: npm test 11/11 · npm run test:e2e (en serie) 43/43 · lint (solo el aviso previo) · build OK
+    prisma migrate status (DIRECT_URL, 5432) → "Database schema is up to date!"
+
+**Quedó a medias / roto:** nada en código. Pendiente de humanos: Samuel cambia `DATABASE_URL` a 6543 en Render; Alex y
+Samuel, el puerto en su `server/.env`. Hasta entonces Render usa 5 de los 15 del session pooler (sin riesgo mientras
+los locales vayan por 6543).
+**Decisiones nuevas:** D-021.
+**El siguiente debe empezar por:** mezclar el PR de F0-10 y avisar a Alex y Samuel del cambio de puerto; luego
+`/inicio F0-11` (zona segura en Android 15+, ver `docs/evidencias/F0-09_01_apk-movil-dev-ui.png`).

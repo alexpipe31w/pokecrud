@@ -173,3 +173,18 @@ según el orden (pasó con HapticsService: 1 de 4 corridas). Por eso plugins y A
   contenido mixto solo se activa con `CAP_DEV=1`, nunca en el de producción.
 - **Icono/splash provisionales propios** (pin de mapa con forma de ball, tokens de DISENO.md) generados por script.
   Los splash por densidad suben el APK de 4,8 a 8,2 MB: aceptado mientras sea provisional.
+
+## D-021 · `DATABASE_URL` por el transaction pooler de Supabase (F0-10) (2026-10-11, Kenneth)
+
+- **Contexto (medido):** el _session pooler_ (5432) admite **15 clientes en total** (`EMAXCONNSESSION … pool_size: 15`).
+  Render (pool 5) + cada servidor local (pool 5) + los e2e los compartían: con tres personas a la vez, producción daba 500.
+- **Decisión:** `DATABASE_URL` → _transaction pooler_ (**6543**); `DIRECT_URL` sigue en 5432 (las migraciones necesitan
+  modo sesión, D-017). Mismo usuario y contraseña. Sin `?pgbouncer=true`: con el adaptador `PrismaPg` (node-postgres)
+  no hace falta y se comprobó que todo funciona (transacciones interactivas del refresh incluidas).
+- **Medido:** 40 conexiones simultáneas por 6543 → 40/40 (por 5432 fallaban 5 de 20). e2e en paralelo por 6543: 8/8
+  verdes. Dos servidores locales + Render + e2e en paralelo a la vez: 2.516 consultas en 35 s, 0 fallos.
+- **Hallazgo de paso:** los e2e en paralelo daban un 500 intermitente que NO era el pooler: cada archivo borraba en su
+  `afterAll` todos los `@pokecrud.test` y se llevaba los jugadores de otro archivo a mitad de test (FK). Ahora cada
+  archivo borra solo su prefijo (`test+`, `crud+`) y los de prueba con > 1 h (restos de Postman): `test/support/cleanup.ts`.
+- **Consecuencia:** en modo transacción no hay estado de sesión entre consultas (nada de `SET` de sesión, advisory locks
+  de sesión ni `LISTEN/NOTIFY`). Si algún día hace falta, usar `DIRECT_URL` para ese caso concreto.

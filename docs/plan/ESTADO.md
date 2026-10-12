@@ -3,15 +3,18 @@
 > Se **reescribe** al cerrar cada sesión (no es histórico; el histórico es `BITACORA.md`).
 > Máximo una pantalla. Si lees esto al empezar: después lee `ROADMAP.md`.
 
-**Última actualización:** 2026-10-11 · por Kenneth (Claude) · rama `feature/F0-09-apk`
+**Última actualización:** 2026-10-11 · por Kenneth (Claude) · rama `feature/F0-10-transaction-pooler`
 
 ## Fase actual
 
-**F0 · Fundaciones** — **F0-01…F0-08 en `develop`** (PR #8-#16). **F0-09 hecha y mezclada** (Kenneth, PR #17).
-Quedan **F0-10** (transaction pooler) y **F0-11** (zona segura Android 15+), ambas nuevas. Después, F1.
+**F0 · Fundaciones** — **F0-01…F0-09 en `develop`** (PR #8-#17). **F0-10 hecha** (Kenneth, PR pendiente de mezclar).
+Queda **F0-11** (zona segura Android 15+). Después, F1 (mapa).
 
 ## Hecho
 
+- **F0-10 (Kenneth, rama `feature/F0-10-transaction-pooler`):** `DATABASE_URL` por el _transaction pooler_ (6543),
+  `DIRECT_URL` sigue en 5432. Medido: 40/40 conexiones; 2 servidores locales + Render + e2e en paralelo = 2.516
+  consultas, 0 fallos. Arreglado el borrado cruzado entre archivos e2e (500 intermitente en paralelo). D-021.
 - **F0-09 (Kenneth, rama `feature/F0-09-apk`):** `android/` (Capacitor 8.5.2) con permisos, `npm run apk` (producción →
   Render; `-- device` → Nest del PC por IP LAN; `--install` con adb), icono y splash propios (`resources/brand.mjs`).
   **Probado en un Samsung A36 (Android 16):** APK 8,18 MB, splash, Pokédex desde Render, registro, `/dev/ui` con sesión
@@ -47,13 +50,14 @@ Quedan **F0-10** (transaction pooler) y **F0-11** (zona segura Android 15+), amb
 
 ## En curso
 
-- **F0-10** (@kenneth, rama `feature/F0-10-transaction-pooler`): transaction pooler. Punto de guardado: medido que el pooler en modo transacción (6543) admite 40+ clientes y que Prisma (PrismaPg) funciona ahí; arreglado el borrado cruzado entre archivos e2e (cada uno limpia solo sus jugadores). e2e en paralelo contra 6543: 8/8. Sigue: cambiar `DATABASE_URL` a 6543 en `.env`, `.env.example` y SECRETOS.
+- Nadie.
 
 ## Siguiente paso concreto
 
-1. Revisar y mezclar el PR #17 (F0-09) en `develop`.
-2. Siguiente tarea libre: **F0-10** (pooler, riesgo abajo) o **F0-11** (zona segura). Luego F1 (mapa): F1-01 ya
-   tiene su dependencia (F0-09) y necesita el APK para medir fps en un Android real.
+1. Revisar y mezclar el PR de F0-10 en `develop`. **Alex y Samuel:** puerto de `DATABASE_URL` → 6543 en su `.env`;
+   **Samuel:** también en Render (ver Bloqueos).
+2. Siguiente tarea libre: **F0-11** (zona segura Android 15+). Luego F1 (mapa): F1-01 ya tiene su dependencia (F0-09)
+   y necesita el APK para medir fps en un Android real.
 3. Para generar el APK en otro PC: instalar JDK 21 (`winget install Microsoft.OpenJDK.21`) y `npm run apk`.
 
 ## Bloqueos / roto / pendiente de humanos
@@ -61,9 +65,10 @@ Quedan **F0-10** (transaction pooler) y **F0-11** (zona segura Android 15+), amb
 - **Cada compañero necesita su propio `JWT_SECRET`** en su `server/.env` para arrancar el servidor en local (SECRETOS.md).
 - **En local hacen falta dos servidores:** Nest (`cd server && npm run start:dev`, puerto **3000**) y la app (`npm start`).
   Si tu `server/.env` tiene `PORT=3001` de antes, cámbialo a 3000 (o bórralo).
-- **RIESGO — límite de conexiones (F0-10):** el _session pooler_ de Supabase admite **15 clientes en total**. Render (5) +
-  cada servidor local (5) los comparten: con los tres desarrollando a la vez, producción puede dar 500 (`EMAXCONNSESSION`).
-  Mientras no se haga F0-10, apagad el servidor local cuando no lo uséis.
+- **ACCIÓN — puerto de la base (F0-10, D-021):** cada uno cambia en su `server/.env` el puerto de `DATABASE_URL` de
+  **5432 a 6543** (solo ese; `DIRECT_URL` se queda en 5432). **Samuel:** lo mismo en la variable `DATABASE_URL` de Render.
+  Mientras alguien siga en 5432 consume del cupo de 15 del session pooler (hoy Render: 5); no rompe nada, pero el riesgo
+  vuelve si los tres se quedan en 5432.
 
 - **Render está en la cuenta de Samuel:** solo él ve los logs y cambia variables. Si hay que rotar la contraseña de la BD
   (SECRETOS.md), Samuel actualiza `DATABASE_URL` y `DIRECT_URL` en Render. Plan gratis: se duerme a los 15 min.
