@@ -15,6 +15,7 @@ import type {
 } from '@shared/engine/battle/types';
 import { createRng, type Rng } from '@shared/engine/rng';
 import { AudioService } from '../../services/game/audio.service';
+import { eventSfx, hitSfx } from './battle-sfx';
 import { DatasetService } from '../../services/game/dataset.service';
 import { HapticsService } from '../../services/game/haptics.service';
 import { describeEvent } from './battle-text';
@@ -154,6 +155,8 @@ export class BattleController {
         { name: rival.name, team: trainerTeam(rival, species, supported) },
       ]);
       this.state.set(state);
+      // Todos los gritos del combate, ya: con datos móviles el primero no llegaba a sonar (F2-08).
+      this.audio.preloadCries(state.sides.flatMap((side) => side.team.map((m) => m.speciesId)));
       this.shown.set([this.snapshot(state, PLAYER), this.snapshot(state, RIVAL)]);
       this.phase.set('animating');
       await this.say(`¡${rival.name} quiere luchar!`, 1200);
@@ -214,7 +217,10 @@ export class BattleController {
     if (result.state.winner !== null) {
       this.winner.set(result.state.winner);
       this.phase.set('ended');
-      if (result.state.winner === PLAYER) this.haptics.success();
+      if (result.state.winner === PLAYER) {
+        this.haptics.success();
+        void this.audio.playSfx('victory');
+      }
       return;
     }
     // El rival cambia solo (su IA elige a quién); el jugador elige en la hoja.
@@ -252,7 +258,10 @@ export class BattleController {
   private async play(before: BattleState, events: BattleEvent[]): Promise<void> {
     let lastMove: Move | null = null;
     let crit = false;
+    let multiplier = 1;
     for (const e of events) {
+      const sfx = eventSfx(e);
+      if (sfx) void this.audio.playSfx(sfx);
       const text = describeEvent(e, {
         pokemon: (side) => this.shown()[side]?.name ?? '',
         move: (id) => this.ctx?.moves.get(id)?.names.es ?? '¿?',
@@ -263,15 +272,20 @@ export class BattleController {
         case 'move':
           lastMove = this.ctx?.moves.get(e.moveId) ?? null;
           crit = false;
+          multiplier = 1;
           this.emitFx({ side: e.side, kind: 'lunge' });
           break;
         case 'crit':
           crit = true;
           break;
+        case 'effectiveness':
+          multiplier = e.multiplier;
+          break;
         case 'damage': {
           const p = this.shown()[e.side];
           this.patch(e.side, { hp: e.hpAfter });
           if (e.amount > 0) {
+            if (e.source === 'move') void this.audio.playSfx(hitSfx(crit, multiplier));
             this.emitFx({
               side: e.side,
               kind: 'hit',

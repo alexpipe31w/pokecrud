@@ -9,6 +9,13 @@ function fakeContext() {
   const ctx = {
     state: 'suspended',
     destination: {},
+    sampleRate: 48_000,
+    createBuffer: vi.fn((channels: number, length: number, sampleRate: number) => ({
+      channels,
+      length,
+      sampleRate,
+      copyToChannel: vi.fn(),
+    })),
     resume: vi.fn(() => {
       ctx.state = 'running';
       return Promise.resolve();
@@ -106,10 +113,29 @@ describe('AudioService', () => {
     warn.mockRestore();
   });
 
-  it('playSfx de un efecto que no está en el catálogo avisa una vez y no lo pide', async () => {
+  it('playSfx de un efecto generado (F2-08) lo calcula una vez, sin descargar nada, y lo reproduce', async () => {
+    await service.playSfx('hit-crit');
+    await service.playSfx('hit-crit');
+    expect(fake.ctx.createBuffer).toHaveBeenCalledTimes(1);
+    expect(fetchMock).not.toHaveBeenCalled();
+    expect(fake.started).toHaveLength(2);
+  });
+
+  it('preloadCries descarga los gritos sin sonar y luego playCry ya no los pide', async () => {
+    service.preloadCries([25, 25, 4]);
+    await new Promise((r) => setTimeout(r, 0));
+    expect(cryFetches(25)).toBe(1);
+    expect(cryFetches(4)).toBe(1);
+    expect(fake.started).toHaveLength(0);
+    await service.playCry(25);
+    expect(cryFetches(25)).toBe(1);
+    expect(fake.started).toHaveLength(1);
+  });
+
+  it('playSfx de un efecto que no existe (ni generado ni en el catálogo) avisa una vez y no lo pide', async () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
-    await service.playSfx('tap');
-    await service.playSfx('tap');
+    await service.playSfx('no-existe');
+    await service.playSfx('no-existe');
     expect(warn).toHaveBeenCalledTimes(1);
     expect(fetchMock).not.toHaveBeenCalled();
     expect(fake.started).toHaveLength(0);
