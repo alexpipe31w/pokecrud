@@ -448,3 +448,34 @@ reales dan ~10-20 a 200 m (D-025), así que sobra margen para el avatar, la hier
 - **Probar en el móvil:** la captura de pantalla por CDP del WebView NO recoge el mapa (WebGL) y sale gris; usar
   `adb shell screencap`. Para ir a `/dev/*` en el APK no hay botón: se navega por CDP (`adb forward` +
   `history.pushState`), hasta que F1-04 traiga el menú.
+
+## D-038 · La capa 3D del mapa solo existe con el mapa a la vista; y nunca sondear el canvas de Google (F1-04) (2026-10-12, Kenneth)
+
+- **Qué pasaba (Samsung A36, Adreno 710):** al abrir la Pokédex (o bloquear el móvil) el mapa volvía en blanco o en
+  **raster** (plano, sin capa 3D ni avatar). Logcat: `Offscreen context lost via ARB/EXT_robustness. Reset status =
+  GL_UNKNOWN_CONTEXT_RESET_KHR` + `log_gpu_snapshot`: **la GPU se reiniciaba** ~4,5 s después de ocultar el mapa.
+  Ningún JS llamaba a `loseContext()` (comprobado con un gancho antes de cargar Google). Tras un reinicio "desconocido"
+  Chrome **bloquea WebGL a la página**: ni Google puede crear un mapa vectorial nuevo (cae a raster) ni un canvas
+  cualquiera obtiene contexto; `preventDefault()` en `webglcontextlost` no lo devuelve. Solo cerrar la app lo arregla.
+- **Causa:** `ThreeJSOverlayView` con `animationMode: 'always'` sigue pidiendo un fotograma tras otro aunque la página
+  del mapa esté oculta (`ion-page-hidden`, 0×0) o la app en segundo plano.
+- **Decisión:** `MapPage` desmonta el overlay (`overlay.setMap(null)`) en `ionViewWillLeave` y con
+  `document.hidden`, y lo vuelve a montar en `ionViewDidEnter` / al volver a primer plano. Medido: 3 idas y vueltas a
+  la Pokédex y 10 s en segundo plano → mapa vectorial siempre, **0 reinicios de GPU** en logcat.
+- **Red de seguridad:** si aun así se pierde el contexto o el mapa cae a raster (`getRenderingType() === 'RASTER'`),
+  se rehace el mapa **solo con la pantalla visible** (con la página oculta Google no puede crear el vectorial), tras
+  1,5 s y como mucho 3 veces por minuto; si no hay manera, "No se pudo cargar el mapa" + Reintentar.
+- **Nunca llamar a `getContext()` sobre el canvas de Google** (ni crear canvas WebGL "de prueba"): si el canvas aún no
+  tiene contexto, se lo roba a Google (cae a raster); y cada contexto de prueba cuenta para el límite de contextos
+  del WebView, que al pasarse mata el más antiguo = el del mapa. Las dos cosas pasaron durante las pruebas de F1-04.
+
+## D-039 · Sobre el mapa 3D el vidrio va sin esmerilar (token `--glass-filter`) (F1-04) (2026-10-12, Kenneth)
+
+DISENO §1 pide vidrio esmerilado (`backdrop-filter: blur(20px) saturate(160%)`). Sobre un mapa WebGL que se redibuja
+en cada fotograma, el desenfoque obliga a releer el fondo una y otra vez. **Medido en el Samsung A36** (CDP, 10 s por
+caso, dos tandas iguales): con desenfoque 20 px → quieto 61 / joystick 58 / **menú abierto 42 fps**; con 8 px → igual
+(62/57/42: lo caro es tener `backdrop-filter`, no el radio); **sin desenfoque → 78 / 77 / 61 fps**.
+**Decisión:** token `--glass-filter` (por defecto el esmerilado de siempre) en `src/theme/tokens.scss`, que usan todos
+los componentes de vidrio; `MapPage` lo pone a `none` y cambia `--surface` por `--surface-opaque` (0,94 claro / 0,92
+oscuro) para que el texto se lea igual sin el desenfoque. El resto de pantallas (combate, login…) no cambia. Si algún
+día se quiere esmerilado sobre el mapa, medir antes en un Android de gama media.
