@@ -7,7 +7,7 @@
 
 ## Fase actual
 
-**F0 · Fundaciones** — **F0-01…F0-08 en `develop`** (PR #8-#16). **F0-09 hecha** (Kenneth, PR #17 pendiente de mezclar).
+**F0 · Fundaciones** — **F0-01…F0-08 en `develop`** (PR #8-#16). **F0-09 hecha y mezclada** (Kenneth, PR #17).
 Quedan **F0-10** (transaction pooler) y **F0-11** (zona segura Android 15+), ambas nuevas. Después, F1.
 
 ## Hecho
@@ -47,7 +47,7 @@ Quedan **F0-10** (transaction pooler) y **F0-11** (zona segura Android 15+), amb
 
 ## En curso
 
-- Nadie.
+- **F0-10** (@kenneth, rama `feature/F0-10-transaction-pooler`): transaction pooler. Punto de guardado: reclamada, sin código aún.
 
 ## Siguiente paso concreto
 
