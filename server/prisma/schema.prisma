@@ -11,19 +11,26 @@ datasource db {
 }
 
 model Player {
-  id            String          @id @default(uuid()) @db.Uuid
-  email         String          @unique
-  passwordHash  String
-  nickname      String          @unique
-  level         Int             @default(1)
-  xp            Int             @default(0)
-  createdAt     DateTime        @default(now())
-  updatedAt     DateTime        @updatedAt
-  refreshTokens RefreshToken[]
-  teams         Team[]
-  favorites     Favorite[]
-  customPokemon CustomPokemon[]
-  inventory     Inventory[]
+  id               String            @id @default(uuid()) @db.Uuid
+  email            String            @unique
+  passwordHash     String
+  nickname         String            @unique
+  level            Int               @default(1)
+  xp               Int               @default(0)
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  refreshTokens    RefreshToken[]
+  teams            Team[]
+  favorites        Favorite[]
+  customPokemon    CustomPokemon[]
+  inventory        Inventory[]
+  /// Última posición conocida (la manda GET /spawns). La captura exige estar a ≤ 80 m del spawn (F2-06, D-028).
+  lastLat          Float?
+  lastLng          Float?
+  lastLocatedAt    DateTime?
+  caught           CaughtPokemon[]
+  encounterResults EncounterResult[]
+  throws           Throw[]
 }
 
 model RefreshToken {
@@ -122,4 +129,86 @@ model Inventory {
   player    Player        @relation(fields: [playerId], references: [id], onDelete: Cascade)
 
   @@id([playerId, item])
+}
+
+enum PokemonGender {
+  M
+  F
+}
+
+enum EncounterOutcome {
+  CAUGHT
+  FLED
+}
+
+enum ThrowQuality {
+  none
+  nice
+  great
+  excellent
+}
+
+/// Pokémon capturado (F2-06). Sus datos salen del spawn recalculado en el servidor, nunca del cliente.
+model CaughtPokemon {
+  id          String         @id @default(uuid()) @db.Uuid
+  playerId    String         @db.Uuid
+  speciesId   Int
+  nickname    String?
+  level       Int
+  /// { hp, attack, defense, specialAttack, specialDefense, speed } 0-31.
+  ivs         Json
+  nature      String
+  gender      PokemonGender?
+  shiny       Boolean
+  heightScale Float
+  /// Hasta 4 movimientos (los últimos aprendidos por nivel), para el combate (F4).
+  moves       Int[]
+  ball        InventoryItem
+  /// Spawn del que salió (`celda:franja:índice`).
+  encounterId String
+  caughtLat   Float
+  caughtLng   Float
+  caughtAt    DateTime       @default(now())
+  favorite    Boolean        @default(false)
+  player      Player         @relation(fields: [playerId], references: [id], onDelete: Cascade)
+
+  @@index([playerId, caughtAt])
+  @@index([playerId, speciesId])
+}
+
+/// Un spawn solo se resuelve una vez por jugador: capturado o huido (UNIQUE). Se puede borrar pasado 1 día: la
+/// franja del spawn dura 10 min y después el id ya no se acepta.
+model EncounterResult {
+  id          String           @id @default(uuid()) @db.Uuid
+  playerId    String           @db.Uuid
+  encounterId String
+  outcome     EncounterOutcome
+  createdAt   DateTime         @default(now())
+  player      Player           @relation(fields: [playerId], references: [id], onDelete: Cascade)
+
+  @@unique([playerId, encounterId])
+  @@index([createdAt])
+}
+
+/// Cada lanzamiento, con su resultado: un reintento con el mismo clientThrowId devuelve esto y no gasta otra bola.
+/// Retención 7 días (se borran al lanzar; D-028).
+model Throw {
+  id              String         @id @default(uuid()) @db.Uuid
+  playerId        String         @db.Uuid
+  clientThrowId   String         @db.Uuid
+  encounterId     String
+  ball            InventoryItem
+  berry           InventoryItem?
+  throwQuality    ThrowQuality
+  curve           Boolean
+  captured        Boolean
+  shakes          Int
+  fled            Boolean
+  xpGained        Int
+  caughtPokemonId String?        @db.Uuid
+  createdAt       DateTime       @default(now())
+  player          Player         @relation(fields: [playerId], references: [id], onDelete: Cascade)
+
+  @@unique([playerId, clientThrowId])
+  @@index([playerId, createdAt])
 }

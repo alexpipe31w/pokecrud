@@ -17,6 +17,7 @@ import {
   cellBounds,
   cellsWithin,
   isNightAt,
+  parseSpawnId,
   slotEndsAt,
   slotFor,
   spawnsForCell,
@@ -46,6 +47,16 @@ export interface NearbySpawns {
 
 const round6 = (n: number): number => Math.round(n * 1e6) / 1e6;
 
+/** Lo que necesitan el encuentro y la captura de cada especie (F2-06). */
+export interface SpeciesDetails {
+  id: number;
+  captureRate: number;
+  speed: number;
+  isLegendary: boolean;
+  isMythical: boolean;
+  learnset: { moveId: number; level: number }[];
+}
+
 /**
  * Spawns deterministas (F1-06, D-025). Nada se guarda: para (celda, franja) la semilla es
  * HMAC-SHA256(SPAWN_SALT, versión:celda:franja) y `spawnsForCell` (shared/) hace el resto. Sin `SPAWN_SALT` o sin
@@ -56,6 +67,7 @@ export class SpawnsService {
   private readonly logger = new Logger(SpawnsService.name);
   private readonly salt: string | undefined;
   private species: SpawnSpecies[] | null = null;
+  private readonly details = new Map<number, SpeciesDetails>();
   private readonly tables = new Map<string, SpawnTable>();
 
   constructor(
@@ -85,6 +97,16 @@ export class SpawnsService {
         isMythical: s.isMythical,
         isBaby: s.isBaby,
       }));
+      for (const s of all) {
+        this.details.set(s.id, {
+          id: s.id,
+          captureRate: s.captureRate,
+          speed: s.baseStats.spe,
+          isLegendary: s.isLegendary,
+          isMythical: s.isMythical,
+          learnset: s.learnset,
+        });
+      }
     } catch (err) {
       this.logger.error({
         msg: 'spawns.dataset_unavailable',
@@ -149,6 +171,35 @@ export class SpawnsService {
       this.seed(cellId, slot),
       this.table(weather, night),
     );
+  }
+
+  /**
+   * Recalcula un spawn a partir de su id (`celda:franja:índice`) sin haberlo guardado. `null` si el id no tiene
+   * forma de spawn o esa celda no tiene ese índice. No comprueba si la franja sigue viva: eso lo decide quien llama.
+   */
+  async spawnById(id: string): Promise<WildSpawn | null> {
+    const parsed = parseSpawnId(id);
+    if (!parsed) return null;
+    const spawns = await this.cellSpawns(parsed.cellId, parsed.slot);
+    return spawns.find((s) => s.index === parsed.index) ?? null;
+  }
+
+  speciesDetails(speciesId: number): SpeciesDetails | undefined {
+    return this.details.get(speciesId);
+  }
+
+  /** Tamaño individual XS-XL (0,5-1,5 de la altura de la especie), fijo para cada spawn y secreto como la semilla. */
+  heightScale(spawnId: string): number {
+    if (!this.salt) {
+      throw new ServiceUnavailableException(
+        'Los Pokémon salvajes no están disponibles ahora mismo',
+      );
+    }
+    const n = createHmac('sha256', this.salt)
+      .update(`${SEED_VERSION}:size:${spawnId}`)
+      .digest()
+      .readUInt32BE(0);
+    return Math.round((0.5 + n / 2 ** 32) * 100) / 100;
   }
 
   private seed(cellId: string, slot: number): number {

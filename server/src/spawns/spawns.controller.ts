@@ -1,5 +1,8 @@
 import { Controller, Get, Query } from '@nestjs/common';
 import { Throttle } from '@nestjs/throttler';
+import type { AuthPlayer } from '../auth/auth.decorators.js';
+import { CurrentPlayer } from '../auth/auth.decorators.js';
+import { LocationService } from '../location/location.service.js';
 import { SpawnsQueryDto } from './spawns.dto.js';
 import { NearbySpawns, SpawnsService } from './spawns.service.js';
 
@@ -9,11 +12,22 @@ import { NearbySpawns, SpawnsService } from './spawns.service.js';
  */
 @Controller('spawns')
 export class SpawnsController {
-  constructor(private readonly spawns: SpawnsService) {}
+  constructor(
+    private readonly spawns: SpawnsService,
+    private readonly location: LocationService,
+  ) {}
 
   @Throttle({ default: { limit: 20, ttl: 60_000 } })
   @Get()
-  near(@Query() q: SpawnsQueryDto): Promise<NearbySpawns> {
-    return this.spawns.near(q.lat, q.lng);
+  async near(
+    @CurrentPlayer() player: AuthPlayer,
+    @Query() q: SpawnsQueryDto,
+  ): Promise<NearbySpawns> {
+    // Se guarda dónde está el jugador: la captura (F2-06) exige estar a ≤ 80 m del Pokémon.
+    const [nearby] = await Promise.all([
+      this.spawns.near(q.lat, q.lng),
+      this.location.record(player.id, q.lat, q.lng),
+    ]);
+    return nearby;
   }
 }

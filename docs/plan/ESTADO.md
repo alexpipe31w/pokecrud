@@ -3,7 +3,7 @@
 > Se **reescribe** al cerrar cada sesión (no es histórico; el histórico es `BITACORA.md`).
 > Máximo una pantalla. Si lees esto al empezar: después lee `ROADMAP.md`.
 
-**Última actualización:** 2026-10-11 · por Alex (Claude) · rama `feature/F2-03-formula-captura` (PR abierto)
+**Última actualización:** 2026-10-11 · por Alex (Claude) · rama `feature/F2-06-captura-servidor` (PR abierto)
 
 ## Fase actual
 
@@ -11,6 +11,11 @@
 
 ## Hecho
 
+- **F2-06 (Alex, rama `feature/F2-06-captura-servidor`, PR abierto; sale de F2-03):** captura autoritativa.
+  `GET /encounters/:id` (datos para la escena) y `POST /encounters/:id/throw` (una transacción: franja viva, ≤ 80 m,
+  gasto atómico de bola/baya, RNG del servidor, `CaughtPokemon`, XP; idempotente por `clientThrowId`). `GET /spawns`
+  guarda la ubicación del jugador. Migración `capture` **ya aplicada en Supabase**. D-028. Falta que la app lo use
+  (F2-04/05/07, necesitan F2-01 en Android).
 - **F2-03 (Alex, rama `feature/F2-03-formula-captura`, PR abierto; sale de F1-08):** `shared/engine/capture.ts`:
   fórmula de captura Gen III+ (bola, baya, lanzamiento, curva, PS), huida por rareza/velocidad y `resolveThrow` con
   RNG inyectado (el servidor tira en F2-06). D-027.
@@ -63,7 +68,7 @@
 
 ## En curso
 
-- Nadie. Esperan revisión **en orden** (ver PENDIENTES DE HUMANOS): #21 → #22 → #23 → F2-03.
+- Nadie. Esperan revisión **en orden** (ver PENDIENTES DE HUMANOS): #21 → #22 → #23 → #24 → #25.
 - **F1-01 → PENDIENTE DE KENNETH** (medir fps en su Android): rama `feature/F1-01-spike-mapa-3d`, instrucciones
   exactas en la última entrada de F1-01 de la bitácora.
 
@@ -84,7 +89,7 @@
 ### PENDIENTES DE HUMANOS — lista única (quien termine algo, lo marca `[x]`; cada tarea nueva añade aquí lo suyo)
 
 **Kenneth o Samuel (revisión):**
-- [ ] Revisar y mezclar **en este orden**: #21 (F0-12 admin) → #22 (F1-06 spawns) → #23 (F1-08 mochila) → PR de F2-03.
+- [ ] Revisar y mezclar **en este orden**: #21 (F0-12 admin) → #22 (F1-06 spawns) → #23 (F1-08 mochila) → #24 (F2-03 fórmula) → #25 (F2-06 captura).
   Cada uno sale del anterior: al mezclar uno, GitHub reapunta el siguiente a `develop`.
 
 **Samuel (Render, solo él tiene acceso):**

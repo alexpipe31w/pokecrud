@@ -110,9 +110,12 @@
       Dep: F2-02, F1-07.
 - [ ] **F2-05 · Lanzamiento** — gesto 1:1, física, curva, círculo de precisión, bolas y bayas, hápticos.
       Dep: F2-04.
-- [ ] **F2-06 · Captura autoritativa en servidor** — `POST /encounters/:id/throw` con transacción,
+- [x] **F2-06 · Captura autoritativa en servidor** (@alex, 2026-10-11) — `POST /encounters/:id/throw` con transacción,
       descuento atómico, `UNIQUE` de idempotencia, validación de distancia (ARQUITECTURA §6); test de
       concurrencia (dos lanzamientos simultáneos). Dep: F2-03, F1-06, F1-08.
+      **Hecho:** `GET /encounters/:id` y `POST /encounters/:id/throw`; migración `capture` aplicada. e2e 11/11 (franja,
+      distancia, gasto atómico, reintento ×5 a la vez = 1 bola, 3 capturas simultáneas = 1 gana, huida, sin bolas,
+      antitrampa de precisión, validación). D-028.
 - [ ] **F2-07 · Secuencia de captura/escape y shiny** — absorción, sacudidas, fanfarria, recompensas,
       pantalla de "¡Capturado!" con datos del individuo. Dep: F2-05, F2-06.
 - [ ] **F2-08 · Audio del juego** — buscar/crear SFX y música libres, `CREDITOS.md`, mezcla y volúmenes.

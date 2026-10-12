@@ -468,3 +468,35 @@ la correcta: se corrigió el test, no el código.)
 **Decisiones nuevas:** D-027.
 **El siguiente debe empezar por:** mezclar en orden #21 → #22 → #23 → este. Siguiente tarea libre sin móvil:
 **F2-06** (captura autoritativa en servidor: sus deps F2-03, F1-06 y F1-08 ya están hechas), F4-01 o F2-08.
+
+## 2026-10-11 22:20 · @alex (Claude) · F2-06 · rama `feature/F2-06-captura-servidor` (sale de F2-03)
+
+**Qué se hizo:** módulo `server/src/encounters/` (`GET /encounters/:id`, `POST /encounters/:id/throw`), `LocationService`
+(`GET /spawns` guarda la última ubicación), `SpawnsService` ampliado (`spawnById`, `speciesDetails`, `heightScale`).
+Modelos `CaughtPokemon`, `EncounterResult` (UNIQUE jugador+encuentro), `Throw` (UNIQUE jugador+clientThrowId) y columnas
+de ubicación en `Player`, con CHECKs. Todo el lanzamiento en una transacción (D-028). `THROW_RESOLVER` inyectable.
+**Archivos clave:** `server/src/encounters/*`, `server/src/location/*`, `server/prisma/migrations/20261012030000_capture/`,
+`server/test/encounters.e2e-spec.ts`.
+**Cómo se probó (salida real):**
+
+    prisma migrate deploy → Applying migration `20261012030000_capture` · applied
+    prisma migrate diff BD → schema: solo la columna `role` de F0-12 (esa rama no está mezclada en esta) ✔
+    server: npm test → 23/23 · npm run test:e2e → Test Files 7 passed · Tests 64 passed (encuentros: 11 nuevos)
+      401 / 404 / 410; lejos (1,1 km) → 403 sin gastar; sin ubicación → 403; detalle sin IVs
+      captura (Super Ball, Genial, curva): 200, 1 bola menos, CaughtPokemon con datos del servidor, XP 160 en /auth/me,
+        2.º lanzamiento → 409 sin gastar
+      mismo clientThrowId en serie y 5 a la vez → misma respuesta, 2 lanzamientos guardados, 2 bolas en total
+      3 lanzamientos distintos a la vez que capturan → [200, 409, 409], 1 capturado, 1 bola
+      fallo con baya → gasta bola y baya, encuentro abierto; huida → cierra (409 después)
+      Ultra Ball con 0 en la bolsa → 409 y nada cambia; 12 "excellent" previos → cuenta como "great"
+      validación (MASTER_BALL, baya como bola, campo extra, UUID malo, calidad inventada) → 400
+      fórmula real sin forzar → se resuelve y se guarda
+    lint server: solo el aviso previo de auth.e2e-spec
+
+Primer intento: el test de 5 reintentos simultáneos superaba los 5 s (cada transacción ~1 s contra São Paulo y se
+esperan por el bloqueo de la fila de la mochila, que es justo lo que las hace seguras). Se subieron el tope de la
+transacción (maxWait 5 s, timeout 10 s) y el del test.
+**Quedó a medias / roto:** nada en servidor. La app aún no lo usa (F2-04/05/07). Pokédex y caramelos → F3.
+**Decisiones nuevas:** D-028.
+**El siguiente debe empezar por:** mezclar en orden #21 → #22 → #23 → #24 → este. Siguiente libre sin móvil: F4-01
+(plan del motor de combate) o F2-08 (audio).
