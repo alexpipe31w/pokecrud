@@ -77,6 +77,7 @@
 
 ## En curso
 
+- **F4-04 (Alex, rama `feature/F4-04-reducer`, sale de F4-03):** `battle-engine.ts` (reducer puro) con estados y stats.
 - Esperan revisión **en orden** (ver PENDIENTES DE HUMANOS): #21 → #22 → #23 → #24 → #25 → #26 → #27 → #28.
 - **F1-01 → PENDIENTE DE KENNETH** (medir fps en su Android): rama `feature/F1-01-spike-mapa-3d`, instrucciones
   exactas en la última entrada de F1-01 de la bitácora.
