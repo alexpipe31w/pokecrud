@@ -122,8 +122,7 @@ visual del mapa ya tiene vía libre (**F1-01 hecha: plan A, D-035**); el del enc
 
 1. **Alex:** nombrarse ADMIN del inventario (`cd server && npm run admin -- grant <correo>`). Hasta entonces nadie
    puede agregar/editar/eliminar Pokémon en `/pokemon` (hoy hay 0 ADMIN en la base).
-2. **Kenneth:** poner `SPAWN_SALT` en su `server/.env`
-   (`node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))"`; sin ella `/spawns` da 503).
+2. ~~**Kenneth:** poner `SPAWN_SALT` en su `server/.env`~~ → hecho (2026-10-12).
 3. **Siguiente tarea libre:** **F1-03** (ubicación, brújula y joystick; sigue `docs/plan/fases/F1-mapa.md`, necesita
    Android para el criterio). Con Android también →
    F2-01 (spike de cámara y giroscopio). Sin móvil → F5-01 o F2-08.
@@ -150,7 +149,7 @@ visual del mapa ya tiene vía libre (**F1-01 hecha: plan A, D-035**); el del enc
 
 - [ ] Probar el combate en su Android: APK → `/dev/ui` → "Combate de prueba"; que vaya fluido y se oigan los gritos.
 - [x] ~~**F1-01:** medir fps en su Android~~ → la retoma Samuel en su Redmi Note 10 (2026-10-12).
-- [ ] Su `server/.env`: `SPAWN_SALT` propia.
+- [x] Su `server/.env`: `SPAWN_SALT` propia (64 caracteres) y `DATABASE_URL` en 6543 comprobado. (2026-10-12)
 
 **Quien coja F2-08 (audio):**
 
@@ -171,7 +170,7 @@ visual del mapa ya tiene vía libre (**F1-01 hecha: plan A, D-035**); el del enc
 - **Cada compañero necesita su propio `JWT_SECRET`** en su `server/.env` para arrancar el servidor en local (SECRETOS.md).
 - **En local hacen falta dos servidores:** Nest (`cd server && npm run start:dev`, puerto **3000**) y la app (`npm start`).
   Si tu `server/.env` tiene `PORT=3001` de antes, cámbialo a 3000 (o bórralo).
-- **ACCIÓN — puerto de la base (F0-10, D-021):** (Alex, Samuel y Render: hecho; falta confirmar Kenneth) cada uno cambia en su `server/.env` el puerto de `DATABASE_URL` de
+- **ACCIÓN — puerto de la base (F0-10, D-021):** (Alex, Samuel, Kenneth y Render: hecho) cada uno cambia en su `server/.env` el puerto de `DATABASE_URL` de
   **5432 a 6543** (solo ese; `DIRECT_URL` se queda en 5432). **Samuel:** lo mismo en la variable `DATABASE_URL` de Render.
   Mientras alguien siga en 5432 consume del cupo de 15 del session pooler (hoy Render: 5); no rompe nada, pero el riesgo
   vuelve si los tres se quedan en 5432.
