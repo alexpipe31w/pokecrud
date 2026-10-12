@@ -116,7 +116,7 @@ visual del mapa ya tiene vía libre (**F1-01 hecha: plan A, D-035**); el del enc
 ## En curso
 
 - **F1-03 (Kenneth, rama `feature/F1-03-ubicacion-brujula`)**: reclamada 2026-10-12. Sigue
-  `docs/plan/fases/F1-mapa.md` → F1-03. **Punto de guardado:** pasos 1-6 hechos (lógica pura, servicios, AvatarMotion, `app-joystick` con flechas de teclado); pasos 7-8 hechos (`app-location-gate`, modo "Sígueme" en `/dev/mapa`; app 147 tests, shared 140, lint y build OK). Probado en navegador 390×844 (GPS simulado: idle→walk→run, salto de 300 m descartado; permiso denegado → joystick; evidencias `F1-03_0{1,2,3}_navegador-*.png`). Falta el paso 9: APK en el Samsung A36 y caminar ~100 m.
+  `docs/plan/fases/F1-mapa.md` → F1-03. **Punto de guardado:** pasos 1-6 hechos (lógica pura, servicios, AvatarMotion, `app-joystick` con flechas de teclado); pasos 7-8 hechos (`app-location-gate`, modo "Sígueme" en `/dev/mapa`; app 147 tests, shared 140, lint y build OK). Probado en navegador 390×844 (GPS simulado: idle→walk→run, salto de 300 m descartado; permiso denegado → joystick; evidencias `F1-03_0{1,2,3}_navegador-*.png`). Paso 9 en el Samsung A36: caminando OK (idle/walk 0,6-1,2 m/s/run 3,3 m/s, ±3-5 m, brújula gira) y sin permiso OK; falta solo el joystick con el dedo en el móvil y cerrar (REGLA 2).
 
 ## Siguiente paso concreto
 
