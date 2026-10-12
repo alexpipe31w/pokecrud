@@ -7,8 +7,10 @@ export default defineConfig({
     globals: true,
     root: './',
     include: ['**/*.e2e-spec.ts'],
-    // Un archivo cada vez: cada uno levanta su app con un pool de 5 conexiones y el session pooler de Supabase admite
-    // 15 clientes EN TOTAL (compartidos con Render y los servidores locales). En paralelo daba EMAXCONNSESSION → 500.
+    // En serie por defecto: con DATABASE_URL en el session pooler (5432, .env antiguo) cada archivo abre un pool de 5 y
+    // entre todos superan los 15 clientes (EMAXCONNSESSION → 500). Con el transaction pooler (6543, F0-10) en paralelo
+    // también pasa: `npx vitest run --config ./vitest.config.e2e.ts --fileParallelism`. Cada archivo borra solo SUS
+    // jugadores (test/support/cleanup.ts).
     fileParallelism: false,
   },
 });

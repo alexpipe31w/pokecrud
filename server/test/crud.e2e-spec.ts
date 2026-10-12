@@ -4,10 +4,11 @@ import { Test } from '@nestjs/testing';
 import request from 'supertest';
 import { AppModule } from '../src/app.module.js';
 import { PrismaService } from '../src/prisma/prisma.service.js';
+import { cleanupTestPlayers } from './support/cleanup.js';
 
-// e2e del CRUD del curso (F0-08) contra la base REAL (server/.env). Jugadores con @pokecrud.test (se borran en
-// afterAll, y sus equipos/favoritos/personalizados caen en cascada). Los Pokémon de inventario que se crean usan
-// ids ≥ 90000 (fuera de la Pokédex) y también se borran.
+// e2e del CRUD del curso (F0-08) contra la base REAL (server/.env). Jugadores crud+…@pokecrud.test: en afterAll se
+// borran SOLO los de este archivo (otros e2e pueden ir en paralelo) y sus equipos/favoritos/personalizados caen en
+// cascada. Los Pokémon de inventario que se crean usan ids ≥ 90000 (fuera de la Pokédex) y también se borran.
 const DOMAIN = '@pokecrud.test';
 const TEST_IDS = { gte: 90_000 };
 
@@ -77,7 +78,7 @@ describe('CRUD del curso (e2e)', () => {
 
   afterAll(async () => {
     await prisma.inventoryPokemon.deleteMany({ where: { id: TEST_IDS } });
-    await prisma.player.deleteMany({ where: { email: { endsWith: DOMAIN } } });
+    await cleanupTestPlayers(prisma, 'crud+');
     await app.close();
   });
 
