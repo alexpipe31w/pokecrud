@@ -51,7 +51,8 @@
 
 ## En curso
 
-- Nadie.
+- **F1-01 (Alex, rama `feature/F1-01-spike-mapa-3d`):** spike Google Maps 3D + three.js, medir fps.
+- F0-12 (Alex) espera revisión: PR #21.
 
 ## Siguiente paso concreto
 
