@@ -116,7 +116,7 @@ visual del mapa ya tiene vía libre (**F1-01 hecha: plan A, D-035**); el del enc
 ## En curso
 
 - **F1-03 (Kenneth, rama `feature/F1-03-ubicacion-brujula`)**: reclamada 2026-10-12. Sigue
-  `docs/plan/fases/F1-mapa.md` → F1-03. **Punto de guardado:** pasos 1-6 hechos (lógica pura, servicios, AvatarMotion, `app-joystick` con flechas de teclado); paso 7a hecho (`app-location-gate` con tests; añade "Reintentar" y `DEFAULT_CENTER`); sigue el paso 8 (modo "Sígueme" en `/dev/mapa`).
+  `docs/plan/fases/F1-mapa.md` → F1-03. **Punto de guardado:** pasos 1-6 hechos (lógica pura, servicios, AvatarMotion, `app-joystick` con flechas de teclado); pasos 7-8 hechos (`app-location-gate`, modo "Sígueme" en `/dev/mapa`; app 147 tests, shared 140, lint y build OK). Falta el paso 9: probar en el navegador con joystick y en Android caminando ~100 m.
 
 ## Siguiente paso concreto
 

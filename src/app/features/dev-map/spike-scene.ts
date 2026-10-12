@@ -1,5 +1,6 @@
 import { createRng } from '@shared/engine/rng';
 import * as THREE from 'three';
+import type { Gait } from '../../game/map-scene/avatar-motion';
 
 /**
  * Escena de prueba del spike F1-01: lo que tendrá el mapa de verdad (avatar, círculo de alcance, Pokémon como
@@ -45,9 +46,23 @@ export function spawnSpots(seed: number, count = MAX_SPAWNS): SpawnSpot[] {
   return spots;
 }
 
+/** Pose del jugador en modo "Sígueme" (F1-03): metros locales (este, norte), rumbo y marcha de `AvatarMotion`. */
+export interface PlayerPose {
+  east: number;
+  north: number;
+  facingDeg: number;
+  gait: Gait;
+}
+
+/** Rebote del avatar por marcha: [amplitud en m, velocidad en rad/s]. */
+const BOB: Record<Gait, [number, number]> = { idle: [0.15, 2], walk: [0.4, 8], run: [0.8, 12] };
+
 export class SpikeScene {
   readonly scene = new THREE.Scene();
+  /** Avatar + sombra + círculo de alcance: se mueven juntos. */
+  private readonly player = new THREE.Group();
   private readonly avatar = new THREE.Group();
+  private pose: PlayerPose | null = null;
   private readonly sprites: THREE.Sprite[] = [];
   private readonly shadows: THREE.Mesh[] = [];
   private readonly grass: THREE.InstancedMesh;
@@ -59,6 +74,7 @@ export class SpikeScene {
 
   constructor(seed: number) {
     this.spots = spawnSpots(seed);
+    this.scene.add(this.player);
     this.buildAvatar();
     this.buildReachCircle();
 
@@ -113,10 +129,23 @@ export class SpikeScene {
   }
 
   /** Animación por fotograma (lo que costará de verdad en F1: todo se mueve un poco, siempre). */
+  /** Modo "Sígueme": coloca al jugador (x = este, z = −norte) mirando a `facingDeg`; `null` = vuelve al centro. */
+  setPlayer(pose: PlayerPose | null): void {
+    this.pose = pose;
+    this.player.position.set(pose?.east ?? 0, 0, -(pose?.north ?? 0));
+  }
+
   update(timeMs: number): void {
     const t = timeMs / 1000;
-    this.avatar.position.y = Math.abs(Math.sin(t * 4)) * 0.6;
-    this.avatar.rotation.y = t * 0.5;
+    if (this.pose) {
+      const [amp, speed] = BOB[this.pose.gait];
+      this.avatar.position.y = Math.abs(Math.sin(t * speed)) * amp;
+      // La nariz mira a −Z (norte); el rumbo de brújula va en sentido horario → rotación negativa en Y.
+      this.avatar.rotation.y = (-this.pose.facingDeg * Math.PI) / 180;
+    } else {
+      this.avatar.position.y = Math.abs(Math.sin(t * 4)) * 0.6;
+      this.avatar.rotation.y = t * 0.5;
+    }
 
     for (let i = 0; i < this.visible; i++) {
       const spot = this.spots[i];
@@ -144,8 +173,12 @@ export class SpikeScene {
     body.position.y = 3.2;
     const head = new THREE.Mesh(this.track(new THREE.SphereGeometry(1.4, 16, 12)), skinMat);
     head.position.y = 7;
-    this.avatar.add(body, head);
-    this.scene.add(this.avatar);
+    // Nariz: indica hacia dónde mira el avatar (−Z = norte con rotación 0).
+    const nose = new THREE.Mesh(this.track(new THREE.ConeGeometry(0.6, 1.6, 12)), bodyMat);
+    nose.rotation.x = -Math.PI / 2;
+    nose.position.set(0, 7, -1.9);
+    this.avatar.add(body, head, nose);
+    this.player.add(this.avatar);
 
     const shadow = new THREE.Mesh(
       this.track(new THREE.CircleGeometry(2.4, 24)),
@@ -160,7 +193,7 @@ export class SpikeScene {
     );
     shadow.rotation.x = -Math.PI / 2;
     shadow.position.y = 0.2;
-    this.scene.add(shadow);
+    this.player.add(shadow);
   }
 
   private buildReachCircle(): void {
@@ -178,7 +211,7 @@ export class SpikeScene {
     );
     ring.rotation.x = -Math.PI / 2;
     ring.position.y = 0.3;
-    this.scene.add(ring);
+    this.player.add(ring);
   }
 
   private track<T extends { dispose(): void }>(resource: T): T {

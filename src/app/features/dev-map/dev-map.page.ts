@@ -3,12 +3,20 @@ import {
   ElementRef,
   OnDestroy,
   afterNextRender,
+  inject,
   signal,
   viewChild,
 } from '@angular/core';
 import { ThreeJSOverlayView } from '@googlemaps/three';
 import { IonContent } from '@ionic/angular';
+import { fromLocalM, toLocalM, type LatLng } from '@shared/engine/geo';
 import { MAPS_MAP_ID, loadMapsLibrary, mapsAuthFailed } from '../../core/maps/google-maps.loader';
+import { joystickVelocity } from '../../game/geo/joystick-math';
+import { AvatarMotion, type Gait } from '../../game/map-scene/avatar-motion';
+import { CompassService } from '../../services/location/compass.service';
+import { DEFAULT_CENTER, LocationService } from '../../services/location/location.service';
+import { JoystickComponent, type JoystickVector } from '../../shared/ui/joystick.component';
+import { LocationGateComponent } from '../map/location-gate.component';
 import { FpsMeter, FpsSummary } from './fps-meter';
 import { MAX_SPAWNS, SpikeScene, artworkUrl, spawnSpots } from './spike-scene';
 
@@ -21,7 +29,9 @@ interface BenchResult extends FpsSummary {
 }
 
 /** Parque Santander, Neiva (cerca de la FET): calles y edificios con volumen en el mapa vectorial. */
-const CENTER = { lat: 2.9273, lng: -75.2819 };
+const CENTER = DEFAULT_CENTER;
+/** Modo "Sígueme": si el jugador se aleja más de esto del origen se re-ancla la escena (precisión de float32). */
+const REANCHOR_M = 1000;
 const SEED = 20261011;
 const ZOOM = 19;
 const TILT = 67.5;
@@ -45,10 +55,13 @@ const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
  * dibujada como overlay three.js (plan A) o como markers HTML (plan B), con medidor de fps y una batería de
  * mediciones con la cámara girando (lo que hará la brújula). Los resultados salen en pantalla y en la consola con
  * el prefijo `[F1-01]` (en el móvil: chrome://inspect). No es la pantalla del juego: eso es F1-04.
+ *
+ * F1-03 añade el modo "Sígueme": GPS filtrado (o joystick) + brújula + `AvatarMotion`, para probar la ubicación en
+ * un Android real antes de que exista `/mapa`.
  */
 @Component({
   selector: 'app-dev-map',
-  imports: [IonContent],
+  imports: [IonContent, JoystickComponent, LocationGateComponent],
   template: `
     <!-- Pantalla completa: anula la zona segura global (D-022) y coloca los controles con --ion-safe-area-*. -->
     <ion-content
@@ -66,9 +79,31 @@ const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
         @if (status()) {
           <div class="status">{{ status() }}</div>
         }
+        @if (following()) {
+          <div class="status">
+            {{ location.status() }} · {{ gait() }} · {{ speed() }} m/s
+            @if (location.position(); as p) {
+              · ±{{ round(p.accuracy) }} m
+            }
+            · rumbo {{ compass.heading() === null ? '—' : round(compass.heading()!) + '°' }}
+          </div>
+          <div class="row">
+            @if (location.status() === 'joystick') {
+              <button (click)="useGps()">Usar GPS</button>
+            }
+            <button (click)="stopFollowing()">Dejar de seguir</button>
+          </div>
+        }
       </div>
 
-      <div class="hud bottom">
+      @if (following()) {
+        <app-location-gate />
+        @if (location.status() === 'joystick') {
+          <app-joystick (vector)="joy = $event" />
+        }
+      }
+
+      <div class="hud bottom" [hidden]="following()">
         <div class="row">
           @for (m of modes; track m) {
             <button [class.on]="mode() === m" [disabled]="running()" (click)="setMode(m)">
@@ -94,6 +129,7 @@ const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
           <button class="primary" [disabled]="running() || !ready()" (click)="runBattery()">
             Medir batería ({{ batteryMinutes }} min)
           </button>
+          <button [disabled]="running() || !ready()" (click)="follow()">Sígueme</button>
         </div>
         @if (results().length) {
           <table>
@@ -136,6 +172,9 @@ const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
     }
     .hud > * {
       pointer-events: auto;
+    }
+    .hud[hidden] {
+      display: none;
     }
     .top {
       top: calc(var(--ion-safe-area-top, 0px) + 12px);
@@ -241,6 +280,19 @@ export class DevMapPage implements OnDestroy {
   private lastFrame = 0;
   private destroyed = false;
 
+  // Modo "Sígueme" (F1-03).
+  protected readonly location = inject(LocationService);
+  protected readonly compass = inject(CompassService);
+  protected readonly following = signal(false);
+  protected readonly gait = signal<Gait>('idle');
+  protected readonly speed = signal('0.0');
+  protected readonly round = Math.round;
+  /** Último vector del joystick (se lee en cada fotograma; no hace falta que sea signal). */
+  protected joy: JoystickVector = { dx: 0, dy: 0 };
+  private motion = new AvatarMotion();
+  /** Origen de la escena (= ancla del overlay) en modo "Sígueme"; null hasta el primer fix. */
+  private origin: LatLng | null = null;
+
   constructor() {
     afterNextRender(() => void this.init());
   }
@@ -295,8 +347,39 @@ export class DevMapPage implements OnDestroy {
     }
   }
 
+  /** Modo "Sígueme": el avatar va a la posición del GPS filtrado (o del joystick) y la cámara gira con la brújula. */
+  protected async follow(): Promise<void> {
+    this.following.set(true);
+    this.spinning.set(false);
+    this.setMode('three');
+    this.compass.start();
+    await this.location.start();
+    // Joystick guardado en ajustes de otra sesión: arranca sin posición → se le da el centro por defecto.
+    if (this.location.status() === 'joystick' && !this.location.position()) {
+      this.location.useJoystickAt(CENTER);
+    }
+  }
+
+  protected async useGps(): Promise<void> {
+    this.joy = { dx: 0, dy: 0 };
+    await this.location.useGps();
+  }
+
+  protected stopFollowing(): void {
+    void this.location.stop();
+    this.compass.stop();
+    this.following.set(false);
+    this.joy = { dx: 0, dy: 0 };
+    this.origin = null;
+    this.spike?.setPlayer(null);
+    this.overlay?.setAnchor({ ...CENTER, altitude: 0 });
+    this.map?.moveCamera({ center: CENTER, heading: 0 });
+  }
+
   ngOnDestroy(): void {
     this.destroyed = true;
+    void this.location.stop();
+    this.compass.stop();
     cancelAnimationFrame(this.raf);
     this.clearMarkers();
     this.overlay?.setMap(null);
@@ -360,9 +443,37 @@ export class DevMapPage implements OnDestroy {
       this.heading = (this.heading + (dt * 360) / MEASURE_MS) % 360;
       this.map.moveCamera({ heading: this.heading });
     }
+    if (this.following()) this.followStep(Math.min(dt / 1000, 0.1));
     if (Math.floor(now / 250) !== Math.floor((now - dt) / 250))
       this.fps.set(this.meter.recentFps());
     this.raf = requestAnimationFrame((t) => this.tick(t));
+  }
+
+  /** Un fotograma del modo "Sígueme" (`dts` en segundos, con tope para no saltar al volver de segundo plano). */
+  private followStep(dts: number): void {
+    if (!this.map || !this.overlay || !this.spike) return;
+    const camHeading = this.compass.heading() ?? 0;
+    if (this.location.status() === 'joystick') {
+      const v = joystickVelocity(this.joy.dx, this.joy.dy, camHeading);
+      if (v.east || v.north) this.location.nudge(v.east * dts, v.north * dts);
+    }
+    const pos = this.location.position();
+    if (!pos) return;
+    let local = this.origin ? toLocalM(this.origin, pos) : null;
+    if (!this.origin || !local || Math.hypot(local.east, local.north) > REANCHOR_M) {
+      // Primer fix (o muy lejos del origen): la escena se ancla aquí y el avatar aparece sin animar.
+      this.origin = { lat: pos.lat, lng: pos.lng };
+      this.overlay.setAnchor({ ...this.origin, altitude: 0 });
+      this.motion = new AvatarMotion();
+      local = { east: 0, north: 0 };
+    }
+    this.motion.setTarget(local.east, local.north);
+    const f = this.motion.step(dts);
+    this.spike.setPlayer(f);
+    this.map.moveCamera({ center: fromLocalM(this.origin, f.east, f.north), heading: camHeading });
+    if (f.gait !== this.gait()) this.gait.set(f.gait);
+    const speed = f.speed.toFixed(1);
+    if (speed !== this.speed()) this.speed.set(speed);
   }
 
   /** Aplica modo y cantidad: el overlay solo se monta en modo three.js; los markers solo en modo markers. */

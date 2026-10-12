@@ -772,7 +772,7 @@ export class AvatarMotion {
   `transition: transform var(--dur-small) var(--ease-out)` (solo al soltar). `touch-action: none`. Háptico `tap()` al
   agarrar. `aria-label="Joystick: mover al personaje"`. Posición: abajo a la izquierda, por encima de
   `var(--ion-safe-area-bottom)`.
-- [ ] **6b.** (se hace en el paso 8, en `/dev/mapa`) Uso en la pantalla: cada frame, `const v = joystickVelocity(dx, dy, cameraHeading)` →
+- [x] **6b.** (se hace en el paso 8, en `/dev/mapa`) Uso en la pantalla: cada frame, `const v = joystickVelocity(dx, dy, cameraHeading)` →
   `location.nudge(v.east * dt, v.north * dt)`.
 - [x] **6c.** Lint + build. Commit `F1-03: joystick en pantalla` + `/guardar`.
 
@@ -790,20 +790,20 @@ export class AvatarMotion {
     (→ `useJoystickAt(DEFAULT_CENTER)` = Parque Santander, el del spike).
   - `unavailable` → lo mismo con "Este dispositivo no da la ubicación".
   - `weak` → **no cubre**: chip pequeño "GPS débil" arriba en el centro.
-- [ ] **7b.** Usarlo ya en `/dev/mapa` (paso 8). Commit `F1-03: pantalla de permisos` + `/guardar`.
+- [x] **7b.** Usarlo ya en `/dev/mapa` (paso 8). Commit `F1-03: pantalla de permisos` + `/guardar`.
 
 ### Paso 8 — Probarlo antes de que exista `/mapa`: modo "Sígueme" en `/dev/mapa`
 
 **Files:** Modify `src/app/features/dev-map/dev-map.page.ts`
 
-- [ ] **8a.** Botón "Sígueme" (además de los de la batería): llama a `location.start()` y `compass.start()`; con el
+- [x] **8a.** Botón "Sígueme" (además de los de la batería): llama a `location.start()` y `compass.start()`; con el
   primer `position()` re-ancla el overlay ahí (`overlay.setAnchor({ ...pos, altitude: 0 })`) y usa ese punto como
   origen; en `tick(now)`: `motion.setTarget(...toLocalM(origen, location.position()))`, `const f = motion.step(dt)`,
   avatar del spike en `(f.east, 0, -f.north)` y `rotation.y = -f.facingDeg·π/180`; cámara
   `map.moveCamera({ center: fromLocalM(origen, f.east, f.north), heading: compass.heading() ?? 0 })`. Si el estado es
   `denied`/`unavailable` → `location.useJoystickAt(CENTER)` y se muestra `app-joystick`. Texto de estado con
   `status()` y `gait`.
-- [ ] **8b.** Lint, `ng test`, build. Commit `F1-03: modo Sígueme en /dev/mapa` + `/guardar`.
+- [x] **8b.** Lint, `ng test`, build. Commit `F1-03: modo Sígueme en /dev/mapa` + `/guardar`.
 
 ### Paso 9 — Prueba en Android y cierre
 
