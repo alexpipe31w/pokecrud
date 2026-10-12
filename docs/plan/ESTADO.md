@@ -3,22 +3,22 @@
 > Se **reescribe** al cerrar cada sesión (no es histórico; el histórico es `BITACORA.md`).
 > Máximo una pantalla. Si lees esto al empezar: después lee `ROADMAP.md`.
 
-**Última actualización:** 2026-10-12 · por Alex (Claude) · `develop` (#38 y F1-05 mezclados)
+**Última actualización:** 2026-10-12 · por Alex (Claude) · `develop` (F1-05, F0-14 y F1-07 mezclados)
 
-## 👉 RELEVO DE ALEX (2026-10-12, tarde)
+## 👉 RELEVO DE ALEX (2026-10-12, noche)
 
-1. ✅ **F1-05 (avatar 3D) en `develop`** salvo la prueba en Android (paso 3b). El jugador ya es un entrenador low-poly
-   (gorra con visera = hacia dónde mira, mochila, piernas y brazos que se balancean): anda, corre inclinado y respira
-   quieto. Probado en navegador con el joystick (`docs/evidencias/F1-05_*`).
-2. **Quien tenga Android (Kenneth o Samuel):** `npm run apk -- --install`, andar y trotar con GPS, medir fps por CDP como
-   en F1-04 8b. Si ≥ 55 → F1-05 `[x]` en ROADMAP. Si va lento, el presupuesto está en `avatar-3d.ts` (12 mallas).
-3. **Leer D-040** antes de animar algo cíclico según la velocidad: la fase se acumula, nunca `velocidad × t`.
-4. **Siguiente:** F1-07 (Pokémon en el mapa) ya puede empezar (no necesita el 3b). Con Android también F2-01.
-   Sin móvil: F5-01, F2-08, F1-09 o F1-10.
-5. **Nueva forma de trabajar (Alex, 2026-10-12):** cada uno mezcla su propio PR en `develop` en cuanto lint + test +
-   build estén en verde, sin esperar revisión (rama → PR → merge; sigue sin haber push directo a `develop`).
-6. Lo de antes sigue valiendo: D-038/D-039 antes de tocar el mapa; probar en Android con `npm run apk -- --install`,
-   fps por CDP y capturas del mapa con `adb shell screencap`.
+1. ✅ **F1-07 (Pokémon en el mapa) y F1-05 (avatar 3D) en `develop`**, los dos a falta SOLO de la prueba en Android.
+   En `/mapa` ya salen los Pokémon salvajes del servidor: brotan agitando una mata de hierba, suena su grito bajito si
+   están cerca, al tocarlos lejos dicen "Acércate más" y al alcance (≤ 40 m) abren `/encuentro/:id` (provisional:
+   nombre, nivel y grito; la captura AR es F2-04).
+2. **Quien tenga Android (Kenneth o Samuel):** con un solo `npm run apk -- --install` se prueban las dos cosas: 7b de
+   F1-07 y 3b de F1-05 (ver "PENDIENTES DE HUMANOS"). Si van ≥ 55 fps, marcar las dos `[x]` en ROADMAP.
+3. **Leer D-040 y D-041.** D-041: antes de abrir un encuentro se le manda la posición al servidor (si no, 403), y los
+   edificios 3D de Google tapan a los Pokémon que quedan detrás (no se arregla desde three.js; Alex decide si 2D).
+4. **Siguiente:** con Android → F2-01 (spike de cámara, desbloquea la AR). Sin móvil → F1-09, F1-10, F5-01 o F2-08.
+5. **Forma de trabajar (Alex, 2026-10-12):** cada uno mezcla su PR en `develop` en cuanto el CI esté en verde (lint +
+   test + build), sin esperar revisión; `develop` está protegida y no deja mezclar en rojo.
+6. D-038/D-039 siguen valiendo antes de tocar el mapa. Capturas del mapa en Android con `adb shell screencap`.
 
 **Importante (D-034):** la escena de combate de `/combate/prueba` es **temporal**. Alex quiere el combate **en
 realidad aumentada con la cámara**. Lo que hay debajo (motor, IA, controlador, textos, menú) se reutiliza; solo cambia
@@ -34,6 +34,10 @@ fórmula (F2-03) y captura en servidor (F2-06) hechas; lo visual del encuentro e
 
 ## Hecho
 
+- **F1-07 (Alex, mezclado; falta 7b en Android):** Pokémon salvajes en `/mapa`: feed de `/spawns` (cuándo pedir,
+  espera tras fallar), brotan agitando su mata de hierba, se desvanecen al irse, grito bajito por cercanía, toque →
+  "Acércate más" o `/encuentro/:id` (provisional hasta F2-04). Antes del encuentro se manda la posición (D-041). App
+  236 tests. Evidencias `F1-07_*`.
 - **F1-05 (Alex, mezclado; falta 3b en Android):** `limb-pose.ts` (pose + `advanceStride`, D-040) y `avatar-3d.ts`
   (entrenador procedural, 12 mallas, sombra que encoge con el bote, pose suavizada) en `MapScene` (×1,8). App 183
   tests, shared 140, lint y build OK. Navegador: anda / corre / se para (`F1-05_01…05`).
@@ -137,7 +141,7 @@ fórmula (F2-03) y captura en servidor (F2-06) hechas; lo visual del encuentro e
 
 ## En curso
 
-- Nadie. F1-05 solo espera la prueba en Android (paso 3b, ver arriba).
+- Nadie. F1-05 (3b) y F1-07 (7b) solo esperan la prueba en Android.
 
 ## Siguiente paso concreto
 
@@ -166,6 +170,8 @@ fórmula (F2-03) y captura en servidor (F2-06) hechas; lo visual del encuentro e
 
 **Kenneth o Samuel (Android):**
 
+- [ ] **F1-07 paso 7b:** en la calle con el APK de producción: ≥ 55 fps con los Pokémon de verdad, grito bajito al
+      acercarse, tocar uno lejos → "Acércate más", uno al alcance → encuentro. Anotar cuántos había y los fps.
 - [ ] **F1-05 paso 3b:** andar y trotar con el APK, fps ≥ 55 en `/mapa` con el avatar nuevo (CDP). Marcar F1-05 `[x]`.
 
 **Kenneth:**
@@ -193,6 +199,9 @@ fórmula (F2-03) y captura en servidor (F2-06) hechas; lo visual del encuentro e
 
 **Alex:**
 
+- [ ] (D-041) ¿Edificios 2D en el estilo `pokecrud-juego` para que no tapen a los Pokémon? (hoy en 3D: se ven mejor
+      pero esconden los que quedan detrás de una casa).
+
 - [x] (2026-10-12) Estilo del Map ID `5309ecf69efbfe12f3ecbc4c` sin POI comerciales: estilos `pokecrud-juego` (claro,
       edificios 3D, densidad de POI "Dispersa") y `pokecrud-juego-noche` (oscuro) con Comida y bebida, Venta minorista,
       Servicio, Alojamiento y Entretenimiento ocultos; asignados al modo claro y al oscuro del Map ID. Ojo: los estilos
@@ -201,7 +210,7 @@ fórmula (F2-03) y captura en servidor (F2-06) hechas; lo visual del encuentro e
 - [x] (2026-10-12) Alex registrado y ADMIN (`npm run admin -- list` → alexpipe31w@gmail.com y samu1630).
 - [ ] Postman (tras #21): poner `adminEmail`/`adminPassword` en SU entorno local de Postman.
 - [ ] Antes del **2027-01-10**: tope de Google Maps o pasar a MapLibre (ver más abajo).
-- [ ] Decidir qué hacer con las 6 capturas `docs/evidencias/HU-02_*.jpg` sin commitear.
+- [ ] Las 6 capturas `docs/evidencias/HU-02_*.jpg` se GUARDAN sin commitear: Alex las documentará más adelante (2026-10-12). No borrarlas.
 - [x] (2026-10-12, Alex) `develop` protegida + CI obligatoria (F0-14): lint + tests + build de app y servidor en cada PR;
       no hace falta revisión, pero no se puede mezclar en rojo.
 - [x] `server/.env` en 6543, `JWT_SECRET` y `SPAWN_SALT` locales; JDK 21 instalado (2026-10-11).

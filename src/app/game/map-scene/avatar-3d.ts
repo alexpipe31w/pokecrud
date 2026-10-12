@@ -72,7 +72,10 @@ export class Avatar3D {
     );
     crown.position.y = 4.85;
     // Visera hacia delante (−Z): indica hacia dónde mira, como la nariz del avatar provisional.
-    const visor = new THREE.Mesh(this.track(new THREE.CylinderGeometry(0.95, 0.95, 0.14, 16)), mat(COLORS.capVisor));
+    const visor = new THREE.Mesh(
+      this.track(new THREE.CylinderGeometry(0.95, 0.95, 0.14, 16)),
+      mat(COLORS.capVisor),
+    );
     visor.scale.z = 0.8;
     visor.position.set(0, 4.88, -1.15);
     const eyeGeo = this.track(new THREE.SphereGeometry(0.17, 8, 6));
@@ -100,7 +103,12 @@ export class Avatar3D {
     this.shadow = new THREE.Mesh(
       this.track(new THREE.CircleGeometry(2.4, 24)),
       this.track(
-        new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.3, depthWrite: false }),
+        new THREE.MeshBasicMaterial({
+          color: 0x000000,
+          transparent: true,
+          opacity: 0.3,
+          depthWrite: false,
+        }),
       ),
     );
     this.shadow.rotation.x = -Math.PI / 2;

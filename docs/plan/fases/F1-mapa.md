@@ -1143,7 +1143,7 @@ bajito por cercanía, toque → encuentro. Máximo 30 dibujados (D-035).
 
 **Files:** Create `src/app/game/map-scene/spawn-diff.ts` + spec
 
-- [ ] **1a. Test que falla:**
+- [x] **1a. Test que falla:**
 
 ```ts
 import { diffSpawns, nearestN } from './spawn-diff';
@@ -1164,7 +1164,7 @@ describe('spawn-diff', () => {
 });
 ```
 
-- [ ] **1b.** falla. **1c.**
+- [x] **1b.** falla. **1c.**
 
 ```ts
 import { distanceM, type LatLng } from '@shared/engine/geo';
@@ -1189,7 +1189,7 @@ export function nearestN(list: readonly VisibleSpawn[], origin: LatLng, n = MAX_
 }
 ```
 
-- [ ] **1d.** pasa. Commit + `/guardar`.
+- [x] **1d.** pasa. Commit + `/guardar`.
 
 ### Paso 2 — Cuándo volver a pedir `/spawns` (puro)
 
@@ -1200,7 +1200,7 @@ al acabar la franja (`expiresAt`, + 1 s de margen); o si el jugador se movió > 
 a la vez ni con menos de 8 s entre ellas (salvo el fin de franja). Tras un error, espera exponencial 5 s → 10 → 20 →
 máx. 60 s (servidor dormido, DISENO §6).
 
-- [ ] **2a. Test que falla:**
+- [x] **2a. Test que falla:**
 
 ```ts
 import { REFETCH_MOVE_M, shouldRefetch, type FetchState } from './refetch';
@@ -1229,7 +1229,7 @@ describe('shouldRefetch', () => {
 });
 ```
 
-- [ ] **2b.** falla. **2c.**
+- [x] **2b.** falla. **2c.**
 
 ```ts
 import { distanceM, type LatLng } from '@shared/engine/geo';
@@ -1260,18 +1260,18 @@ export function shouldRefetch(s: FetchState, now: number, pos: LatLng): boolean 
 }
 ```
 
-- [ ] **2d.** pasa. Commit + `/guardar`.
+- [x] **2d.** pasa. Commit + `/guardar`.
 
 ### Paso 3 — `SpawnFeedService`
 
 **Files:** Create `src/app/services/game/spawn-feed.service.ts` + spec
 
-- [ ] **3a.** Servicio con `HttpClient` (el interceptor pone el token): `readonly spawns = signal<VisibleSpawn[]>([])`,
+- [x] **3a.** Servicio con `HttpClient` (el interceptor pone el token): `readonly spawns = signal<VisibleSpawn[]>([])`,
   `weather`, `night`, `error = signal<string | null>`. `tick(now, pos)` (lo llama la pantalla cada ~1 s) → si
   `shouldRefetch(...)` hace `GET ${environment.serverUrl}/spawns?lat=…&lng=…` (lat/lng redondeados a 6 decimales,
   `timeout(70_000)` como `BagService` por Render dormido). 401 → lo maneja el interceptor; 503 → `error` "Los Pokémon
   salvajes no están disponibles ahora mismo" (sin borrar los que hay); 429 → cuenta como fallo (espera).
-- [ ] **3b. Tests** con `provideHttpClientTesting`: (1) primer `tick` hace una petición con `lat`/`lng` y publica
+- [x] **3b. Tests** con `provideHttpClientTesting`: (1) primer `tick` hace una petición con `lat`/`lng` y publica
   `spawns`, `weather`, `night`; (2) un segundo `tick` inmediato en el mismo sitio no pide; (3) un 503 deja `error` y
   conserva la lista anterior. Commit + `/guardar`.
 
@@ -1284,7 +1284,7 @@ DISENO §5: "hierba que se agita en su celda → emerge con un pequeño salto + 
 1 m) y aparece (opacidad 0 → 1, escala 0,95 → 1, nunca desde 0: DISENO §4.3); después, reposo (balanceo suave de la
 hierba). Desaparecer: 300 ms de opacidad 1 → 0 y escala → 0,95.
 
-- [ ] **4a. Test que falla:**
+- [x] **4a. Test que falla:**
 
 ```ts
 import { APPEAR_MS, DISAPPEAR_MS, appearPose, disappearPose } from './appear';
@@ -1310,7 +1310,7 @@ describe('appear', () => {
 });
 ```
 
-- [ ] **4b.** falla. **4c.**
+- [x] **4b.** falla. **4c.**
 
 ```ts
 export const SHAKE_MS = 700;
@@ -1347,17 +1347,17 @@ export function disappearPose(ms: number): SpritePose {
 ```
 
   Al final del salto (`k = 1`): `y = −2 + 3 + 0 = 1` → enlaza con el reposo sin salto visual.
-- [ ] **4d.** pasa. Commit + `/guardar`.
+- [x] **4d.** pasa. Commit + `/guardar`.
 
 ### Paso 5 — Texturas y `SpawnLayer`
 
 **Files:** Create `src/app/game/map-scene/sprite-textures.ts`, `spawn-layer.ts`; Modify `map-scene.ts`
 
-- [ ] **5a. `SpriteTextures`:** `get(speciesId): THREE.Texture` con caché LRU (máx. 40; al expulsar → `dispose()`).
+- [x] **5a. `SpriteTextures`:** `get(speciesId): THREE.Texture` con caché LRU (máx. 40; al expulsar → `dispose()`).
   Carga con `THREE.TextureLoader().setCrossOrigin('anonymous')` probando en orden (footgun de CLAUDE.md):
   `…/sprites/pokemon/other/home/{id}.png` → `…/other/official-artwork/{id}.png` → `…/sprites/pokemon/{id}.png`; si
   todas fallan, un círculo "?" dibujado en un `CanvasTexture`. `colorSpace = SRGBColorSpace`.
-- [ ] **5b. `SpawnLayer`** (a partir del spike, que ya está medido):
+- [x] **5b. `SpawnLayer`** (a partir del spike, que ya está medido):
   - `sync(drawn: VisibleSpawn[], origin, nowMs)`: con `diffSpawns` contra los que tiene → los nuevos nacen con
     `bornAt = nowMs` (si es la **primera** sincronización tras entrar al mapa, `bornAt = nowMs − APPEAR_MS`: los que ya
     estaban no "brotan" todos a la vez); los que sobran pasan a `dyingAt` y se borran tras `DISAPPEAR_MS`.
@@ -1367,37 +1367,54 @@ export function disappearPose(ms: number): SpritePose {
     con `grassAmp`.
   - `pick(ndc: THREE.Vector2): string | null` → `overlay.raycast(ndc, sprites)` → id del spawn tocado.
   - `reposition(origin)` tras un re-anclaje.
-- [ ] **5c.** Lint + build. Commit + `/guardar`.
+- [x] **5c.** Lint + build. Commit + `/guardar`.
 
 ### Paso 6 — Conectarlo en `MapPage`: aparición, grito y toque
 
 **Files:** Modify `src/app/features/map/map.page.ts`, `src/app/services/game/audio.service.ts` (+ spec); Create
 `src/app/features/encounter/encounter.page.ts`; Modify `app.routes.ts`
 
-- [ ] **6a. `playCry` con volumen:** test nuevo en `audio.service.spec.ts` con el doble de `AudioContext` que ya
+- [x] **6a. `playCry` con volumen:** test nuevo en `audio.service.spec.ts` con el doble de `AudioContext` que ya
   usa ese archivo: `playCry(25, 0.3)` crea un `GainNode` con `gain.value = 0.3` entre la fuente y el bus `cries`;
   `playCry(25)` sigue sonando a 1 (los tests actuales no cambian). Implementación: parámetro `gain = 1` →
   `play(buffer, 'cries', gain)`; en `play`, si `gain !== 1`, `source → ctx.createGain() (value = gain) → bus`.
-- [ ] **6b.** En el bucle (cada ~1 s): `spawnFeed.tick(now, position)`; `spawnLayer.sync(nearestN(spawnFeed.spawns(),
+- [x] **6b.** En el bucle (cada ~1 s): `spawnFeed.tick(now, position)`; `spawnLayer.sync(nearestN(spawnFeed.spawns(),
   posAvatar), origin, now)`. Por cada alta (no en la primera sincronización) a ≤ 60 m: `audio.playCry(speciesId,
   clamp(1 − d/60, 0,2, 0,6))`, como mucho **uno cada 5 s** (si no, en una franja nueva sonarían 15 a la vez).
-- [ ] **6c. Toque:** en el `div` del mapa, `pointerdown` guarda punto y hora; `pointerup` a < 10 px y < 300 ms = toque
+- [x] **6c. Toque:** en el `div` del mapa, `pointerdown` guarda punto y hora; `pointerup` a < 10 px y < 300 ms = toque
   (no arrastre ni pellizco) → `ndc = ((x / w)·2 − 1, −(y / h)·2 + 1)` → `spawnLayer.pick(ndc)`:
   - a ≤ `REACH_RADIUS_M` del avatar → háptico `tap()` + `router.navigateByUrl('/encuentro/' + id)`.
   - más lejos → el sprite da un saltito y un chip "Acércate más" 1,5 s (sin navegar).
-- [ ] **6d. `/encuentro/:id` PROVISIONAL** (ruta con `authGuard`): `GET /encounters/:id` → arte `home`, nombre en
+- [x] **6d. `/encuentro/:id` PROVISIONAL** (ruta con `authGuard`): `GET /encounters/:id` → arte `home`, nombre en
   español (DatasetService), nivel, grito; "Volver al mapa". Errores del servidor (D-028) con texto: 403 "Estás
   demasiado lejos", 410 "Se ha ido…", 409 "Ya lo intentaste", 404 "Este Pokémon ya no está". Comentario
   `// PROVISIONAL (F1-07): F2-04 lo sustituye por la escena AR`. La transición de verdad (DISENO §5) es de F2-04.
-- [ ] **6e.** Lint, `ng test`, build. Commit + `/guardar`.
+- [x] **6e.** Lint, `ng test`, build. Commit + `/guardar`.
 
 ### Paso 7 — Prueba y evidencias
 
-- [ ] **7a.** Navegador 390×844 con joystick y el servidor local (`cd server && npm run start:dev`, con
+- [x] **7a.** Navegador 390×844 con joystick y el servidor local (`cd server && npm run start:dev`, con
   `SPAWN_SALT`): aparecen Pokémon con la hierba agitándose, al acercarse con el joystick suena el grito bajito, tocar
   uno lejano → "Acércate más", uno cercano → `/encuentro/:id` con sus datos. Capturas → `docs/evidencias/F1-07_*`.
 - [ ] **7b.** Android con el APK de producción (Render): en la calle, ≥ 55 fps con los Pokémon de verdad (contador de
   F1-04 8b), grito al acercarse, toque → encuentro. Anotar cuántos Pokémon había y los fps. REGLA 2.
+
+**Hecho (Alex, 2026-10-12; falta 7b en un Android). Cambios respecto a este plan:**
+
+- **Antes de abrir el encuentro se manda la posición** (`SpawnFeedService.reportPosition`, un `GET /spawns` fuera de
+  turno): el servidor mide la distancia desde la última posición de `/spawns` y el feed solo la renueva cada 60 m, así
+  que tras acercarse a un Pokémon `GET /encounters/:id` daba **403 "demasiado lejos"** (visto en la prueba). D-041.
+- **Hierba = matas densas** (pedido de Alex: "se ve muy fea"): `grass-tuft.ts`, 40 briznas finas por mata (hoja que
+  se estrecha y se curva, base oscura y punta clara, 4 verdes, alturas 2,6-5,5 m, más tupida en el centro), en un solo
+  `InstancedMesh` (≤ 60 matas × 40 = 2.400 instancias, 1 llamada de dibujo). Tamaño exagerado como el sprite: a zoom 19
+  una hierba "real" no se ve.
+- **Toque con cilindros invisibles**, no con el sprite: `ThreeJSOverlayView.raycast` no pone la cámara en el raycaster
+  y `THREE.Sprite` la necesita.
+- **Texturas con contador de referencias**, no LRU: con LRU un Pokémon que siguiera en pantalla podía perder su
+  textura si entraban 40 especies nuevas.
+- **Los edificios 3D tapan a los Pokémon** que quedan detrás y no se puede evitar desde three.js (D-041).
+- `EncounterView` pasó a `shared/protocol/encounters.ts` (lo usan app y servidor). `/encuentro/:id` es PROVISIONAL
+  (F2-04 lo cambia por la escena AR). El chip del clima ya sale del feed (adiós a la petición aparte de F1-04).
 
 ---
 

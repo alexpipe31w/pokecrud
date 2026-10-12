@@ -72,10 +72,13 @@ export class AudioService {
     if (buffer) this.play(buffer, 'sfx');
   }
 
-  /** Grito de una especie. Nunca lanza: si falla la red resuelve false. */
-  async playCry(speciesId: number): Promise<boolean> {
+  /**
+   * Grito de una especie. Nunca lanza: si falla la red resuelve false. `gain` (0..1) baja este grito en concreto
+   * sobre el volumen de gritos de los ajustes (p. ej. un Pokémon lejano en el mapa, F1-07).
+   */
+  async playCry(speciesId: number, gain = 1): Promise<boolean> {
     try {
-      this.play(await this.loadCry(speciesId), 'cries');
+      this.play(await this.loadCry(speciesId), 'cries', gain);
       return true;
     } catch (err) {
       console.warn(`[audio] no se pudo reproducir el grito #${speciesId}`, err);
@@ -105,11 +108,17 @@ export class AudioService {
     this.buses.cries.gain.value = s.criesVolume;
   }
 
-  private play(buffer: AudioBuffer, bus: AudioBus): void {
+  private play(buffer: AudioBuffer, bus: AudioBus, gain = 1): void {
     const ctx = this.context();
     const source = ctx.createBufferSource();
     source.buffer = buffer;
-    source.connect(this.buses![bus]);
+    if (gain === 1) source.connect(this.buses![bus]);
+    else {
+      const local = ctx.createGain();
+      local.gain.value = gain;
+      local.connect(this.buses![bus]);
+      source.connect(local);
+    }
     source.start();
   }
 

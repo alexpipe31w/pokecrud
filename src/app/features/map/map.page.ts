@@ -3,26 +3,35 @@ import {
   ElementRef,
   OnDestroy,
   afterNextRender,
+  computed,
   inject,
   signal,
   viewChild,
 } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { Router } from '@angular/router';
 import { ThreeJSOverlayView } from '@googlemaps/three';
 import { IonContent, ViewDidEnter, ViewWillLeave } from '@ionic/angular';
-import { fromLocalM, toLocalM, type LatLng } from '@shared/engine/geo';
-import type { Weather } from '@shared/engine/spawns';
-import type { NearbySpawns } from '@shared/protocol/spawns';
-import { firstValueFrom, timeout } from 'rxjs';
+import { distanceM, fromLocalM, toLocalM, type LatLng } from '@shared/engine/geo';
+import * as THREE from 'three';
 
-import { environment } from '../../../environments/environment';
 import { AuthService } from '../../core/auth/auth.service';
 import { MAPS_MAP_ID, loadMapsLibrary, mapsAuthFailed } from '../../core/maps/google-maps.loader';
 import { joystickVelocity } from '../../game/geo/joystick-math';
 import { AvatarMotion } from '../../game/map-scene/avatar-motion';
 import { isNightLocal } from '../../game/map-scene/day-night';
-import { MapScene, REANCHOR_M } from '../../game/map-scene/map-scene';
+import {
+  CryThrottle,
+  cryGain,
+  isTap,
+  toNdc,
+  type PointerMark,
+} from '../../game/map-scene/map-input';
+import { MapScene, REACH_RADIUS_M, REANCHOR_M } from '../../game/map-scene/map-scene';
+import { nearestN } from '../../game/map-scene/spawn-diff';
+import { AudioService } from '../../services/game/audio.service';
 import { BagService } from '../../services/game/bag.service';
+import { HapticsService } from '../../services/game/haptics.service';
+import { SpawnFeedService } from '../../services/game/spawn-feed.service';
 import { CompassService } from '../../services/location/compass.service';
 import { DEFAULT_CENTER, LocationService } from '../../services/location/location.service';
 import { JoystickComponent, type JoystickVector } from '../../shared/ui/joystick.component';
@@ -47,8 +56,10 @@ const GL_RECOVER_DELAY_MS = 1500;
 /** Tope de reconstrucciones del mapa en REBUILD_WINDOW_MS (si WebGL no vuelve, no se entra en bucle). */
 const MAX_REBUILDS = 3;
 const REBUILD_WINDOW_MS = 60_000;
-/** El clima del HUD sale de `GET /spawns` (F1-07 lo cambia por el feed de spawns): sin respuesta en este tiempo, sin chip. */
-const WEATHER_TIMEOUT_MS = 8000;
+/** Cada cuánto se mira si toca pedir `/spawns` y se recolocan los Pokémon dibujados (F1-07). */
+const SPAWN_SYNC_MS = 250;
+/** Cuánto se ve el aviso "Acércate más" al tocar un Pokémon fuera de alcance. */
+const TOO_FAR_MS = 1500;
 
 /**
  * Pantalla principal del juego (F1-04): Google Maps vectorial inclinado que sigue al jugador (GPS filtrado o
@@ -87,9 +98,12 @@ const WEATHER_TIMEOUT_MS = 8000;
             [northUp]="northUp()"
             (modeToggle)="northUp.set(!northUp())"
           />
-          <app-weather-chip [weather]="weather()" [night]="night()" />
+          <app-weather-chip [weather]="spawnFeed.weather()" [night]="night()" />
         </div>
       </div>
+      @if (notice(); as n) {
+        <div class="notice" role="status">{{ n }}</div>
+      }
       <app-ball-menu />
 
       <app-location-gate [mapsError]="mapsError()" (retryMaps)="retryMaps()" />
@@ -128,6 +142,23 @@ const WEATHER_TIMEOUT_MS = 8000;
     .hud__right > * {
       pointer-events: auto;
     }
+    .notice {
+      position: absolute;
+      z-index: 10;
+      left: 50%;
+      bottom: calc(var(--ion-safe-area-bottom, 0px) + 112px);
+      transform: translateX(-50%);
+      max-width: calc(100% - 2 * var(--s-4));
+      padding: var(--s-2) var(--s-4);
+      border-radius: var(--r-chip);
+      background: var(--surface);
+      color: var(--surface-text);
+      border-top: 1px solid var(--glass-edge);
+      box-shadow: var(--shadow-sm);
+      font: 600 0.85rem/1.3 var(--font-display);
+      text-align: center;
+      pointer-events: none;
+    }
     .hud__right {
       margin-left: auto;
       display: grid;
@@ -141,9 +172,12 @@ export class MapPage implements ViewDidEnter, ViewWillLeave, OnDestroy {
   private readonly mapEl = viewChild.required<ElementRef<HTMLDivElement>>('mapEl');
   protected readonly location = inject(LocationService);
   private readonly compass = inject(CompassService);
-  private readonly http = inject(HttpClient);
   protected readonly auth = inject(AuthService);
   protected readonly bag = inject(BagService);
+  protected readonly spawnFeed = inject(SpawnFeedService);
+  private readonly audio = inject(AudioService);
+  private readonly haptics = inject(HapticsService);
+  private readonly router = inject(Router);
 
   protected readonly night = signal(isNightLocal(new Date()));
   /** Por qué no se pudo cargar Google Maps (la pantalla de estados lo muestra con "Reintentar"). */
@@ -152,8 +186,12 @@ export class MapPage implements ViewDidEnter, ViewWillLeave, OnDestroy {
   protected readonly northUp = signal(false);
   /** Rumbo de la cámara redondeado a grados (para la aguja del HUD; no cambia en cada fotograma). */
   protected readonly cameraHeading = signal(0);
-  /** Clima de la celda del jugador (GET /spawns); null = sin datos todavía o el servidor no respondió. */
-  protected readonly weather = signal<Weather | null>(null);
+  /** "Acércate más" tras tocar un Pokémon lejano (gana al error del feed mientras dura). */
+  private readonly tooFar = signal(false);
+  /** Aviso flotante sobre el mapa: Pokémon fuera de alcance o el feed de Pokémon salvajes caído. */
+  protected readonly notice = computed(() =>
+    this.tooFar() ? 'Acércate más para atraparlo' : this.spawnFeed.error(),
+  );
   /** Último vector del joystick (se lee en cada fotograma; no hace falta que sea signal). */
   protected joy: JoystickVector = { dx: 0, dy: 0 };
 
@@ -167,8 +205,25 @@ export class MapPage implements ViewDidEnter, ViewWillLeave, OnDestroy {
   private lastFrame = 0;
   private nightTimer?: ReturnType<typeof setInterval>;
   private active = false;
-  /** El clima se pide una vez por visita, en cuanto hay posición. */
-  private weatherAsked = false;
+  /** Último instante en que se miró el feed de Pokémon (cada SPAWN_SYNC_MS). */
+  private lastSpawnSync = 0;
+  /** Posición del avatar en el último fotograma (para la distancia al tocar un Pokémon). */
+  private avatarPos: LatLng | null = null;
+  private readonly cries = new CryThrottle();
+  private pointerDown: PointerMark | null = null;
+  private tooFarTimer?: ReturnType<typeof setTimeout>;
+  /** Abriendo un encuentro (un segundo toque mientras tanto no hace nada). */
+  private opening = false;
+  private readonly onPointerDown = (e: PointerEvent): void => {
+    this.pointerDown = e.isPrimary ? { x: e.clientX, y: e.clientY, t: e.timeStamp } : null;
+  };
+  private readonly onPointerUp = (e: PointerEvent): void => {
+    const down = this.pointerDown;
+    this.pointerDown = null;
+    if (down && e.isPrimary && isTap(down, { x: e.clientX, y: e.clientY, t: e.timeStamp })) {
+      this.tapAt(e.clientX, e.clientY);
+    }
+  };
   private destroyed = false;
   private rebuilding = false;
   /** Cuándo se rehízo el mapa últimamente (tope de reintentos: sin WebGL no se entra en bucle). */
@@ -205,7 +260,8 @@ export class MapPage implements ViewDidEnter, ViewWillLeave, OnDestroy {
   ionViewDidEnter(): void {
     if (this.active || this.destroyed) return;
     this.active = true;
-    this.weatherAsked = false;
+    this.lastSpawnSync = 0;
+    this.mapScene.spawns.enter();
     this.attachOverlay();
     this.scheduleRecover();
     void this.bag.load();
@@ -226,12 +282,16 @@ export class MapPage implements ViewDidEnter, ViewWillLeave, OnDestroy {
     void this.location.stop();
     this.compass.stop();
     this.joy = { dx: 0, dy: 0 };
+    this.pointerDown = null;
   }
 
   ngOnDestroy(): void {
     this.destroyed = true;
     this.ionViewWillLeave();
     clearInterval(this.nightTimer);
+    clearTimeout(this.tooFarTimer);
+    this.mapEl().nativeElement.removeEventListener('pointerdown', this.onPointerDown, true);
+    this.mapEl().nativeElement.removeEventListener('pointerup', this.onPointerUp, true);
     this.mapEl().nativeElement.removeEventListener('webglcontextlost', this.onContextLost, true);
     this.mapEl().nativeElement.removeEventListener(
       'webglcontextrestored',
@@ -265,6 +325,9 @@ export class MapPage implements ViewDidEnter, ViewWillLeave, OnDestroy {
       true,
     );
     document.addEventListener('visibilitychange', this.onVisibility);
+    // Toques sobre los Pokémon: en captura, antes de que Google los use para arrastrar el mapa (no se cancelan).
+    this.mapEl().nativeElement.addEventListener('pointerdown', this.onPointerDown, true);
+    this.mapEl().nativeElement.addEventListener('pointerup', this.onPointerUp, true);
     clearInterval(this.nightTimer);
     this.nightTimer = setInterval(() => this.recoverIfLost(), NIGHT_CHECK_MS);
     // Por si Ionic disparó ionViewDidEnter antes de que el mapa existiera (primera carga).
@@ -406,10 +469,6 @@ export class MapPage implements ViewDidEnter, ViewWillLeave, OnDestroy {
     if (rounded !== this.cameraHeading()) this.cameraHeading.set(rounded);
     const pos = this.location.position();
     if (!pos) return;
-    if (!this.weatherAsked) {
-      this.weatherAsked = true;
-      void this.loadWeather(pos);
-    }
     if (!this.origin) {
       // Primera posición: la escena se ancla aquí y el avatar aparece sin animar.
       this.origin = { lat: pos.lat, lng: pos.lng };
@@ -424,25 +483,75 @@ export class MapPage implements ViewDidEnter, ViewWillLeave, OnDestroy {
       this.origin = fromLocalM(this.origin, f.east, f.north);
       this.overlay.setAnchor({ ...this.origin, altitude: 0 });
       this.motion.shift(f.east, f.north);
+      this.mapScene.spawns.reposition(this.origin);
       f = { ...f, east: 0, north: 0 };
     }
     this.mapScene.setPlayer(f, now);
-    this.map.moveCamera({ center: fromLocalM(this.origin, f.east, f.north), heading });
+    this.avatarPos = fromLocalM(this.origin, f.east, f.north);
+    if (now - this.lastSpawnSync >= SPAWN_SYNC_MS) {
+      this.lastSpawnSync = now;
+      this.syncSpawns(pos, this.avatarPos, now);
+    }
+    this.mapScene.spawns.update(now);
+    this.map.moveCamera({ center: this.avatarPos, heading });
   }
 
-  /** Clima para el HUD. Si falla (sin red, servidor durmiendo, sin SPAWN_SALT → 503), simplemente no hay chip. */
-  private async loadWeather(at: LatLng): Promise<void> {
+  /**
+   * Pide `/spawns` cuando toca (lo decide el feed) y deja en la escena los MAX_DRAWN más cercanos al avatar. Los que
+   * brotan cerca suenan bajito (DISENO §5), como mucho uno cada pocos segundos.
+   */
+  private syncSpawns(gps: LatLng, avatar: LatLng, now: number): void {
+    if (!this.origin) return;
+    void this.spawnFeed.tick(gps);
+    const sprouted = this.mapScene.spawns.sync(
+      nearestN(this.spawnFeed.spawns(), avatar),
+      this.origin,
+      now,
+    );
+    for (const s of sprouted) {
+      const gain = cryGain(distanceM(avatar, s));
+      if (gain !== null && this.cries.take(now)) {
+        void this.audio.playCry(s.speciesId, gain);
+        break;
+      }
+    }
+  }
+
+  /** Toque sobre el mapa: si cae en un Pokémon, al encuentro (si está a mano) o "Acércate más". */
+  private tapAt(clientX: number, clientY: number): void {
+    if (!this.overlay || !this.avatarPos) return;
+    const targets = this.mapScene.spawns.hitTargets();
+    if (targets.length === 0) return;
+    const ndc = toNdc(clientX, clientY, this.mapEl().nativeElement.getBoundingClientRect());
+    const hit = this.overlay.raycast(new THREE.Vector2(ndc.x, ndc.y), targets)[0];
+    const id = hit ? this.mapScene.spawns.idOf(hit.object) : null;
+    const spawn = id ? this.mapScene.spawns.get(id) : null;
+    if (!id || !spawn) return;
+    if (distanceM(this.avatarPos, spawn) <= REACH_RADIUS_M) {
+      this.haptics.tap();
+      void this.openEncounter(id);
+      return;
+    }
+    this.mapScene.spawns.hop(id, performance.now());
+    this.tooFar.set(true);
+    clearTimeout(this.tooFarTimer);
+    this.tooFarTimer = setTimeout(() => this.tooFar.set(false), TOO_FAR_MS);
+  }
+
+  /**
+   * Antes de abrir el encuentro se le dice al servidor dónde está el jugador AHORA: mide la distancia desde la última
+   * posición de `GET /spawns` y el feed solo la renueva cada 60 m (si no, 403 "demasiado lejos" tras acercarse).
+   * Si falla igual se abre: la pantalla del encuentro enseña el error del servidor.
+   */
+  private async openEncounter(id: string): Promise<void> {
+    const pos = this.location.position();
+    if (this.opening || !pos) return;
+    this.opening = true;
     try {
-      const res = await firstValueFrom(
-        this.http
-          .get<NearbySpawns>(`${environment.serverUrl}/spawns`, {
-            params: { lat: at.lat, lng: at.lng },
-          })
-          .pipe(timeout(WEATHER_TIMEOUT_MS)),
-      );
-      this.weather.set(res.weather ?? null);
-    } catch (err) {
-      console.warn('[mapa] sin clima', err);
+      await this.spawnFeed.reportPosition({ lat: pos.lat, lng: pos.lng });
+      await this.router.navigateByUrl(`/encuentro/${encodeURIComponent(id)}`);
+    } finally {
+      this.opening = false;
     }
   }
 

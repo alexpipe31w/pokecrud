@@ -93,7 +93,8 @@ describe('Avatar3D', () => {
     const a = new Avatar3D(0xff4d4d);
     // Andar hasta que la pierna esté bien adelantada.
     let t = 0;
-    for (let i = 0; i < 600 && legs(a)[0] < 0.4; i++) t = run(a, frame({ gait: 'walk', speed: 1.4 }), 1, t);
+    for (let i = 0; i < 600 && legs(a)[0] < 0.4; i++)
+      t = run(a, frame({ gait: 'walk', speed: 1.4 }), 1, t);
     const before = legs(a)[0];
     expect(before).toBeGreaterThan(0.4);
     t = run(a, frame(), 1, t);
@@ -127,8 +128,8 @@ describe('Avatar3D', () => {
   it('dispose libera geometrías y materiales', () => {
     const a = new Avatar3D(0xff4d4d);
     const ms = meshes(a.root);
-    const spies = [...new Set(ms.flatMap((m) => [m.geometry, m.material as THREE.Material]))].map((r) =>
-      vi.spyOn(r, 'dispose'),
+    const spies = [...new Set(ms.flatMap((m) => [m.geometry, m.material as THREE.Material]))].map(
+      (r) => vi.spyOn(r, 'dispose'),
     );
     a.dispose();
     for (const s of spies) expect(s).toHaveBeenCalled();
