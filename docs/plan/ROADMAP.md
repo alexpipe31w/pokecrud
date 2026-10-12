@@ -68,7 +68,7 @@
 
 ## F1 · Mapa con GPS
 
-- [ ] **F1-01 · [SPIKE] Google Maps 3D + overlay three.js** — mapa vectorial con Map ID, tilt, overlay con
+- [~] **F1-01 · [SPIKE] Google Maps 3D + overlay three.js** (@alex, 2026-10-11) — mapa vectorial con Map ID, tilt, overlay con
       un objeto 3D; medir fps en Android real. Decidir plan A/B (ARQUITECTURA §4) y anotarlo en DECISIONES.
       Dep: F0-09. Criterio: medición de fps en la bitácora + decisión escrita.
 - [ ] **F1-02 · Plan detallado de F1** (`docs/plan/fases/F1-mapa.md`). Dep: F1-01.
