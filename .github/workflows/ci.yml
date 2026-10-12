@@ -1,0 +1,53 @@
+# CI (F0-14): lint + tests + build obligatorios para mezclar en develop. Sin secretos: los e2e del servidor (base real)
+# siguen siendo locales (`cd server && npm run test:e2e`).
+name: CI
+
+on:
+  pull_request:
+    branches: [develop, main]
+  push:
+    branches: [develop]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  app:
+    name: App (lint, tests, build)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npx ng test --watch=false
+      - run: npm run test:shared
+      - run: npm run build
+
+  server:
+    name: Servidor (lint, unitarios, build)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: server
+    env:
+      # Solo para que `prisma generate` lea prisma.config.ts; nada se conecta a ella.
+      DIRECT_URL: postgresql://ci:ci@localhost:5432/ci
+      DATABASE_URL: postgresql://ci:ci@localhost:5432/ci
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: server/package-lock.json
+      - run: npm ci
+      - run: npm run lint
+      - run: npm test
+      - run: npm run build

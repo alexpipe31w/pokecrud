@@ -84,6 +84,11 @@
 
 ## F1 · Mapa con GPS
 
+- [x] **F0-14 · CI y `develop` protegida** (@alex, 2026-10-12) — pendiente de la revisión de F0. Criterio: cada PR a
+      `develop` pasa lint + tests + build de la app y del servidor en GitHub Actions y no se puede mezclar en rojo.
+      **Hecho:** `.github/workflows/ci.yml` (app: lint, `ng test`, `test:shared`, build; servidor: lint, unitarios,
+      build; los e2e siguen siendo locales porque necesitan la base real). `develop` exige los dos trabajos en verde,
+      sin exigir revisión (cada uno mezcla su PR).
 - [x] **F1-01 · [SPIKE] Google Maps 3D + overlay three.js** (@alex + @samuel, 2026-10-12) — mapa vectorial con Map ID, tilt, overlay con
       un objeto 3D; medir fps en Android real. Decidir plan A/B (ARQUITECTURA §4) y anotarlo en DECISIONES.
       Dep: F0-09. Criterio: medición de fps en la bitácora + decisión escrita.

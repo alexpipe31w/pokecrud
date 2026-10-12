@@ -943,3 +943,14 @@ brazos y piernas colgados de pivotes, sombra que encoge con el bote; 12 mallas, 
 **Decisiones nuevas:** D-040.
 **El siguiente debe empezar por:** con Android, `npm run apk -- --install`, andar y trotar con el GPS y medir fps por CDP
 (como en F1-04 8b); si ≥ 55, marcar F1-05 `[x]`. Sin Android: F1-07 (Pokémon en el mapa) ya puede empezar.
+
+## 2026-10-12 17:00 · @alex (Claude) · F0-14 · rama `feature/F0-14-ci`
+
+**Qué se hizo:** GitHub Actions `CI` en cada PR a `develop` (y push a `develop`): app (lint, `ng test`, `test:shared`,
+build) y servidor (lint, unitarios, build). `develop` protegida: exige los dos trabajos en verde; sin revisión obligatoria.
+**Cómo se probó (salida real):**
+
+    PR #40: App (lint, tests, build) pass 55s · Servidor (lint, unitarios, build) pass 27s
+
+**Quedó a medias / roto:** nada. Los e2e del servidor no corren en CI (necesitan la base de Supabase).
+**El siguiente debe empezar por:** nada nuevo: si el CI sale en rojo en tu PR, arréglalo antes de mezclar.

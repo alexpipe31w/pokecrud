@@ -200,8 +200,8 @@ fórmula (F2-03) y captura en servidor (F2-06) hechas; lo visual del encuentro e
 - [ ] Postman (tras #21): poner `adminEmail`/`adminPassword` en SU entorno local de Postman.
 - [ ] Antes del **2027-01-10**: tope de Google Maps o pasar a MapLibre (ver más abajo).
 - [ ] Decidir qué hacer con las 6 capturas `docs/evidencias/HU-02_*.jpg` sin commitear.
-- [ ] (Recomendado en la revisión de F0) Proteger `develop` y añadir CI con lint + test + build obligatorios:
-      hoy los 23 PR se han mezclado sin revisión.
+- [x] (2026-10-12, Alex) `develop` protegida + CI obligatoria (F0-14): lint + tests + build de app y servidor en cada PR;
+      no hace falta revisión, pero no se puede mezclar en rojo.
 - [x] `server/.env` en 6543, `JWT_SECRET` y `SPAWN_SALT` locales; JDK 21 instalado (2026-10-11).
 
 - **Cada compañero necesita su propio `JWT_SECRET`** en su `server/.env` para arrancar el servidor en local (SECRETOS.md).
