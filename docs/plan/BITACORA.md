@@ -788,3 +788,22 @@ ayer). Comprobado el riesgo: un `rng.js` viejo junto a `rng.ts` lo usa Vitest en
 **Decisiones nuevas:** D-036.
 **El siguiente debe empezar por:** F1-02 — plan detallado de F1 en `docs/plan/fases/F1-mapa.md` con `writing-plans`
 (leer D-035: plan A, ≤ 30 Pokémon; D-022: el mapa anula la zona segura; `/dev/mapa` y `spike-scene.ts` como base).
+
+## 2026-10-12 12:50 · @samuel (Claude) · F1-02 · rama `feature/F1-02-plan-mapa`
+
+**Qué se hizo:** mezclado el PR #33 (F0-13) con permiso de Samuel. F1-02: plan detallado de la fase del mapa con la
+skill `writing-plans` en `docs/plan/fases/F1-mapa.md`, a partir del spike (`/dev/mapa`, `spike-scene.ts`, D-035),
+ARQUITECTURA §4-5, DISENO §1/§4-6 y el código actual (`google-maps.loader.ts`, `SettingsService.joystickMode`,
+`AudioService`, `GET /spawns`). Cubre F1-03, F1-04, F1-05 y F1-07 con archivos exactos, código y tests (TDD), casillas
+por paso para los puntos de guardado y riesgos. Decisiones de diseño que fija el plan (sin código aún): lógica pura con
+tests (`shared/engine/geo.ts`, `src/app/game/geo/*`, `avatar-motion`, `appear`, `refetch`, `spawn-diff`); escena en
+metros locales con re-anclaje a 1 km; `/mapa` sustituye a las pestañas (`/pokedex` con botón atrás); `GET /spawns`
+devolverá `weather` y `night` (contrato en `shared/protocol/spawns.ts`); alcance de toque 40 m (el servidor permite 80);
+`/encuentro/:id` provisional hasta F2-04; avatar procedural (sin glTF); `@capacitor/geolocation` 8.2.3 exacto.
+**Cómo se probó:** es un documento. Autorrevisión: cada test del plan recalculado a mano contra su implementación (filtro
+GPS, ángulos, joystick, avatar, pose, aparición, política de peticiones): cuadran. Corregidos 4 fallos (doble del plugin,
+`localStorage` entre tests, callback ilegible, `ColorScheme` está en la librería `core`) y movida la pantalla de permisos
+a F1-03 (lo pide su criterio).
+**Quedó a medias / roto:** nada. Pendiente de Alex: estilo del Map ID sin POI y con variante oscura (en ESTADO).
+**Decisiones nuevas:** ninguna en DECISIONES (las del plan se anotarán al implementarlas si cambian algo).
+**El siguiente debe empezar por:** F1-03 siguiendo `docs/plan/fases/F1-mapa.md` (paso 1: `shared/engine/geo.ts`).

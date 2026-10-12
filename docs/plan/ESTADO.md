@@ -3,7 +3,7 @@
 > Se **reescribe** al cerrar cada sesión (no es histórico; el histórico es `BITACORA.md`).
 > Máximo una pantalla. Si lees esto al empezar: después lee `ROADMAP.md`.
 
-**Última actualización:** 2026-10-12 · por Samuel (Claude) · rama `feature/F1-02-plan-mapa` (reclama F1-02)
+**Última actualización:** 2026-10-12 · por Samuel (Claude) · rama `feature/F1-02-plan-mapa` (F1-02 hecha, PR abierto)
 
 ## 👉 RELEVO DE ALEX A SAMUEL — HECHO (2026-10-12)
 
@@ -32,6 +32,9 @@ visual del mapa ya tiene vía libre (**F1-01 hecha: plan A, D-035**); el del enc
 
 ## Hecho
 
+- **F1-02 (Samuel, PR pendiente):** plan de la fase del mapa en `docs/plan/fases/F1-mapa.md`: F1-03 (GPS filtrado,
+  brújula, joystick, permisos), F1-04 (`/mapa` como pantalla principal, HUD, menú de la Poké Ball, adiós pestañas,
+  clima en `GET /spawns`), F1-05 (avatar 3D procedural) y F1-07 (Pokémon con hierba, grito por cercanía, toque).
 - **F0-13 (Samuel, PR #33 mezclado):** los `.js` que aparecían en `shared/` salen de compilar el servidor con la config
   previa a D-024 (rama vieja); Vitest los usaba EN VEZ del `.ts`. Ahora `scripts/clean-shared-artifacts.mjs` los borra
   solo antes de `start`/`build`/`test` (raíz, `server/`, APK) y `.gitignore` impide subirlos. D-036.
@@ -112,8 +115,7 @@ visual del mapa ya tiene vía libre (**F1-01 hecha: plan A, D-035**); el del enc
 
 ## En curso
 
-- **F1-02 (@samuel, 2026-10-12)** — rama `feature/F1-02-plan-mapa`. **Punto de guardado:** reclamada; paso siguiente:
-  escribir `docs/plan/fases/F1-mapa.md` (F1-03, F1-04, F1-05, F1-07) con `writing-plans`.
+- Nadie (F1-02 terminada; su PR espera revisión/mezcla).
 
 ## Siguiente paso concreto
 
@@ -121,7 +123,8 @@ visual del mapa ya tiene vía libre (**F1-01 hecha: plan A, D-035**); el del enc
    puede agregar/editar/eliminar Pokémon en `/pokemon` (hoy hay 0 ADMIN en la base).
 2. **Kenneth:** poner `SPAWN_SALT` en su `server/.env`
    (`node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))"`; sin ella `/spawns` da 503).
-3. **Siguiente tarea libre:** **F1-02** (plan detallado de F1 con `writing-plans`; leer D-035 y D-022). Con Android →
+3. **Siguiente tarea libre:** **F1-03** (ubicación, brújula y joystick; sigue `docs/plan/fases/F1-mapa.md`, necesita
+   Android para el criterio). Con Android también →
    F2-01 (spike de cámara y giroscopio). Sin móvil → F5-01 o F2-08.
 4. Para generar el APK en otro PC: JDK 21 (`winget install Microsoft.OpenJDK.21`; si da "el hash no coincide",
    `winget install EclipseAdoptium.Temurin.21.JDK`) y `npm run apk`.
@@ -154,6 +157,8 @@ visual del mapa ya tiene vía libre (**F1-01 hecha: plan A, D-035**); el del enc
 
 **Alex:**
 
+- [ ] (Para F1-04) Estilo del Map ID `5309ecf69efbfe12f3ecbc4c` en Google Cloud: **sin POI comerciales** y con
+      **variante oscura** (noche). Si no se puede, crear un segundo Map ID para la noche (plan en `fases/F1-mapa.md`).
 - [ ] Nombrarse ADMIN del inventario tras mezclar #21: registrarse en la app y `cd server && npm run admin -- grant <correo>`.
 - [ ] Postman (tras #21): poner `adminEmail`/`adminPassword` en SU entorno local de Postman.
 - [ ] Antes del **2027-01-10**: tope de Google Maps o pasar a MapLibre (ver más abajo).
