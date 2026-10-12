@@ -188,3 +188,13 @@ según el orden (pasó con HapticsService: 1 de 4 corridas). Por eso plugins y A
   archivo borra solo su prefijo (`test+`, `crud+`) y los de prueba con > 1 h (restos de Postman): `test/support/cleanup.ts`.
 - **Consecuencia:** en modo transacción no hay estado de sesión entre consultas (nada de `SET` de sesión, advisory locks
   de sesión ni `LISTEN/NOTIFY`). Si algún día hace falta, usar `DIRECT_URL` para ese caso concreto.
+
+## D-022 · Zona segura global para pantallas sin `ion-header` (F0-11) (2026-10-11, Kenneth)
+
+Con `targetSdk` 36 Android dibuja la app de borde a borde y `/dev/ui` quedaba bajo la barra de estado. **Decisión:** una
+sola regla en `src/global.scss` (`.ion-page:not(:has(> ion-header)) > ion-content`) pone `--padding-*` =
+`var(--ion-safe-area-*)`: el fondo llega al borde y el contenido se aparta; las pantallas nuevas sin cabecera quedan
+cubiertas solas. Las que llevan `ion-header` no cambian (Ionic ya lo resuelve). Medido en el Samsung A36: inset 35 px
+arriba / 15 px abajo; sin scroll extra en login y registro. **Una pantalla que deba ir a pantalla completa de verdad
+(mapa F1, encuentro AR F2) anula `--padding-top/bottom` en su `ion-content`** y coloca sus controles con
+`var(--ion-safe-area-*)`. `:has()` existe desde Chrome 105: en un WebView más viejo simplemente no se aplica (como antes).

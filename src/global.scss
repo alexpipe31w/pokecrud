@@ -48,3 +48,16 @@
 :root {
   --font-display: 'Fredoka', system-ui, sans-serif;
 }
+
+/*
+ * Zona segura (F0-11). Con targetSdk 35+ Android dibuja la app de borde a borde (bajo la barra de estado y la de
+ * gestos). `ion-header` ya deja ese hueco; las pantallas SIN cabecera (login, registro, /dev/ui… y las que vengan)
+ * lo reciben aquí: el fondo llega al borde y el contenido se aparta. En navegador de escritorio los insets valen 0.
+ * Si una pantalla necesita ir de verdad a pantalla completa (mapa, encuentro AR), que lo anule en su ion-content.
+ */
+.ion-page:not(:has(> ion-header)) > ion-content {
+  --padding-top: var(--ion-safe-area-top, 0px);
+  --padding-bottom: var(--ion-safe-area-bottom, 0px);
+  --padding-start: var(--ion-safe-area-left, 0px);
+  --padding-end: var(--ion-safe-area-right, 0px);
+}
