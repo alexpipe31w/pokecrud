@@ -12,15 +12,30 @@ export interface LimbPose {
   lean: number;
 }
 
+const TAU = 2 * Math.PI;
+
 /** Zancada ≈ 0,75 m andando, 1,2 m corriendo: la cadencia sale de la velocidad (los pies no "patinan"). */
-export function limbPose(gait: Gait, speed: number, t: number): LimbPose {
+function strideM(gait: Gait): number {
+  return gait === 'run' ? 1.2 : 0.75;
+}
+
+/**
+ * Avanza la fase de la zancada (radianes, en [0, 2π)). Se ACUMULA fotograma a fotograma: calcularla como
+ * `velocidad × t` con `t` absoluto haría saltar las piernas cada vez que `AvatarMotion` suaviza la velocidad.
+ */
+export function advanceStride(phase: number, gait: Gait, speed: number, dt: number): number {
+  if (gait === 'idle' || dt <= 0) return phase;
+  const next = phase + TAU * (speed / (2 * strideM(gait))) * dt;
+  return next % TAU;
+}
+
+/** Pose de las extremidades para una fase de zancada; `t` (segundos) solo marca la respiración en reposo. */
+export function limbPose(gait: Gait, phase: number, t: number): LimbPose {
   if (gait === 'idle') {
-    const b = Math.sin(t * 2 * Math.PI * 0.4) * 0.05;
+    const b = Math.sin(t * TAU * 0.4) * 0.05;
     return { legL: 0, legR: 0, armL: 0, armR: 0, bob: b, lean: 0 };
   }
   const run = gait === 'run';
-  const stride = run ? 1.2 : 0.75;
-  const phase = 2 * Math.PI * (speed / (2 * stride)) * t;
   const amp = run ? 0.9 : 0.5;
   const s = Math.sin(phase);
   return {

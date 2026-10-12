@@ -1100,7 +1100,7 @@ export function limbPose(gait: Gait, speed: number, t: number): LimbPose {
 
 **Files:** Create `src/app/game/map-scene/avatar-3d.ts`; Modify `map-scene.ts` (sustituye el avatar provisional)
 
-- [ ] **2a.** Personaje low-poly procedural (no hay glTF libres que valgan; D-003 ya eligió procedural para todo lo
+- [x] **2a.** Personaje low-poly procedural (no hay glTF libres que valgan; D-003 ya eligió procedural para todo lo
   que no sea arte oficial): grupo raíz → torso (cápsula, color `--accent` leído una vez con
   `getComputedStyle(document.documentElement)`), cabeza (esfera, piel), **gorra** (media esfera + visera, rojo/blanco),
   mochila (caja redondeada), brazos y piernas como cápsulas **colgadas de un pivote** (`Group` en la cadera/hombro
@@ -1108,8 +1108,8 @@ export function limbPose(gait: Gait, speed: number, t: number): LimbPose {
   `update(frame: AvatarFrame, timeS)`: aplica `limbPose(frame.gait, frame.speed, timeS)`, `rotation.y` desde
   `facingDeg`, `position.y = bob`, `rotation.x = lean`. Sombra: disco negro 30 % que se encoge un poco con el bote.
   Círculo de alcance: el anillo de `MapScene` (40 m) con pulso.
-- [ ] **2b.** Un solo material por color (compartidos), ≤ 12 mallas, sin `castShadow`. `dispose()`.
-- [ ] **2c.** `MapScene.setPlayer` llama a `avatar.update`. Lint + build. Commit + `/guardar`.
+- [x] **2b.** Un solo material por color (compartidos), ≤ 12 mallas, sin `castShadow`. `dispose()`.
+- [x] **2c.** `MapScene.setPlayer` llama a `avatar.update`. Lint + build. Commit + `/guardar`.
 
 ### Paso 3 — Prueba
 

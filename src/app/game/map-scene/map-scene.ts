@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 
+import { Avatar3D } from './avatar-3d';
 import type { AvatarFrame } from './avatar-motion';
 
 /** Alcance del jugador (solo UX: el servidor permite lanzar hasta 80 m, D-028). */
@@ -9,7 +10,7 @@ export const REANCHOR_M = 1000;
 /** El anillo de alcance "respira" entre estas opacidades con este periodo. */
 const RING_OPACITY: [number, number] = [0.5, 0.8];
 const RING_PERIOD_MS = 1600;
-/** El avatar provisional a escala 1 casi no se ve a zoom 19 con la cámara inclinada (F1-04, Kenneth): ×1,8 hasta F1-05. */
+/** A escala 1 (≈ 9,5 m) el avatar casi no se ve a zoom 19 con la cámara inclinada (F1-04, Kenneth): ×1,8. */
 const AVATAR_SCALE = 1.8;
 
 /** Luces del día (= las que pone `ThreeJSOverlayView` por defecto) y de la noche (más frías y tenues). */
@@ -20,15 +21,14 @@ const LIGHTS = {
 
 /**
  * Escena three.js del mapa (ARQUITECTURA §2: motor de presentación, sin Angular). Metros locales respecto al origen
- * (= ancla del overlay): x = este, z = −norte, y = arriba. Por ahora solo el jugador; los Pokémon llegan en F1-07.
- * Sin sombras proyectadas: las sombras son discos semitransparentes (lo medido en D-035).
+ * (= ancla del overlay): x = este, z = −norte, y = arriba. Por ahora solo el jugador (`Avatar3D`, F1-05); los Pokémon
+ * llegan en F1-07. Sin sombras proyectadas: las sombras son discos semitransparentes (lo medido en D-035).
  */
 export class MapScene {
   readonly scene = new THREE.Scene();
   /** Avatar + sombra + círculo de alcance: se mueven juntos. */
   readonly player = new THREE.Group();
-  /** Avatar PROVISIONAL (cápsula + cabeza + nariz del spike) hasta el avatar 3D de F1-05. */
-  private readonly avatar = new THREE.Group();
+  private readonly avatar = new Avatar3D();
   private readonly ringMaterial: THREE.MeshBasicMaterial;
   private readonly hemi = new THREE.HemisphereLight();
   private readonly sun = new THREE.DirectionalLight();
@@ -40,28 +40,7 @@ export class MapScene {
     this.scene.add(this.hemi, this.sun, this.player);
     this.setNight(false);
 
-    const bodyMat = this.track(new THREE.MeshLambertMaterial({ color: 0xe53935 }));
-    const skinMat = this.track(new THREE.MeshLambertMaterial({ color: 0xffcc80 }));
-    const body = new THREE.Mesh(this.track(new THREE.CapsuleGeometry(1.6, 3, 4, 12)), bodyMat);
-    body.position.y = 3.2;
-    const head = new THREE.Mesh(this.track(new THREE.SphereGeometry(1.4, 16, 12)), skinMat);
-    head.position.y = 7;
-    // Nariz: indica hacia dónde mira (−Z = norte con rotación 0).
-    const nose = new THREE.Mesh(this.track(new THREE.ConeGeometry(0.6, 1.6, 12)), bodyMat);
-    nose.rotation.x = -Math.PI / 2;
-    nose.position.set(0, 7, -1.9);
-    this.avatar.add(body, head, nose);
-    this.avatar.scale.setScalar(AVATAR_SCALE);
-
-    const shadow = new THREE.Mesh(
-      this.track(new THREE.CircleGeometry(2.4, 24)),
-      this.track(
-        new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.3, depthWrite: false }),
-      ),
-    );
-    shadow.rotation.x = -Math.PI / 2;
-    shadow.position.y = 0.2;
-    shadow.scale.setScalar(AVATAR_SCALE);
+    this.avatar.root.scale.setScalar(AVATAR_SCALE);
 
     this.ringMaterial = this.track(
       new THREE.MeshBasicMaterial({
@@ -79,14 +58,13 @@ export class MapScene {
     ring.rotation.x = -Math.PI / 2;
     ring.position.y = 0.3;
 
-    this.player.add(this.avatar, shadow, ring);
+    this.player.add(this.avatar.root, ring);
   }
 
-  /** Coloca al jugador según `AvatarMotion` y anima el pulso del anillo de alcance. */
+  /** Coloca y anima al jugador según `AvatarMotion`, y el pulso del anillo de alcance. */
   setPlayer(f: AvatarFrame, timeMs: number): void {
     this.player.position.set(f.east, 0, -f.north);
-    // El rumbo de brújula va en sentido horario → rotación negativa en Y.
-    this.avatar.rotation.y = (-f.facingDeg * Math.PI) / 180;
+    this.avatar.update(f, timeMs / 1000);
     const [lo, hi] = RING_OPACITY;
     const wave = (1 + Math.sin((timeMs / RING_PERIOD_MS) * Math.PI * 2)) / 2;
     this.ringMaterial.opacity = lo + (hi - lo) * wave;
@@ -103,6 +81,7 @@ export class MapScene {
   }
 
   dispose(): void {
+    this.avatar.dispose();
     for (const d of this.disposables) d.dispose();
     this.scene.clear();
   }
