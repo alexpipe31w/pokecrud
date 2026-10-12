@@ -107,8 +107,9 @@ evolution{chainId, from, to[{id, minLevel, item, trigger}]}, learnset[{moveId, l
   Google: verdes/teal tipo juego, sin POIs comerciales), `tilt: 67.5`, `heading` = brújula del
   móvil, zoom fijo ~18 con gesto de pellizco limitado. Paquete `@googlemaps/js-api-loader`.
 - Overlay 3D con `WebGLOverlayView` + three.js (paquete `@googlemaps/three`, `ThreeJSOverlayView`):
-  avatar, Pokémon (sprite en billboard con sombra), hierba animada, círculo de alcance. **[SPIKE F1-01]**
-  confirmar 60 fps en Android gama media; plan B = markers HTML (`AdvancedMarkerElement`) con CSS 3D.
+  avatar, Pokémon (sprite en billboard con sombra), hierba animada, círculo de alcance. **Confirmado en F1-01 (D-035):** 58 fps con 30 Pokémon en un
+  Redmi Note 10 → como mucho 30 dibujados a la vez. El plan B (markers HTML `AdvancedMarkerElement`) rindió peor y
+  se descarta.
 - GPS: `@capacitor/geolocation` `watchPosition` (alta precisión) → filtro de suavizado (media móvil +
   descarte de saltos > 50 m en < 2 s, que son errores del GPS) → interpolación del avatar a 60 fps.
 - Brújula: `deviceorientationabsolute` (Android) con suavizado circular. Botón para "norte arriba".

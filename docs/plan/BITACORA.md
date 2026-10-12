@@ -425,6 +425,38 @@ botones se ven; la lógica está cubierta por tests).
 **El siguiente debe empezar por:** revisar el PR de F0-12 (`gh pr diff`), mezclarlo y pedir a Samuel el Manual Deploy;
 después `/inicio F1-01`.
 
+## 2026-10-11 21:00 · @alex (Claude) · F1-01 (a medias, pasa a Kenneth) · rama `feature/F1-01-spike-mapa-3d`
+
+**Qué se hizo:** página `/dev/mapa` (solo desarrollo, exige sesión): Google Maps vectorial (Map ID, tilt 67,5°, zoom 19,
+Parque Santander de Neiva) + la escena del juego (avatar, círculo de alcance 40 m, Pokémon como sprites con sombra y
+hierba animada en InstancedMesh). Plan A = `ThreeJSOverlayView` (`@googlemaps/three` 4.0.13); plan B =
+`AdvancedMarkerElement` con `<img>` y animación CSS; modo "Solo mapa" como línea base. Medidor de fps (`FpsMeter`, con
+tests) y botón "Medir batería": 7 configuraciones × (2 s calentando + 10 s midiendo con la cámara girando 360°).
+Cargador de Maps con timeout de 15 s y aviso si falta la clave (`src/app/core/maps/google-maps.loader.ts`).
+`environment.local.ts` ahora se importa: `scripts/ensure-local-env.mjs` lo crea desde la plantilla si falta
+(postinstall/prestart/prebuild/apk). `@googlemaps/three` no expone sus tipos con `moduleResolution: bundler` → copia
+mínima en `src/types/googlemaps-three.d.ts`.
+**Archivos clave:** `src/app/features/dev-map/`, `src/app/core/maps/google-maps.loader.ts`, `scripts/ensure-local-env.mjs`.
+**Cómo se probó (salida real):**
+
+    app: ng test → 26 archivos, 96/96 · shared 10/10 · lint OK · build OK
+    npm run apk → JDK 21: C:\Program Files\Microsoft\jdk-21.0.12.101-hotspot · BUILD SUCCESSFUL · APK 8.29 MB
+    PC (Chrome, RTX 5070, 390×844, renderingType VECTOR) — batería:
+      Solo mapa 0 → 177 fps · p95 5,9 ms · tirones 0,1 %
+      three.js 10/30/60 → 169,9 / 177 / 179,1 fps · p95 7,2 / 6 / 5,7 ms · 0 %
+      Markers 10/30/60 → 179,7 / 179,2 / 179,5 fps · p95 5,7 ms · 0 %
+    (en PC no discrimina: todo va al tope de la pantalla de 180 Hz)
+
+Evidencias `docs/evidencias/F1-01_0{1,2}_*.png`.
+**Quedó a medias / roto:** falta la medición en Android real (criterio de la tarea) y la decisión A/B. Alex no tiene
+Android → **la termina Kenneth**.
+**El siguiente debe empezar por (Kenneth):** `git fetch && git checkout feature/F1-01-spike-mapa-3d && npm install`
+(necesitas tu `environment.local.ts` con la clave de Maps), móvil por USB, `npm run apk -- --install`. En la app:
+entrar con una cuenta de Render y abrir `/dev/mapa` (desde chrome://inspect → consola: `location.href = '/dev/mapa'`).
+Pulsar "Medir batería" (~2 min, sin tocar el móvil), copiar de la consola la línea `[F1-01] batería {...}` a esta
+bitácora y escribir la decisión en DECISIONES: si three.js con 30 Pokémon da ≥ 50 fps de media y < 5 % de tirones →
+plan A; si no, plan B (o A con menos objetos). Luego `/cierre` y PR.
+
 ## 2026-10-11 21:15 · @alex (Claude) · F1-06 · rama `feature/F1-06-spawns`
 
 **Qué se hizo:** motor de spawns puro `shared/engine/spawns.ts` (`cellIdFor`, `cellsWithin`, `slotFor`, `isNightAt`,
@@ -702,3 +734,33 @@ Render tras #22…#27: /health/ready 200; /spawns y /bag → 401 sin sesión (ru
 **Decisiones nuevas:** ninguna (correcciones al relevo: Render despliega solo; GitHub no reapunta PR apilados aquí).
 **El siguiente debe empezar por:** Alex → `cd server && npm run admin -- grant <su correo>`; Kenneth → F1-01 en su
 Android y `SPAWN_SALT` en su `.env`; cualquiera → F0-13 (pequeña) o F5-01 / F2-08 / F2-01.
+
+## 2026-10-12 12:05 · @samuel (Claude) · F1-01 (retomo de @alex en "medir en Android") · rama `feature/F1-01-spike-mapa-3d`
+
+**Qué se hizo:** rama de Alex puesta al día con `develop` (53 commits; conflictos solo en BITACORA y ESTADO, resueltos
+conservando todo). APK de producción instalado en el Redmi Note 10 y batería de `/dev/mapa` lanzada desde el PC por el
+protocolo de depuración del WebView (`adb forward` + Chrome DevTools Protocol, sin tocar el móvil). La primera batería no
+valía: el mapa se había movido/acercado y casi no había objetos en pantalla (todo 60 fps). Se recargó y se repitió desde
+la vista inicial sin tocar → esa es la buena. Decisión **plan A** (D-035); ARQUITECTURA §4 actualizada.
+**Archivos clave:** `docs/plan/DECISIONES.md` (D-035), `docs/evidencias/F1-01_03_redmi-note10-three-60.png` (three.js ×
+60 con avatar, círculo y Pokémon visibles), `F1-01_04_redmi-note10-cerca.png` (vista acercada).
+**Cómo se probó (salida real):**
+
+    lint: All files pass linting · ng test: 29 archivos, 107 passed · shared: 11 archivos, 136 passed · build OK
+    npm run apk -- --install → BUILD SUCCESSFUL · APK (production) 8.41 MB · adb install: Success
+    [F1-01] batería {"device":{… Android 12; M2101K7BL … Chrome/153.0.8010.36 …","dpr":2.75,"viewport":"392x872",
+      "gpu":"Mali-G76","renderingType":"VECTOR"},"results":[
+      {"mode":"none","count":0,"avgFps":58.8,"p95Ms":16.8,"worstMs":132.7,"jankPct":0.2},
+      {"mode":"three","count":10,"avgFps":59.2,"p95Ms":16.8,"worstMs":49.8,"jankPct":0.2},
+      {"mode":"three","count":30,"avgFps":58.4,"p95Ms":16.8,"worstMs":33.4,"jankPct":0},
+      {"mode":"three","count":60,"avgFps":48.5,"p95Ms":33.3,"worstMs":49.8,"jankPct":0.8},
+      {"mode":"markers","count":10,"avgFps":56.7,"p95Ms":33.1,"worstMs":66.6,"jankPct":0.5},
+      {"mode":"markers","count":30,"avgFps":52.3,"p95Ms":33.3,"worstMs":49.7,"jankPct":1.7},
+      {"mode":"markers","count":60,"avgFps":43.8,"p95Ms":33.4,"worstMs":66.4,"jankPct":3.7}]}
+    temperatura de la batería: 34,4 °C → 37,4 °C tras ~6 min de pruebas
+
+**Quedó a medias / roto:** nada. Para F8-02: prueba de 10 min (calor/batería). Para F1-04: quitar POI comerciales del
+estilo del Map ID (consola de Google, Alex).
+**Decisiones nuevas:** D-035.
+**El siguiente debe empezar por:** F0-13 (artefactos `.js` en `shared/`, pequeña) o F1-02 (plan detallado de F1 con
+`writing-plans`, leyendo D-035 y D-022: el mapa anula la zona segura).

@@ -3,7 +3,7 @@
 > Se **reescribe** al cerrar cada sesión (no es histórico; el histórico es `BITACORA.md`).
 > Máximo una pantalla. Si lees esto al empezar: después lee `ROADMAP.md`.
 
-**Última actualización:** 2026-10-12 · por Samuel (Claude) · rama `feature/F0-12-admin-inventario` (al mezclar #21)
+**Última actualización:** 2026-10-12 · por Samuel (Claude) · rama `feature/F1-01-spike-mapa-3d` (F1-01 hecha, PR abierto)
 
 ## 👉 RELEVO DE ALEX A SAMUEL — HECHO (2026-10-12)
 
@@ -28,10 +28,13 @@ la parte visual (F4-07).
 
 **F0 completa** (en `develop`). **F4 (combate) completa en código** a falta de la versión AR (F4-07). **F1 y F2 a
 medias:** spawns (F1-06), mochila/XP (F1-08), fórmula de captura (F2-03) y captura en servidor (F2-06) hechos; lo
-visual del mapa y del encuentro espera a los spikes en Android (F1-01 Kenneth, F2-01).
+visual del mapa ya tiene vía libre (**F1-01 hecha: plan A, D-035**); el del encuentro espera al spike F2-01.
 
 ## Hecho
 
+- **F1-01 (Alex + Samuel, PR pendiente de mezclar):** spike del mapa medido en un Redmi Note 10: three.js con 30
+  Pokémon a 58,4 fps y 0 % de tirones, mejor que los markers HTML (52,3). **Plan A, máximo 30 Pokémon dibujados**
+  (D-035). Página de pruebas `/dev/mapa` (solo desarrollo). Desbloquea F1-02…F1-05.
 - **F4-05 (Alex, PR mezclado):** **escena de combate jugable** en `/combate/prueba` (botón en `/dev/ui`):
   elegir rival (fácil/normal/difícil), combate por turnos contra la IA con animaciones, textos, eficacia prevista,
   cambio de Pokémon y final. **Con esto la F4 (motor + IA + escena) está completa.** D-033.
@@ -106,17 +109,16 @@ visual del mapa y del encuentro espera a los spikes en Android (F1-01 Kenneth, F
 
 ## En curso
 
-- **F1-01 → PENDIENTE DE KENNETH** (medir fps en su Android): rama `feature/F1-01-spike-mapa-3d`, instrucciones
-  exactas en la última entrada de F1-01 de la bitácora.
+- Nadie (F1-01 terminada; su PR espera revisión/mezcla).
 
 ## Siguiente paso concreto
 
 1. **Alex:** nombrarse ADMIN del inventario (`cd server && npm run admin -- grant <correo>`). Hasta entonces nadie
    puede agregar/editar/eliminar Pokémon en `/pokemon` (hoy hay 0 ADMIN en la base).
-2. **Kenneth:** cerrar F1-01 (medición en Android + decisión A/B) y poner `SPAWN_SALT` en su `server/.env`
+2. **Kenneth:** poner `SPAWN_SALT` en su `server/.env`
    (`node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))"`; sin ella `/spawns` da 503).
-3. **Siguiente tarea libre:** sin móvil → F5-01 (plan del PvP) o F2-08 (audio). Con Android → F2-01 (spike de cámara
-   y giroscopio). F1-02…F1-05 esperan a F1-01.
+3. **Siguiente tarea libre:** F0-13 (pequeña) y luego **F1-02** (plan de F1; ya desbloqueada por F1-01). Con Android →
+   F2-01 (spike de cámara y giroscopio). Sin móvil → F5-01 o F2-08.
 4. **Tarea pequeña nueva (F0-13):** que los `.js`/`.d.ts` que a veces deja la compilación del servidor dentro de
    `shared/` no se puedan subir ni usar por error (ver Bloqueos).
 5. Para generar el APK en otro PC: JDK 21 (`winget install Microsoft.OpenJDK.21`; si da "el hash no coincide",
@@ -141,8 +143,7 @@ visual del mapa y del encuentro espera a los spikes en Android (F1-01 Kenneth, F
 **Kenneth:**
 
 - [ ] Probar el combate en su Android: APK → `/dev/ui` → "Combate de prueba"; que vaya fluido y se oigan los gritos.
-- [ ] **F1-01:** medir fps en su Android y escribir la decisión plan A/B (rama `feature/F1-01-spike-mapa-3d`,
-      instrucciones en su bitácora). Bloquea F1-02…F1-05.
+- [x] ~~**F1-01:** medir fps en su Android~~ → la retoma Samuel en su Redmi Note 10 (2026-10-12).
 - [ ] Su `server/.env`: `SPAWN_SALT` propia.
 
 **Quien coja F2-08 (audio):**

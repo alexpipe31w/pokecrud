@@ -386,3 +386,26 @@ entrenadores, `BattleController` (reproducción por eventos), `battle-text.ts` y
 `battle-sheet`). Lo que cambia es la capa visual: escenario, sprites y efectos pasan a una escena three.js sobre la
 cámara (misma tecnología que F2-04). Tarea nueva **F4-07** (depende del spike F2-01). Sin cámara o sin permiso → el
 fondo ilustrado de siempre (DISENO §6), no una pantalla rota.
+
+## D-035 · Mapa: plan A (Google Maps vectorial + `ThreeJSOverlayView`), máximo 30 Pokémon dibujados (F1-01) (2026-10-12, Samuel)
+
+**Medido en un Redmi Note 10** (Android 12, MIUI 13, GPU Mali-G76, pantalla de 60 Hz, WebView Chrome 153, 392×872 a
+dpr 2,75) con `/dev/mapa` del APK de producción, vista inicial (zoom 19, tilt 67,5°, girando 360°), 10 s por modo:
+
+| Modo | N | fps medios | p95 | tirones |
+|---|---|---|---|---|
+| Solo mapa | 0 | 58,8 | 16,8 ms | 0,2 % |
+| three.js | 10 / 30 / 60 | 59,2 / **58,4** / 48,5 | 16,8 / 16,8 / 33,3 ms | 0,2 / 0 / 0,8 % |
+| Markers HTML | 10 / 30 / 60 | 56,7 / 52,3 / 43,8 | 33,1 / 33,3 / 33,4 ms | 0,5 / 1,7 / 3,7 % |
+
+**Decisión:** plan A de ARQUITECTURA §4 (`@googlemaps/three` 4.0.13 + three 0.186.1). three.js con 30 Pokémon queda
+en el tope de la pantalla y rinde **mejor** que los markers HTML con la misma carga (cada marker es DOM que el mapa
+recoloca en cada fotograma). **Límite: como mucho 30 Pokémon dibujados a la vez** (con 60 ya baja a 48 fps); los spawns
+reales dan ~10-20 a 200 m (D-025), así que sobra margen para el avatar, la hierba y efectos. El plan B se descarta.
+
+- **Cuidado al medir:** si se toca o se hace zoom en el mapa la medición no vale (con la cámara cerca casi no hay
+  objetos en pantalla y todo da 60). Medir sin tocar el móvil, desde la vista inicial.
+- **Pendiente para F8-02:** el móvil pasó de 34,4 °C a 37,4 °C en ~6 min de pruebas; medir 10 min seguidos (calor y
+  batería) antes de la demo.
+- **Para F1-04:** el Map ID actual muestra los POI comerciales (restaurantes, tiendas); ARQUITECTURA §4 pide un estilo
+  sin ellos (se cambia en la consola de Google, cuenta de Alex).
