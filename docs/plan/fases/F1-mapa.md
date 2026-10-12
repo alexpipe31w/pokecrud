@@ -1001,10 +1001,27 @@ this.overlay.setMap(this.map);
 - [x] **8a.** Navegador 390×844 con joystick (sin GPS en el PC): login → `/mapa`; moverse, girar la brújula del HUD,
   abrir el menú. **Capturas de día y de noche** (para la de noche, cambiar temporalmente la hora del PC o forzar
   `night` con `?noche=1` solo en desarrollo) → `docs/evidencias/F1-04_0{1,2}_*.png`.
-- [ ] **8b.** Android real: caminar, girar; medir fps con `FpsMeter` (añadir el contador oculto tras un toque largo en
+- [x] **8b.** Android real: caminar, girar; medir fps con `FpsMeter` (añadir el contador oculto tras un toque largo en
   la brújula solo en builds de desarrollo) — objetivo ≥ 55 de media. Captura → `F1-04_03_*.png`.
-- [ ] **8c.** Checklist DISENO §1: mapa protagonista, sin pestañas, vidrio, HUD en su sitio, noche 19-6, botones
+- [x] **8c.** Checklist DISENO §1: mapa protagonista, sin pestañas, vidrio, HUD en su sitio, noche 19-6, botones
   ≥ 44 px, contraste AA en los textos sobre vidrio. REGLA 2.
+
+**Hecho (Kenneth, 2026-10-12). Cambios respecto a este plan:**
+
+- **8b sin `FpsMeter` en la app:** los fps se midieron desde el PC por CDP (`requestAnimationFrame` en ventanas de
+  10 s: quieto / joystick / menú abierto). Ojo: el Samsung A36 cambia solo entre 60 y 120 Hz; "≈60" puede ser el tope
+  de la pantalla, no lentitud.
+- **Zoom 19** (no 18) y **avatar provisional ×1,8**: a 18 casi no se veía. El pellizco sigue dejando 17-20.
+- **Luces propias en `MapScene`** (día = las de `ThreeJSOverlayView`, noche más fría y tenue): overlay con
+  `addDefaultLighting: false`.
+- **Pausa fuera de pantalla:** con `ion-router-outlet` la página del mapa no se destruye; `ionViewWillLeave` para el
+  bucle, el GPS y la brújula y **desmonta la capa 3D** (`overlay.setMap(null)`), también con la app en segundo plano.
+  Sin eso la GPU del A36 se reiniciaba y el mapa volvía en raster (D-038).
+- **El mapa se rehace solo** (perdió el contexto WebGL, cayó a raster o cambió día/noche) y únicamente con la pantalla
+  a la vista, tras 1,5 s, máx. 3 veces por minuto (D-038). Error de Maps → "No se pudo cargar el mapa" + Reintentar.
+- **Vidrio sin esmerilar sobre el mapa** (token `--glass-filter: none` + `--surface-opaque` en `MapPage`): con
+  desenfoque el menú abierto iba a 42 fps; sin él, a 61 (D-039).
+- El chip del clima pide `GET /spawns` una vez por visita al tener posición (F1-07 lo cambiará por `SpawnFeedService`).
 
 ---
 

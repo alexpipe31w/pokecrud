@@ -3,19 +3,23 @@
 > Se **reescribe** al cerrar cada sesión (no es histórico; el histórico es `BITACORA.md`).
 > Máximo una pantalla. Si lees esto al empezar: después lee `ROADMAP.md`.
 
-**Última actualización:** 2026-10-12 · por Kenneth (Claude) · rama `feature/F1-03-ubicacion-brujula` (PR a `develop`)
+**Última actualización:** 2026-10-12 · por Kenneth (Claude) · rama `feature/F1-04-pantalla-mapa` (PR a `develop`)
 
-## 👉 RELEVO DE KENNETH (2026-10-12)
+## 👉 RELEVO DE KENNETH A ALEX (2026-10-12)
 
-1. ✅ **F1-03 hecha** (PR #36 mezclado en `develop`): GPS filtrado, brújula, joystick, pantalla de permisos
-   y `AvatarMotion`, probados caminando por Neiva con el Samsung A36. Detalle en "Hecho" y en la bitácora. D-037.
-2. **Siguiente tarea: F1-04** (pantalla `/mapa` principal, HUD, menú de la Poké Ball, fuera las pestañas). Sigue
-   `docs/plan/fases/F1-mapa.md` → F1-04 (empieza por el paso 1: contrato de `/spawns` en `shared/protocol`). Lee
-   antes la nota "Hecho (Kenneth…)" al final de F1-03 en ese plan. Necesita el estilo del Map ID sin POI (Alex).
-3. **Probar en el APK:** en la app no hay botón a `/dev/ui` ni `/dev/mapa`. Se llega por el cable USB: `adb forward`
-   del WebView + `history.pushState` por CDP (D-037). Las capturas del mapa con `adb shell screencap` (la de CDP sale gris).
-4. Si al abrir la app se queda cargando la Pokédex: Render (gratis) está despertando, espera ~1 min. Si al cambiar de
-   red el móvil da `ERR_NAME_NOT_RESOLVED`, cierra y abre la app.
+1. **Mezclar primero el PR de F1-04** (`feature/F1-04-pantalla-mapa` → `develop`). Trae un cambio de servidor
+   (`weather` y `night` en `GET /spawns`): Render lo despliega solo al mezclar; hasta entonces el APK no enseña el clima.
+2. **Lo nuevo:** al iniciar sesión se entra a **`/mapa`** (pantalla principal; ya no hay pestañas). Menú = botón Poké
+   Ball: Pokédex (`/pokedex`, con botón "‹ Mapa"), Combate de prueba, Joystick sí/no, Reducir efectos, Cerrar sesión.
+   `/dev/ui` y `/dev/mapa` siguen existiendo pero sin botón (en el APK se llega por CDP, D-037).
+3. **Leer D-038 y D-039 antes de tocar el mapa:** la capa 3D (`ThreeJSOverlayView`) se desmonta fuera de pantalla y en
+   segundo plano (si no, la GPU del Samsung A36 se reiniciaba y el mapa volvía plano), **nunca** llamar a `getContext()`
+   sobre el canvas de Google ni crear canvas WebGL de prueba, y sobre el mapa el vidrio va sin desenfoque (rendimiento).
+4. **Siguiente en la cadena del mapa: F1-05** (avatar 3D) y luego F1-07 (Pokémon en el mapa). Con Android también
+   F2-01 (spike de cámara). Sin móvil: F5-01 o F2-08. Nuevas pequeñas: F1-09 (pantalla "servidor despertando") y F1-10
+   (el HUD sigue al día/noche del mapa).
+5. **Probar en un Android:** `npm run apk -- --install`; medir fps por CDP (el A36 cambia solo entre 60 y 120 Hz: "≈60"
+   puede ser el tope de la pantalla); capturas del mapa con `adb shell screencap` (las de CDP salen sin el mapa).
 
 **Importante (D-034):** la escena de combate de `/combate/prueba` es **temporal**. Alex quiere el combate **en
 realidad aumentada con la cámara**. Lo que hay debajo (motor, IA, controlador, textos, menú) se reutiliza; solo cambia
@@ -24,13 +28,23 @@ la parte visual (F4-07).
 ## Fase actual
 
 **F0 completa** (en `develop`). **F4 (combate) completa en código** a falta de la versión AR (F4-07). **F1 a medias:**
-spike (F1-01, plan A), plan (F1-02), ubicación y brújula (F1-03), spawns (F1-06) y mochila/XP (F1-08) hechos; faltan la
-pantalla `/mapa` (F1-04), el avatar 3D (F1-05) y los Pokémon en el mapa (F1-07). **F2:** fórmula (F2-03) y captura en
-servidor (F2-06) hechas; lo visual del encuentro espera al spike F2-01 (cámara + giroscopio).
+spike (F1-01), plan (F1-02), ubicación y brújula (F1-03), **pantalla `/mapa` (F1-04, PR pendiente de mezclar)**,
+spawns (F1-06) y mochila/XP (F1-08) hechos; faltan el avatar 3D (F1-05) y los Pokémon en el mapa (F1-07). **F2:**
+fórmula (F2-03) y captura en servidor (F2-06) hechas; lo visual del encuentro espera al spike F2-01 (cámara + giroscopio).
 
 ## Hecho
 
-- **F1-03 (Kenneth, rama `feature/F1-03-ubicacion-brujula`, PR a `develop`):** `shared/engine/geo.ts` (metros locales,
+- **F1-04 (Kenneth, rama `feature/F1-04-pantalla-mapa`, PR a `develop`):** `/mapa` como ruta principal (fuera
+  `core/layout/tabs`; `/tabs/pokedex` redirige a `/pokedex`), `MapScene` (jugador provisional ×1,8, anillo que late,
+  luces de día y de noche), `MapPage` (Google Maps vectorial zoom 19 / tilt 67,5°, modo oscuro 19:00-6:00 con
+  `isNightLocal`, cámara que sigue al avatar y gira con la brújula, re-anclaje a 1 km, pausa fuera de pantalla, estado
+  de error de Maps), HUD (`app-player-hud` + mochila, `app-map-compass` norte arriba/sigue, `app-weather-chip`) y
+  `app-ball-menu`. Servidor: `weather` y `night` en `GET /spawns` (contrato en `shared/protocol/spawns.ts`, e2e 67/67).
+  **Samsung A36:** 78/77/61 fps (quieto/joystick/menú abierto); Pokédex ida y vuelta, bloqueo y segundo plano sin
+  fallos (dos fallos graves encontrados y arreglados, D-038; vidrio sin esmerilar sobre el mapa, D-039).
+  App 167 tests, shared 140. Evidencias `F1-04_0{1..10}_*`.
+
+- **F1-03 (Kenneth, PR #36 mezclado):** `shared/engine/geo.ts` (metros locales,
   igual que el servidor), `GpsFilter` (descarta > 50 m de error y saltos > 50 m en < 2 s, media ponderada de 4),
   `angles.ts`, `joystick-math.ts`, `AvatarMotion` (idle/walk/run), `LocationService` y `CompassService` (plugins por
   token, D-016), `app-joystick` (dedo + flechas), `app-location-gate` (pedir permiso / buscando / sin permiso / sin GPS
@@ -120,16 +134,16 @@ servidor (F2-06) hechas; lo visual del encuentro espera al spike F2-01 (cámara 
 
 ## En curso
 
-- **F1-04 (Kenneth, rama `feature/F1-04-pantalla-mapa`)**: reclamada 2026-10-12. Sigue `docs/plan/fases/F1-mapa.md` → F1-04.
-  **Punto de guardado:** paso 1 hecho (`GET /spawns` devuelve `weather` y `night`; contrato en `shared/protocol/spawns.ts`; e2e 67/67). Paso 2 hecho (`day-night.ts`). Paso 3 hecho (rutas: `/mapa` principal con un esqueleto de `MapPage`, `/pokedex` con botón atrás, fuera las pestañas). Paso 4 hecho (`MapScene` con luces propias día/noche y spec). Paso 5 hecho (`MapPage`: mapa día/noche, overlay, bucle, cámara; pausa al salir con `ionViewWillLeave`). Paso 6 hecho (error de Maps → "No se pudo cargar el mapa" + Reintentar). Paso 7 hecho (HUD: placa + mochila, brújula norte-arriba/sigue, chip del clima desde `GET /spawns`, menú de la Poké Ball con Pokédex, Combate, Joystick, Reducir efectos y Cerrar sesión). Paso 8a hecho: navegador 390×844 de día y de noche (zona horaria de Tokio), menú, joystick y Pokédex ida y vuelta, 0 errores; zoom 19 y avatar provisional ×1,8 (a zoom 18 casi no se veía). Evidencias `F1-04_0{1..4}_navegador-*.png`. 8b en el Samsung A36: arreglados 2 fallos graves (mapa en blanco/raster al volver de la Pokédex o de segundo plano = la GPU se reiniciaba por la capa 3D oculta, D-038) y el rendimiento (vidrio sin esmerilar sobre el mapa, D-039: 78/77/61 fps quieto/joystick/menú). Falta: confirmación final de Kenneth y cierre (REGLA 2).
+- Nadie. F1-04 terminada (falta mezclar su PR). Siguiente libre: **F1-05** (avatar 3D).
 
 ## Siguiente paso concreto
 
-1. **F1-04 en curso (Kenneth).** Siguiente tarea libre para otro: con Android → F2-01 (spike de cámara y giroscopio);
-   sin móvil → F5-01 o F2-08.
-2. **Alex:** nombrarse ADMIN del inventario (`cd server && npm run admin -- grant <correo>`); hoy hay 0 ADMIN. Y el
-   estilo del Map ID sin POI comerciales y con variante oscura (lo necesita F1-04).
-3. Para generar el APK en otro PC: JDK 21 (`winget install Microsoft.OpenJDK.21`; si da "el hash no coincide",
+1. **Alex o Samuel:** mezclar el PR de F1-04 y comprobar que Render despliega solo (`GET /spawns` con `weather`).
+2. **Siguiente tarea:** F1-05 (avatar 3D) siguiendo `docs/plan/fases/F1-mapa.md` → F1-05 (leer antes las notas "Hecho"
+   de F1-03 y F1-04 en ese plan, y D-038/D-039). Con Android también → F2-01. Sin móvil → F5-01 o F2-08.
+3. **Alex:** estilo del Map ID sin POI comerciales (siguen saliendo restaurantes y tiendas); la noche ya funciona con
+   el esquema oscuro por defecto de Google. Y nombrarse ADMIN del inventario (hoy hay 0 ADMIN).
+4. Para generar el APK en otro PC: JDK 21 (`winget install Microsoft.OpenJDK.21`; si da "el hash no coincide",
    `winget install EclipseAdoptium.Temurin.21.JDK`) y `npm run apk`.
 
 ## Bloqueos / roto / pendiente de humanos
@@ -141,6 +155,7 @@ servidor (F2-06) hechas; lo visual del encuentro espera al spike F2-01 (cámara 
 - [x] (Samuel, 2026-10-12) Revisar y mezclar #21…#31: primero la cadena #22 → #31 y #21 al final (único con
       conflictos). GitHub NO reapuntó solo (el repo no borra las ramas mezcladas): la base se cambió a `develop` a mano.
 - [x] Mezclar el PR #36 de **F1-03** (Kenneth, 2026-10-12).
+- [ ] Mezclar el PR de **F1-04** (`feature/F1-04-pantalla-mapa`). Trae cambio de servidor: Render despliega solo.
 
 **Samuel (Render, solo él tiene acceso):**
 
@@ -170,11 +185,13 @@ servidor (F2-06) hechas; lo visual del encuentro espera al spike F2-01 (cámara 
 - [ ] El APK pasó de 8,4 a 11,4 MB con `@capacitor/geolocation` (librería nativa de ubicación; `classes.dex` sin
       minificar). Medir con el de release (minify/R8).
 - [ ] En el Samsung A36 (pantalla de 120 Hz) `/dev/mapa` con 30 Pokémon marca 40-120 fps según la zona; medir en F8-02.
+      (`/mapa` de F1-04, solo con el avatar: 78/77/61 fps quieto/joystick/menú, D-039. Repetir cuando F1-07 traiga los Pokémon.)
 
 **Alex:**
 
-- [ ] (Para F1-04) Estilo del Map ID `5309ecf69efbfe12f3ecbc4c` en Google Cloud: **sin POI comerciales** y con
-      **variante oscura** (noche). Si no se puede, crear un segundo Map ID para la noche (plan en `fases/F1-mapa.md`).
+- [ ] Estilo del Map ID `5309ecf69efbfe12f3ecbc4c` en Google Cloud: **sin POI comerciales** (en `/mapa` siguen saliendo
+      restaurantes y tiendas). La noche ya funciona: `/mapa` usa `colorScheme: DARK` y Google aplica su oscuro por defecto;
+      una variante oscura propia en el estilo es opcional.
 - [ ] Nombrarse ADMIN del inventario tras mezclar #21: registrarse en la app y `cd server && npm run admin -- grant <correo>`.
 - [ ] Postman (tras #21): poner `adminEmail`/`adminPassword` en SU entorno local de Postman.
 - [ ] Antes del **2027-01-10**: tope de Google Maps o pasar a MapLibre (ver más abajo).
