@@ -33,6 +33,8 @@ const PUBLIC_PLAYER = {
   id: true,
   email: true,
   nickname: true,
+  /** La app lo usa solo para mostrar u ocultar botones; quien manda es AdminGuard en el servidor. */
+  role: true,
   level: true,
   xp: true,
 } as const;

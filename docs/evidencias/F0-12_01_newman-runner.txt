@@ -1,0 +1,254 @@
+npm warn deprecated har-validator@5.1.5: this library is no longer supported
+npm warn deprecated uuid@3.4.0: uuid@10 and below is no longer supported.  For ESM codebases, update to uuid@latest.  For CommonJS codebases, use uuid@11 (but be aware this version will likely be deprecated in 2028).
+npm warn deprecated uuid@8.3.2: uuid@10 and below is no longer supported.  For ESM codebases, update to uuid@latest.  For CommonJS codebases, use uuid@11 (but be aware this version will likely be deprecated in 2028).
+npm warn deprecated @faker-js/faker@5.5.3: Please update to a newer version.
+(node:24368) [DEP0176] DeprecationWarning: fs.F_OK is deprecated, use fs.constants.F_OK instead
+(Use `node --trace-deprecation ...` to show where the warning was created)
+newman
+
+PokéCRUD
+
+□ 0 · Sesión
+└ Registrar jugador de prueba
+  POST http://localhost:3000/auth/register [201 Created, 1.55kB, 874ms]
+  √  responde 201
+
+└ Login ADMIN (variables adminEmail / adminPassword de tu entorno)
+  POST http://localhost:3000/auth/login [200 OK, 1.55kB, 319ms]
+  √  login ADMIN 200 (si falla: pon adminEmail/adminPassword en tu entorno de Postman)
+  √  la cuenta es ADMIN
+
+□ Inventario (/pokemon)
+└ Limpieza previa (200 o 404)
+  DELETE http://localhost:3000/pokemon/99150 [404 Not Found, 1.14kB, 285ms]
+  √  200 o 404
+
+└ Listar ordenado por id (público)
+  GET http://localhost:3000/pokemon?_sort=id&_order=asc [200 OK, 69.7kB, 415ms]
+  √  responde 200
+  √  al menos los 151
+  √  ordenado por id
+
+└ Buscar por nombre (name_like)
+  GET http://localhost:3000/pokemon?name_like=mew [200 OK, 1.94kB, 141ms]
+  √  responde 200
+  √  encuentra mew y mewtwo
+
+└ Listar paginado
+  GET http://localhost:3000/pokemon?_sort=id&_order=asc&_page=2&_limit=10 [200 OK, 5.58kB, 651ms]
+  √  responde 200
+  √  página 2 = ids 11-20
+  √  trae X-Total-Count
+
+└ Obtener por id (público)
+  GET http://localhost:3000/pokemon/150 [200 OK, 1.51kB, 133ms]
+  √  responde 200
+  √  es mewtwo
+
+└ Crear sin sesión → 401
+  POST http://localhost:3000/pokemon [401 Unauthorized, 1.14kB, 3ms]
+  √  responde 401
+
+└ Crear como jugador normal → 403 (F0-12)
+  POST http://localhost:3000/pokemon [403 Forbidden, 1.17kB, 135ms]
+  √  responde 403: solo un ADMIN escribe en el inventario
+
+└ Crear
+  POST http://localhost:3000/pokemon [201 Created, 1.52kB, 263ms]
+  √  responde 201
+
+└ Crear id repetido → 409
+  POST http://localhost:3000/pokemon [409 Conflict, 1.15kB, 259ms]
+  √  responde 409
+
+└ Validación: stock negativo → 400
+  POST http://localhost:3000/pokemon [400 Bad Request, 1.15kB, 143ms]
+  √  responde 400
+
+└ Reemplazar (PUT)
+  PUT http://localhost:3000/pokemon/99150 [200 OK, 1.52kB, 276ms]
+  √  responde 200
+  √  reemplazado
+
+└ Actualizar parcial (precio y stock)
+  PATCH http://localhost:3000/pokemon/99150 [200 OK, 1.52kB, 276ms]
+  √  responde 200
+  √  precio y stock
+
+└ Eliminar
+  DELETE http://localhost:3000/pokemon/99150 [200 OK, 1.06kB, 272ms]
+  √  responde 200
+
+└ Ya no existe → 404
+  GET http://localhost:3000/pokemon/99150 [404 Not Found, 1.14kB, 141ms]
+  √  responde 404
+
+□ Equipos (/teams)
+└ Crear
+  POST http://localhost:3000/teams [201 Created, 1.23kB, 143ms]
+  √  responde 201
+  √  no expone playerId
+
+└ Listar (solo los míos)
+  GET http://localhost:3000/teams [200 OK, 1.23kB, 138ms]
+  √  responde 200
+  √  es un array
+  √  incluye el creado
+
+└ Listar paginado
+  GET http://localhost:3000/teams?_page=1&_limit=5 [200 OK, 1.25kB, 668ms]
+  √  responde 200
+  √  trae X-Total-Count
+
+└ Obtener por id
+  GET http://localhost:3000/teams/72 [200 OK, 1.23kB, 134ms]
+  √  responde 200
+  √  no expone playerId
+
+└ Reemplazar (PUT)
+  PUT http://localhost:3000/teams/72 [200 OK, 1.24kB, 138ms]
+  √  responde 200
+  √  name reemplazado
+  √  description reemplazado
+
+└ Actualizar parcial (PATCH)
+  PATCH http://localhost:3000/teams/72 [200 OK, 1.25kB, 137ms]
+  √  responde 200
+  √  description actualizado
+
+└ Validación: 7 Pokémon → 400
+  POST http://localhost:3000/teams [400 Bad Request, 1.16kB, 3ms]
+  √  responde 400
+
+└ Sin sesión → 401
+  GET http://localhost:3000/teams [401 Unauthorized, 1.14kB, 2ms]
+  √  responde 401
+
+└ Eliminar
+  DELETE http://localhost:3000/teams/72 [200 OK, 1.06kB, 141ms]
+  √  responde 200
+
+└ Ya no existe → 404
+  GET http://localhost:3000/teams/72 [404 Not Found, 1.14kB, 133ms]
+  √  responde 404
+
+□ Favoritos (/favorites)
+└ Crear
+  POST http://localhost:3000/favorites [201 Created, 1.2kB, 137ms]
+  √  responde 201
+  √  no expone playerId
+
+└ Listar (solo los míos)
+  GET http://localhost:3000/favorites [200 OK, 1.2kB, 133ms]
+  √  responde 200
+  √  es un array
+  √  incluye el creado
+
+└ Listar paginado
+  GET http://localhost:3000/favorites?_page=1&_limit=5 [200 OK, 1.21kB, 141ms]
+  √  responde 200
+  √  trae X-Total-Count
+
+└ Obtener por id
+  GET http://localhost:3000/favorites/175 [200 OK, 1.19kB, 140ms]
+  √  responde 200
+  √  no expone playerId
+
+└ Reemplazar (PUT)
+  PUT http://localhost:3000/favorites/175 [200 OK, 1.19kB, 143ms]
+  √  responde 200
+  √  pokemonId reemplazado
+  √  pokemonName reemplazado
+  √  note reemplazado
+  √  rating reemplazado
+
+└ Actualizar parcial (PATCH)
+  PATCH http://localhost:3000/favorites/175 [200 OK, 1.19kB, 137ms]
+  √  responde 200
+  √  rating actualizado
+
+└ Validación: valoración 6 → 400
+  POST http://localhost:3000/favorites [400 Bad Request, 1.15kB, 3ms]
+  √  responde 400
+
+└ Sin sesión → 401
+  GET http://localhost:3000/favorites [401 Unauthorized, 1.14kB, 2ms]
+  √  responde 401
+
+└ Eliminar
+  DELETE http://localhost:3000/favorites/175 [200 OK, 1.06kB, 142ms]
+  √  responde 200
+
+└ Ya no existe → 404
+  GET http://localhost:3000/favorites/175 [404 Not Found, 1.14kB, 138ms]
+  √  responde 404
+
+□ Pokémon personalizados (/customPokemon)
+└ Crear
+  POST http://localhost:3000/customPokemon [201 Created, 1.25kB, 141ms]
+  √  responde 201
+  √  no expone playerId
+
+└ Listar (solo los míos)
+  GET http://localhost:3000/customPokemon [200 OK, 1.25kB, 136ms]
+  √  responde 200
+  √  es un array
+  √  incluye el creado
+
+└ Listar paginado
+  GET http://localhost:3000/customPokemon?_page=1&_limit=5 [200 OK, 1.26kB, 136ms]
+  √  responde 200
+  √  trae X-Total-Count
+
+└ Obtener por id
+  GET http://localhost:3000/customPokemon/71 [200 OK, 1.25kB, 138ms]
+  √  responde 200
+  √  no expone playerId
+
+└ Reemplazar (PUT)
+  PUT http://localhost:3000/customPokemon/71 [200 OK, 1.25kB, 141ms]
+  √  responde 200
+  √  name reemplazado
+  √  imageUrl reemplazado
+  √  description reemplazado
+
+└ Actualizar parcial (PATCH)
+  PATCH http://localhost:3000/customPokemon/71 [200 OK, 1.26kB, 138ms]
+  √  responde 200
+  √  description actualizado
+
+└ Validación: tipo inexistente → 400
+  POST http://localhost:3000/customPokemon [400 Bad Request, 1.31kB, 3ms]
+  √  responde 400
+
+└ Sin sesión → 401
+  GET http://localhost:3000/customPokemon [401 Unauthorized, 1.14kB, 2ms]
+  √  responde 401
+
+└ Eliminar
+  DELETE http://localhost:3000/customPokemon/71 [200 OK, 1.06kB, 138ms]
+  √  responde 200
+
+└ Ya no existe → 404
+  GET http://localhost:3000/customPokemon/71 [404 Not Found, 1.16kB, 140ms]
+  √  responde 404
+
+┌─────────────────────────┬────────────────────┬───────────────────┐
+│                         │           executed │            failed │
+├─────────────────────────┼────────────────────┼───────────────────┤
+│              iterations │                  1 │                 0 │
+├─────────────────────────┼────────────────────┼───────────────────┤
+│                requests │                 46 │                 0 │
+├─────────────────────────┼────────────────────┼───────────────────┤
+│            test-scripts │                 46 │                 0 │
+├─────────────────────────┼────────────────────┼───────────────────┤
+│      prerequest-scripts │                  1 │                 0 │
+├─────────────────────────┼────────────────────┼───────────────────┤
+│              assertions │                 82 │                 0 │
+├─────────────────────────┴────────────────────┴───────────────────┤
+│ total run duration: 12.3s                                        │
+├──────────────────────────────────────────────────────────────────┤
+│ total data received: 81.06kB (approx)                            │
+├──────────────────────────────────────────────────────────────────┤
+│ average response time: 183ms [min: 2ms, max: 874ms, s.d.: 170ms] │
+└──────────────────────────────────────────────────────────────────┘

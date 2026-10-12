@@ -65,6 +65,19 @@
       Dep: F0-09. Criterio: captura en Android real sin solapes en `/dev/ui`, login y registro.
       **Hecho:** regla global en `src/global.scss` (D-022); Samsung A36: `/dev/ui`, login y registro sin solapes ni scroll
       extra, Pokédex sin cambios. Evidencias `F0-11_0{1,2,3}_*.png`.
+- [x] **F0-12 · Solo un admin escribe en el inventario `/pokemon`** (@alex, 2026-10-11) — hoy cualquier cuenta (el registro es
+      abierto y el repo/Render son públicos) puede crear, editar o borrar los 151 del inventario compartido. Añadir rol
+      `ADMIN` a `Player` (leído de la BD en cada escritura, no del token) y exigirlo en POST/PUT/PATCH/DELETE de `/pokemon`.
+      Dep: F0-08. Criterio: jugador normal → 403, sin sesión → 401, admin → 2xx (e2e + Postman); la app oculta agregar/editar
+      a quien no es admin; script para dar/quitar el rol.
+      **Hecho:** migración `player_role` aplicada en Supabase; e2e 45/45 (4 nuevos casos de rol); Postman 82/82 con newman;
+      app 94/94. D-023. **Pendiente de humanos:** nombrar al primer ADMIN (`npm run admin -- grant <correo>`).
+      (Render despliega solo al mezclar en `develop`: no hace falta Manual Deploy.)
+- [ ] **F0-13 · Artefactos de compilación en `shared/`** — la primera `npm run build` del servidor tras D-024 dejó 42
+      `.js`/`.d.ts`/`.js.map` junto a las fuentes de `shared/` (Samuel, 2026-10-12; probable `tsconfig.build.tsbuildinfo`
+      viejo, no se reproduce compilando desde cero). Riesgo: subirlos por error o que Vite/Vitest/Node usen el `.js` viejo
+      en vez del `.ts`. Dep: F1-06. Criterio: reproducir la causa o descartarla; `.gitignore` que impida subirlos sin
+      ocultar archivos legítimos (`shared/package.json`); si la causa es la caché, que `npm run build` la limpie.
 
 ## F1 · Mapa con GPS
 

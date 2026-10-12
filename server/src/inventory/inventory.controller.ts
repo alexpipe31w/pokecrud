@@ -10,9 +10,11 @@ import {
   Put,
   Query,
   Res,
+  UseGuards,
 } from '@nestjs/common';
 import { Throttle } from '@nestjs/throttler';
 import type { Response } from 'express';
+import { AdminGuard } from '../auth/admin.guard.js';
 import { Public } from '../auth/auth.decorators.js';
 import { WRITE_LIMIT } from '../common/limits.js';
 import { setTotalCount } from '../common/list-query.js';
@@ -26,8 +28,9 @@ import {
 import { InventoryService } from './inventory.service.js';
 
 /**
- * `/pokemon` de IS-11: inventario compartido de la clase. Leer es público; escribir exige sesión (cualquier
- * jugador). Mismo contrato que JSON Server: listas como array plano, DELETE → 200 `{}`.
+ * `/pokemon` de IS-11: inventario compartido de la clase. Leer es público; escribir exige sesión Y rol ADMIN
+ * (F0-12: con el registro abierto, cualquiera podía borrar los 151). Sin sesión → 401; jugador normal → 403.
+ * Mismo contrato que JSON Server: listas como array plano, DELETE → 200 `{}`.
  */
 @Controller('pokemon')
 export class InventoryController {
@@ -51,12 +54,14 @@ export class InventoryController {
   }
 
   @Throttle(WRITE_LIMIT)
+  @UseGuards(AdminGuard)
   @Post()
   create(@Body() dto: CreateInventoryPokemonDto): Promise<InventoryPokemon> {
     return this.inventory.create(dto);
   }
 
   @Throttle(WRITE_LIMIT)
+  @UseGuards(AdminGuard)
   @Put(':id')
   replace(
     @Param('id', ParseIntPipe) id: number,
@@ -66,6 +71,7 @@ export class InventoryController {
   }
 
   @Throttle(WRITE_LIMIT)
+  @UseGuards(AdminGuard)
   @Patch(':id')
   patch(
     @Param('id', ParseIntPipe) id: number,
@@ -75,6 +81,7 @@ export class InventoryController {
   }
 
   @Throttle(WRITE_LIMIT)
+  @UseGuards(AdminGuard)
   @Delete(':id')
   async remove(
     @Param('id', ParseIntPipe) id: number,

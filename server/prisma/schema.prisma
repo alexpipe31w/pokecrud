@@ -10,11 +10,18 @@ datasource db {
   provider = "postgresql"
 }
 
+enum PlayerRole {
+  PLAYER
+  ADMIN
+}
+
 model Player {
   id               String            @id @default(uuid()) @db.Uuid
   email            String            @unique
   passwordHash     String
   nickname         String            @unique
+  /// F0-12: solo ADMIN escribe en el inventario `/pokemon`. Se lee de la BD en cada escritura (no va en el token).
+  role             PlayerRole        @default(PLAYER)
   level            Int               @default(1)
   xp               Int               @default(0)
   createdAt        DateTime          @default(now())

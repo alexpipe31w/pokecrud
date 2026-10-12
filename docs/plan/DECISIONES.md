@@ -199,6 +199,23 @@ arriba / 15 px abajo; sin scroll extra en login y registro. **Una pantalla que d
 (mapa F1, encuentro AR F2) anula `--padding-top/bottom` en su `ion-content`** y coloca sus controles con
 `var(--ion-safe-area-*)`. `:has()` existe desde Chrome 105: en un WebView más viejo simplemente no se aplica (como antes).
 
+## D-023 · Solo un ADMIN escribe en el inventario `/pokemon` (F0-12) (2026-10-11, Alex)
+
+Con F0-08 cualquier jugador con sesión podía crear, editar y borrar el inventario compartido, y el registro es abierto
+(repo y Render públicos): cualquiera podía vaciar los 151 en minutos. **Decisión:** enum `PlayerRole` (`PLAYER` |
+`ADMIN`, por defecto `PLAYER`) en `Player`, y `AdminGuard` (`server/src/auth/admin.guard.ts`) en POST/PUT/PATCH/DELETE
+de `/pokemon`. Sin sesión → 401; jugador normal → 403; leer sigue siendo público.
+
+- **El rol se lee de la BD en cada escritura, NO va en el JWT:** quitarlo surte efecto en la siguiente petición sin
+  esperar a que caduque el access token. Cuesta una consulta por escritura del inventario (pocas).
+- **No hay endpoint para nombrar admins:** solo `cd server && npm run admin -- grant|revoke <correo>` (y `list`), es
+  decir, quien tenga la contraseña de la BD. Un endpoint así sería el primer objetivo de un atacante.
+- `/auth/*` devuelve `role` en `player` para que la app oculte agregar/editar/eliminar (`AuthService.isAdmin`,
+  `adminGuard` en `/pokemon/nuevo` y `/pokemon/:id/editar`). Es solo UI: quien manda es el servidor.
+- `/teams`, `/favorites`, `/customPokemon` no cambian (ya eran de cada jugador).
+- Postman: las escrituras del inventario usan `{{adminToken}}`, que sale del login con `adminEmail`/`adminPassword`
+  del **entorno local de Postman de cada uno** (nunca en la colección: el repo es público).
+
 ## D-024 · El servidor compila `shared/` (F1-06) (2026-10-11, Alex)
 
 F1-06 es lo primero del servidor que usa el motor puro. **Decisión:** `server/tsconfig.build.json` con `rootDir: ".."` e
@@ -248,7 +265,7 @@ el comando de arranque no cambia (`npm run start:prod`).
 ## D-027 · Fórmula de captura y huida (F2-03) (2026-10-11, Alex)
 
 - `shared/engine/capture.ts` implementa ARQUITECTURA §6 tal cual: `a = ((3·PSmax − 2·PSact)·captureRate·bola·baya·
-  lanzamiento·curva)/(3·PSmax)`, `b = floor(65536/(255/a)^0,1875)`, 4 comprobaciones con enteros en [0, 65535]
+lanzamiento·curva)/(3·PSmax)`, `b = floor(65536/(255/a)^0,1875)`, 4 comprobaciones con enteros en [0, 65535]
   (`a ≥ 255` → segura). Bonus: Poké 1 · Super 1,5 · Ultra 2 · Frambu 1,5 · Bien 1,3 · Genial 1,7 · Excelente 2 ·
   **curva 1,7** (ARQUITECTURA no lo fijaba; es el de Pokémon GO). Referencias: captureRate 45 sin ayudas = 11,9 %;
   legendario (3) = 1,6 % y con todo 8,9 %; captureRate 255 con Super + Excelente + curva = 100 %.
@@ -264,7 +281,7 @@ el comando de arranque no cambia (`npm run start:prod`).
 
 - **API:** `GET /encounters/:id` (nivel, sexo, shiny, tamaño, `expiresAt`, `status` open/caught/fled; nunca IVs) y
   `POST /encounters/:id/throw { ball, berry?, throwQuality, curve, clientThrowId }` → `{ captured, shakes, fled,
-  throwQuality, xpGained, caught, bag }`. `:id` = id del spawn de `GET /spawns`. Errores: 404 no existe, 410 franja
+throwQuality, xpGained, caught, bag }`. `:id` = id del spawn de `GET /spawns`. Errores: 404 no existe, 410 franja
   acabada, 403 lejos / sin ubicación, 409 ya resuelto o sin objetos, 400 validación.
 - **Ubicación:** `GET /spawns` guarda `Player.lastLat/lastLng/lastLocatedAt` (mejor esfuerzo). Para encontrar o lanzar
   hay que tener una ubicación de hace ≤ 5 min a ≤ 80 m del Pokémon. No para un GPS falso, pero sí lanzar contra ids de
@@ -369,4 +386,3 @@ entrenadores, `BattleController` (reproducción por eventos), `battle-text.ts` y
 `battle-sheet`). Lo que cambia es la capa visual: escenario, sprites y efectos pasan a una escena three.js sobre la
 cámara (misma tecnología que F2-04). Tarea nueva **F4-07** (depende del spike F2-01). Sin cámara o sin permiso → el
 fondo ilustrado de siempre (DISENO §6), no una pantalla rota.
-

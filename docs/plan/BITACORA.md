@@ -394,6 +394,37 @@ login/registro (tiene que volver a entrar).
 **El siguiente debe empezar por:** mezclar el PR de F0-11; luego `/inicio F1-01` (spike Google Maps 3D + three.js en
 Android real) — antes, leer ARQUITECTURA §4 y D-022 (el mapa anula la zona segura en su `ion-content`).
 
+## 2026-10-11 20:45 · @alex (Claude) · F0-12 · rama `feature/F0-12-admin-inventario`
+
+**Qué se hizo:** revisión de los PR #16-#20 de Kenneth (código sólido; server 11/11, app 92/92, shared 10/10, lint y
+build OK; Render sirve `/pokemon` con 151). Hallazgo: cualquier cuenta podía escribir en el inventario compartido y el
+registro es abierto → nueva tarea F0-12. Rol `PlayerRole` (`PLAYER`|`ADMIN`) en `Player`; `AdminGuard` en las 4
+escrituras de `/pokemon` (rol leído de la BD, no del token); script `npm run admin -- list|grant|revoke <correo>`;
+`role` sale en `player` de `/auth/*`; la app oculta FAB, deslizar y botones del detalle a quien no es ADMIN y
+`adminGuard` protege `/pokemon/nuevo` y `/pokemon/:id/editar`. Postman: login ADMIN con variables del entorno local,
+escrituras del inventario con `{{adminToken}}` y caso nuevo "jugador normal → 403". De paso, en el PC de Alex:
+`DATABASE_URL` → 6543, `JWT_SECRET` local generado (faltaba) y JDK 21 instalado (`openjdk 21.0.12.1`).
+**Archivos clave:** `server/src/auth/admin.guard.ts`, `server/prisma/admin.ts`,
+`server/prisma/migrations/20261012010000_player_role/`, `server/src/inventory/inventory.controller.ts`,
+`server/test/crud.e2e-spec.ts`, `src/app/core/auth/auth.guard.ts`, `backend/postman/PokeCRUD.postman_collection.json`.
+**Cómo se probó (salida real):**
+
+    prisma migrate deploy → Applying migration `20261012010000_player_role` · All migrations have been successfully applied.
+    prisma migrate diff (BD de Supabase → schema.prisma) → -- This is an empty migration.
+    server: npm test → 11/11 · npm run test:e2e (DATABASE_URL por 6543) → Test Files 4 passed · Tests 45 passed
+      (nuevos: jugador normal → 403 en POST/PUT/PATCH/DELETE sin cambiar nada; quitar el rol → 403 con el MISMO token)
+    newman (servidor local + cuenta ADMIN temporal @pokecrud.test) → requests 46 · assertions 82 · failed 0
+      (docs/evidencias/F0-12_01_newman-runner.txt; la cuenta temporal se borró después)
+    app: ng test → 94/94 · lint OK · build OK
+    BD tras las pruebas: inventario 151, 0 Pokémon de prueba, 0 ADMIN
+
+**Quedó a medias / roto:** nada en código. Pendiente de humanos: revisar/mezclar el PR; Samuel → Manual Deploy en
+Render (y su 6543); Alex → `npm run admin -- grant <correo>` con su cuenta. No se probó en el móvil (solo cambia qué
+botones se ven; la lógica está cubierta por tests).
+**Decisiones nuevas:** D-023.
+**El siguiente debe empezar por:** revisar el PR de F0-12 (`gh pr diff`), mezclarlo y pedir a Samuel el Manual Deploy;
+después `/inicio F1-01`.
+
 ## 2026-10-11 21:15 · @alex (Claude) · F1-06 · rama `feature/F1-06-spawns`
 
 **Qué se hizo:** motor de spawns puro `shared/engine/spawns.ts` (`cellIdFor`, `cellsWithin`, `slotFor`, `isNightAt`,
@@ -649,3 +680,25 @@ F4-05 es temporal. Tarea nueva **F4-07** (depende del spike F2-01).
 en su PC. No tienen datos sensibles (Postman contra localhost). Regla: añadir archivos por ruta, nunca `-A` de `docs/`.
 **El siguiente (Samuel) debe empezar por:** la sección "👉 RELEVO PARA SAMUEL" de `ESTADO.md` (mezclar #21→#31 en
 orden, Render: 6543 + `SPAWN_SALT` + Manual Deploy, su `.env`, y elegir F5-01 / F2-08 / F2-01).
+
+## 2026-10-12 11:30 · @samuel (Claude) · relevo de Alex: revisión y mezcla de #21…#31 · rama `feature/F0-12-admin-inventario`
+
+**Qué se hizo:** puesto al día (pull, `npm install` en raíz y `server/`, `server/.env` con `DATABASE_URL` en 6543 y
+`SPAWN_SALT` local). Render: `DATABASE_URL` en 6543 y `SPAWN_SALT` propia (Samuel). Montado Android en su PC: JDK 21
+(Temurin: el MSI de Microsoft daba "el hash del instalador no coincide", descarga de 211 KB) y Android Studio; APK
+instalado en un Redmi Note 10 (Android 12, MIUI 13, hay que activar "Instalar vía USB"). Revisión de los 11 PR de Alex:
+integración local develop + cadena + F0-12, y orden de mezcla cambiado: cadena #22→#31 primero (entra limpia) y #21 al
+final (único con conflictos: BITACORA, DECISIONES, ESTADO y `schema.prisma`; resueltos conservando todo y en orden).
+GitHub NO reapuntó los PR apilados (el repo no borra las ramas mezcladas): base cambiada a `develop` a mano antes de
+cada mezcla (#28…#31 los cambió y mezcló Samuel en la web). ESTADO al día y F0-13 nueva en el ROADMAP.
+**Cómo se probó (salida real):**
+integración local (develop + #22…#31 + #21): server Tests 22 passed (22) · e2e Test Files 7 passed (7), Tests 66 passed (66)
+app Tests 103 passed (103) · shared Tests 136 passed (136) · lint OK · build OK (app y servidor)
+prisma migrate diff --from-config-datasource --to-schema … --exit-code → exit 0 (esquema combinado = base real)
+diff de Alex: 0 secretos (contraseña BD, clave Maps, SPAWN_SALT/JWT_SECRET con valor, claves privadas) y 0 archivos sensibles
+BD tras los e2e: 0 jugadores @pokecrud.test · 3 jugadores · 0 ADMIN
+Render tras #22…#27: /health/ready 200; /spawns y /bag → 401 sin sesión (rutas nuevas desplegadas)
+**Quedó a medias / roto:** nada de código. F0-13 (artefactos `.js` en `shared/`) anotada. Falta nombrar ADMIN (Alex).
+**Decisiones nuevas:** ninguna (correcciones al relevo: Render despliega solo; GitHub no reapunta PR apilados aquí).
+**El siguiente debe empezar por:** Alex → `cd server && npm run admin -- grant <su correo>`; Kenneth → F1-01 en su
+Android y `SPAWN_SALT` en su `.env`; cualquiera → F0-13 (pequeña) o F5-01 / F2-08 / F2-01.

@@ -24,6 +24,7 @@ NestJS 12 (ESM) + Prisma 7.10 + PostgreSQL (Supabase). Arquitectura en `docs/pla
 | `npm run db:migrate -- --name <x>`     | Crea una migración nueva (OJO: en una base con datos, revisar el SQL) |
 | `npm run db:deploy`                    | Aplica las migraciones pendientes (lo que se usa en Render)           |
 | `npm run db:seed`                      | Semilla del CRUD del curso (`backend/legacy/db.seed.json`)            |
+| `npm run admin -- list\|grant\|revoke <correo>` | Quién puede escribir en `/pokemon` (rol ADMIN, D-023)  |
 
 ## Endpoints
 

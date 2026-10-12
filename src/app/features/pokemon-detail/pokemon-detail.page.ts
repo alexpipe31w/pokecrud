@@ -24,6 +24,7 @@ import { dexNumber, displayName } from '../../core/utils/pokemon-defaults';
 import { Pokemon, PokemonStats } from '../../models/pokemon.model';
 import { PokeApiService } from '../../services/poke-api.service';
 import { PokemonService } from '../../services/pokemon.service';
+import { AuthService } from '../../core/auth/auth.service';
 import { UiService } from '../../services/ui.service';
 import { TypeChipsComponent } from '../../shared/components/type-chips/type-chips.component';
 
@@ -66,6 +67,8 @@ export class PokemonDetailPage implements ViewWillEnter {
   private readonly pokemonService = inject(PokemonService);
   private readonly pokeApi = inject(PokeApiService);
   private readonly ui = inject(UiService);
+  /** Solo un ADMIN ve agregar/editar/eliminar (F0-12); el servidor lo exige igualmente. */
+  protected readonly isAdmin = inject(AuthService).isAdmin;
   private readonly router = inject(Router);
   private readonly navCtrl = inject(NavController);
 

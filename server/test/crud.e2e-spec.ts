@@ -44,6 +44,7 @@ describe('CRUD del curso (e2e)', () => {
   let prisma: PrismaService;
   let ash: string; // access tokens de dos jugadores distintos
   let misty: string;
+  let oak: string; // ADMIN: el único que escribe en /pokemon (F0-12)
 
   const http = () => request(app.getHttpServer());
   const as = (token: string | undefined, req: request.Test) =>
@@ -51,7 +52,8 @@ describe('CRUD del curso (e2e)', () => {
       'X-Forwarded-For',
       nextIp(),
     );
-  const register = async (): Promise<string> => {
+  const playerIds = new Map<string, string>(); // access token → id del jugador
+  const register = async (role?: 'ADMIN'): Promise<string> => {
     const res = await http()
       .post('/auth/register')
       .set('X-Forwarded-For', nextIp())
@@ -61,7 +63,15 @@ describe('CRUD del curso (e2e)', () => {
         nickname: `c_${randomUUID().slice(0, 8)}`,
       })
       .expect(201);
-    return (res.body as { accessToken: string }).accessToken;
+    const body = res.body as { accessToken: string; player: { id: string } };
+    // El rol solo se da desde la BD (npm run admin), nunca por la API: el test hace lo mismo.
+    if (role)
+      await prisma.player.update({
+        where: { id: body.player.id },
+        data: { role },
+      });
+    playerIds.set(body.accessToken, body.player.id);
+    return body.accessToken;
   };
 
   beforeAll(async () => {
@@ -73,7 +83,11 @@ describe('CRUD del curso (e2e)', () => {
     await app.init();
     prisma = app.get(PrismaService);
     await prisma.inventoryPokemon.deleteMany({ where: { id: TEST_IDS } });
-    [ash, misty] = await Promise.all([register(), register()]);
+    [ash, misty, oak] = await Promise.all([
+      register(),
+      register(),
+      register('ADMIN'),
+    ]);
   });
 
   afterAll(async () => {
@@ -161,22 +175,54 @@ describe('CRUD del curso (e2e)', () => {
       await as(undefined, http().delete('/pokemon/150')).expect(401);
     });
 
-    it('ciclo completo con sesión: POST 201 → POST repetido 409 → PUT → PATCH → DELETE → 404', async () => {
-      const created = await as(ash, http().post('/pokemon'))
+    it('escribir con sesión de jugador normal → 403 y no cambia nada (F0-12)', async () => {
+      const before = await as(undefined, http().get('/pokemon/150')).expect(
+        200,
+      );
+      await as(ash, http().post('/pokemon'))
+        .send(mewtwoLike(90001))
+        .expect(403);
+      await as(ash, http().put('/pokemon/150'))
+        .send(mewtwoLike(150))
+        .expect(403);
+      await as(ash, http().patch('/pokemon/150'))
+        .send({ stock: 0 })
+        .expect(403);
+      await as(ash, http().delete('/pokemon/150')).expect(403);
+      await as(undefined, http().get('/pokemon/90001')).expect(404);
+      const after = await as(undefined, http().get('/pokemon/150')).expect(200);
+      expect(after.body).toEqual(before.body);
+    });
+
+    it('quitar el rol surte efecto al instante, con el mismo token (F0-12)', async () => {
+      const temp = await register('ADMIN');
+      await as(temp, http().post('/pokemon'))
+        .send(mewtwoLike(90003))
+        .expect(201);
+      await prisma.player.update({
+        where: { id: playerIds.get(temp) },
+        data: { role: 'PLAYER' },
+      });
+      await as(temp, http().delete('/pokemon/90003')).expect(403);
+      await as(oak, http().delete('/pokemon/90003')).expect(200);
+    });
+
+    it('ciclo completo como ADMIN: POST 201 → POST repetido 409 → PUT → PATCH → DELETE → 404', async () => {
+      const created = await as(oak, http().post('/pokemon'))
         .send({ ...mewtwoLike(90001), createdAt: '2026-01-01T00:00:00.000Z' })
         .expect(201);
       expect(created.body).toMatchObject({ id: 90001, price: 50000, stock: 3 });
 
-      await as(misty, http().post('/pokemon'))
+      await as(oak, http().post('/pokemon'))
         .send(mewtwoLike(90001))
         .expect(409);
 
-      const replaced = await as(misty, http().put('/pokemon/90001'))
+      const replaced = await as(oak, http().put('/pokemon/90001'))
         .send({ ...mewtwoLike(90001), name: 'reemplazado', price: 1 })
         .expect(200);
       expect(replaced.body).toMatchObject({ name: 'reemplazado', price: 1 });
 
-      const patched = await as(ash, http().patch('/pokemon/90001'))
+      const patched = await as(oak, http().patch('/pokemon/90001'))
         .send({ price: 45000, stock: 10 })
         .expect(200);
       expect(patched.body).toMatchObject({
@@ -185,31 +231,31 @@ describe('CRUD del curso (e2e)', () => {
         stock: 10,
       });
 
-      await as(ash, http().delete('/pokemon/90001')).expect(200);
+      await as(oak, http().delete('/pokemon/90001')).expect(200);
       await as(undefined, http().get('/pokemon/90001')).expect(404);
-      await as(ash, http().put('/pokemon/90001'))
+      await as(oak, http().put('/pokemon/90001'))
         .send(mewtwoLike(90001))
         .expect(404);
     });
 
     it('validación: stock/precio negativos, stats fuera de rango, campos extra y id distinto del de la ruta → 400', async () => {
-      await as(ash, http().post('/pokemon'))
+      await as(oak, http().post('/pokemon'))
         .send({ ...mewtwoLike(90002), stock: -1 })
         .expect(400);
-      await as(ash, http().post('/pokemon'))
+      await as(oak, http().post('/pokemon'))
         .send({ ...mewtwoLike(90002), price: -5 })
         .expect(400);
-      await as(ash, http().post('/pokemon'))
+      await as(oak, http().post('/pokemon'))
         .send({
           ...mewtwoLike(90002),
           stats: { ...mewtwoLike(1).stats, hp: 999 },
         })
         .expect(400);
-      await as(ash, http().post('/pokemon'))
+      await as(oak, http().post('/pokemon'))
         .send({ ...mewtwoLike(90002), isAdmin: true })
         .expect(400);
-      await as(ash, http().patch('/pokemon/150')).send({ id: 151 }).expect(400);
-      await as(ash, http().patch('/pokemon/150'))
+      await as(oak, http().patch('/pokemon/150')).send({ id: 151 }).expect(400);
+      await as(oak, http().patch('/pokemon/150'))
         .send({ stock: -3 })
         .expect(400);
     });

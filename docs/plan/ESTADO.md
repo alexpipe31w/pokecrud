@@ -3,24 +3,22 @@
 > Se **reescribe** al cerrar cada sesión (no es histórico; el histórico es `BITACORA.md`).
 > Máximo una pantalla. Si lees esto al empezar: después lee `ROADMAP.md`.
 
-**Última actualización:** 2026-10-12 · por Alex (Claude) · rama `feature/F4-05-escena-combate` (punta de la cadena de PR)
+**Última actualización:** 2026-10-12 · por Samuel (Claude) · rama `feature/F0-12-admin-inventario` (al mezclar #21)
 
-## 👉 RELEVO PARA SAMUEL (léelo primero)
+## 👉 RELEVO DE ALEX A SAMUEL — HECHO (2026-10-12)
 
-Alex trabajó el 2026-10-11/12 en una **cadena de 11 PR** (#21 → #31). Cada uno sale del anterior, así que **este
-ESTADO solo está completo en la rama `feature/F4-05-escena-combate`** hasta que se mezclen. Haz esto, en orden:
-
-1. **Revisar y mezclar en orden** #21 → #22 → #23 → #24 → #25 → #26 → #27 → #28 → #29 → #30 → #31 (al mezclar uno,
-   GitHub reapunta el siguiente a `develop`). Resumen de cada uno en "Hecho" y en su PR.
-2. **En Render (solo tú tienes acceso):** `DATABASE_URL` al puerto **6543**; añadir **`SPAWN_SALT`** (≥ 32 caracteres
-   aleatorios, propia de Render: `node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))"`);
-   después **Manual Deploy** (no es automático). Comprobar `https://pokecrud-server.onrender.com/health/ready`.
-   Las migraciones nuevas (`player_role`, `inventory`, `capture`) **ya están aplicadas** en Supabase.
-3. **En tu `server/.env`:** puerto 6543 en `DATABASE_URL`, tu `JWT_SECRET` y tu `SPAWN_SALT`. Luego
-   `git pull && npm install && cd server && npm install` y prueba `npm test`, `npm run test:e2e`, `npm run test:shared`.
-4. **Qué coger después** (REGLA 1, una tarea): sin móvil → **F5-01** (plan del PvP; el motor ya está listo) o
-   **F2-08** (audio: faltan los SFX de golpe del combate). Con un Android → **F2-01** (spike de cámara + giroscopio):
-   es la llave de todo lo de realidad aumentada, **incluido el combate en AR que pidió Alex (D-034, F4-07)**.
+1. ✅ **PR mezclados:** #22 → #31 (cadena, entró limpia) y #21 al final (único con conflictos: docs y `schema.prisma`,
+   resueltos conservando todo; esquema = base real). Antes, integración local completa: servidor 22 unitarios + 66
+   e2e, app 103, shared 136, lint y build OK. **Ojo para próximas cadenas:** este repo NO borra la rama al mezclar,
+   así que GitHub **no** reapunta solo el PR siguiente: hay que cambiar su base a `develop` a mano antes de mezclarlo.
+2. ✅ **Render (Samuel):** `DATABASE_URL` en 6543 y `SPAWN_SALT` propia puestos. **Render SÍ despliega solo** al
+   mezclar en `develop` (trigger "Branch updated"): no hace falta Manual Deploy. Probado: `/health/ready` 200, `/spawns`
+   y `/bag` existen (401 sin sesión).
+3. ✅ **`server/.env` de Samuel:** 6543, `JWT_SECRET` y `SPAWN_SALT` propios.
+4. **Samuel también montó Android:** JDK 21 (Temurin) + Android Studio; APK instalado y probado en un **Redmi Note 10**
+   (Android 12, MIUI 13): Pokédex desde Render, login, 60 fps. En Xiaomi hay que activar "Instalar vía USB".
+5. **Qué coger después** (REGLA 1, una tarea): sin móvil → **F5-01** (plan del PvP) o **F2-08** (audio). Con un
+   Android → **F2-01** (spike de cámara + giroscopio): la llave de la AR, **incluido el combate en AR (D-034, F4-07)**.
 
 **Importante (D-034):** la escena de combate de `/combate/prueba` es **temporal**. Alex quiere el combate **en
 realidad aumentada con la cámara**. Lo que hay debajo (motor, IA, controlador, textos, menú) se reutiliza; solo cambia
@@ -34,36 +32,36 @@ visual del mapa y del encuentro espera a los spikes en Android (F1-01 Kenneth, F
 
 ## Hecho
 
-- **F4-05 (Alex, PR abierto; sale de F4-06):** **escena de combate jugable** en `/combate/prueba` (botón en `/dev/ui`):
+- **F4-05 (Alex, PR mezclado):** **escena de combate jugable** en `/combate/prueba` (botón en `/dev/ui`):
   elegir rival (fácil/normal/difícil), combate por turnos contra la IA con animaciones, textos, eficacia prevista,
   cambio de Pokémon y final. **Con esto la F4 (motor + IA + escena) está completa.** D-033.
-- **F4-06 (Alex, PR abierto; sale de F4-04):** IA rival (`shared/engine/battle/ai.ts`, fácil/normal/difícil) y 3
+- **F4-06 (Alex, PR mezclado):** IA rival (`shared/engine/battle/ai.ts`, fácil/normal/difícil) y 3
   entrenadores de prueba (`shared/data/trainers.ts`). D-032. Siguiente: **F4-05**, la escena de combate en la app.
-- **F4-04 (Alex, PR abierto; sale de F4-03):** motor de combate completo en `shared/engine/battle/battle-engine.ts`
+- **F4-04 (Alex, PR mezclado):** motor de combate completo en `shared/engine/battle/battle-engine.ts`
   (`createBattle`, `resolveTurn` puro y determinista; estados, etapas, drenaje, multigolpe, retroceso, cambios,
   Forcejeo, victoria). 1.000 combates aleatorios terminan siempre. D-031. **Siguiente: F4-05 (escena) y F4-06 (IA).**
-- **F4-03 (Alex, PR abierto; sale de F4-02):** `shared/engine/battle/damage.ts` (daño, crítico, precisión, orden) =
+- **F4-03 (Alex, PR mezclado):** `shared/engine/battle/damage.ts` (daño, crítico, precisión, orden) =
   calculadora de Showdown en 10 casos × 16 tiradas; `isSupportedMove` / `defaultMoves` (548 movimientos) y la captura
   del servidor ya solo asigna movimientos soportados. D-030.
-- **F4-02 (Alex, PR abierto; sale de F4-01):** `shared/engine/battle/`: tabla de tipos 18×18 (= tabla oficial),
+- **F4-02 (Alex, PR mezclado):** `shared/engine/battle/`: tabla de tipos 18×18 (= tabla oficial),
   `calcStats` y etapas (= ejemplo de Bulbapedia), `statChangeTarget`. Dataset regenerado (v`0c1997bdfa5a`) con
   `target`, `flinchChance` y `metaCategory` en los movimientos (D-029). La app invalidará su caché sola (versión nueva).
-- **F4-01 (Alex, PR abierto; sale de F2-06):** plan del motor de combate en `docs/plan/fases/F4-combate.md`: contrato
+- **F4-01 (Alex, PR mezclado):** plan del motor de combate en `docs/plan/fases/F4-combate.md`: contrato
   `resolveTurn(state, actions, rng) → {state, events}`, reglas Gen V+, 550 de 706 movimientos en la v1 y el hueco del
   dataset (falta `target` de los cambios de stats y `flinchChance`; se arregla en F4-02 paso 1).
-- **F2-06 (Alex, rama `feature/F2-06-captura-servidor`, PR abierto; sale de F2-03):** captura autoritativa.
+- **F2-06 (Alex, rama `feature/F2-06-captura-servidor`, PR mezclado):** captura autoritativa.
   `GET /encounters/:id` (datos para la escena) y `POST /encounters/:id/throw` (una transacción: franja viva, ≤ 80 m,
   gasto atómico de bola/baya, RNG del servidor, `CaughtPokemon`, XP; idempotente por `clientThrowId`). `GET /spawns`
   guarda la ubicación del jugador. Migración `capture` **ya aplicada en Supabase**. D-028. Falta que la app lo use
   (F2-04/05/07, necesitan F2-01 en Android).
-- **F2-03 (Alex, rama `feature/F2-03-formula-captura`, PR abierto; sale de F1-08):** `shared/engine/capture.ts`:
+- **F2-03 (Alex, rama `feature/F2-03-formula-captura`, PR mezclado):** `shared/engine/capture.ts`:
   fórmula de captura Gen III+ (bola, baya, lanzamiento, curva, PS), huida por rareza/velocidad y `resolveThrow` con
   RNG inyectado (el servidor tira en F2-06). D-027.
-- **F1-08 (Alex, rama `feature/F1-08-inventario-xp`, PR abierto; sale de F1-06):** mochila (`Inventory`, `GET /bag`,
+- **F1-08 (Alex, rama `feature/F1-08-inventario-xp`, PR mezclado):** mochila (`Inventory`, `GET /bag`,
   kit 30 Poké / 5 Super / 0 Ultra / 5 Frambu al registrarse y a los existentes; migración `inventory` **ya aplicada en
   Supabase**), curva de nivel en `shared/engine/progression.ts` y `ProgressionService.addXp` (sin endpoint, para F2).
   Placa del jugador `app-player-hud` visible en `/dev/ui`. D-026.
-- **F1-06 (Alex, rama `feature/F1-06-spawns`, PR abierto):** spawns deterministas. Motor puro
+- **F1-06 (Alex, rama `feature/F1-06-spawns`, PR mezclado):** spawns deterministas. Motor puro
   `shared/engine/spawns.ts` (celdas de ~78 m, franjas de 10 min, pesos por rareza/clima/noche) y `GET /spawns?lat&lng`
   (sesión, ≤ 200 m, solo `{id, speciesId, lat, lng}`). Semilla HMAC con `SPAWN_SALT` (solo servidor), clima de
   Open-Meteo por celda de 0,1° y franja (timeout 4 s → "despejado"). **El servidor ahora compila `shared/`:** sale en
@@ -108,58 +106,66 @@ visual del mapa y del encuentro espera a los spikes en Android (F1-01 Kenneth, F
 
 ## En curso
 
-- Esperan revisión **en orden** (ver PENDIENTES DE HUMANOS): #21 → #22 → #23 → #24 → #25 → #26 → #27 → #28 → #29 → #30 → #31.
 - **F1-01 → PENDIENTE DE KENNETH** (medir fps en su Android): rama `feature/F1-01-spike-mapa-3d`, instrucciones
   exactas en la última entrada de F1-01 de la bitácora.
 
 ## Siguiente paso concreto
 
-1. **Revisar y mezclar los PR en orden: F0-12 (#21), F1-06 (#22), F1-08.** Tras mezclar, Samuel: Manual Deploy en Render.
-2. **`SPAWN_SALT` (F1-06):** cada uno la añade a su `server/.env` (≥ 32 caracteres aleatorios:
-   `node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))"`); **Samuel, también en Render**
-   antes del deploy. Sin ella `/spawns` da 503 y el resto funciona. Alex ya la tiene.
-3. **Kenneth:** cerrar F1-01 (medición en Android + decisión A/B). Desbloquea F1-02…F1-05.
-4. Siguientes tareas: F1-02…F1-05 esperan a F1-01 (Kenneth). Libres sin móvil: mirar el ROADMAP de F2-F4 (motor de
-   combate F4 en `shared/` no necesita mapa).
-5. Samuel: puerto de `DATABASE_URL` → 6543 en su `.env` y en Render (Alex ya lo hizo).
-6. Para generar el APK en otro PC: JDK 21 (`winget install Microsoft.OpenJDK.21`) y `npm run apk`.
+1. **Alex:** nombrarse ADMIN del inventario (`cd server && npm run admin -- grant <correo>`). Hasta entonces nadie
+   puede agregar/editar/eliminar Pokémon en `/pokemon` (hoy hay 0 ADMIN en la base).
+2. **Kenneth:** cerrar F1-01 (medición en Android + decisión A/B) y poner `SPAWN_SALT` en su `server/.env`
+   (`node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))"`; sin ella `/spawns` da 503).
+3. **Siguiente tarea libre:** sin móvil → F5-01 (plan del PvP) o F2-08 (audio). Con Android → F2-01 (spike de cámara
+   y giroscopio). F1-02…F1-05 esperan a F1-01.
+4. **Tarea pequeña nueva (F0-13):** que los `.js`/`.d.ts` que a veces deja la compilación del servidor dentro de
+   `shared/` no se puedan subir ni usar por error (ver Bloqueos).
+5. Para generar el APK en otro PC: JDK 21 (`winget install Microsoft.OpenJDK.21`; si da "el hash no coincide",
+   `winget install EclipseAdoptium.Temurin.21.JDK`) y `npm run apk`.
 
 ## Bloqueos / roto / pendiente de humanos
 
 ### PENDIENTES DE HUMANOS — lista única (quien termine algo, lo marca `[x]`; cada tarea nueva añade aquí lo suyo)
 
 **Kenneth o Samuel (revisión):**
-- [ ] Revisar y mezclar **en este orden**: #21 (F0-12 admin) → #22 (F1-06 spawns) → #23 (F1-08 mochila) → #24 (F2-03 fórmula) → #25 (F2-06 captura) → #26 (F4-01 plan combate) → #27 (F4-02 tipos y stats) → #28 (F4-03 daño) → #29 (F4-04 motor de combate) → #30 (F4-06 IA) → #31 (F4-05 escena de combate).
-  Cada uno sale del anterior: al mezclar uno, GitHub reapunta el siguiente a `develop`.
+
+- [x] (Samuel, 2026-10-12) Revisar y mezclar #21…#31: primero la cadena #22 → #31 y #21 al final (único con
+      conflictos). GitHub NO reapuntó solo (el repo no borra las ramas mezcladas): la base se cambió a `develop` a mano.
 
 **Samuel (Render, solo él tiene acceso):**
-- [ ] `DATABASE_URL` → puerto **6543** en Render (F0-10, D-021).
-- [ ] Añadir **`SPAWN_SALT`** en Render (≥ 32 caracteres aleatorios, propia de Render) ANTES de desplegar F1-06.
-- [ ] **Manual Deploy** después de cada mezcla en `develop` (con repo público por URL NO es automático).
-- [ ] Su `server/.env`: puerto 6543, `JWT_SECRET` y `SPAWN_SALT` propios.
+
+- [x] `DATABASE_URL` → puerto **6543** en Render (F0-10, D-021). (2026-10-12)
+- [x] Añadir **`SPAWN_SALT`** en Render (≥ 32 caracteres aleatorios, propia de Render). (2026-10-12)
+- [x] ~~Manual Deploy tras cada mezcla~~: no hace falta, Render despliega solo al cambiar `develop` (comprobado).
+- [x] Su `server/.env`: puerto 6543, `JWT_SECRET` y `SPAWN_SALT` propios. (2026-10-12)
 
 **Kenneth:**
+
 - [ ] Probar el combate en su Android: APK → `/dev/ui` → "Combate de prueba"; que vaya fluido y se oigan los gritos.
 - [ ] **F1-01:** medir fps en su Android y escribir la decisión plan A/B (rama `feature/F1-01-spike-mapa-3d`,
-  instrucciones en su bitácora). Bloquea F1-02…F1-05.
+      instrucciones en su bitácora). Bloquea F1-02…F1-05.
 - [ ] Su `server/.env`: `SPAWN_SALT` propia.
 
 **Quien coja F2-08 (audio):**
+
 - [ ] SFX de golpe/crítico/debilitado para la escena de combate (hoy solo hay gritos y vibración).
 
 **Alex:**
+
 - [ ] Nombrarse ADMIN del inventario tras mezclar #21: registrarse en la app y `cd server && npm run admin -- grant <correo>`.
 - [ ] Postman (tras #21): poner `adminEmail`/`adminPassword` en SU entorno local de Postman.
 - [ ] Antes del **2027-01-10**: tope de Google Maps o pasar a MapLibre (ver más abajo).
 - [ ] Decidir qué hacer con las 6 capturas `docs/evidencias/HU-02_*.jpg` sin commitear.
 - [ ] (Recomendado en la revisión de F0) Proteger `develop` y añadir CI con lint + test + build obligatorios:
-  hoy los 23 PR se han mezclado sin revisión.
+      hoy los 23 PR se han mezclado sin revisión.
 - [x] `server/.env` en 6543, `JWT_SECRET` y `SPAWN_SALT` locales; JDK 21 instalado (2026-10-11).
 
+- **Artefactos en `shared/` (F0-13, pendiente):** la primera `npm run build` del servidor tras traer D-024 dejó 42
+  `.js`/`.d.ts`/`.js.map` junto a las fuentes de `shared/` (probable caché incremental vieja; compilando desde cero no
+  se reproduce). No están en `.gitignore`: **no los subas**; si aparecen, bórralos (podrían usarse en lugar del `.ts`).
 - **Cada compañero necesita su propio `JWT_SECRET`** en su `server/.env` para arrancar el servidor en local (SECRETOS.md).
 - **En local hacen falta dos servidores:** Nest (`cd server && npm run start:dev`, puerto **3000**) y la app (`npm start`).
   Si tu `server/.env` tiene `PORT=3001` de antes, cámbialo a 3000 (o bórralo).
-- **ACCIÓN — puerto de la base (F0-10, D-021):** cada uno cambia en su `server/.env` el puerto de `DATABASE_URL` de
+- **ACCIÓN — puerto de la base (F0-10, D-021):** (Alex, Samuel y Render: hecho; falta confirmar Kenneth) cada uno cambia en su `server/.env` el puerto de `DATABASE_URL` de
   **5432 a 6543** (solo ese; `DIRECT_URL` se queda en 5432). **Samuel:** lo mismo en la variable `DATABASE_URL` de Render.
   Mientras alguien siga en 5432 consume del cupo de 15 del session pooler (hoy Render: 5); no rompe nada, pero el riesgo
   vuelve si los tres se quedan en 5432.
