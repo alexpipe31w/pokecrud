@@ -7,7 +7,7 @@
 
 ## Fase actual
 
-**F0 · Fundaciones** — **F0-01…F0-08 en `develop`** (PR #8-#16). **F0-09 hecha** (Kenneth, PR pendiente de mezclar).
+**F0 · Fundaciones** — **F0-01…F0-08 en `develop`** (PR #8-#16). **F0-09 hecha** (Kenneth, PR #17 pendiente de mezclar).
 Quedan **F0-10** (transaction pooler) y **F0-11** (zona segura Android 15+), ambas nuevas. Después, F1.
 
 ## Hecho
@@ -51,7 +51,7 @@ Quedan **F0-10** (transaction pooler) y **F0-11** (zona segura Android 15+), amb
 
 ## Siguiente paso concreto
 
-1. Revisar y mezclar el PR de F0-09 en `develop`.
+1. Revisar y mezclar el PR #17 (F0-09) en `develop`.
 2. Siguiente tarea libre: **F0-10** (pooler, riesgo abajo) o **F0-11** (zona segura). Luego F1 (mapa): F1-01 ya
    tiene su dependencia (F0-09) y necesita el APK para medir fps en un Android real.
 3. Para generar el APK en otro PC: instalar JDK 21 (`winget install Microsoft.OpenJDK.21`) y `npm run apk`.
