@@ -52,7 +52,11 @@ import { levelProgress } from '@shared/engine/progression';
       height: 48px;
       flex: none;
       border-radius: 50%;
-      background: linear-gradient(160deg, var(--accent) 50%, var(--paper) 50%);
+      background: radial-gradient(
+        circle at 35% 30%,
+        color-mix(in srgb, var(--accent), white 35%),
+        var(--accent) 65%
+      );
       color: var(--accent-ink);
       font: 700 22px/1 var(--font-display);
       text-shadow: 0 1px 2px rgb(0 0 0 / 0.35);

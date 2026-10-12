@@ -90,8 +90,11 @@
       Manual Deploy; sin ella `/spawns` da 503 y lo demás sigue igual.
 - [ ] **F1-07 · Pokémon en el mapa** — sprites en el overlay, hierba agitándose, aparición/desaparición
       animada, grito bajito por cercanía, toque → encuentro. Dep: F1-05, F1-06.
-- [~] **F1-08 · Inventario y XP básicos** (@alex, 2026-10-11) — modelo `Inventory`, bolas iniciales, nivel/XP del jugador en
+- [x] **F1-08 · Inventario y XP básicos** (@alex, 2026-10-11) — modelo `Inventory`, bolas iniciales, nivel/XP del jugador en
       el HUD. Dep: F0-07.
+      **Hecho:** modelo `Inventory` + `GET /bag` (kit 30/5/0/5 al registrarse y a los existentes), curva de nivel y
+      `ProgressionService.addXp` atómico; placa `app-player-hud` (en `/dev/ui` hasta F1-04). shared 27/27, app 97/97,
+      server 21/21 + e2e 53/53. D-026. Sale de F1-06: mezclar antes el PR #22.
 
 ## F2 · Encuentro en AR y captura
 

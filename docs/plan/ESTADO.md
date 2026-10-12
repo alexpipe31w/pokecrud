@@ -3,7 +3,7 @@
 > Se **reescribe** al cerrar cada sesión (no es histórico; el histórico es `BITACORA.md`).
 > Máximo una pantalla. Si lees esto al empezar: después lee `ROADMAP.md`.
 
-**Última actualización:** 2026-10-11 · por Alex (Claude) · rama `feature/F1-06-spawns` (PR abierto)
+**Última actualización:** 2026-10-11 · por Alex (Claude) · rama `feature/F1-08-inventario-xp` (PR abierto)
 
 ## Fase actual
 
@@ -11,6 +11,10 @@
 
 ## Hecho
 
+- **F1-08 (Alex, rama `feature/F1-08-inventario-xp`, PR abierto; sale de F1-06):** mochila (`Inventory`, `GET /bag`,
+  kit 30 Poké / 5 Super / 0 Ultra / 5 Frambu al registrarse y a los existentes; migración `inventory` **ya aplicada en
+  Supabase**), curva de nivel en `shared/engine/progression.ts` y `ProgressionService.addXp` (sin endpoint, para F2).
+  Placa del jugador `app-player-hud` visible en `/dev/ui`. D-026.
 - **F1-06 (Alex, rama `feature/F1-06-spawns`, PR abierto):** spawns deterministas. Motor puro
   `shared/engine/spawns.ts` (celdas de ~78 m, franjas de 10 min, pesos por rareza/clima/noche) y `GET /spawns?lat&lng`
   (sesión, ≤ 200 m, solo `{id, speciesId, lat, lng}`). Semilla HMAC con `SPAWN_SALT` (solo servidor), clima de
@@ -56,19 +60,19 @@
 
 ## En curso
 
-- **F1-08 (Alex, rama `feature/F1-08-inventario-xp`, sale de F1-06):** inventario, bolas iniciales, nivel/XP y HUD.
-- **F1-06 hecha** (Alex, PR #22) y **F0-12 hecha** (Alex, PR #21): esperan revisión.
+- Nadie. Esperan revisión, **en este orden**: F0-12 (PR #21), F1-06 (PR #22) y F1-08 (sale de F1-06).
 - **F1-01 → PENDIENTE DE KENNETH** (medir fps en su Android): rama `feature/F1-01-spike-mapa-3d`, instrucciones
   exactas en la última entrada de F1-01 de la bitácora.
 
 ## Siguiente paso concreto
 
-1. **Revisar y mezclar los PR de F0-12 (#21) y F1-06.** Tras mezclar, Samuel: Manual Deploy en Render.
+1. **Revisar y mezclar los PR en orden: F0-12 (#21), F1-06 (#22), F1-08.** Tras mezclar, Samuel: Manual Deploy en Render.
 2. **`SPAWN_SALT` (F1-06):** cada uno la añade a su `server/.env` (≥ 32 caracteres aleatorios:
    `node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))"`); **Samuel, también en Render**
    antes del deploy. Sin ella `/spawns` da 503 y el resto funciona. Alex ya la tiene.
 3. **Kenneth:** cerrar F1-01 (medición en Android + decisión A/B). Desbloquea F1-02…F1-05.
-4. Siguiente tarea libre sin móvil: **F1-08** (inventario y XP básicos, dep F0-07 ✔).
+4. Siguientes tareas: F1-02…F1-05 esperan a F1-01 (Kenneth). Libres sin móvil: mirar el ROADMAP de F2-F4 (motor de
+   combate F4 en `shared/` no necesita mapa).
 5. Samuel: puerto de `DATABASE_URL` → 6543 en su `.env` y en Render (Alex ya lo hizo).
 6. Para generar el APK en otro PC: JDK 21 (`winget install Microsoft.OpenJDK.21`) y `npm run apk`.
 

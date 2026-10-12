@@ -416,3 +416,31 @@ encuentro, 503 si falta la sal (D-025). `SPAWN_SALT` añadida a `.env.example`, 
 Render (Samuel) antes del deploy. Los niveles (1-25) se ligarán al nivel del jugador en F3.
 **Decisiones nuevas:** D-024, D-025.
 **El siguiente debe empezar por:** revisar el PR de F1-06; luego `/inicio F1-08` (o F1-02 si Kenneth ya cerró F1-01).
+
+## 2026-10-11 21:35 · @alex (Claude) · F1-08 · rama `feature/F1-08-inventario-xp` (sale de F1-06)
+
+**Qué se hizo:** `shared/engine/items.ts` (objetos y kit inicial) y `shared/engine/progression.ts` (curva 500·(L−1)·L,
+`levelForXp`, `levelProgress`). Servidor: modelo `Inventory` (enum `InventoryItem`, PK (playerId, item), CHECK 0-999)
+con migración que da el kit a los jugadores existentes; kit al registrarse en la misma escritura que el `Player`;
+`GET /bag` (garantiza el kit con ON CONFLICT DO NOTHING); `ProgressionService.addXp` atómico (sin endpoint). App:
+`BagService` (se vacía al cambiar de jugador), placa `app-player-hud` (avatar, nivel, barra de XP, bolas) y mochila
+en `/dev/ui`. La rama se mezcló con `feature/F1-06-spawns` porque necesita que el servidor compile `shared/` (D-024).
+**Archivos clave:** `shared/engine/{items,progression}.ts`, `server/src/bag/`, `server/src/progression/`,
+`server/prisma/migrations/20261012020000_inventory/`, `src/app/shared/ui/player-hud.component.ts`,
+`src/app/services/game/bag.service.ts`.
+**Cómo se probó (salida real):**
+
+    prisma migrate diff (schema de develop → este) = mismo SQL que la migración (+ CHECK y kit a mano)
+    prisma migrate deploy → 20261012020000_inventory aplicada · kit: 3 jugadores × 4 filas (POKE 90, GREAT 15, ULTRA 0, RAZZ 15)
+    shared: 27/27 (5 nuevos) · app: ng test 97/97 (5 nuevos), lint OK, build OK (sin avisos de presupuesto)
+    server: npm test 21/21 · test:e2e → Test Files 6 passed · Tests 53 passed (bag: 7 nuevos)
+      kit exacto al registrarse; GET /bag dos veces no regala nada; no pisa cantidades; jugador sin filas → kit;
+      la BD rechaza qty −1 y 1000; 10 addXp(1000) simultáneos → 10.000 XP y nivel 5 en /auth/me;
+      addXp dentro de una transacción que falla → 0 XP; addXp(0 | −5 | 1,5 | 100.001) → 400
+    navegador (390×844): /dev/ui con cuenta de prueba (1.500 XP) → placa "nivel 2 · 500 / 2000 XP · 35 bolas" y
+      mochila 30/5/0/5. Arreglado el contraste de la inicial del avatar. Evidencias F1-08_0{1,2}_*.png
+
+**Quedó a medias / roto:** nada. La placa se coloca en el mapa en F1-04.
+**Decisiones nuevas:** D-026.
+**El siguiente debe empezar por:** mezclar en orden #21, #22 y el PR de F1-08 (Samuel: `SPAWN_SALT` en Render +
+Manual Deploy). Luego F1-02 en cuanto Kenneth cierre F1-01.
