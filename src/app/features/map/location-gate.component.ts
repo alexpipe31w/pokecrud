@@ -1,4 +1,4 @@
-import { Component, computed, effect, inject, signal } from '@angular/core';
+import { Component, computed, effect, inject, input, output, signal } from '@angular/core';
 
 import { DEFAULT_CENTER, LocationService } from '../../services/location/location.service';
 import { SettingsService } from '../../services/game/settings.service';
@@ -8,11 +8,11 @@ import { GlassPanelComponent } from '../../shared/ui/glass-panel.component';
 /** Tras cuánto tiempo sin fix se explica "Buscando señal GPS…" (antes, el mapa ya se ve detrás). */
 export const SEARCHING_NOTICE_MS = 4000;
 
-type View = 'ask' | 'searching' | 'denied' | 'unavailable' | 'weak' | null;
+type View = 'maps' | 'ask' | 'searching' | 'denied' | 'unavailable' | 'weak' | null;
 
 /**
  * Estados de la ubicación sobre el mapa (DISENO §6, nunca pantalla en blanco): pedir permiso, buscando señal,
- * sin permiso / sin GPS (→ joystick) y "GPS débil" (aviso pequeño que no bloquea).
+ * sin permiso / sin GPS (→ joystick), "GPS débil" (aviso pequeño que no bloquea) y el mapa que no carga (F1-04).
  */
 @Component({
   selector: 'app-location-gate',
@@ -27,6 +27,11 @@ type View = 'ask' | 'searching' | 'denied' | 'unavailable' | 'weak' | null;
         <div class="veil">
           <app-glass-panel size="lg" class="card" role="dialog" aria-live="polite">
             @switch (view()) {
+              @case ('maps') {
+                <h2>No se pudo cargar el mapa</h2>
+                <p>{{ mapsError() }}</p>
+                <app-game-button label="Reintentar" [block]="true" (pressed)="retryMaps.emit()" />
+              }
               @case ('ask') {
                 <h2>¿Dónde estás?</h2>
                 <p>Necesitamos tu ubicación para que aparezcan Pokémon a tu alrededor.</p>
@@ -40,19 +45,28 @@ type View = 'ask' | 'searching' | 'denied' | 'unavailable' | 'weak' | null;
               @case ('denied') {
                 <h2>Sin permiso de ubicación</h2>
                 <p>Puedes jugar con el joystick o activarlo en los Ajustes del móvil.</p>
-                <app-game-button label="Reintentar" variant="glass" [block]="true" (pressed)="retry()" />
+                <app-game-button
+                  label="Reintentar"
+                  variant="glass"
+                  [block]="true"
+                  (pressed)="retry()"
+                />
               }
               @case ('unavailable') {
                 <h2>Sin GPS</h2>
                 <p>Este dispositivo no da la ubicación. Puedes jugar con el joystick.</p>
               }
             }
-            <app-game-button
-              [label]="view() === 'searching' ? 'Usar joystick mientras tanto' : 'Jugar con joystick'"
-              [variant]="view() === 'denied' || view() === 'unavailable' ? 'primary' : 'glass'"
-              [block]="true"
-              (pressed)="joystick()"
-            />
+            @if (view() !== 'maps') {
+              <app-game-button
+                [label]="
+                  view() === 'searching' ? 'Usar joystick mientras tanto' : 'Jugar con joystick'
+                "
+                [variant]="view() === 'denied' || view() === 'unavailable' ? 'primary' : 'glass'"
+                [block]="true"
+                (pressed)="joystick()"
+              />
+            }
           </app-glass-panel>
         </div>
       }
@@ -120,6 +134,11 @@ type View = 'ask' | 'searching' | 'denied' | 'unavailable' | 'weak' | null;
 export class LocationGateComponent {
   private readonly location = inject(LocationService);
   private readonly settings = inject(SettingsService);
+
+  /** Error al cargar Google Maps (la pantalla del mapa lo pasa); manda sobre los estados de la ubicación. */
+  readonly mapsError = input<string | null>(null);
+  /** "Reintentar" en el error de Maps: la pantalla vuelve a cargar el mapa. */
+  readonly retryMaps = output<void>();
   /** Lleva más de SEARCHING_NOTICE_MS en "searching" sin fix. */
   private readonly slow = signal(false);
 
@@ -130,6 +149,7 @@ export class LocationGateComponent {
   );
 
   protected readonly view = computed<View>(() => {
+    if (this.mapsError()) return 'maps';
     switch (this.location.status()) {
       case 'idle':
       case 'prompt':

@@ -11,7 +11,7 @@ import { ThreeJSOverlayView } from '@googlemaps/three';
 import { IonContent, ViewDidEnter, ViewWillLeave } from '@ionic/angular';
 import { fromLocalM, toLocalM, type LatLng } from '@shared/engine/geo';
 
-import { MAPS_MAP_ID, loadMapsLibrary } from '../../core/maps/google-maps.loader';
+import { MAPS_MAP_ID, loadMapsLibrary, mapsAuthFailed } from '../../core/maps/google-maps.loader';
 import { joystickVelocity } from '../../game/geo/joystick-math';
 import { AvatarMotion } from '../../game/map-scene/avatar-motion';
 import { isNightLocal } from '../../game/map-scene/day-night';
@@ -25,6 +25,8 @@ const ZOOM = 18;
 const TILT = 67.5;
 /** Cada cuánto se mira si se ha cruzado las 19:00 o las 6:00 (el esquema de color solo se fija al crear el mapa). */
 const NIGHT_CHECK_MS = 60_000;
+/** Google avisa de una clave rechazada llamando a `gm_authFailure` poco después de cargar: se mira pasado este tiempo. */
+const AUTH_CHECK_MS = 3000;
 
 /**
  * Pantalla principal del juego (F1-04): Google Maps vectorial inclinado que sigue al jugador (GPS filtrado o
@@ -44,7 +46,7 @@ const NIGHT_CHECK_MS = 60_000;
     >
       <div #mapEl class="map" [class.is-night]="night()"></div>
 
-      <app-location-gate />
+      <app-location-gate [mapsError]="mapsError()" (retryMaps)="retryMaps()" />
       @if (location.status() === 'joystick') {
         <app-joystick (vector)="joy = $event" />
       }
@@ -67,6 +69,8 @@ export class MapPage implements ViewDidEnter, ViewWillLeave, OnDestroy {
   private readonly compass = inject(CompassService);
 
   protected readonly night = signal(isNightLocal(new Date()));
+  /** Por qué no se pudo cargar Google Maps (la pantalla de estados lo muestra con "Reintentar"). */
+  protected readonly mapsError = signal<string | null>(null);
   /** `true` = norte siempre arriba; `false` = el mapa gira con la brújula (lo alterna la brújula del HUD, paso 7). */
   readonly northUp = signal(false);
   /** Último vector del joystick (se lee en cada fotograma; no hace falta que sea signal). */
@@ -115,14 +119,30 @@ export class MapPage implements ViewDidEnter, ViewWillLeave, OnDestroy {
 
   /** Carga Google Maps y monta el overlay. Los errores los muestra la pantalla de estados (paso 6). */
   private async init(): Promise<void> {
-    await this.createMap();
+    this.mapsError.set(null);
+    try {
+      await this.createMap();
+    } catch (err) {
+      console.error('[mapa] no se pudo cargar Google Maps', err);
+      this.mapsError.set(err instanceof Error ? err.message : 'Revisa tu conexión a internet.');
+      return;
+    }
     if (this.destroyed) return;
+    setTimeout(() => {
+      if (mapsAuthFailed()) this.mapsError.set('Google rechazó la clave del mapa.');
+    }, AUTH_CHECK_MS);
+    clearInterval(this.nightTimer);
     this.nightTimer = setInterval(() => {
       const night = isNightLocal(new Date());
-      if (night !== this.night()) void this.createMap();
+      if (night !== this.night())
+        void this.createMap().catch((err) => console.error('[mapa] día/noche', err));
     }, NIGHT_CHECK_MS);
     // Por si Ionic disparó ionViewDidEnter antes de que el mapa existiera (primera carga).
     this.ionViewDidEnter();
+  }
+
+  protected retryMaps(): void {
+    void this.init();
   }
 
   /** (Re)crea el mapa: el esquema de color de día o de noche solo se puede fijar al crearlo. */

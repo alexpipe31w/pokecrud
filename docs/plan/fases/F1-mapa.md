@@ -974,9 +974,9 @@ this.overlay.setMap(this.map);
 
 **Files:** Modify `src/app/features/map/location-gate.component.ts` (creado en F1-03 paso 7), `map.page.ts`
 
-- [ ] **6a.** Montar `app-location-gate` sobre el mapa y añadirle el estado de error de Maps (`MapsLoadError` /
+- [x] **6a.** Montar `app-location-gate` sobre el mapa y añadirle el estado de error de Maps (`MapsLoadError` /
   `mapsAuthFailed()`) → "No se pudo cargar el mapa" + "Reintentar" (vuelve a llamar a `init()`).
-- [ ] **6b.** Commit + `/guardar`.
+- [x] **6b.** Commit + `/guardar`.
 
 ### Paso 7 — HUD y menú de la Poké Ball (DISENO §1)
 
