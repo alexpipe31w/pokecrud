@@ -155,6 +155,12 @@ async function main() {
     healing: m.meta?.healing ?? 0,
     minHits: m.meta?.min_hits ?? null,
     maxHits: m.meta?.max_hits ?? null,
+    // F4-02: a quién afecta el movimiento (los cambios de stats van al usuario o al rival) y retroceso del rival.
+    target: m.target?.name ?? 'selected-pokemon',
+    flinchChance: m.meta?.flinch_chance ?? 0,
+    // `target` no basta para los de daño: Puño Incremento es `selected-pokemon` y sube el ataque del USUARIO.
+    // PokéAPI lo dice aquí: `damage+raise` = cambios al usuario, `damage+lower` = al rival.
+    metaCategory: m.meta?.category?.name ?? null,
   }));
 
   const TYPE_NAMES = [

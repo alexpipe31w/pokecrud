@@ -286,3 +286,13 @@ el comando de arranque no cambia (`npm run start:prod`).
   lanzar, fuera de la respuesta y sin romperla si falla.
 - **Fuera de alcance (anotado):** Pokédex vistos/capturados y caramelos (F3), y que el cliente lo use (F2-04/05/07).
 
+## D-029 · A quién afectan los cambios de stats: `target` + `metaCategory` (F4-02) (2026-10-11, Alex)
+
+El dataset ahora trae `target`, `flinchChance` y `metaCategory` (PokéAPI `meta.category`) en cada movimiento. **El
+`target` solo vale para los de estado**: en los de daño siempre es `selected-pokemon`, también en Puño Incremento
+(sube SU ataque) o A Bocajarro (baja SUS defensas). Para los de daño manda `metaCategory`: `damage-raise` → usuario
+(aunque el cambio sea negativo), `damage-lower` → rival. 7 movimientos de la Gen 9 vienen sin categoría: por defecto
+son del usuario salvo Lumina Crash y Bomba Jarabe (rival). En 1 vs 1, `user-and-allies` (Aullido) = usuario; `ally` y
+`all-pokemon` (Aroma Floral, Labrar) no aplican. `statChance: 0` con cambios = 100 %. Todo en
+`shared/engine/battle/moves.ts`; si PokéAPI rellena las categorías que faltan, revisar la lista.
+
