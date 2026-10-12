@@ -3,16 +3,9 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "outDir": "./out-tsc/app",
-    "types": []
+    "types": ["google.maps"]
   },
-  "files": [
-    "src/main.ts"
-  ],
-  "include": [
-    "src/**/*.d.ts",
-    "shared/**/*.ts"
-  ],
-  "exclude": [
-    "shared/**/*.spec.ts"
-  ]
+  "files": ["src/main.ts"],
+  "include": ["src/**/*.d.ts", "shared/**/*.ts"],
+  "exclude": ["shared/**/*.spec.ts"]
 }

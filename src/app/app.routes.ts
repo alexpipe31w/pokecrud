@@ -11,6 +11,7 @@ import { authGuard, guestGuard } from './core/auth/auth.guard';
  *  /pokemon/:id       → Detalle de un Pokémon
  *  /pokemon/:id/editar → Editar un Pokémon
  *  /dev/ui            → Escaparate del sistema de diseño (solo desarrollo, exige sesión)
+ *  /dev/mapa          → Spike F1-01: Google Maps 3D + three.js con medidor de fps (solo desarrollo, exige sesión)
  *
  * Toda ruta nueva lleva `canActivate: [authGuard]`. EXCEPCIÓN (F0-08): la Pokédex y el detalle de IS-11 son de
  * solo lectura y `GET /pokemon` es público en el servidor, así que se ven sin sesión. Agregar y editar sí la
@@ -48,6 +49,11 @@ export const routes: Routes = [
     path: 'dev/ui',
     canActivate: [authGuard],
     loadComponent: () => import('./features/dev-ui/dev-ui.page').then((m) => m.DevUiPage),
+  },
+  {
+    path: 'dev/mapa',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/dev-map/dev-map.page').then((m) => m.DevMapPage),
   },
   {
     path: '',
