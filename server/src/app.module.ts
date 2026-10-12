@@ -15,6 +15,7 @@ import { PrismaModule } from './prisma/prisma.module.js';
 import { SpawnsModule } from './spawns/spawns.module.js';
 import { BagModule } from './bag/bag.module.js';
 import { ProgressionModule } from './progression/progression.module.js';
+import { EncountersModule } from './encounters/encounters.module.js';
 import { TeamsModule } from './teams/teams.module.js';
 
 const isProd = process.env['NODE_ENV'] === 'production';
@@ -71,6 +72,8 @@ function requestId(req: IncomingMessage, res: ServerResponse): string {
     // F1-08: mochila (GET /bag) y XP/nivel (sin endpoint, lo usan captura y combate).
     BagModule,
     ProgressionModule,
+    // F2-06: encuentro y captura autoritativos.
+    EncountersModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: ThrottlerGuard },
