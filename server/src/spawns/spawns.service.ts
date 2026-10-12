@@ -1,13 +1,17 @@
 import { createHmac } from 'node:crypto';
 import { readFileSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { dirname, resolve } from 'node:path';
 import {
   Injectable,
   Logger,
   ServiceUnavailableException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import type { Species } from '../../../shared/data/dataset.types.js';
+import type { Move, Species } from '../../../shared/data/dataset.types.js';
+import {
+  defaultMoves,
+  isSupportedMove,
+} from '../../../shared/engine/battle/moves.js';
 import {
   type SpawnSpecies,
   type SpawnTable,
@@ -68,6 +72,8 @@ export class SpawnsService {
   private readonly salt: string | undefined;
   private species: SpawnSpecies[] | null = null;
   private readonly details = new Map<number, SpeciesDetails>();
+  /** Movimientos que el motor de combate v1 sabe ejecutar (F4-03): solo esos se asignan al capturar. */
+  private readonly supportedMoves = new Set<number>();
   private readonly tables = new Map<string, SpawnTable>();
 
   constructor(
@@ -107,6 +113,11 @@ export class SpawnsService {
           learnset: s.learnset,
         });
       }
+      const moves = JSON.parse(
+        readFileSync(resolve(dirname(datasetPath), 'moves.json'), 'utf8'),
+      ) as Move[];
+      for (const m of moves)
+        if (isSupportedMove(m)) this.supportedMoves.add(m.id);
     } catch (err) {
       this.logger.error({
         msg: 'spawns.dataset_unavailable',
@@ -182,6 +193,15 @@ export class SpawnsService {
     if (!parsed) return null;
     const spawns = await this.cellSpawns(parsed.cellId, parsed.slot);
     return spawns.find((s) => s.index === parsed.index) ?? null;
+  }
+
+  /** Los 4 movimientos con los que llega un Pokémon de esta especie y nivel (los últimos soportados; D-030). */
+  defaultMoves(speciesId: number, level: number): number[] {
+    return defaultMoves(
+      this.details.get(speciesId)?.learnset ?? [],
+      level,
+      (id) => this.supportedMoves.has(id),
+    );
   }
 
   speciesDetails(speciesId: number): SpeciesDetails | undefined {

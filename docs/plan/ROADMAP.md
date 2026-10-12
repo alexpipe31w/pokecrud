@@ -144,8 +144,10 @@
 - [x] **F4-02 · Tabla de tipos y stats** (@alex, 2026-10-11) — `type-chart.ts`, `stats.ts` con tests (18×18 completa). Dep: F4-01.
       **Hecho:** 324 casillas de PokéAPI = tabla oficial; stats = ejemplo de Bulbapedia (Garchomp nv 78); dataset con
       `target`/`flinchChance`/`metaCategory` y `statChangeTarget` (D-029). shared 71/71.
-- [~] **F4-03 · Daño, precisión, crítico, prioridad** (@alex, 2026-10-11) — `damage.ts` con tests comparados con una
+- [x] **F4-03 · Daño, precisión, crítico, prioridad** (@alex, 2026-10-11) — `damage.ts` con tests comparados con una
       calculadora pública (anotar los casos). Dep: F4-02.
+      **Hecho:** 10 casos × 16 tiradas idénticas a `@smogon/calc` 0.12.0 (motor de calc.pokemonshowdown.com);
+      548 movimientos soportados y la captura solo asigna esos. shared 99/99, server 22/22 + e2e 64/64. D-030.
 - [ ] **F4-04 · Estados y cambios de stats** — dentro de `battle-engine.ts` (reducer puro) con tests. Dep: F4-03.
 - [ ] **F4-05 · Escena de combate** — UI de turnos, selección de movimiento con tipo/PP/efectividad
       prevista, animaciones por tipo, cola de eventos, textos en español, cambio de Pokémon. Dep: F4-04, F0-04.

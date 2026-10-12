@@ -1,6 +1,12 @@
 import { readFileSync } from 'node:fs';
 import type { Move } from '../../data/dataset.types.js';
-import { statChangeChance, statChangeTarget } from './moves.js';
+import {
+  FALLBACK_MOVE_ID,
+  defaultMoves,
+  isSupportedMove,
+  statChangeChance,
+  statChangeTarget,
+} from './moves.js';
 
 const moves = JSON.parse(
   readFileSync(new URL('../../../src/assets/data/moves.json', import.meta.url), 'utf8'),
@@ -55,5 +61,62 @@ describe('a quién afectan los cambios de stats (con el dataset real)', () => {
       expect(m).toHaveProperty('metaCategory');
     }
     expect(byName('bite').flinchChance).toBe(30);
+  });
+});
+
+describe('movimientos soportados por el motor v1 (con el dataset real)', () => {
+  it('cuenta: todos los de daño con poder + los de estado con stats, estado alterado o curación', () => {
+    const supported = moves.filter(isSupportedMove);
+    const damaging = moves.filter((m) => m.category !== 'status' && (m.power ?? 0) > 0);
+    expect(damaging).toHaveLength(442);
+    // 550 del plan menos Aroma Floral y Labrar (no aplican en 1 vs 1, D-029)
+    expect(supported).toHaveLength(548);
+  });
+
+  it.each([
+    ['thunderbolt', true],
+    ['swords-dance', true],
+    ['thunder-wave', true],
+    ['toxic', true],
+    ['recover', true],
+    ['seismic-toss', false],
+    ['reflect', false],
+    ['metronome', false],
+    ['aromatic-mist', false],
+  ])('%s → %s', (name, expected) => {
+    expect(isSupportedMove(byName(name))).toBe(expected);
+  });
+
+  it('defaultMoves: los 4 últimos soportados hasta su nivel, sin repetir; si no hay, Placaje', () => {
+    const learnset = [
+      { moveId: 1, level: 1 },
+      { moveId: 2, level: 1 },
+      { moveId: 3, level: 3 },
+      { moveId: 4, level: 7 },
+      { moveId: 1, level: 9 },
+      { moveId: 5, level: 12 },
+      { moveId: 6, level: 40 },
+      { moveId: 7, level: 0 },
+      { moveId: 8, level: 10 },
+    ];
+    const ok = (id: number) => id !== 8;
+    expect(defaultMoves(learnset, 12, ok)).toEqual([3, 4, 1, 5]);
+    expect(defaultMoves(learnset, 5, ok)).toEqual([1, 2, 3]);
+    expect(defaultMoves(learnset, 1, () => false)).toEqual([FALLBACK_MOVE_ID]);
+    expect(defaultMoves([], 30, ok)).toEqual([FALLBACK_MOVE_ID]);
+  });
+
+  it('ninguna de las 1025 especies se queda sin movimientos a nivel 1, 25 y 50', () => {
+    const pokedex = JSON.parse(
+      readFileSync(new URL('../../../src/assets/data/pokedex.json', import.meta.url), 'utf8'),
+    ) as { learnset: { moveId: number; level: number }[] }[];
+    const ok = new Set(moves.filter(isSupportedMove).map((m) => m.id));
+    for (const s of pokedex) {
+      for (const level of [1, 25, 50]) {
+        const picked = defaultMoves(s.learnset, level, (id) => ok.has(id));
+        expect(picked.length).toBeGreaterThanOrEqual(1);
+        expect(picked.length).toBeLessThanOrEqual(4);
+      }
+    }
   });
 });

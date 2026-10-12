@@ -159,3 +159,14 @@ describe('WeatherService', () => {
     expect(fetchSpy).toHaveBeenCalledTimes(1);
   });
 });
+
+describe('SpawnsService.defaultMoves (F4-03)', () => {
+  it('con el dataset real: 1-4 movimientos, todos soportados por el motor', () => {
+    const { service } = make();
+    // Pikachu nivel 25 y Ditto (solo aprende Transformación, no soportado → Placaje)
+    const pikachu = service.defaultMoves(25, 25);
+    expect(pikachu.length).toBeGreaterThanOrEqual(1);
+    expect(pikachu.length).toBeLessThanOrEqual(4);
+    expect(service.defaultMoves(132, 50)).toEqual([33]);
+  });
+});
