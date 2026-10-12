@@ -541,3 +541,25 @@ fórmula ya cuadraba con Bulbapedia. Se corrigió el test.
 **Decisiones nuevas:** D-029.
 **El siguiente debe empezar por:** F4-03 (daño, precisión, crítico, orden), paso 1 del plan: `isSupportedMove` y
 `defaultMoves`, y que `movesAtLevel` del servidor use ese filtro.
+
+## 2026-10-11 23:20 · @alex (Claude) · F4-03 · rama `feature/F4-03-dano` (sale de F4-02)
+
+**Qué se hizo:** `shared/engine/battle/damage.ts` (`damageRolls`, `rollDamage`, `critChance`, `hitChance`,
+`rollAccuracy`, `effectiveSpeed`, `firstToAct`), `moves.ts` (`isSupportedMove`, `defaultMoves`). Servidor:
+`SpawnsService.defaultMoves` (carga `moves.json`) sustituye a `movesAtLevel` en la captura. Oráculo de referencia en
+`scripts/oracles/showdown-damage.cjs`.
+**Cómo se probó (salida real):**
+
+    @smogon/calc 0.12.0 (2026-09-18) instalado aparte en %TEMP% → 10 casos, p. ej.
+      Garchomp Alegre Terremoto → Heatran: 268,276,276,280,288,288,292,292,300,300,304,304,312,312,316,324
+      Lucario −2 atk crítico A Bocajarro → Blissey +2 def: 878 … 1034
+    npm run test:shared → 99/99 (28 nuevos): las 16 tiradas de los 10 casos = Showdown, y sus stats = las nuestras
+      soportados = 548 (442 de daño + estado aplicable); ninguna especie sin movimientos a nivel 1/25/50
+    server: npm test 22/22 · test:e2e 64/64 (la captura ya usa defaultMoves) · lint: solo el aviso previo
+    app: lint OK, build OK
+
+(Todos los casos de Showdown pasaron a la primera.) No había `CaughtPokemon` de jugadores reales con movimientos no
+soportados (solo cuentas de prueba, ya borradas).
+**Quedó a medias / roto:** nada.
+**Decisiones nuevas:** D-030.
+**El siguiente debe empezar por:** F4-04 (reducer `battle-engine.ts` con estados y cambios de stats), según el plan.

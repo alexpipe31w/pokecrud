@@ -296,3 +296,17 @@ son del usuario salvo Lumina Crash y Bomba Jarabe (rival). En 1 vs 1, `user-and-
 `all-pokemon` (Aroma Floral, Labrar) no aplican. `statChance: 0` con cambios = 100 %. Todo en
 `shared/engine/battle/moves.ts`; si PokéAPI rellena las categorías que faltan, revisar la lista.
 
+## D-030 · Daño verificado contra Showdown y solo movimientos soportados al capturar (F4-03) (2026-10-11, Alex)
+
+- `shared/engine/battle/damage.ts` replica el orden exacto de redondeos de `@smogon/calc` (motor de
+  calc.pokemonshowdown.com): base con `floor`, crítico `floor(×1,5)`, tirada `floor(×(85+i)/100)`, STAB como 6144/4096,
+  `pokeRound` (x,5 hacia abajo) antes de la efectividad, quemado `floor(/2)`, mínimo 1. El crítico ignora etapas negativas
+  del atacante y positivas del defensor. **Verificado:** 10 casos (×4, ×2, ×0,5, ×0,25, ×0, crítico, quemado, etapas,
+  nivel 5) con las 16 tiradas idénticas a las de `@smogon/calc` 0.12.0, y las stats también. El oráculo está en
+  `scripts/oracles/showdown-damage.cjs` (se instala aparte; no es dependencia).
+- Crítico Gen VII+ por etapas (1/24, 1/8, 1/2, siempre), precisión con etapas netas topadas en ±6 y tirada 0-99, orden:
+  cambiar > prioridad > velocidad efectiva (etapas, parálisis ×0,5) > empate al azar.
+- **Soportados:** 548 de 706 (todos los de daño con poder + los de estado con stats aplicables, estado alterado o
+  curación). Al capturar, `CaughtPokemon.moves` = `defaultMoves` de shared/ (los 4 últimos SOPORTADOS; si no hay,
+  Placaje). El servidor carga `moves.json` junto a `pokedex.json`. Ditto (solo Transformación) → Placaje.
+

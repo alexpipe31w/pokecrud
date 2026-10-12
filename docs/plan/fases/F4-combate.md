@@ -136,14 +136,14 @@ paralelo (la escena juega contra una IA "elige al azar" hasta que llegue F4-06).
 
 ## F4-03 · Daño, precisión, crítico, prioridad
 
-- [ ] **Paso 1 — `moves.ts`:** `isSupportedMove`, `defaultMoves(learnset, level, moves)` (los 4 últimos soportados;
+- [x] **Paso 1 — `moves.ts`:** `isSupportedMove`, `defaultMoves(learnset, level, moves)` (los 4 últimos soportados;
   reserva Placaje). Cambiar `movesAtLevel` del servidor para que use el mismo filtro (test en `encounters.service.spec`).
-- [ ] **Paso 2 — `damage.ts`:** `calcDamage({attacker, defender, move, crit, roll})` determinista (roll 85-100 lo pasa
+- [x] **Paso 2 — `damage.ts`:** (hecho con `@smogon/calc` 0.12.0 como oráculo: 10 casos × 16 tiradas idénticas, D-030) `calcDamage({attacker, defender, move, crit, roll})` determinista (roll 85-100 lo pasa
   quien llama) + `rollCrit`, `rollAccuracy`, `turnOrder`. **Tests contra la calculadora de Showdown**
   (calc.pokemonshowdown.com): anotar en el spec al menos 6 casos (físico/especial, STAB, súper eficaz ×4, poco
   eficaz, inmune, crítico, quemado) con el rango mínimo-máximo que da la calculadora (sin habilidades ni objetos).
-- [ ] **Paso 3:** tests de orden (prioridad gana a velocidad, parálisis, empate reproducible con semilla).
-- [ ] **Paso 4:** REGLA 2.
+- [x] **Paso 3:** tests de orden (prioridad gana a velocidad, parálisis, empate reproducible con semilla).
+- [x] **Paso 4:** REGLA 2.
 
 ## F4-04 · Estados y cambios de stats (reducer)
 

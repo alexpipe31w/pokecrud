@@ -26,10 +26,7 @@ import { Prisma } from '../generated/prisma/client.js';
 import { LocationService, distanceM } from '../location/location.service.js';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { ProgressionService } from '../progression/progression.service.js';
-import {
-  SpawnsService,
-  type SpeciesDetails,
-} from '../spawns/spawns.service.js';
+import { SpawnsService } from '../spawns/spawns.service.js';
 import type { ThrowDto } from './encounters.dto.js';
 
 /**
@@ -97,22 +94,6 @@ export interface ThrowResult {
   xpGained: number;
   caught: CaughtView | null;
   bag: BagView;
-}
-
-/** Los 4 últimos movimientos que la especie aprende por nivel hasta `level` (sin repetir). */
-export function movesAtLevel(
-  learnset: SpeciesDetails['learnset'],
-  level: number,
-): number[] {
-  const learned = learnset
-    .filter((m) => m.level >= 1 && m.level <= level)
-    .sort((a, b) => a.level - b.level)
-    .map((m) => m.moveId);
-  const unique: number[] = [];
-  for (let i = learned.length - 1; i >= 0 && unique.length < 4; i--) {
-    if (!unique.includes(learned[i])) unique.unshift(learned[i]);
-  }
-  return unique;
 }
 
 const caughtView = (c: {
@@ -258,7 +239,7 @@ export class EncountersService {
                 gender: spawn.gender,
                 shiny: spawn.shiny,
                 heightScale: this.spawns.heightScale(spawn.id),
-                moves: movesAtLevel(species.learnset, spawn.level),
+                moves: this.spawns.defaultMoves(spawn.speciesId, spawn.level),
                 ball: dto.ball,
                 encounterId,
                 caughtLat: spawn.lat,

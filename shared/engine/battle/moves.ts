@@ -45,3 +45,61 @@ export function statChangeChance(move: Pick<Move, 'statChanges' | 'statChance'>)
   if (move.statChanges.length === 0) return 0;
   return move.statChance > 0 ? move.statChance : 100;
 }
+
+/** Estados que el motor v1 sabe aplicar (plan F4). `poison` incluye Tóxico (se distingue por el nombre en F4-04). */
+export const SUPPORTED_AILMENTS: ReadonlySet<string> = new Set([
+  'burn',
+  'freeze',
+  'paralysis',
+  'poison',
+  'sleep',
+  'confusion',
+]);
+
+/** Placaje: reserva si una especie no tiene ningún movimiento soportado a su nivel. */
+export const FALLBACK_MOVE_ID = 33;
+
+/**
+ * ¿Lo sabe ejecutar el motor v1? De daño: con poder fijo (los de daño sin poder — Sísmico, Guillotina… — no).
+ * De estado: si cambia stats a alguien que existe en 1 vs 1, causa un estado soportado o cura.
+ */
+export function isSupportedMove(
+  move: Pick<
+    Move,
+    | 'name'
+    | 'category'
+    | 'power'
+    | 'target'
+    | 'metaCategory'
+    | 'statChanges'
+    | 'ailment'
+    | 'healing'
+  >,
+): boolean {
+  if (move.category !== 'status') return (move.power ?? 0) > 0;
+  return (
+    statChangeTarget(move) !== 'none' ||
+    (move.ailment !== null && SUPPORTED_AILMENTS.has(move.ailment)) ||
+    move.healing > 0
+  );
+}
+
+/**
+ * Los 4 movimientos por defecto de un Pokémon (ARQUITECTURA §7): los 4 últimos que aprende por nivel hasta `level`
+ * (nivel ≥ 1: los de nivel 0 se aprenden al evolucionar), sin repetir y solo soportados. Si no queda ninguno, Placaje.
+ */
+export function defaultMoves(
+  learnset: readonly { moveId: number; level: number }[],
+  level: number,
+  isSupported: (moveId: number) => boolean,
+): number[] {
+  const learned = learnset
+    .filter((m) => m.level >= 1 && m.level <= level && isSupported(m.moveId))
+    .sort((a, b) => a.level - b.level)
+    .map((m) => m.moveId);
+  const picked: number[] = [];
+  for (let i = learned.length - 1; i >= 0 && picked.length < 4; i--) {
+    if (!picked.includes(learned[i])) picked.unshift(learned[i]);
+  }
+  return picked.length > 0 ? picked : [FALLBACK_MOVE_ID];
+}
