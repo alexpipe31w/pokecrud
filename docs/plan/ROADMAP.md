@@ -148,7 +148,7 @@
 
 ## F2 · Encuentro en AR y captura
 
-- [ ] **F2-01 · [SPIKE] Cámara + giroscopio en el WebView** — getUserMedia vs camera-preview, AR por
+- [~] **F2-01 · [SPIKE] Cámara + giroscopio en el WebView** (@kenneth, 2026-10-12) — getUserMedia vs camera-preview, AR por
       giroscopio, fps. Decisión en DECISIONES. Dep: F0-09.
 - [ ] **F2-02 · Plan detallado de F2** (`docs/plan/fases/F2-captura.md`). Dep: F2-01.
 - [x] **F2-03 · Fórmula de captura** (@alex, 2026-10-11) — `shared/engine/capture.ts` (+ huida) con tests de casos conocidos.

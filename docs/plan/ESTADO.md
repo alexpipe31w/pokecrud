@@ -152,7 +152,9 @@ fórmula (F2-03) y captura en servidor (F2-06) hechas; lo visual del encuentro e
 
 ## En curso
 
-- Nadie. F1-05 (3b) y F1-07 (7b) solo esperan la prueba en Android.
+- **F2-01 (Kenneth, rama `feature/F2-01-spike-camara-giroscopio`):** spike de cámara + giroscopio en el WebView del
+  Samsung A36. **Punto de guardado:** recién reclamada, sin código todavía.
+- F1-05 (3b) y F1-07 (7b) solo esperan la prueba en Android.
 
 ## Siguiente paso concreto
 
