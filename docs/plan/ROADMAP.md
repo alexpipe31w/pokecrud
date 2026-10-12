@@ -144,7 +144,7 @@
 - [x] **F4-02 · Tabla de tipos y stats** (@alex, 2026-10-11) — `type-chart.ts`, `stats.ts` con tests (18×18 completa). Dep: F4-01.
       **Hecho:** 324 casillas de PokéAPI = tabla oficial; stats = ejemplo de Bulbapedia (Garchomp nv 78); dataset con
       `target`/`flinchChance`/`metaCategory` y `statChangeTarget` (D-029). shared 71/71.
-- [ ] **F4-03 · Daño, precisión, crítico, prioridad** — `damage.ts` con tests comparados con una
+- [~] **F4-03 · Daño, precisión, crítico, prioridad** (@alex, 2026-10-11) — `damage.ts` con tests comparados con una
       calculadora pública (anotar los casos). Dep: F4-02.
 - [ ] **F4-04 · Estados y cambios de stats** — dentro de `battle-engine.ts` (reducer puro) con tests. Dep: F4-03.
 - [ ] **F4-05 · Escena de combate** — UI de turnos, selección de movimiento con tipo/PP/efectividad

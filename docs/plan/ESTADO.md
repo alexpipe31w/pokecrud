@@ -74,6 +74,7 @@
 
 ## En curso
 
+- **F4-03 (Alex, rama `feature/F4-03-dano`, sale de F4-02):** daño, precisión, crítico, orden; movimientos soportados.
 - Esperan revisión **en orden** (ver PENDIENTES DE HUMANOS): #21 → #22 → #23 → #24 → #25 → #26 → #27.
 - **F1-01 → PENDIENTE DE KENNETH** (medir fps en su Android): rama `feature/F1-01-spike-mapa-3d`, instrucciones
   exactas en la última entrada de F1-01 de la bitácora.
