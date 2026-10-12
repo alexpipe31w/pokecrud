@@ -121,7 +121,7 @@ servidor (F2-06) hechas; lo visual del encuentro espera al spike F2-01 (cámara 
 ## En curso
 
 - **F1-04 (Kenneth, rama `feature/F1-04-pantalla-mapa`)**: reclamada 2026-10-12. Sigue `docs/plan/fases/F1-mapa.md` → F1-04.
-  **Punto de guardado:** paso 1 hecho (`GET /spawns` devuelve `weather` y `night`; contrato en `shared/protocol/spawns.ts`; e2e 67/67). Sigue el paso 2 (`day-night.ts`).
+  **Punto de guardado:** paso 1 hecho (`GET /spawns` devuelve `weather` y `night`; contrato en `shared/protocol/spawns.ts`; e2e 67/67). Paso 2 hecho (`day-night.ts`). Sigue el paso 3 (rutas: `/mapa` principal, fuera las pestañas).
 
 ## Siguiente paso concreto
 

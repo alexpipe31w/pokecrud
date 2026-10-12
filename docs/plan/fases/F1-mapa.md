@@ -885,7 +885,7 @@ export interface NearbySpawns {
 
 **Files:** Create `src/app/game/map-scene/day-night.ts` + spec
 
-- [ ] **2a. Test:** `isNightLocal(new Date(2026, 9, 12, 19, 0))` → `true`; `5:59` → `true`; `6:00` → `false`;
+- [x] **2a. Test:** `isNightLocal(new Date(2026, 9, 12, 19, 0))` → `true`; `5:59` → `true`; `6:00` → `false`;
   `18:59` → `false`. **2b.** falla. **2c.** `export const isNightLocal = (d: Date): boolean => d.getHours() >= 19 ||
   d.getHours() < 6;` (DISENO §1: hora local del móvil, no la del servidor). **2d.** pasa. Commit.
 
