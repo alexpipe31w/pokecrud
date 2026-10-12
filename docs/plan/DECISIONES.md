@@ -479,3 +479,12 @@ caso, dos tandas iguales): con desenfoque 20 px → quieto 61 / joystick 58 / **
 los componentes de vidrio; `MapPage` lo pone a `none` y cambia `--surface` por `--surface-opaque` (0,94 claro / 0,92
 oscuro) para que el texto se lea igual sin el desenfoque. El resto de pantallas (combate, login…) no cambia. Si algún
 día se quiere esmerilado sobre el mapa, medir antes en un Android de gama media.
+
+## D-040 · La zancada del avatar acumula su fase; nunca `velocidad × t` absoluto (F1-05) (2026-10-12, Alex)
+
+El plan proponía `limbPose(gait, speed, t)` con la fase `2π · speed / (2 · zancada) · t` y `t` = reloj del bucle. Como
+`AvatarMotion` suaviza la velocidad, esta cambia un poco en cada fotograma, y con `t` grande la fase salta: con la
+página abierta 600 s, 0,05 m/s de diferencia son ~125 rad → piernas temblando. **Decisión:** `advanceStride(phase,
+gait, speed, dt)` suma la fase fotograma a fotograma (continua aunque cambien la velocidad o el paso andar/correr) y
+`limbPose(gait, phase, t)` la recibe. Vale igual para cualquier animación cíclica que dependa de la velocidad (p. ej.
+los Pokémon que anden en F1-07): acumular la fase, no multiplicar por el reloj.

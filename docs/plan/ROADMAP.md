@@ -115,6 +115,7 @@
       al mapa"). Dep: F1-04.
 - [~] **F1-05 · Avatar 3D** (@alex, 2026-10-12) — personaje que camina/corre/se queda quieto según velocidad, sombra,
       círculo de alcance. Dep: F1-04.
+      **Falta solo 3b:** probarlo en un Android real (andar y trotar, ≥ 55 fps). Código mezclado en `develop`.
 - [x] **F1-06 · Spawns deterministas** (@alex, 2026-10-11) — `shared/engine/spawns.ts` + `rng.ts` con tests; endpoint
       `GET /spawns?lat&lng` (celdas a ≤ 200 m, salt solo en servidor, clima Open-Meteo con timeout y
       caché por celda 15 min). Dep: F0-06, F0-02. Criterio: misma entrada → mismos spawns (test); dos

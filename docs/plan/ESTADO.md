@@ -3,23 +3,22 @@
 > Se **reescribe** al cerrar cada sesión (no es histórico; el histórico es `BITACORA.md`).
 > Máximo una pantalla. Si lees esto al empezar: después lee `ROADMAP.md`.
 
-**Última actualización:** 2026-10-12 · por Kenneth (Claude) · `develop` (#36 y #37 mezclados)
+**Última actualización:** 2026-10-12 · por Alex (Claude) · `develop` (#38 y F1-05 mezclados)
 
-## 👉 RELEVO DE KENNETH A ALEX (2026-10-12)
+## 👉 RELEVO DE ALEX (2026-10-12, tarde)
 
-1. ✅ **F1-04 mezclada** (PR #37 en `develop`). Render la desplegó solo en < 2 min: `GET /spawns` ya devuelve
-   `weather` y `night` (comprobado con una cuenta de prueba, borrada), así que el APK ya enseña el clima.
-2. **Lo nuevo:** al iniciar sesión se entra a **`/mapa`** (pantalla principal; ya no hay pestañas). Menú = botón Poké
-   Ball: Pokédex (`/pokedex`, con botón "‹ Mapa"), Combate de prueba, Joystick sí/no, Reducir efectos, Cerrar sesión.
-   `/dev/ui` y `/dev/mapa` siguen existiendo pero sin botón (en el APK se llega por CDP, D-037).
-3. **Leer D-038 y D-039 antes de tocar el mapa:** la capa 3D (`ThreeJSOverlayView`) se desmonta fuera de pantalla y en
-   segundo plano (si no, la GPU del Samsung A36 se reiniciaba y el mapa volvía plano), **nunca** llamar a `getContext()`
-   sobre el canvas de Google ni crear canvas WebGL de prueba, y sobre el mapa el vidrio va sin desenfoque (rendimiento).
-4. **Siguiente en la cadena del mapa: F1-05** (avatar 3D) y luego F1-07 (Pokémon en el mapa). Con Android también
-   F2-01 (spike de cámara). Sin móvil: F5-01 o F2-08. Nuevas pequeñas: F1-09 (pantalla "servidor despertando") y F1-10
-   (el HUD sigue al día/noche del mapa).
-5. **Probar en un Android:** `npm run apk -- --install`; medir fps por CDP (el A36 cambia solo entre 60 y 120 Hz: "≈60"
-   puede ser el tope de la pantalla); capturas del mapa con `adb shell screencap` (las de CDP salen sin el mapa).
+1. ✅ **F1-05 (avatar 3D) en `develop`** salvo la prueba en Android (paso 3b). El jugador ya es un entrenador low-poly
+   (gorra con visera = hacia dónde mira, mochila, piernas y brazos que se balancean): anda, corre inclinado y respira
+   quieto. Probado en navegador con el joystick (`docs/evidencias/F1-05_*`).
+2. **Quien tenga Android (Kenneth o Samuel):** `npm run apk -- --install`, andar y trotar con GPS, medir fps por CDP como
+   en F1-04 8b. Si ≥ 55 → F1-05 `[x]` en ROADMAP. Si va lento, el presupuesto está en `avatar-3d.ts` (12 mallas).
+3. **Leer D-040** antes de animar algo cíclico según la velocidad: la fase se acumula, nunca `velocidad × t`.
+4. **Siguiente:** F1-07 (Pokémon en el mapa) ya puede empezar (no necesita el 3b). Con Android también F2-01.
+   Sin móvil: F5-01, F2-08, F1-09 o F1-10.
+5. **Nueva forma de trabajar (Alex, 2026-10-12):** cada uno mezcla su propio PR en `develop` en cuanto lint + test +
+   build estén en verde, sin esperar revisión (rama → PR → merge; sigue sin haber push directo a `develop`).
+6. Lo de antes sigue valiendo: D-038/D-039 antes de tocar el mapa; probar en Android con `npm run apk -- --install`,
+   fps por CDP y capturas del mapa con `adb shell screencap`.
 
 **Importante (D-034):** la escena de combate de `/combate/prueba` es **temporal**. Alex quiere el combate **en
 realidad aumentada con la cámara**. Lo que hay debajo (motor, IA, controlador, textos, menú) se reutiliza; solo cambia
@@ -29,11 +28,15 @@ la parte visual (F4-07).
 
 **F0 completa** (en `develop`). **F4 (combate) completa en código** a falta de la versión AR (F4-07). **F1 a medias:**
 spike (F1-01), plan (F1-02), ubicación y brújula (F1-03), **pantalla `/mapa` (F1-04)**,
-spawns (F1-06) y mochila/XP (F1-08) hechos; faltan el avatar 3D (F1-05) y los Pokémon en el mapa (F1-07). **F2:**
+spawns (F1-06), mochila/XP (F1-08) y **avatar 3D (F1-05, falta probarlo en Android)** hechos; faltan los Pokémon en
+el mapa (F1-07). **F2:**
 fórmula (F2-03) y captura en servidor (F2-06) hechas; lo visual del encuentro espera al spike F2-01 (cámara + giroscopio).
 
 ## Hecho
 
+- **F1-05 (Alex, mezclado; falta 3b en Android):** `limb-pose.ts` (pose + `advanceStride`, D-040) y `avatar-3d.ts`
+  (entrenador procedural, 12 mallas, sombra que encoge con el bote, pose suavizada) en `MapScene` (×1,8). App 183
+  tests, shared 140, lint y build OK. Navegador: anda / corre / se para (`F1-05_01…05`).
 - **F1-04 (Kenneth, PR #37 mezclado; Render desplegado):** `/mapa` como ruta principal (fuera
   `core/layout/tabs`; `/tabs/pokedex` redirige a `/pokedex`), `MapScene` (jugador provisional ×1,8, anillo que late,
   luces de día y de noche), `MapPage` (Google Maps vectorial zoom 19 / tilt 67,5°, modo oscuro 19:00-6:00 con
@@ -134,16 +137,12 @@ fórmula (F2-03) y captura en servidor (F2-06) hechas; lo visual del encuentro e
 
 ## En curso
 
-- **F1-05 (avatar 3D) — @alex, 2026-10-12**, rama `feature/F1-05-avatar-3d`. Punto de guardado: pasos 1 y 2 HECHOS
-  (`limb-pose.ts` + `avatar-3d.ts` conectado en `MapScene`; 183 tests app, lint y build OK). Siguiente: paso 3a
-  (prueba en navegador con joystick + evidencias); 3b (Android, ≥ 55 fps) para Kenneth o Samuel.
+- Nadie. F1-05 solo espera la prueba en Android (paso 3b, ver arriba).
 
 ## Siguiente paso concreto
 
-1. **Siguiente tarea:** F1-05 (avatar 3D) siguiendo `docs/plan/fases/F1-mapa.md` → F1-05 (leer antes las notas "Hecho"
-   de F1-03 y F1-04 en ese plan, y D-038/D-039). Con Android también → F2-01. Sin móvil → F5-01 o F2-08.
-2. **Alex:** estilo del Map ID sin POI comerciales (siguen saliendo restaurantes y tiendas); la noche ya funciona con
-   el esquema oscuro por defecto de Google. Y nombrarse ADMIN del inventario (hoy hay 0 ADMIN).
+1. **Con Android:** cerrar F1-05 (paso 3b) y después F2-01 (spike de cámara y giroscopio, desbloquea la AR).
+2. **Sin Android:** F1-07 (Pokémon en el mapa) siguiendo `docs/plan/fases/F1-mapa.md` → F1-07; o F1-09 / F1-10.
 3. Para generar el APK en otro PC: JDK 21 (`winget install Microsoft.OpenJDK.21`; si da "el hash no coincide",
    `winget install EclipseAdoptium.Temurin.21.JDK`) y `npm run apk`.
 
@@ -164,6 +163,10 @@ fórmula (F2-03) y captura en servidor (F2-06) hechas; lo visual del encuentro e
 - [x] Añadir **`SPAWN_SALT`** en Render (≥ 32 caracteres aleatorios, propia de Render). (2026-10-12)
 - [x] ~~Manual Deploy tras cada mezcla~~: no hace falta, Render despliega solo al cambiar `develop` (comprobado).
 - [x] Su `server/.env`: puerto 6543, `JWT_SECRET` y `SPAWN_SALT` propios. (2026-10-12)
+
+**Kenneth o Samuel (Android):**
+
+- [ ] **F1-05 paso 3b:** andar y trotar con el APK, fps ≥ 55 en `/mapa` con el avatar nuevo (CDP). Marcar F1-05 `[x]`.
 
 **Kenneth:**
 
