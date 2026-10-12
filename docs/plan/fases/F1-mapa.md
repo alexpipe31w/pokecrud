@@ -1413,6 +1413,8 @@ export function disappearPose(ms: number): SpritePose {
 - **Texturas con contador de referencias**, no LRU: con LRU un Pokémon que siguiera en pantalla podía perder su
   textura si entraban 40 especies nuevas.
 - **Los edificios 3D tapan a los Pokémon** que quedan detrás y no se puede evitar desde three.js (D-041).
+- **Pokémon en HTML encima del mapa** (D-042, decisión de Alex: edificios 3D y Pokémon siempre visibles):
+  `PokemonDom` + `MapOverlay`; el toque es un `click` en la imagen. `SpriteTextures` y los cilindros de toque se fueron.
 - `EncounterView` pasó a `shared/protocol/encounters.ts` (lo usan app y servidor). `/encuentro/:id` es PROVISIONAL
   (F2-04 lo cambia por la escena AR). El chip del clima ya sale del feed (adiós a la petición aparte de F1-04).
 

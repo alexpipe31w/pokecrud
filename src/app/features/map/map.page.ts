@@ -9,24 +9,19 @@ import {
   viewChild,
 } from '@angular/core';
 import { Router } from '@angular/router';
-import { ThreeJSOverlayView } from '@googlemaps/three';
+import type * as THREE from 'three';
 import { IonContent, ViewDidEnter, ViewWillLeave } from '@ionic/angular';
 import { distanceM, fromLocalM, toLocalM, type LatLng } from '@shared/engine/geo';
-import * as THREE from 'three';
 
 import { AuthService } from '../../core/auth/auth.service';
 import { MAPS_MAP_ID, loadMapsLibrary, mapsAuthFailed } from '../../core/maps/google-maps.loader';
 import { joystickVelocity } from '../../game/geo/joystick-math';
 import { AvatarMotion } from '../../game/map-scene/avatar-motion';
 import { isNightLocal } from '../../game/map-scene/day-night';
-import {
-  CryThrottle,
-  cryGain,
-  isTap,
-  toNdc,
-  type PointerMark,
-} from '../../game/map-scene/map-input';
+import { CryThrottle, cryGain } from '../../game/map-scene/map-input';
 import { MapScene, REACH_RADIUS_M, REANCHOR_M } from '../../game/map-scene/map-scene';
+import { MapOverlay } from '../../game/map-scene/map-overlay';
+import { PokemonDom } from '../../game/map-scene/pokemon-dom';
 import { nearestN } from '../../game/map-scene/spawn-diff';
 import { AudioService } from '../../services/game/audio.service';
 import { BagService } from '../../services/game/bag.service';
@@ -86,6 +81,8 @@ const TOO_FAR_MS = 1500;
       style="--padding-top: 0; --padding-bottom: 0; --padding-start: 0; --padding-end: 0"
     >
       <div #mapEl class="map" [class.is-night]="night()"></div>
+      <!-- Pokémon en HTML POR ENCIMA del mapa: Google pinta los edificios 3D encima de la capa three.js (D-042). -->
+      <div #pokemonEl class="pokemon-layer"></div>
 
       <!-- HUD (DISENO §1): placa del jugador arriba a la izquierda; brújula y clima arriba a la derecha. -->
       <div class="hud">
@@ -125,6 +122,13 @@ const TOO_FAR_MS = 1500;
     }
     .map.is-night {
       background: var(--ink);
+    }
+    .pokemon-layer {
+      position: absolute;
+      inset: 0;
+      z-index: 1; /* contexto de apilado propio: el z-index de cada Pokémon no pasa por encima del HUD */
+      overflow: hidden;
+      pointer-events: none; /* solo las imágenes de los Pokémon reciben toques; el resto va al mapa */
     }
     .hud {
       position: absolute;
@@ -170,6 +174,7 @@ const TOO_FAR_MS = 1500;
 })
 export class MapPage implements ViewDidEnter, ViewWillLeave, OnDestroy {
   private readonly mapEl = viewChild.required<ElementRef<HTMLDivElement>>('mapEl');
+  private readonly pokemonEl = viewChild.required<ElementRef<HTMLDivElement>>('pokemonEl');
   protected readonly location = inject(LocationService);
   private readonly compass = inject(CompassService);
   protected readonly auth = inject(AuthService);
@@ -198,7 +203,7 @@ export class MapPage implements ViewDidEnter, ViewWillLeave, OnDestroy {
   private readonly mapScene = new MapScene();
   private motion = new AvatarMotion();
   private map?: google.maps.Map;
-  private overlay?: ThreeJSOverlayView;
+  private overlay?: MapOverlay;
   /** Origen de la escena (= ancla del overlay): la primera posición conocida; null hasta tenerla. */
   private origin: LatLng | null = null;
   private raf = 0;
@@ -210,20 +215,11 @@ export class MapPage implements ViewDidEnter, ViewWillLeave, OnDestroy {
   /** Posición del avatar en el último fotograma (para la distancia al tocar un Pokémon). */
   private avatarPos: LatLng | null = null;
   private readonly cries = new CryThrottle();
-  private pointerDown: PointerMark | null = null;
+  /** Los Pokémon en HTML encima del mapa (se crea al montar la vista). */
+  private pokemonDom?: PokemonDom;
   private tooFarTimer?: ReturnType<typeof setTimeout>;
   /** Abriendo un encuentro (un segundo toque mientras tanto no hace nada). */
   private opening = false;
-  private readonly onPointerDown = (e: PointerEvent): void => {
-    this.pointerDown = e.isPrimary ? { x: e.clientX, y: e.clientY, t: e.timeStamp } : null;
-  };
-  private readonly onPointerUp = (e: PointerEvent): void => {
-    const down = this.pointerDown;
-    this.pointerDown = null;
-    if (down && e.isPrimary && isTap(down, { x: e.clientX, y: e.clientY, t: e.timeStamp })) {
-      this.tapAt(e.clientX, e.clientY);
-    }
-  };
   private destroyed = false;
   private rebuilding = false;
   /** Cuándo se rehízo el mapa últimamente (tope de reintentos: sin WebGL no se entra en bucle). */
@@ -246,8 +242,10 @@ export class MapPage implements ViewDidEnter, ViewWillLeave, OnDestroy {
   /** App a segundo plano (pantalla bloqueada, otra app): misma pausa de la capa 3D que al salir de la pantalla. */
   private readonly onVisibility = (): void => {
     if (!this.active) return;
-    if (document.hidden) this.overlay?.setMap(null);
-    else {
+    if (document.hidden) {
+      this.overlay?.setMap(null);
+      this.pokemonDom?.hideAll();
+    } else {
       this.attachOverlay();
       this.scheduleRecover();
     }
@@ -277,12 +275,12 @@ export class MapPage implements ViewDidEnter, ViewWillLeave, OnDestroy {
     // del Samsung A36 (reinicio del contexto → WebGL bloqueado → mapa raster al volver, D-038). Fuera de pantalla,
     // sin capa 3D.
     this.overlay?.setMap(null);
+    this.pokemonDom?.hideAll();
     clearTimeout(this.recoverTimer);
     cancelAnimationFrame(this.raf);
     void this.location.stop();
     this.compass.stop();
     this.joy = { dx: 0, dy: 0 };
-    this.pointerDown = null;
   }
 
   ngOnDestroy(): void {
@@ -290,8 +288,6 @@ export class MapPage implements ViewDidEnter, ViewWillLeave, OnDestroy {
     this.ionViewWillLeave();
     clearInterval(this.nightTimer);
     clearTimeout(this.tooFarTimer);
-    this.mapEl().nativeElement.removeEventListener('pointerdown', this.onPointerDown, true);
-    this.mapEl().nativeElement.removeEventListener('pointerup', this.onPointerUp, true);
     this.mapEl().nativeElement.removeEventListener('webglcontextlost', this.onContextLost, true);
     this.mapEl().nativeElement.removeEventListener(
       'webglcontextrestored',
@@ -300,12 +296,14 @@ export class MapPage implements ViewDidEnter, ViewWillLeave, OnDestroy {
     );
     document.removeEventListener('visibilitychange', this.onVisibility);
     this.overlay?.setMap(null);
+    this.pokemonDom?.dispose();
     this.mapScene.dispose();
   }
 
   /** Carga Google Maps y monta el overlay. Los errores los muestra la pantalla de estados (paso 6). */
   private async init(): Promise<void> {
     this.mapsError.set(null);
+    this.pokemonDom ??= new PokemonDom(this.pokemonEl().nativeElement, (id) => this.tapPokemon(id));
     try {
       await this.createMap();
     } catch (err) {
@@ -325,9 +323,6 @@ export class MapPage implements ViewDidEnter, ViewWillLeave, OnDestroy {
       true,
     );
     document.addEventListener('visibilitychange', this.onVisibility);
-    // Toques sobre los Pokémon: en captura, antes de que Google los use para arrastrar el mapa (no se cancelan).
-    this.mapEl().nativeElement.addEventListener('pointerdown', this.onPointerDown, true);
-    this.mapEl().nativeElement.addEventListener('pointerup', this.onPointerUp, true);
     clearInterval(this.nightTimer);
     this.nightTimer = setInterval(() => this.recoverIfLost(), NIGHT_CHECK_MS);
     // Por si Ionic disparó ionViewDidEnter antes de que el mapa existiera (primera carga).
@@ -429,14 +424,19 @@ export class MapPage implements ViewDidEnter, ViewWillLeave, OnDestroy {
       if (map === this.map && map.getRenderingType() === 'RASTER') this.scheduleRecover();
     });
     if (!this.overlay) {
-      this.overlay = new ThreeJSOverlayView({
-        anchor: { ...(this.origin ?? center), altitude: 0 },
-        upAxis: 'Y',
-        scene: this.mapScene.scene,
-        animationMode: 'always',
-        // Las luces las pone MapScene (cambian de día a noche).
-        addDefaultLighting: false,
-      });
+      const overlay: MapOverlay = new MapOverlay(
+        {
+          anchor: { ...(this.origin ?? center), altitude: 0 },
+          upAxis: 'Y',
+          scene: this.mapScene.scene,
+          animationMode: 'always',
+          // Las luces las pone MapScene (cambian de día a noche).
+          addDefaultLighting: false,
+        },
+        // Los Pokémon (HTML) se colocan con la cámara de ESTE fotograma del mapa: sin desfase al moverse.
+        (projection) => this.drawPokemon(overlay, projection),
+      );
+      this.overlay = overlay;
     }
     this.overlay.setMap(this.map);
   }
@@ -517,16 +517,22 @@ export class MapPage implements ViewDidEnter, ViewWillLeave, OnDestroy {
     }
   }
 
-  /** Toque sobre el mapa: si cae en un Pokémon, al encuentro (si está a mano) o "Acércate más". */
-  private tapAt(clientX: number, clientY: number): void {
-    if (!this.overlay || !this.avatarPos) return;
-    const targets = this.mapScene.spawns.hitTargets();
-    if (targets.length === 0) return;
-    const ndc = toNdc(clientX, clientY, this.mapEl().nativeElement.getBoundingClientRect());
-    const hit = this.overlay.raycast(new THREE.Vector2(ndc.x, ndc.y), targets)[0];
-    const id = hit ? this.mapScene.spawns.idOf(hit.object) : null;
-    const spawn = id ? this.mapScene.spawns.get(id) : null;
-    if (!id || !spawn) return;
+  /** Coloca los Pokémon en HTML con la cámara del fotograma que Google está a punto de pintar. */
+  private drawPokemon(overlay: MapOverlay, projection: THREE.Matrix4): void {
+    if (!this.active || !this.pokemonDom || overlay !== this.overlay) return;
+    const el = this.mapEl().nativeElement;
+    this.pokemonDom.render(
+      this.mapScene.spawns.visuals(),
+      projection,
+      el.clientWidth,
+      el.clientHeight,
+    );
+  }
+
+  /** Toque sobre un Pokémon: al encuentro (si está a mano) o "Acércate más". */
+  private tapPokemon(id: string): void {
+    const spawn = this.mapScene.spawns.get(id);
+    if (!this.avatarPos || !spawn || !this.mapScene.spawns.isAlive(id)) return;
     if (distanceM(this.avatarPos, spawn) <= REACH_RADIUS_M) {
       this.haptics.tap();
       void this.openEncounter(id);

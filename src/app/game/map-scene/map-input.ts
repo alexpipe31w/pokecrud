@@ -4,9 +4,6 @@ export const CRY_RANGE_M = 60;
 export const CRY_GAP_MS = 5000;
 const CRY_GAIN_MIN = 0.2;
 const CRY_GAIN_MAX = 0.6;
-/** Un toque: el dedo no se mueve más de esto ni se queda más tiempo (si no, es arrastre o pellizco del mapa). */
-const TAP_MAX_PX = 10;
-const TAP_MAX_MS = 300;
 
 /** Volumen del grito a `distanceM` metros; null si está demasiado lejos para oírlo. */
 export function cryGain(distanceM: number): number | null {
@@ -23,26 +20,4 @@ export class CryThrottle {
     this.last = nowMs;
     return true;
   }
-}
-
-export interface PointerMark {
-  x: number;
-  y: number;
-  t: number;
-}
-
-export function isTap(down: PointerMark, up: PointerMark): boolean {
-  return Math.hypot(up.x - down.x, up.y - down.y) <= TAP_MAX_PX && up.t - down.t <= TAP_MAX_MS;
-}
-
-/** Píxeles de pantalla → coordenadas normalizadas (−1..1, y hacia arriba) del elemento del mapa, para el raycast. */
-export function toNdc(
-  clientX: number,
-  clientY: number,
-  rect: { left: number; top: number; width: number; height: number },
-): { x: number; y: number } {
-  return {
-    x: ((clientX - rect.left) / rect.width) * 2 - 1,
-    y: -((clientY - rect.top) / rect.height) * 2 + 1,
-  };
 }

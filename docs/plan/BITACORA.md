@@ -1001,3 +1001,20 @@ Pokémon: decisión de Alex (D-041).
 **Decisiones nuevas:** D-041.
 **El siguiente debe empezar por:** con Android, 7b de F1-07 y 3b de F1-05 (mismo APK). Sin Android: F1-09 / F1-10, o
 F2-02 si ya hay spike de cámara.
+
+## 2026-10-12 18:45 · @alex (Claude) · F1-07 (Pokémon encima de los edificios) · rama `feature/F1-07-pokemon-encima`
+
+**Qué se hizo:** Alex eligió edificios 3D y que los Pokémon se vean siempre. Los Pokémon pasan a `<img>` en una capa
+HTML sobre el mapa, colocados cada fotograma con la cámara del overlay (D-042): `pokemon-dom.ts` (proyección +
+imágenes + toque), `map-overlay.ts` (subclase que expone la matriz en `onBeforeDraw`). `SpawnLayer` ya solo lleva
+estado, sombra y hierba; fuera `SpriteTextures`, cilindros de toque, `isTap` y `toNdc`.
+**Cómo se probó (salida real):**
+
+    lint OK · ng test: 52 archivos, 233 passed (exit 0) · build OK
+    navegador ×2,5 (Nest local, joystick, cuenta f107b-prueba@pokecrud.test borrada): 13 <img class="pokemon"> visibles,
+      todos ENCIMA de los edificios 3D y sobre su mata (F1-07_07, F1-07_08); corriendo, siguen pegados a su hierba;
+      tocar uno lejano → "Acércate más para atraparlo"; rAF 165 fps en el PC; 0 errores de consola
+
+**Quedó a medias / roto:** 7b en Android (ahora también medir el coste de la capa HTML).
+**Decisiones nuevas:** D-042.
+**El siguiente debe empezar por:** lo que diga ESTADO.
