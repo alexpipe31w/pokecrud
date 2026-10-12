@@ -3,7 +3,7 @@
 > Se **reescribe** al cerrar cada sesión (no es histórico; el histórico es `BITACORA.md`).
 > Máximo una pantalla. Si lees esto al empezar: después lee `ROADMAP.md`.
 
-**Última actualización:** 2026-10-12 · por Samuel (Claude) · rama `feature/F0-13-artefactos-shared` (F0-13 hecha, PR abierto)
+**Última actualización:** 2026-10-12 · por Samuel (Claude) · rama `feature/F1-02-plan-mapa` (reclama F1-02)
 
 ## 👉 RELEVO DE ALEX A SAMUEL — HECHO (2026-10-12)
 
@@ -32,7 +32,7 @@ visual del mapa ya tiene vía libre (**F1-01 hecha: plan A, D-035**); el del enc
 
 ## Hecho
 
-- **F0-13 (Samuel, PR pendiente):** los `.js` que aparecían en `shared/` salen de compilar el servidor con la config
+- **F0-13 (Samuel, PR #33 mezclado):** los `.js` que aparecían en `shared/` salen de compilar el servidor con la config
   previa a D-024 (rama vieja); Vitest los usaba EN VEZ del `.ts`. Ahora `scripts/clean-shared-artifacts.mjs` los borra
   solo antes de `start`/`build`/`test` (raíz, `server/`, APK) y `.gitignore` impide subirlos. D-036.
 - **F1-01 (Alex + Samuel, PR #32 mezclado):** spike del mapa medido en un Redmi Note 10: three.js con 30
@@ -112,7 +112,8 @@ visual del mapa ya tiene vía libre (**F1-01 hecha: plan A, D-035**); el del enc
 
 ## En curso
 
-- Nadie (F0-13 terminada; su PR espera revisión/mezcla).
+- **F1-02 (@samuel, 2026-10-12)** — rama `feature/F1-02-plan-mapa`. **Punto de guardado:** reclamada; paso siguiente:
+  escribir `docs/plan/fases/F1-mapa.md` (F1-03, F1-04, F1-05, F1-07) con `writing-plans`.
 
 ## Siguiente paso concreto
 

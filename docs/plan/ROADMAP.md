@@ -90,7 +90,7 @@
       **Hecho (Alex):** `/dev/mapa` con plan A (three.js) y plan B (markers), medidor y "Medir batería"; medido en PC.
       **Hecho (Samuel):** medido en un Redmi Note 10 (Mali-G76): three.js × 30 = 58,4 fps, 0 % tirones; markers × 30 =
       52,3 fps. **Plan A, máximo 30 Pokémon dibujados** (D-035). Evidencias `F1-01_0{3,4}_redmi-*.png`.
-- [ ] **F1-02 · Plan detallado de F1** (`docs/plan/fases/F1-mapa.md`). Dep: F1-01.
+- [~] **F1-02 · Plan detallado de F1** (@samuel, 2026-10-12) (`docs/plan/fases/F1-mapa.md`). Dep: F1-01.
 - [ ] **F1-03 · Ubicación y brújula** — `LocationService` (watch, suavizado, descarte de saltos),
       `CompassService`, modo joystick, pantalla de permisos diseñada.
       Dep: F1-02. Criterio: tests del filtro; avatar se mueve suave caminando de verdad y con joystick.
