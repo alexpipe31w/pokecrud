@@ -116,7 +116,7 @@ visual del mapa ya tiene vía libre (**F1-01 hecha: plan A, D-035**); el del enc
 ## En curso
 
 - **F1-03 (Kenneth, rama `feature/F1-03-ubicacion-brujula`)**: reclamada 2026-10-12. Sigue
-  `docs/plan/fases/F1-mapa.md` → F1-03. **Punto de guardado:** paso 1 hecho (geo.ts, 4 tests); sigue el paso 2 (filtro del GPS).
+  `docs/plan/fases/F1-mapa.md` → F1-03. **Punto de guardado:** pasos 1-2 hechos (geo.ts, gps-filter.ts); sigue el paso 3 (ángulos y joystick).
 
 ## Siguiente paso concreto
 

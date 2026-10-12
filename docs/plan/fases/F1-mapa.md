@@ -182,7 +182,7 @@ Reglas (ARQUITECTURA §4): se ignoran fixes con precisión peor de 50 m (salvo e
 descartan los **saltos de > 50 m en < 2 s** (errores del GPS); se suaviza con una media de los 4 últimos ponderada por
 `1/precisión²`; un fix con hora repetida o anterior se ignora. Señal débil = precisión > 25 m.
 
-- [ ] **2a. Test que falla:**
+- [x] **2a. Test que falla:**
 
 ```ts
 import { fromLocalM, toLocalM } from '@shared/engine/geo';
@@ -242,8 +242,8 @@ describe('GpsFilter', () => {
 });
 ```
 
-- [ ] **2b.** `npx ng test --watch=false --include src/app/game/geo/gps-filter.spec.ts` → FALLA.
-- [ ] **2c. Implementación:**
+- [x] **2b.** `npx ng test --watch=false --include src/app/game/geo/gps-filter.spec.ts` → FALLA.
+- [x] **2c. Implementación:**
 
 ```ts
 import { distanceM, type LatLng } from '@shared/engine/geo';
@@ -310,8 +310,8 @@ export class GpsFilter {
 Nota: la media de 4 fixes "arrastra" ~1-2 s al caminar; lo compensa la interpolación del avatar (paso 5), que ya va
 detrás del objetivo. Si en el móvil se nota retraso, bajar `WINDOW` a 3 (y anotarlo).
 
-- [ ] **2d.** El mismo comando → PASA (7 tests).
-- [ ] **2e.** Commit `F1-03: filtro del GPS con tests` + `/guardar`.
+- [x] **2d.** El mismo comando → PASA (7 tests).
+- [x] **2e.** Commit `F1-03: filtro del GPS con tests` + `/guardar`.
 
 ### Paso 3 — Ángulos y joystick (puros)
 
