@@ -3,12 +3,12 @@
 > Se **reescribe** al cerrar cada sesión (no es histórico; el histórico es `BITACORA.md`).
 > Máximo una pantalla. Si lees esto al empezar: después lee `ROADMAP.md`.
 
-**Última actualización:** 2026-10-12 · por Kenneth (Claude) · rama `feature/F1-04-pantalla-mapa` (PR #37 a `develop`)
+**Última actualización:** 2026-10-12 · por Kenneth (Claude) · `develop` (#36 y #37 mezclados)
 
 ## 👉 RELEVO DE KENNETH A ALEX (2026-10-12)
 
-1. **Mezclar primero el PR #37 de F1-04** (`feature/F1-04-pantalla-mapa` → `develop`). Trae un cambio de servidor
-   (`weather` y `night` en `GET /spawns`): Render lo despliega solo al mezclar; hasta entonces el APK no enseña el clima.
+1. ✅ **F1-04 mezclada** (PR #37 en `develop`). Render la desplegó solo en < 2 min: `GET /spawns` ya devuelve
+   `weather` y `night` (comprobado con una cuenta de prueba, borrada), así que el APK ya enseña el clima.
 2. **Lo nuevo:** al iniciar sesión se entra a **`/mapa`** (pantalla principal; ya no hay pestañas). Menú = botón Poké
    Ball: Pokédex (`/pokedex`, con botón "‹ Mapa"), Combate de prueba, Joystick sí/no, Reducir efectos, Cerrar sesión.
    `/dev/ui` y `/dev/mapa` siguen existiendo pero sin botón (en el APK se llega por CDP, D-037).
@@ -28,13 +28,13 @@ la parte visual (F4-07).
 ## Fase actual
 
 **F0 completa** (en `develop`). **F4 (combate) completa en código** a falta de la versión AR (F4-07). **F1 a medias:**
-spike (F1-01), plan (F1-02), ubicación y brújula (F1-03), **pantalla `/mapa` (F1-04, PR pendiente de mezclar)**,
+spike (F1-01), plan (F1-02), ubicación y brújula (F1-03), **pantalla `/mapa` (F1-04)**,
 spawns (F1-06) y mochila/XP (F1-08) hechos; faltan el avatar 3D (F1-05) y los Pokémon en el mapa (F1-07). **F2:**
 fórmula (F2-03) y captura en servidor (F2-06) hechas; lo visual del encuentro espera al spike F2-01 (cámara + giroscopio).
 
 ## Hecho
 
-- **F1-04 (Kenneth, PR #37, pendiente de mezclar):** `/mapa` como ruta principal (fuera
+- **F1-04 (Kenneth, PR #37 mezclado; Render desplegado):** `/mapa` como ruta principal (fuera
   `core/layout/tabs`; `/tabs/pokedex` redirige a `/pokedex`), `MapScene` (jugador provisional ×1,8, anillo que late,
   luces de día y de noche), `MapPage` (Google Maps vectorial zoom 19 / tilt 67,5°, modo oscuro 19:00-6:00 con
   `isNightLocal`, cámara que sigue al avatar y gira con la brújula, re-anclaje a 1 km, pausa fuera de pantalla, estado
@@ -134,16 +134,15 @@ fórmula (F2-03) y captura en servidor (F2-06) hechas; lo visual del encuentro e
 
 ## En curso
 
-- Nadie. F1-04 terminada (falta mezclar su PR). Siguiente libre: **F1-05** (avatar 3D).
+- Nadie. Siguiente libre: **F1-05** (avatar 3D).
 
 ## Siguiente paso concreto
 
-1. **Alex o Samuel:** mezclar el PR #37 de F1-04 y comprobar que Render despliega solo (`GET /spawns` con `weather`).
-2. **Siguiente tarea:** F1-05 (avatar 3D) siguiendo `docs/plan/fases/F1-mapa.md` → F1-05 (leer antes las notas "Hecho"
+1. **Siguiente tarea:** F1-05 (avatar 3D) siguiendo `docs/plan/fases/F1-mapa.md` → F1-05 (leer antes las notas "Hecho"
    de F1-03 y F1-04 en ese plan, y D-038/D-039). Con Android también → F2-01. Sin móvil → F5-01 o F2-08.
-3. **Alex:** estilo del Map ID sin POI comerciales (siguen saliendo restaurantes y tiendas); la noche ya funciona con
+2. **Alex:** estilo del Map ID sin POI comerciales (siguen saliendo restaurantes y tiendas); la noche ya funciona con
    el esquema oscuro por defecto de Google. Y nombrarse ADMIN del inventario (hoy hay 0 ADMIN).
-4. Para generar el APK en otro PC: JDK 21 (`winget install Microsoft.OpenJDK.21`; si da "el hash no coincide",
+3. Para generar el APK en otro PC: JDK 21 (`winget install Microsoft.OpenJDK.21`; si da "el hash no coincide",
    `winget install EclipseAdoptium.Temurin.21.JDK`) y `npm run apk`.
 
 ## Bloqueos / roto / pendiente de humanos
@@ -155,7 +154,7 @@ fórmula (F2-03) y captura en servidor (F2-06) hechas; lo visual del encuentro e
 - [x] (Samuel, 2026-10-12) Revisar y mezclar #21…#31: primero la cadena #22 → #31 y #21 al final (único con
       conflictos). GitHub NO reapuntó solo (el repo no borra las ramas mezcladas): la base se cambió a `develop` a mano.
 - [x] Mezclar el PR #36 de **F1-03** (Kenneth, 2026-10-12).
-- [ ] Mezclar el PR #37 de **F1-04** (`feature/F1-04-pantalla-mapa`). Trae cambio de servidor: Render despliega solo.
+- [x] Mezclar el PR #37 de **F1-04** (Kenneth, 2026-10-12). Render desplegó solo en < 2 min (`/spawns` con `weather`).
 
 **Samuel (Render, solo él tiene acceso):**
 
