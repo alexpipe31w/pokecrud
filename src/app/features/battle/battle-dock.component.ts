@@ -18,7 +18,7 @@ const DARK_TYPES = new Set<TypeName>([
   selector: 'app-battle-dock',
   template: `
     <p class="message" aria-live="polite">{{ ctrl.message() }}</p>
-    @switch (ctrl.phase()) {
+    @switch (ctrl.phase() === 'animating' ? 'choose' : ctrl.phase()) {
       @case ('choose') {
         <div class="moves">
           @for (m of ctrl.moves(); track m.index) {
@@ -26,7 +26,7 @@ const DARK_TYPES = new Set<TypeName>([
               class="move"
               [class.move--dark]="dark(m.type)"
               [style.--t]="'var(--t-' + m.type + ')'"
-              [disabled]="m.pp === 0 && anyPp()"
+              [disabled]="busy() || (m.pp === 0 && anyPp())"
               (click)="ctrl.act({ kind: 'move', moveIndex: m.index })"
               [attr.aria-label]="
                 m.name +
@@ -53,8 +53,8 @@ const DARK_TYPES = new Set<TypeName>([
           }
         </div>
         <div class="actions">
-          <button class="ghost" (click)="openSheet.emit()">Cambiar</button>
-          <button class="ghost ghost--danger" (click)="forfeit()">
+          <button class="ghost" [disabled]="busy()" (click)="openSheet.emit()">Cambiar</button>
+          <button class="ghost ghost--danger" [disabled]="busy()" (click)="forfeit()">
             {{ confirm() ? '¿Seguro? Toca otra vez' : 'Rendirse' }}
           </button>
         </div>
@@ -122,8 +122,10 @@ const DARK_TYPES = new Set<TypeName>([
       color: var(--paper);
       text-shadow: 0 1px 1px rgb(0 0 0 / 0.35);
     }
-    .move:disabled {
+    .move:disabled,
+    .actions button:disabled {
       opacity: 0.45;
+      transition: opacity var(--dur-small) var(--ease-out);
     }
     .move__name {
       font: 600 1rem/1.15 var(--font-display);
@@ -186,6 +188,11 @@ export class BattleDockComponent {
   readonly openSheet = output<void>();
   protected readonly confirm = signal(false);
   private confirmTimer: ReturnType<typeof setTimeout> | undefined;
+
+  /** Mientras se anima el turno el menú se queda (el diseño no salta) pero no se puede tocar. */
+  protected busy(): boolean {
+    return this.ctrl.phase() === 'animating';
+  }
 
   protected anyPp(): boolean {
     return this.ctrl.moves().some((m) => m.pp > 0);

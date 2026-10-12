@@ -609,3 +609,28 @@ quiere más diferencia, subir el ruido del fácil o quitarle los cambios de esta
 **Quedó a medias / roto:** nada.
 **Decisiones nuevas:** D-032.
 **El siguiente debe empezar por:** F4-05 (escena de combate), paso 1 del plan: `/combate/prueba` contra un entrenador.
+
+## 2026-10-12 00:30 · @alex (Claude) · F4-05 · rama `feature/F4-05-escena-combate` (sale de F4-06)
+
+**Qué se hizo:** escena de combate en `src/app/features/battle/`: `battle.controller.ts` (motor + IA + reproducción de
+eventos al ritmo de los textos, gritos y vibración), `battle-text.ts` (eventos → español, con tests), `battle.page.ts`
+(escenario teñido por tipos, plataformas, sprites `home`, animaciones WAAPI), componentes `battle-info`, `battle-dock`
+(menú con tipo/PP/eficacia, cambiar, rendirse con confirmación, final), `battle-sheet` (cambio voluntario y forzado),
+`battle-burst` (anillo + partículas del tipo + número de daño), `battle-picker` (elegir rival). Ruta `/combate/prueba`
+(con sesión) y botón en `/dev/ui`.
+**Cómo se probó (salida real):**
+
+    app: ng test 101/101 (4 nuevos de textos) · lint OK · build OK sin avisos de presupuesto · shared 136/136
+    navegador 390×844 (Playwright, cuenta @pokecrud.test borrada después):
+      - Nadadora Marina: Impactrueno "▲ Súper eficaz" contra Goldeen → −36/−38, "¡Es superefectivo!", sacudida de la
+        escena; combate entero → "¡Has derrotado a Nadadora Marina!" + "¡Victoria!" en 6 turnos, 0 errores en consola
+      - Excursionista Roco: Impactrueno "✕ No afecta", Ataque Rápido "▼ Poco eficaz"; Pikachu debilitado → hoja
+        "¿Qué Pokémon vas a sacar?" → Bulbasaur con Látigo Cepa "▲ Súper eficaz"
+    Evidencias docs/evidencias/F4-05_0{1..6}_*.png (la 01 está en ancho de escritorio).
+
+Ajustes tras mirarlo: horizonte más alto (las plataformas flotaban en el cielo), Pikachu más pequeño (tapaba su panel),
+menú visible pero desactivado durante el turno (el panel de abajo quedaba vacío), golpe más visible (anillo, partículas
+con contorno, número grande) y la hoja marcaba "En combate" a un debilitado.
+**Quedó a medias / roto:** probar en Android real (Kenneth) y SFX de golpe (F2-08). Ambos en PENDIENTES de ESTADO.
+**Decisiones nuevas:** D-033.
+**El siguiente debe empezar por:** F5 (PvP en tiempo real, servidor con el mismo motor) — primero su plan; o F2-08.

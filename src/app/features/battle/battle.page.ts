@@ -72,8 +72,8 @@ interface Burst {
                   class="sprite sprite--me"
                   [src]="art(me.speciesId)"
                   [alt]="me.name"
-                  width="208"
-                  height="208"
+                  width="184"
+                  height="184"
                 />
                 <app-battle-info class="info info--me" [pokemon]="me" [showNumbers]="true" />
               </section>

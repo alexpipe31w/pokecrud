@@ -21,8 +21,7 @@ import { BattleController } from './battle.controller';
           ' de ' +
           p.maxHp +
           ' PS' +
-          (p.active ? ', en combate' : '') +
-          (p.hp === 0 ? ', debilitado' : '')
+          (p.hp === 0 ? ', debilitado' : p.active ? ', en combate' : '')
         "
       >
         <img [src]="sprite(p.speciesId)" alt="" width="56" height="56" />
@@ -33,7 +32,7 @@ import { BattleController } from './battle.controller';
           <app-hp-bar [current]="p.hp" [max]="p.maxHp" />
         </span>
         <span class="state">
-          {{ p.active ? 'En combate' : p.hp === 0 ? 'Debilitado' : p.hp + '/' + p.maxHp }}
+          {{ p.hp === 0 ? 'Debilitado' : p.active ? 'En combate' : p.hp + '/' + p.maxHp }}
         </span>
       </button>
     }

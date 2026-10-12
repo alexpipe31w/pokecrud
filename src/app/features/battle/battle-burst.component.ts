@@ -7,6 +7,7 @@ const PARTICLES = Array.from({ length: 12 }, (_, i) => i);
   selector: 'app-battle-burst',
   host: { 'aria-hidden': 'true', '[style.--c]': 'color()' },
   template: `
+    <span class="ring"></span>
     @for (p of particles; track p) {
       <span class="dot" [style.--a]="p * 30 + 'deg'"></span>
     }
@@ -31,53 +32,76 @@ const PARTICLES = Array.from({ length: 12 }, (_, i) => i);
       left: 118px;
       bottom: 120px;
     }
-    .dot {
+    .ring {
       position: absolute;
-      width: 10px;
-      height: 10px;
-      margin: -5px;
+      width: 120px;
+      height: 120px;
+      margin: -60px;
       border-radius: 50%;
-      background: var(--c);
-      box-shadow: 0 0 8px var(--c);
-      animation: fly 620ms var(--ease-out) forwards;
+      border: 6px solid var(--c);
+      box-shadow:
+        0 0 0 2px rgb(15 26 43 / 0.35),
+        0 0 24px var(--c);
+      animation: ring 420ms var(--ease-out) forwards;
     }
-    @keyframes fly {
+    @keyframes ring {
       from {
-        transform: rotate(var(--a)) translateX(0) scale(1);
+        transform: scale(0.3);
         opacity: 1;
       }
       to {
-        transform: rotate(var(--a)) translateX(64px) scale(0.3);
+        transform: scale(1.15);
+        opacity: 0;
+      }
+    }
+    .dot {
+      position: absolute;
+      width: 16px;
+      height: 16px;
+      margin: -8px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #fff 0 30%, var(--c) 45%);
+      box-shadow:
+        0 0 0 2px rgb(15 26 43 / 0.45),
+        0 0 10px var(--c);
+      animation: fly 640ms var(--ease-out) forwards;
+    }
+    @keyframes fly {
+      from {
+        transform: rotate(var(--a)) translateX(10px) scale(1);
+        opacity: 1;
+      }
+      to {
+        transform: rotate(var(--a)) translateX(96px) scale(0.35);
         opacity: 0;
       }
     }
     .num {
       position: absolute;
       transform: translate(-50%, -50%);
-      font: 700 1.6rem/1 var(--font-display);
+      font: 700 2.1rem/1 var(--font-display);
       color: var(--paper);
-      text-shadow:
-        0 2px 0 var(--ink),
-        0 0 12px rgb(15 26 43 / 0.6);
-      animation: rise 860ms var(--ease-out) forwards;
+      -webkit-text-stroke: 1.5px var(--ink);
+      text-shadow: 0 3px 0 var(--ink);
+      animation: rise 900ms var(--ease-out) forwards;
     }
     .num--crit {
       color: var(--gold);
-      font-size: 2rem;
+      font-size: 2.6rem;
     }
     .num--heal {
       color: var(--success);
     }
     @keyframes rise {
       from {
-        transform: translate(-50%, -30%) scale(0.95);
-        opacity: 0;
+        transform: translate(-50%, -20%) scale(1.3);
       }
-      20% {
+      25% {
+        transform: translate(-50%, -70%) scale(1);
         opacity: 1;
       }
       to {
-        transform: translate(-50%, -160%) scale(1);
+        transform: translate(-50%, -170%) scale(1);
         opacity: 0;
       }
     }

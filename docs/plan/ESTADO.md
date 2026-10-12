@@ -3,7 +3,7 @@
 > Se **reescribe** al cerrar cada sesión (no es histórico; el histórico es `BITACORA.md`).
 > Máximo una pantalla. Si lees esto al empezar: después lee `ROADMAP.md`.
 
-**Última actualización:** 2026-10-11 · por Alex (Claude) · rama `feature/F4-06-ia` (PR abierto)
+**Última actualización:** 2026-10-11 · por Alex (Claude) · rama `feature/F4-05-escena-combate` (PR abierto)
 
 ## Fase actual
 
@@ -11,6 +11,9 @@
 
 ## Hecho
 
+- **F4-05 (Alex, PR abierto; sale de F4-06):** **escena de combate jugable** en `/combate/prueba` (botón en `/dev/ui`):
+  elegir rival (fácil/normal/difícil), combate por turnos contra la IA con animaciones, textos, eficacia prevista,
+  cambio de Pokémon y final. **Con esto la F4 (motor + IA + escena) está completa.** D-033.
 - **F4-06 (Alex, PR abierto; sale de F4-04):** IA rival (`shared/engine/battle/ai.ts`, fácil/normal/difícil) y 3
   entrenadores de prueba (`shared/data/trainers.ts`). D-032. Siguiente: **F4-05**, la escena de combate en la app.
 - **F4-04 (Alex, PR abierto; sale de F4-03):** motor de combate completo en `shared/engine/battle/battle-engine.ts`
@@ -82,8 +85,7 @@
 
 ## En curso
 
-- **F4-05 (Alex, rama `feature/F4-05-escena-combate`, sale de F4-06):** escena de combate `/combate/prueba` contra la IA.
-- Esperan revisión **en orden** (ver PENDIENTES DE HUMANOS): #21 → #22 → #23 → #24 → #25 → #26 → #27 → #28 → #29 → #30.
+- Esperan revisión **en orden** (ver PENDIENTES DE HUMANOS): #21 → #22 → #23 → #24 → #25 → #26 → #27 → #28 → #29 → #30 → F4-05.
 - **F1-01 → PENDIENTE DE KENNETH** (medir fps en su Android): rama `feature/F1-01-spike-mapa-3d`, instrucciones
   exactas en la última entrada de F1-01 de la bitácora.
 
@@ -104,7 +106,7 @@
 ### PENDIENTES DE HUMANOS — lista única (quien termine algo, lo marca `[x]`; cada tarea nueva añade aquí lo suyo)
 
 **Kenneth o Samuel (revisión):**
-- [ ] Revisar y mezclar **en este orden**: #21 (F0-12 admin) → #22 (F1-06 spawns) → #23 (F1-08 mochila) → #24 (F2-03 fórmula) → #25 (F2-06 captura) → #26 (F4-01 plan combate) → #27 (F4-02 tipos y stats) → #28 (F4-03 daño) → #29 (F4-04 motor de combate) → #30 (F4-06 IA).
+- [ ] Revisar y mezclar **en este orden**: #21 (F0-12 admin) → #22 (F1-06 spawns) → #23 (F1-08 mochila) → #24 (F2-03 fórmula) → #25 (F2-06 captura) → #26 (F4-01 plan combate) → #27 (F4-02 tipos y stats) → #28 (F4-03 daño) → #29 (F4-04 motor de combate) → #30 (F4-06 IA) → PR de F4-05 (escena de combate).
   Cada uno sale del anterior: al mezclar uno, GitHub reapunta el siguiente a `develop`.
 
 **Samuel (Render, solo él tiene acceso):**
@@ -114,9 +116,13 @@
 - [ ] Su `server/.env`: puerto 6543, `JWT_SECRET` y `SPAWN_SALT` propios.
 
 **Kenneth:**
+- [ ] Probar el combate en su Android: APK → `/dev/ui` → "Combate de prueba"; que vaya fluido y se oigan los gritos.
 - [ ] **F1-01:** medir fps en su Android y escribir la decisión plan A/B (rama `feature/F1-01-spike-mapa-3d`,
   instrucciones en su bitácora). Bloquea F1-02…F1-05.
 - [ ] Su `server/.env`: `SPAWN_SALT` propia.
+
+**Quien coja F2-08 (audio):**
+- [ ] SFX de golpe/crítico/debilitado para la escena de combate (hoy solo hay gritos y vibración).
 
 **Alex:**
 - [ ] Nombrarse ADMIN del inventario tras mezclar #21: registrarse en la app y `cd server && npm run admin -- grant <correo>`.
