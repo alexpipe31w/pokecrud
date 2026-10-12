@@ -563,3 +563,27 @@ soportados (solo cuentas de prueba, ya borradas).
 **Quedó a medias / roto:** nada.
 **Decisiones nuevas:** D-030.
 **El siguiente debe empezar por:** F4-04 (reducer `battle-engine.ts` con estados y cambios de stats), según el plan.
+
+## 2026-10-11 23:45 · @alex (Claude) · F4-04 · rama `feature/F4-04-reducer` (sale de F4-03)
+
+**Qué se hizo:** `shared/engine/battle/types.ts` (contrato: estado, acciones, eventos, `BattleContext`, `BattleError`) y
+`battle-engine.ts` (`createBattle`, `resolveTurn`): validación, orden, PP, precisión, daño con multigolpe y crítico por
+golpe, drenaje/retroceso, estados con inmunidades, confusión, etapas con tope, retroceso del rival, residuos de fin de
+turno, debilitados con cambio forzado, Forcejeo, rendición y victoria.
+**Cómo se probó (salida real):**
+
+    vitest battle-engine.spec.ts → 27/27, 1 instantánea escrita
+      1.000 combates 3 vs 3 aleatorios (especies, niveles 20-60, IVs, naturalezas, acciones al azar): todos terminan
+        en < 500 turnos, sin excepciones, PS y PP siempre en rango (3,3 s)
+      parálisis ≈ 25 % sin moverse en 2.000 turnos; Ataque Furia 2-5 golpes ≈ 35/35/15/15 en 4.000; Mordisco solo hace
+        retroceder si va primero (0 de 500 cuando es más lento)
+      instantánea leída a mano: Fuego Fatuo quema a Blastoise (−9/turno = 1/16), Surf ×2 104, Mordisco quemado a la
+        mitad, Rayo Hielo debilita a Charizard, cambio forzado a Pikachu, Rayo ×2 debilita a Blastoise
+    npm run test:shared → 126/126 · app lint + build OK · server build + 22/22
+
+Primer intento: 4 tests mal escritos (no el motor): paralizaba a un Jolteon (Eléctrico, inmune); el sueño del turno en
+que te duermen sí cuenta; Gigadrenado no cura con la vida llena; el guion de la instantánea usaba un índice que el
+Pokémon de reserva no tenía.
+**Quedó a medias / roto:** nada. Fuera de la v1 (anotado en el plan): movimientos de daño fijo y efectos especiales.
+**Decisiones nuevas:** D-031.
+**El siguiente debe empezar por:** F4-06 (IA, solo shared/, sin móvil) o F4-05 (escena; probar en vista móvil).

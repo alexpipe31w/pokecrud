@@ -147,15 +147,15 @@ paralelo (la escena juega contra una IA "elige al azar" hasta que llegue F4-06).
 
 ## F4-04 · Estados y cambios de stats (reducer)
 
-- [ ] **Paso 1 — `types.ts`** con el contrato de arriba.
-- [ ] **Paso 2 — `createBattle(sides)` y `resolveTurn`:** cambios, orden, PP, precisión, daño, efectos secundarios,
+- [x] **Paso 1 — `types.ts`** con el contrato de arriba.
+- [x] **Paso 2 — `createBattle(sides)` y `resolveTurn`:** cambios, orden, PP, precisión, daño, efectos secundarios,
   estados al final del turno, debilitados, victoria. Sin mutar la entrada (test con `structuredClone` + `toEqual`).
-- [ ] **Paso 3 — tests por regla:** cada estado (incluidas inmunidades), etapas ±6 topadas, drenaje/retroceso,
+- [x] **Paso 3 — tests por regla:** cada estado (incluidas inmunidades), etapas ±6 topadas, drenaje/retroceso,
   multigolpe, retroceso del rival, confusión, cambio forzado tras debilitarse, rendición. Un test de "combate completo"
   con semilla fija cuyo registro de eventos se compara con uno guardado (snapshot).
-- [ ] **Paso 4:** propiedad: 1.000 combates aleatorios entre equipos al azar con semillas distintas terminan siempre
+- [x] **Paso 4:** propiedad: 1.000 combates aleatorios entre equipos al azar con semillas distintas terminan siempre
   (< 500 turnos) sin excepciones y sin PS fuera de [0, máx].
-- [ ] **Paso 5:** REGLA 2.
+- [x] **Paso 5:** REGLA 2.
 
 ## F4-05 · Escena de combate (app)
 
