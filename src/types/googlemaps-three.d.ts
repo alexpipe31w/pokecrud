@@ -3,7 +3,7 @@
 // `moduleResolution: bundler` TypeScript no los encuentra. Esta copia recoge SOLO lo que usa la app (F1-01); si se
 // sube de versión o se usa algo más, copiarlo de node_modules/@googlemaps/three/dist/three.d.ts.
 declare module '@googlemaps/three' {
-  import type { Intersection, Object3D, Scene, Vector2, Vector3 } from 'three';
+  import type { Intersection, Object3D, PerspectiveCamera, Scene, Vector2, Vector3 } from 'three';
 
   export type LatLngTypes =
     | google.maps.LatLngLiteral
@@ -23,6 +23,8 @@ declare module '@googlemaps/three' {
   export class ThreeJSOverlayView {
     readonly scene: Scene;
     animationMode: 'always' | 'ondemand';
+    /** Su `projectionMatrix` es modelo-vista-proyección desde el ancla (la usa `MapOverlay`, F1-07 / D-042). */
+    protected readonly camera: PerspectiveCamera;
     constructor(options?: ThreeJSOverlayViewOptions);
     setAnchor(anchor: LatLngTypes): void;
     onBeforeDraw(): void;

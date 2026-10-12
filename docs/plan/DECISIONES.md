@@ -502,4 +502,23 @@ los Pokémon que anden en F1-07): acumular la fase, no multiplicar por el reloj.
   (Google lo pinta encima igual). Lo que sí se hizo: sombra → hierba → sprite con `depthTest: false` y `renderOrder`, para
   que la hierba nunca tape a su Pokémon. **Única salida real: edificios 2D en el estilo `pokecrud-juego`** (engranaje
   del editor de estilos → Edificios → 2D), como Pokémon GO. Decisión pendiente de Alex (se ve peor el mapa a cambio de
-  no esconder Pokémon).
+  no esconder Pokémon). → **Resuelto en D-042** (Alex quiere 3D Y los Pokémon encima).
+
+## D-042 · Los Pokémon del mapa se pintan en HTML por encima del mapa; edificios 3D (F1-07) (2026-10-12, Alex)
+
+Alex decidió **edificios 3D** en el estilo y **los Pokémon siempre visibles** encima. Como Google pinta los edificios
+después de la capa three.js (D-041), el Pokémon ya no es un `THREE.Sprite`: es un `<img>` en `.pokemon-layer`, encima
+del div del mapa (`PokemonDom`). Cada fotograma, desde `onBeforeDraw` del overlay (`MapOverlay`, subclase de
+`ThreeJSOverlayView` que expone su `camera.projectionMatrix`, la de ESE fotograma: sin desfase al mover la cámara),
+se proyectan su base y su cabeza (`projectToScreen`) y se coloca con `transform` + `opacity` (sin relayout; tamaño
+fijo de 100 px y `scale`). `z-index` por altura en pantalla: el más cercano delante. La sombra y la mata de hierba
+siguen en three.js, en el suelo (pueden quedar detrás de una casa; es lo natural).
+
+- **Toque:** `click` en la propia imagen (las imágenes tienen `pointer-events: auto`; la capa, `none`). Adiós a los
+  cilindros invisibles y al raycast.
+- **Sin texturas three.js:** `SpriteTextures` se borró; el navegador cachea los PNG. Orden de prueba de sprites:
+  home → official-artwork → normal (`onerror`).
+- **NO crear otro canvas WebGL** para esto (D-038: en el móvil le quitaba el contexto al mapa).
+- **Rendimiento:** ≤ 30 imágenes con `transform` por fotograma (el spike midió 52 fps con los markers HTML de Google,
+  más pesados). Medir en Android en el 7b de F1-07; si hiciera falta, no actualizar las que no cambian de sitio.
+- Tipos: `src/types/googlemaps-three.d.ts` declara ahora `protected readonly camera`.

@@ -13,8 +13,8 @@
    nombre, nivel y grito; la captura AR es F2-04).
 2. **Quien tenga Android (Kenneth o Samuel):** con un solo `npm run apk -- --install` se prueban las dos cosas: 7b de
    F1-07 y 3b de F1-05 (ver "PENDIENTES DE HUMANOS"). Si van ≥ 55 fps, marcar las dos `[x]` en ROADMAP.
-3. **Leer D-040 y D-041.** D-041: antes de abrir un encuentro se le manda la posición al servidor (si no, 403), y los
-   edificios 3D de Google tapan a los Pokémon que quedan detrás (no se arregla desde three.js; Alex decide si 2D).
+3. **Leer D-040, D-041 y D-042.** Antes de abrir un encuentro se manda la posición al servidor (si no, 403), y los
+   Pokémon son `<img>` en una capa HTML encima del mapa (Google pinta sus edificios 3D encima de three.js).
 4. **Siguiente:** con Android → F2-01 (spike de cámara, desbloquea la AR). Sin móvil → F1-09, F1-10, F5-01 o F2-08.
 5. **Forma de trabajar (Alex, 2026-10-12):** cada uno mezcla su PR en `develop` en cuanto el CI esté en verde (lint +
    test + build), sin esperar revisión; `develop` está protegida y no deja mezclar en rojo.
@@ -170,7 +170,7 @@ fórmula (F2-03) y captura en servidor (F2-06) hechas; lo visual del encuentro e
 
 **Kenneth o Samuel (Android):**
 
-- [ ] **F1-07 paso 7b:** en la calle con el APK de producción: ≥ 55 fps con los Pokémon de verdad, grito bajito al
+- [ ] **F1-07 paso 7b:** en la calle con el APK de producción: ≥ 55 fps con los Pokémon de verdad (capa HTML, D-042), grito bajito al
       acercarse, tocar uno lejos → "Acércate más", uno al alcance → encuentro. Anotar cuántos había y los fps.
 - [ ] **F1-05 paso 3b:** andar y trotar con el APK, fps ≥ 55 en `/mapa` con el avatar nuevo (CDP). Marcar F1-05 `[x]`.
 
@@ -199,9 +199,7 @@ fórmula (F2-03) y captura en servidor (F2-06) hechas; lo visual del encuentro e
 
 **Alex:**
 
-- [ ] (D-041) ¿Edificios 2D en el estilo `pokecrud-juego` para que no tapen a los Pokémon? (hoy en 3D: se ven mejor
-      pero esconden los que quedan detrás de una casa).
-
+- [x] (D-042, 2026-10-12) Edificios 3D y Pokémon siempre encima: hechos (capa HTML).
 - [x] (2026-10-12) Estilo del Map ID `5309ecf69efbfe12f3ecbc4c` sin POI comerciales: estilos `pokecrud-juego` (claro,
       edificios 3D, densidad de POI "Dispersa") y `pokecrud-juego-noche` (oscuro) con Comida y bebida, Venta minorista,
       Servicio, Alojamiento y Entretenimiento ocultos; asignados al modo claro y al oscuro del Map ID. Ojo: los estilos
