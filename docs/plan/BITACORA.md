@@ -315,3 +315,32 @@ Evidencias `docs/evidencias/F0-08_0{2,3,4}_movil-*.png`.
 **Decisiones nuevas:** ninguna (D-019 en la entrada anterior).
 **El siguiente debe empezar por:** mezclar el PR de F0-08, comprobar `https://pokecrud-server.onrender.com/pokemon?_limit=1`
 y luego `/inicio F0-10` (transaction pooler) o `/inicio F0-09` (APK).
+
+## 2026-10-11 19:40 · @kenneth (Claude) · F0-09 · rama `feature/F0-09-apk`
+
+**Qué se hizo:** antes, mezclado el PR #16 (F0-08) con el visto bueno de Kenneth y comprobado en Render
+(`/pokemon` 200 con `X-Total-Count: 151`, `/teams` sin token 401). Corregido un error propio: al cerrar F0-08 un `sed`
+sin rango marcó los pasos 2-6 de F0-09 en el plan de fase; desmarcados antes de mezclar.
+F0-09 pasos 1-7: `npx cap add android` (Capacitor 8.5.2), `.gitignore` de `android/` con `*.jks`/`*.keystore`,
+`gradlew.bat` con CRLF, permisos, `scripts/apk.mjs` + `npm run apk`, configuración `device` en `angular.json`,
+`cleartext`/`allowMixedContent` solo con `CAP_DEV=1`, icono y splash propios. Instalado Microsoft OpenJDK 21 en el PC de
+Kenneth (el `jbr` de su Android Studio es Java 25 y Gradle 8.14.3 falla con "Unsupported class file major version 69").
+**Archivos clave:** `android/`, `scripts/apk.mjs`, `capacitor.config.ts`, `angular.json`, `resources/brand.mjs`,
+`resources/*.png`, `.gitattributes`, `.gitignore`, `docs/plan/ARQUITECTURA.md` §11.
+**Cómo se probó (salida real):**
+
+    npm run apk → "JDK 21 … BUILD SUCCESSFUL · ✔ APK (production): …/app-debug.apk · 8.18 MB" (8 579 103 bytes)
+    npm run apk -- device → "APK de desarrollo → http://192.168.20.20:3000 … 6.31 MB"; capacitor.config.json con
+      cleartext + allowMixedContent SOLO en ese build (el de producción no los lleva)
+    adb: Samsung SM-A366E (A36), Android 16 / SDK 36 → install "Success"
+    splash con el icono → Pokédex con 151 desde Render · WebView Chrome 154, origin https://localhost, Capacitor android
+    /dev/ui sin sesión → /login?redirect=/dev/ui · registro de Kenneth en el móvil → /dev/ui "kenneth_rb · nivel 1"
+    grito y vibración: confirmados por Kenneth en el móvil
+    am force-stop + reabrir → sigue con sesión en /dev/ui; 0 tokens en localStorage, sessionStorage vacío (Keystore OK)
+    dataset en el móvil: "Dataset: ready · 1025 especies"
+
+**Quedó a medias / roto:** nada en F0-09. Encontrado: en Android 15+ (edge-to-edge) `/dev/ui` se dibuja bajo la barra
+de estado → tarea nueva F0-11. Arte de icono/splash provisional.
+**Decisiones nuevas:** D-020.
+**El siguiente debe empezar por:** mezclar el PR de F0-09; luego `/inicio F0-10` (transaction pooler, riesgo en
+producción) o `/inicio F0-11` (zona segura). Para el APK en otro PC: `winget install Microsoft.OpenJDK.21` y `npm run apk`.

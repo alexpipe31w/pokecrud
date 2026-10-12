@@ -160,3 +160,16 @@ según el orden (pasó con HapticsService: 1 de 4 corridas). Por eso plugins y A
   daba 500 de forma intermitente.
 - **Riesgo abierto (tarea F0-10):** Render (5) + el servidor local de cada compañero (5 c/u) también comparten esos 15.
   Con los tres desarrollando a la vez, producción puede dar 500. Ver ROADMAP F0-10.
+
+## D-020 · APK (F0-09): JDK 21 aparte, Capacitor Android 8.5.2 y APK de desarrollo opcional (2026-10-11, Kenneth)
+
+- **JDK:** el plan decía usar el `jbr` de Android Studio, pero en versiones recientes es **Java 25** y Gradle 8.14.3
+  falla ("Unsupported class file major version 69"). Se instala Microsoft OpenJDK 21 (`winget`) y `scripts/apk.mjs`
+  elige un JDK 17-24 (prefiere 21). No se sube Gradle a 9.x: es el que fija la plantilla de Capacitor 8.
+- **`@capacitor/android` 8.5.2** (el plan decía 8.5.3): igual que `@capacitor/core`/`cli` instalados, como pide
+  Capacitor, y la 8.5.3 tenía 4 días. `@capacitor/splash-screen` 8.0.2 como en el plan.
+- **El APK que se prueba y se presenta es el de producción (Render).** El de desarrollo (`-- device`) es opcional: su
+  IP se genera en cada PC (`environment.device.ts` gitignored, el plan lo daba por commiteado) y el HTTP plano +
+  contenido mixto solo se activa con `CAP_DEV=1`, nunca en el de producción.
+- **Icono/splash provisionales propios** (pin de mapa con forma de ball, tokens de DISENO.md) generados por script.
+  Los splash por densidad suben el APK de 4,8 a 8,2 MB: aceptado mientras sea provisional.

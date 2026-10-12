@@ -48,13 +48,19 @@
       Dep: F0-07. Criterio: la colección de Postman pasa entera contra el servidor nuevo (captura del runner).
       **Hecho:** Runner de Postman 79/79 (`docs/evidencias/F0-08_01_postman-runner-nest.png`) y Newman 44 peticiones /
       79 comprobaciones / 0 fallos (`F0-08_01_newman-runner.txt`). Ampliaciones respecto al plan: D-019.
-- [~] **F0-09 · Pipeline del APK** (@kenneth, 2026-10-11) — `npx cap add android`, permisos, icono y splash provisionales,
-  script `npm run apk` documentado, APK instalado en un Android real mostrando `/dev/ui`.
-  Dep: F0-04. Criterio: foto/captura del móvil + tamaño del APK en la bitácora.
+- [x] **F0-09 · Pipeline del APK** (@kenneth, 2026-10-11) — `npx cap add android`, permisos, icono y splash provisionales,
+      script `npm run apk` documentado, APK instalado en un Android real mostrando `/dev/ui`.
+      Dep: F0-04. Criterio: foto/captura del móvil + tamaño del APK en la bitácora.
+      **Hecho:** APK de producción 8,18 MB en un Samsung A36 (Android 16): splash, Pokédex desde Render, `/dev/ui`
+      con sesión que sobrevive a cerrar la app (Keystore), grito y vibración. Evidencias `F0-09_0{1,2,3}_*.png`. D-020.
 - [ ] **F0-10 · Conexiones a la base: transaction pooler** — el _session pooler_ de Supabase admite 15 clientes en total
       y Render + cada servidor local (pool 5) los comparten (D-019). Pasar `DATABASE_URL` al _transaction pooler_ (6543,
       `?pgbouncer=true` si Prisma lo pide) en Render y en los `.env`, dejando `DIRECT_URL` para migraciones (D-017).
       Dep: F0-08. Criterio: e2e en paralelo + Render + 2 servidores locales a la vez sin `EMAXCONNSESSION` (salida en bitácora).
+- [ ] **F0-11 · Zona segura en Android 15+ (edge-to-edge)** — con `targetSdk` 36 la app se dibuja bajo la barra de
+      estado: en `/dev/ui` el título se cruza con la hora (`F0-09_01_apk-movil-dev-ui.png`); la Pokédex con `ion-header`
+      sí la respeta. Aplicar `env(safe-area-inset-*)` en el layout base para toda pantalla sin `ion-header`.
+      Dep: F0-09. Criterio: captura en Android real sin solapes en `/dev/ui`, login y registro.
 
 ## F1 · Mapa con GPS
 

@@ -261,16 +261,31 @@ TournamentMatch(id, tournamentId, round, slot, p1, p2, winner, battleId, UNIQUE(
 
 ## 11. Generar el APK
 
-1. `npm run build` → `www/`.
-2. `npx cap add android` (solo la primera vez; la carpeta `android/` **sí** se commitea en este
-   proyecto: D-009) y `npx cap sync android`.
-3. Permisos en `android/app/src/main/AndroidManifest.xml`: `ACCESS_FINE_LOCATION`,
-   `ACCESS_COARSE_LOCATION`, `CAMERA`, `INTERNET`, `VIBRATE`.
-4. JDK 21: `JAVA_HOME` = `C:\Program Files\Android\Android Studio\jbr`. SDK en
-   `%LOCALAPPDATA%\Android\Sdk` (ya existe en el PC de Alex).
-5. `cd android && gradlew.bat assembleDebug` → `android/app/build/outputs/apk/debug/app-debug.apk`.
-   Para la entrega: `assembleRelease` con un keystore propio (fuera del repo).
-6. Probar con `adb install -r app-debug.apk` y depurar el WebView en `chrome://inspect`.
+**Un comando:** `npm run apk` (`scripts/apk.mjs`, F0-09) hace `ng build` → `npx cap sync android` →
+`gradlew assembleDebug` e imprime ruta y tamaño (`android/app/build/outputs/apk/debug/app-debug.apk`, ~8 MB).
+
+- `npm run apk` → APK de **producción** (habla con Render por HTTPS). Es el que se instala para probar/presentar.
+- `npm run apk -- device` → APK de **desarrollo** contra el Nest de tu PC: detecta la IP LAN (o
+  `DEVICE_SERVER_URL=http://<IP>:3000`), genera `src/environments/environment.device.ts` (gitignored) y con
+  `CAP_DEV=1` activa `cleartext` + `allowMixedContent` (la app se sirve como `https://localhost`). Móvil y PC en la
+  misma Wi-Fi; si no conecta, el Firewall de Windows tiene que dejar entrar al puerto 3000.
+- `--install` → además `adb install -r` en el móvil conectado (Depuración USB activada).
+
+Detalles:
+
+1. La carpeta `android/` **sí** se commitea (D-009). Su `.gitignore` excluye `build/`, `.gradle/`, `local.properties`,
+   `*.jks`, `*.keystore` y los assets copiados. `gradlew.bat` va con CRLF (`.gitattributes`).
+2. Permisos en `android/app/src/main/AndroidManifest.xml`: `INTERNET`, `ACCESS_FINE_LOCATION`,
+   `ACCESS_COARSE_LOCATION`, `CAMERA`, `VIBRATE`; GPS y cámara como `uses-feature required=false`.
+3. **JDK 17-24 (21 recomendado).** Gradle 8.14.3 (el de Capacitor 8) NO corre con Java 25, y Android Studio reciente
+   trae un `jbr` 25. El script usa `JAVA_HOME` si es compatible, si no el primer JDK 21 instalado, y si no el `jbr`.
+   Instalar: `winget install Microsoft.OpenJDK.21` (D-020). SDK: `ANDROID_HOME` o `%LOCALAPPDATA%AndroidSdk`
+   (Gradle descarga solo la plataforma 36 y build-tools 35 si faltan).
+4. Icono y splash provisionales: `node resources/brand.mjs` (SVG propio → PNG) y
+   `npx @capacitor/assets@3.0.5 generate --android --iconBackgroundColor '#0f1a2b' --splashBackgroundColor '#0f1a2b'`
+   (y los `…Dark`). Arte definitivo: pendiente de diseño.
+5. Depurar: `chrome://inspect` en el PC (el WebView del APK debug admite DevTools). Para la entrega:
+   `assembleRelease` con un keystore propio (fuera del repo).
 
 ## 12. Pruebas
 

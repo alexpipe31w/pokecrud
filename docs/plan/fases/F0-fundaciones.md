@@ -1443,10 +1443,10 @@ Añadir `CHECK` en la migración SQL generada (editar antes de `migrate deploy`)
 - [x] **Paso 5: icono y splash provisionales** — `npx @capacitor/assets generate --android` desde
       `resources/icon.png` (1024×1024) y `resources/splash.png` (2732×2732): Poké Ball estilizada propia
       (no usar arte oficial). Ver skill `generar-imagen` o pedirlo al humano.
-- [ ] **Paso 6: probar en el móvil** — `npm run apk`, `adb install -r android/app/build/outputs/apk/debug/app-debug.apk`,
+- [x] **Paso 6: probar en el móvil** — `npm run apk`, `adb install -r android/app/build/outputs/apk/debug/app-debug.apk`,
       abrir, navegar a `/dev/ui`, oír el grito y ver la vibración. Depurar en `chrome://inspect`.
       Foto o captura en `docs/evidencias/F0-09_01_apk-movil.jpg` y tamaño del APK en la bitácora.
-- [ ] **Paso 7:** actualizar ARQUITECTURA §11 si algo cambió y commit `F0-09: pipeline del APK`.
+- [x] **Paso 7:** actualizar ARQUITECTURA §11 si algo cambió y commit `F0-09: pipeline del APK`.
 
 ---
 
