@@ -7,8 +7,7 @@
 
 ## Fase actual
 
-**F0 · Fundaciones — COMPLETA.** F0-01…F0-10 en `develop` (PR #8-#18); **F0-11 hecha** (Kenneth, PR pendiente de
-mezclar). Siguiente fase: **F1 · Mapa con GPS** (empieza por F1-01, el spike de Google Maps 3D en Android real).
+**F0 · Fundaciones — COMPLETA.** F0-01…F0-10 en `develop` (PR #8-#18); **F0-11 hecha** (Kenneth, PR #19 pendiente de mezclar). Siguiente fase: **F1 · Mapa con GPS** (empieza por F1-01, el spike de Google Maps 3D en Android real).
 
 ## Hecho
 
@@ -56,7 +55,7 @@ mezclar). Siguiente fase: **F1 · Mapa con GPS** (empieza por F1-01, el spike de
 
 ## Siguiente paso concreto
 
-1. Revisar y mezclar el PR de F0-11 en `develop`. **Alex y Samuel:** puerto de `DATABASE_URL` → 6543 en su `.env`;
+1. Revisar y mezclar el PR #19 (F0-11) en `develop`. **Alex y Samuel:** puerto de `DATABASE_URL` → 6543 en su `.env`;
    **Samuel:** también en Render (ver Bloqueos).
 2. Siguiente: **F1-01** (spike Google Maps 3D + overlay three.js, medir fps en Android real; dep F0-09 ✔). Necesita
    `environment.local.ts` con la clave de Maps (Kenneth ya lo tiene) y un móvil. OJO: mapa a pantalla completa →
