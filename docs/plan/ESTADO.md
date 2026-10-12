@@ -125,11 +125,11 @@ servidor (F2-06) hechas; lo visual del encuentro espera al spike F2-01 (cámara 
 
 ## Siguiente paso concreto
 
-2. **Siguiente tarea libre: F1-04** (pantalla `/mapa`; sigue `docs/plan/fases/F1-mapa.md`, criterio con capturas de
-   día y de noche). Con Android también → F2-01 (spike de cámara y giroscopio). Sin móvil → F5-01 o F2-08.
-3. **Alex:** nombrarse ADMIN del inventario (`cd server && npm run admin -- grant <correo>`); hoy hay 0 ADMIN. Y el
+1. **F1-04 en curso (Kenneth).** Siguiente tarea libre para otro: con Android → F2-01 (spike de cámara y giroscopio);
+   sin móvil → F5-01 o F2-08.
+2. **Alex:** nombrarse ADMIN del inventario (`cd server && npm run admin -- grant <correo>`); hoy hay 0 ADMIN. Y el
    estilo del Map ID sin POI comerciales y con variante oscura (lo necesita F1-04).
-4. Para generar el APK en otro PC: JDK 21 (`winget install Microsoft.OpenJDK.21`; si da "el hash no coincide",
+3. Para generar el APK en otro PC: JDK 21 (`winget install Microsoft.OpenJDK.21`; si da "el hash no coincide",
    `winget install EclipseAdoptium.Temurin.21.JDK`) y `npm run apk`.
 
 ## Bloqueos / roto / pendiente de humanos
