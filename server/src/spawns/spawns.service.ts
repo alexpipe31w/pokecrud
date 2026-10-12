@@ -26,6 +26,7 @@ import {
   slotFor,
   spawnsForCell,
 } from '../../../shared/engine/spawns.js';
+import type { NearbySpawns } from '../../../shared/protocol/spawns.js';
 import { WeatherService, weatherCellOf } from './weather.service.js';
 
 /** Radio en el que el jugador ve Pokémon (ROADMAP F1-06: celdas a ≤ 200 m). */
@@ -33,21 +34,6 @@ export const VIEW_RADIUS_M = 200;
 /** Versión del algoritmo en la semilla: si cambia `spawnsForCell`, se sube y no se mezclan spawns viejos (D-025). */
 const SEED_VERSION = 'v1';
 const M_PER_DEG_LAT = 111_320;
-
-/** Lo que ve el cliente en el mapa. Nivel, IVs, naturaleza, sexo y shiny NO salen hasta el encuentro (F2). */
-export interface VisibleSpawn {
-  id: string;
-  speciesId: number;
-  lat: number;
-  lng: number;
-}
-
-export interface NearbySpawns {
-  slot: number;
-  /** Fin de la franja: el cliente vuelve a pedir a partir de aquí. */
-  expiresAt: string;
-  spawns: VisibleSpawn[];
-}
 
 const round6 = (n: number): number => Math.round(n * 1e6) / 1e6;
 
@@ -145,9 +131,16 @@ export class SpawnsService {
       const dx = (s.lng - lng) * mPerDegLng;
       return dx * dx + dy * dy <= VIEW_RADIUS_M * VIEW_RADIUS_M;
     });
+    // Para el HUD: el clima ya está en caché por celda de clima y franja (D-025), no añade peticiones a Open-Meteo.
+    const weather = await this.weather.weatherFor(
+      weatherCellOf(lat, lng),
+      slot,
+    );
     return {
       slot,
       expiresAt: new Date(slotEndsAt(slot)).toISOString(),
+      weather,
+      night: isNightAt(slotEndsAt(slot - 1), lng),
       spawns: visible.map((s) => ({
         id: s.id,
         speciesId: s.speciesId,

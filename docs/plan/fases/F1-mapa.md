@@ -833,7 +833,7 @@ deja `status = 'joystick'` sin posición → la pantalla debe llamar a `useJoyst
 **Files:** Create `shared/protocol/spawns.ts`; Modify `server/src/spawns/spawns.service.ts`,
 `server/test/spawns.e2e-spec.ts`
 
-- [ ] **1a.** `shared/protocol/spawns.ts` (ARQUITECTURA §2: contrato app↔servidor):
+- [x] **1a.** `shared/protocol/spawns.ts` (ARQUITECTURA §2: contrato app↔servidor):
 
 ```ts
 import type { Weather } from '../engine/spawns.js';
@@ -858,10 +858,10 @@ export interface NearbySpawns {
 }
 ```
 
-- [ ] **1b. Test e2e que falla** en `server/test/spawns.e2e-spec.ts`, dentro del `describe` de `GET /spawns` (reusar
+- [x] **1b. Test e2e que falla** en `server/test/spawns.e2e-spec.ts`, dentro del `describe` de `GET /spawns` (reusar
   el jugador/token de ese archivo): `expect(['clear','cloudy','rain','snow','fog','windy']).toContain(res.body.weather)`
   y `expect(typeof res.body.night).toBe('boolean')`. `cd server && npm run test:e2e -- spawns` → FALLA.
-- [ ] **1c.** En `spawns.service.ts`: borrar las interfaces locales `VisibleSpawn`/`NearbySpawns` e importarlas de
+- [x] **1c.** En `spawns.service.ts`: borrar las interfaces locales `VisibleSpawn`/`NearbySpawns` e importarlas de
   `../../../shared/protocol/spawns.js` (D-024: ruta relativa con `.js`); en `near()`:
 
 ```ts
@@ -878,7 +878,7 @@ export interface NearbySpawns {
 
   (El clima ya está en caché por celda y franja, D-025: no añade peticiones a Open-Meteo.) `spawns.controller.ts`
   importa `NearbySpawns` del mismo sitio.
-- [ ] **1d.** e2e → PASA; `npm run build` y `npm test` del servidor en verde. Commit
+- [x] **1d.** e2e → PASA; `npm run build` y `npm test` del servidor en verde. Commit
   `F1-04: clima y noche en GET /spawns (contrato en shared/protocol)` + `/guardar`.
 
 ### Paso 2 — Día/noche (puro)
