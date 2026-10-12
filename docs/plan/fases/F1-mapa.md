@@ -766,15 +766,15 @@ export class AvatarMotion {
 
 **Files:** Create `src/app/shared/ui/joystick.component.ts`
 
-- [ ] **6a.** Componente `app-joystick` (`output vector = { dx, dy }` en radios, emite en cada `pointermove` y
+- [x] **6a.** Componente `app-joystick` (`output vector = { dx, dy }` en radios, emite en cada `pointermove` y
   `{0,0}` al soltar). Pointer Events con `setPointerCapture`, base de 120 px de vidrio (DISENO §1: `var(--surface)`,
   `backdrop-filter`), mando de 52 px que sigue al dedo 1:1 limitado al radio y vuelve al centro con
   `transition: transform var(--dur-small) var(--ease-out)` (solo al soltar). `touch-action: none`. Háptico `tap()` al
   agarrar. `aria-label="Joystick: mover al personaje"`. Posición: abajo a la izquierda, por encima de
   `var(--ion-safe-area-bottom)`.
-- [ ] **6b.** Uso en la pantalla: cada frame, `const v = joystickVelocity(dx, dy, cameraHeading)` →
+- [ ] **6b.** (se hace en el paso 8, en `/dev/mapa`) Uso en la pantalla: cada frame, `const v = joystickVelocity(dx, dy, cameraHeading)` →
   `location.nudge(v.east * dt, v.north * dt)`.
-- [ ] **6c.** Lint + build. Commit `F1-03: joystick en pantalla` + `/guardar`.
+- [x] **6c.** Lint + build. Commit `F1-03: joystick en pantalla` + `/guardar`.
 
 ### Paso 7 — Pantalla de permisos diseñada (DISENO §6)
 
