@@ -318,7 +318,7 @@ detrás del objetivo. Si en el móvil se nota retraso, bajar `WINDOW` a 3 (y ano
 **Files:** Create `src/app/game/geo/angles.ts`, `src/app/game/geo/joystick-math.ts`; Tests `angles.spec.ts`,
 `joystick-math.spec.ts` (misma carpeta).
 
-- [ ] **3a. Tests que fallan:**
+- [x] **3a. Tests que fallan:**
 
 ```ts
 // angles.spec.ts
@@ -370,8 +370,8 @@ describe('joystickVelocity', () => {
 });
 ```
 
-- [ ] **3b.** `npx ng test --watch=false --include "src/app/game/geo/*.spec.ts"` → FALLA.
-- [ ] **3c. Implementación:**
+- [x] **3b.** `npx ng test --watch=false --include "src/app/game/geo/*.spec.ts"` → FALLA.
+- [x] **3c. Implementación:**
 
 ```ts
 // angles.ts — grados de brújula: 0 = norte, sentido horario.
@@ -422,8 +422,8 @@ export function joystickVelocity(dx: number, dy: number, headingDeg: number): { 
 Ojo en el test "arriba del todo": con `dy = -1`, `mag = 1` → `speed = MAX`; la velocidad crece desde 0 al salir de la
 zona muerta (sin salto).
 
-- [ ] **3d.** Mismo comando → PASA (8 tests).
-- [ ] **3e.** Commit `F1-03: ángulos y joystick con tests` + `/guardar`.
+- [x] **3d.** Mismo comando → PASA (8 tests).
+- [x] **3e.** Commit `F1-03: ángulos y joystick con tests` + `/guardar`.
 
 ### Paso 4 — `LocationService` y `CompassService`
 
