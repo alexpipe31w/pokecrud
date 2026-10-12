@@ -92,7 +92,7 @@
       52,3 fps. **Plan A, máximo 30 Pokémon dibujados** (D-035). Evidencias `F1-01_0{3,4}_redmi-*.png`.
 - [x] **F1-02 · Plan detallado de F1** (@samuel, 2026-10-12) (`docs/plan/fases/F1-mapa.md`). Dep: F1-01.
       **Hecho:** plan de F1-03, F1-04, F1-05 y F1-07 con archivos, código y tests (TDD), pasos con casilla y riesgos.
-- [ ] **F1-03 · Ubicación y brújula** — `LocationService` (watch, suavizado, descarte de saltos),
+- [~] **F1-03 · Ubicación y brújula** (@kenneth, 2026-10-12) — `LocationService` (watch, suavizado, descarte de saltos),
       `CompassService`, modo joystick, pantalla de permisos diseñada.
       Dep: F1-02. Criterio: tests del filtro; avatar se mueve suave caminando de verdad y con joystick.
 - [ ] **F1-04 · Pantalla Mapa** — mapa como ruta principal (`/mapa`), estilo día/noche, cámara que sigue
