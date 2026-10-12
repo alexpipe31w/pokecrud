@@ -256,3 +256,62 @@ curl https://pokecrud-server.onrender.com/health/ready → {"status":"ok","db":"
   **Decisiones nuevas:** D-018.
   **El siguiente debe empezar por:** poner `JWT_SECRET` en Render, mezclar el PR de F0-07 y comprobar
   `https://pokecrud-server.onrender.com/health/ready`; luego `/inicio F0-08` o `/inicio F0-09`.
+
+## 2026-10-11 18:30 · @kenneth (Claude) · F0-08 · rama `feature/F0-08-crud-nest`
+
+**Qué se hizo:** F0-08 pasos 1-8 (plan `fases/F0-fundaciones.md`), tests e2e escritos antes del código.
+
+- Configurado `server/.env` (OK, con `JWT_SECRET` propio) y `environment.local.ts` (sin probar: aún no hay mapa).
+- **Base:** modelos `InventoryPokemon`, `Team`, `Favorite`, `CustomPokemon` (FK a `Player` con cascada) y migración
+  `crud_curso` generada con `migrate diff` + CHECKs (`stock_nonneg`, `price_nonneg`, `rating_range`, `max_six`),
+  **aplicada en Supabase** con `migrate deploy`. Semilla `npm run db:seed` (tsx), idempotente y no destructiva; **cargada**.
+- **Servidor:** módulos `inventory` (`/pokemon`), `teams`, `favorites`, `custom-pokemon` + `common/` (consulta tipo JSON
+  Server, paginación, errores Prisma, límite de escritura 30/min). `X-Total-Count` expuesta por CORS.
+- **App:** `apiUrl` unificado en `serverUrl` (dev :3000), `authGuard` en agregar/editar, specs adaptados.
+- **Postman:** colección reescrita (login previo, Bearer de colección, ids encadenados, 79 `pm.test`, id 99150 para no
+  tocar los 151). JSON Server archivado en `backend/legacy/`, sin `npm run api`/`api:reset` ni `json-server`. READMEs.
+- Fallo propio corregido a tiempo: la 1.ª semilla metía los favoritos con `id` explícito y la secuencia quedaba en 1
+  (el siguiente alta habría chocado); se borraron esos 3, se re-sembró sin ids y se comprobó la secuencia.
+- e2e intermitente (registro 500): causa medida = `EMAXCONNSESSION`, el session pooler admite 15 clientes en total →
+  e2e en serie (`fileParallelism: false`) y tarea nueva F0-10 para el riesgo en producción.
+
+**Archivos clave:** `server/prisma/schema.prisma`, `server/prisma/migrations/20261011230000_crud_curso/`,
+`server/prisma/seed.ts`, `server/src/{common,inventory,teams,favorites,custom-pokemon}/`, `server/test/crud.e2e-spec.ts`,
+`server/vitest.config.e2e.ts`, `src/environments/*`, `src/app/app.routes.ts`, `src/app/services/pokemon.service.ts`,
+`backend/postman/PokeCRUD.postman_collection.json`, `backend/legacy/`.
+**Cómo se probó (salida real):**
+
+    server: npm test → Tests 11 passed (11) · npm run test:e2e ×3 → Tests 43 passed (43) (18 auth/health + 25 CRUD)
+            lint → solo el aviso previo de auth.e2e-spec.ts:198 · build OK
+    mutación: quitar playerId del where de teams.get → "expected 404, got 200" (el test protege la regla)
+    db:seed ×2 → "pokemon: 0 creados, 151 ya existían · demo: 2 equipos, 3 favoritos, 1 personalizados" (~5 s)
+    app: npm run test:all → 92/92 + shared 10/10 · lint OK · build OK
+    newman 6.2.1 ×4 → requests 44 / 0 failed · assertions 79 / 0 failed (docs/evidencias/F0-08_01_newman-runner.txt)
+    navegador (Nest :3000 + app :4200): Pokédex 151 sin sesión · "+" sin sesión → /login?redirect=/pokemon/nuevo ·
+      registro → agregar Lucario POST 201 (152) · recargar /editar mantiene sesión · PUT 200 ($19.999) · DELETE 200 (151)
+      · 0 errores de consola. Cuenta de prueba @pokecrud.test (la borran los e2e).
+
+**Quedó a medias / roto:** solo la captura del Runner de Postman (criterio de F0-08) → sigue `[~]`, sin PR. Vista móvil
+390×844 sin comprobar (Chrome no se dejó redimensionar).
+**Decisiones nuevas:** D-019.
+**El siguiente debe empezar por:** (Kenneth) `cd server && npm run start:dev`, Postman → importar
+`backend/postman/PokeCRUD.postman_collection.json` → Run collection → guardar captura como
+`docs/evidencias/F0-08_01_postman-runner-nest.png`, marcar F0-08 `[x]` y abrir el PR a `develop`.
+
+## 2026-10-11 18:50 · @kenneth (Claude) · F0-08 (cierre) · rama `feature/F0-08-crud-nest`
+
+**Qué se hizo:** Runner de Postman ejecutado por Kenneth contra Nest local → F0-08 `[x]` y PR a `develop`. Postman en
+modo local crea `postman/` y `.postman/` en la raíz del repo (copia YAML + id del workspace): añadidas al `.gitignore`.
+**Archivos clave:** `docs/evidencias/F0-08_01_postman-runner-nest.png`, `.gitignore`.
+**Cómo se probó (salida real):**
+
+    Postman Runner: All tests 79 · Passed 79 · Failed 0 · Errors 0 · 15 s (captura)
+
+**Quedó a medias / roto:** nada en F0-08. Pendiente: riesgo del pooler (F0-10).
+**Vista móvil (añadido):** Chrome headless con `Emulation.setDeviceMetricsOverride` 390×844 (CDP): Pokédex, detalle
+#150 y `/pokemon/nuevo` sin sesión → `/login`; `innerWidth` 390 y `scrollWidth` 390 (sin scroll horizontal) en las
+cuatro. Ojo: `--window-size` de Chrome headless no baja de 500 px (las capturas salen recortadas), hay que usar CDP.
+Evidencias `docs/evidencias/F0-08_0{2,3,4}_movil-*.png`.
+**Decisiones nuevas:** ninguna (D-019 en la entrada anterior).
+**El siguiente debe empezar por:** mezclar el PR de F0-08, comprobar `https://pokecrud-server.onrender.com/pokemon?_limit=1`
+y luego `/inicio F0-10` (transaction pooler) o `/inicio F0-09` (APK).

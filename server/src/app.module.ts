@@ -6,9 +6,13 @@ import { APP_GUARD, APP_PIPE } from '@nestjs/core';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { LoggerModule } from 'nestjs-pino';
 import { AuthModule } from './auth/auth.module.js';
+import { CustomPokemonModule } from './custom-pokemon/custom-pokemon.module.js';
+import { FavoritesModule } from './favorites/favorites.module.js';
 import { validateEnv } from './config/env.validation.js';
 import { HealthModule } from './health/health.module.js';
+import { InventoryModule } from './inventory/inventory.module.js';
 import { PrismaModule } from './prisma/prisma.module.js';
+import { TeamsModule } from './teams/teams.module.js';
 
 const isProd = process.env['NODE_ENV'] === 'production';
 const isTest = Boolean(process.env['VITEST']);
@@ -54,6 +58,11 @@ function requestId(req: IncomingMessage, res: ServerResponse): string {
     PrismaModule,
     HealthModule,
     AuthModule,
+    // CRUD del curso (F0-08), mismo contrato que JSON Server.
+    InventoryModule,
+    TeamsModule,
+    FavoritesModule,
+    CustomPokemonModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: ThrottlerGuard },

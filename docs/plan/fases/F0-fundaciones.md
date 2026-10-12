@@ -1325,7 +1325,7 @@ data: { revokedAt: now } })`; si `count === 0` → buscar por `tokenHash`: si ex
 contrato** de JSON Server que usan: `GET/POST/PUT/PATCH/DELETE` en `/pokemon`, `/teams`, `/favorites`,
 `/customPokemon`, `GET /pokemon?_sort=id&_order=asc` y `GET /pokemon?name_like=mew`.
 
-- [ ] **Paso 1: modelos Prisma** (migración `crud_curso`):
+- [x] **Paso 1: modelos Prisma** (migración `crud_curso`):
 
 ```prisma
 model InventoryPokemon {          // `/pokemon` de IS-11: catálogo/inventario compartido
@@ -1386,29 +1386,29 @@ Añadir `CHECK` en la migración SQL generada (editar antes de `migrate deploy`)
 `ALTER TABLE "Favorite" ADD CONSTRAINT rating_range CHECK (rating BETWEEN 1 AND 5);`
 `ALTER TABLE "Team" ADD CONSTRAINT max_six CHECK (cardinality("pokemonIds") <= 6);`
 
-- [ ] **Paso 2: semilla** — `server/prisma/seed.ts` lee `../backend/db.seed.json` y hace `upsert` por id
+- [x] **Paso 2: semilla** — `server/prisma/seed.ts` lee `../backend/db.seed.json` y hace `upsert` por id
       de los 151 de `pokemon` (idempotente: se puede correr N veces). Los `teams/favorites/customPokemon` de
       ejemplo se crean para un jugador demo `demo@pokecrud.test` (también con upsert). Script `"db:seed"`.
-- [ ] **Paso 3: reglas de acceso** (tests e2e primero, uno por regla):
+- [x] **Paso 3: reglas de acceso** (tests e2e primero, uno por regla):
   - `/pokemon`: lectura pública; escritura requiere sesión (cualquier jugador; es el inventario de la clase).
   - `/teams`, `/favorites`, `/customPokemon`: requieren sesión y **todas las consultas filtran por
     `playerId` del token**. Pedir/editar/borrar el id de otro jugador → **404** (no 403: no revelar que existe).
   - Validación con DTOs equivalentes a los de IS-11 (`pokemonIds` máx. 6, `rating` 1-5, `price ≥ 0`, `stock ≥ 0`).
-- [ ] **Paso 4: compatibilidad de consultas** — implementar SOLO lo que se usa: `_sort` (`id|name|price|stock`)
+- [x] **Paso 4: compatibilidad de consultas** — implementar SOLO lo que se usa: `_sort` (`id|name|price|stock`)
       y `_order` (`asc|desc`), `name_like` (→ `contains`, `mode: 'insensitive'`), y paginación `_page`/`_limit`.
       Límite por defecto: `/pokemon` hasta 1025 (tabla acotada por el nº de especies, la app de IS-11 pide
       todo); el resto 50, máximo 100. `PUT` reemplaza, `PATCH` mezcla; `POST /pokemon` con id repetido → 409.
-- [ ] **Paso 5: la app** — `PokemonService` de IS-11 no cambia de URL (`environment.apiUrl`); comprobar que
+- [x] **Paso 5: la app** — `PokemonService` de IS-11 no cambia de URL (`environment.apiUrl`); comprobar que
       la Pokédex funciona igual contra Nest (`npm run start:dev` en `server/` en lugar de `npm run api`).
       Quitar la excepción temporal de rutas públicas de F0-07 Paso 8 SOLO para equipos/favoritos/personalizados.
-- [ ] **Paso 6: Postman** — actualizar `backend/postman/PokeCRUD.postman_collection.json`: variable
+- [x] **Paso 6: Postman** — actualizar `backend/postman/PokeCRUD.postman_collection.json`: variable
       `baseUrl` → `http://localhost:3000`, petición previa de login que guarda `accessToken` en una variable de
       colección y `Authorization: Bearer {{accessToken}}` en las carpetas protegidas. Ejecutar el Runner entero:
       captura `docs/evidencias/F0-08_01_postman-runner-nest.png` con todo en verde.
-- [ ] **Paso 7: archivar JSON Server** — mover `backend/db.json`, `db.seed.json` a `backend/legacy/`,
+- [x] **Paso 7: archivar JSON Server** — mover `backend/db.json`, `db.seed.json` a `backend/legacy/`,
       quitar `npm run api`/`api:reset` del `package.json` raíz y actualizar el README ("Cómo correr").
       (`seed.ts` lee de `backend/legacy/db.seed.json` desde este paso.)
-- [ ] **Paso 8: verificar** (todas las suites + Runner de Postman) y commit `F0-08: CRUD del curso en NestJS`.
+- [x] **Paso 8: verificar** (todas las suites + Runner de Postman) y commit `F0-08: CRUD del curso en NestJS`.
 
 ---
 

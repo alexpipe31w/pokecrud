@@ -133,3 +133,30 @@ según el orden (pasó con HapticsService: 1 de 4 corridas). Por eso plugins y A
 - **Deuda conocida:** el registro responde 409 "Ese correo ya está registrado" (el plan lo pide; revela qué correos
   existen, aceptado en un juego). Apodos únicos distinguiendo mayúsculas ("Ash" ≠ "ash"). Los `RefreshToken`
   caducados no se borran todavía (tarea de limpieza futura).
+
+## D-019 · CRUD del curso en Nest (F0-08): lo que se añadió al plan y por qué (2026-10-11, Kenneth)
+
+- **Un solo servidor en desarrollo, puerto 3000.** JSON Server queda archivado en `backend/legacy/` (sin `npm run api`),
+  así que `environment.apiUrl` desaparece y todo usa `environment.serverUrl` (cierra lo previsto en D-018). El
+  interceptor ya pone el token a `/pokemon` sin cambios.
+- **`/pokemon`: leer es público, escribir exige sesión** (plan). En la app, `/pokemon/nuevo` y `/pokemon/:id/editar`
+  llevan `authGuard`; la Pokédex y el detalle siguen públicos.
+- **Contrato JSON Server conservado:** listas como array plano, `X-Total-Count` solo si llegan `_page`/`_limit`
+  (expuesta por CORS), DELETE → 200 `{}`. Los `createdAt`/`updatedAt` que mandan los clientes se aceptan y se ignoran.
+  Un `id` en el cuerpo de PUT/PATCH distinto del de la ruta → 400. Parámetros de consulta desconocidos → 400
+  (JSON Server los ignoraba; aquí manda `forbidNonWhitelisted`).
+- **Lo ajeno da 404** (no 403): `where: { id, playerId }` en toda lectura/escritura; `playerId` nunca sale en la respuesta.
+- **CHECK extra `price_nonneg`** además de los tres del plan. Favorito repetido → 409 (lo decide el UNIQUE, sin SELECT previo).
+- **Jugador demo de la semilla = `demo@pokecrud.invalid`**, no `@pokecrud.test` como decía el plan: los e2e borran todos
+  los `@pokecrud.test` al terminar y se llevarían los datos de ejemplo. Contraseña aleatoria descartada: nadie entra.
+- **Semilla no destructiva:** `createMany` + `skipDuplicates` (ON CONFLICT DO NOTHING): crea lo que falta y nunca pisa
+  precios/stock editados por la clase. Sin ids explícitos en tablas con secuencia (un id explícito no la avanza).
+  Se ejecuta con `tsx` (devDependency exacta).
+- **Postman re-ejecutable:** la colección registra un jugador `postman+…@pokecrud.test`, usa su token (auth Bearer a
+  nivel de colección), encadena los ids que devuelve el servidor y en `/pokemon` usa el id 99150 (fuera de la
+  Pokédex) con limpieza previa, para no tocar los 151 de la clase en la base compartida.
+- **e2e en serie (`fileParallelism: false`).** El _session pooler_ de Supabase admite **15 clientes en total**
+  (`EMAXCONNSESSION`, comprobado): cuatro archivos e2e en paralelo con pool 5 cada uno lo desbordaban y el registro
+  daba 500 de forma intermitente.
+- **Riesgo abierto (tarea F0-10):** Render (5) + el servidor local de cada compañero (5 c/u) también comparten esos 15.
+  Con los tres desarrollando a la vez, producción puede dar 500. Ver ROADMAP F0-10.

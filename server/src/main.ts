@@ -21,6 +21,8 @@ async function bootstrap(): Promise<void> {
       .split(',')
       .map((s) => s.trim()),
     credentials: false,
+    // Total de un listado paginado (contrato de JSON Server con _page/_limit).
+    exposedHeaders: ['X-Total-Count'],
   });
   app.enableShutdownHooks();
   await app.listen(Number(process.env['PORT'] ?? 3000), '0.0.0.0');

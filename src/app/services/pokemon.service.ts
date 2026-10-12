@@ -5,11 +5,11 @@ import { Observable, catchError, map, of, tap } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { Pokemon, PokemonDraft } from '../models/pokemon.model';
 
-/** CRUD de los Pokémon guardados en el backend propio (JSON Server → `/pokemon`). */
+/** CRUD del inventario de Pokémon (`/pokemon` del servidor NestJS; leer es público, escribir exige sesión). */
 @Injectable({ providedIn: 'root' })
 export class PokemonService {
   private readonly http = inject(HttpClient);
-  private readonly url = `${environment.apiUrl}/pokemon`;
+  private readonly url = `${environment.serverUrl}/pokemon`;
   private readonly _version = signal(0);
 
   /** Cambia cada vez que se crea, edita o elimina un Pokémon (para recargar listas). */
@@ -23,7 +23,7 @@ export class PokemonService {
     return this.http.get<Pokemon>(`${this.url}/${id}`);
   }
 
-  /** `true` si el Pokémon ya está guardado (JSON Server responde 404 si no). */
+  /** `true` si el Pokémon ya está guardado (el servidor responde 404 si no). */
   exists(id: number): Observable<boolean> {
     return this.getById(id).pipe(
       map(() => true),
