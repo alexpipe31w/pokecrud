@@ -52,6 +52,12 @@
 ## En curso
 
 - **F1-01 (Alex, rama `feature/F1-01-spike-mapa-3d`):** spike Google Maps 3D + three.js, medir fps.
+  **Punto de guardado:** página `/dev/mapa` HECHA (mapa vectorial inclinado + escena three.js o markers HTML, medidor
+  de fps y botón "Medir batería" de 7 configuraciones; resultados en pantalla y en consola `[F1-01]`). Medido en PC
+  (RTX 5070): ~177 fps en todo, no discrimina. APK de producción generado (8,29 MB). **Falta:** instalar en un Android
+  real (`npm run apk -- --install` con el móvil por USB), entrar con una cuenta, abrir `/dev/mapa` (desde
+  chrome://inspect → consola: `location.href='/dev/mapa'`), pulsar "Medir batería", pegar los resultados en la
+  bitácora y escribir la decisión plan A/B en DECISIONES.
 - F0-12 (Alex) espera revisión: PR #21.
 
 ## Siguiente paso concreto
