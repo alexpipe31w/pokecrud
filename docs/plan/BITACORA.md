@@ -1070,3 +1070,16 @@ Música separada en F2-10.
 **Quedó a medias / roto:** nada de F2-08. Música = F2-10.
 **Decisiones nuevas:** D-044.
 **El siguiente debe empezar por:** leer el RELEVO de ESTADO (Samuel).
+
+## 2026-10-12 19:55 · @alex (Claude) · seguridad del APK (pendiente de F8-04) · rama `feature/F8-04-sin-logs-capacitor`
+
+**Qué se hizo:** `capacitor.config.ts` → `loggingBehavior: devDevice ? 'debug' : 'none'`. El registro de Capacitor
+imprimía lo que pasa por los plugins (el refresh token de `SecureStorage`, visto en F1-03) y `npm run apk` siempre
+compila un APK de DEPURACIÓN, así que el APK de Render también lo registraba.
+**Cómo se probó (salida real):**
+
+    CAP_DEV=1 npx tsx -e "import c from './capacitor.config.ts'…" → debug
+    CAP_DEV=0 … → none
+
+**Quedó a medias:** comprobarlo en un Android (`adb logcat | grep -i SecureStorage` tras iniciar sesión → nada).
+**El siguiente debe empezar por:** el RELEVO de ESTADO (Samuel).
