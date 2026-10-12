@@ -983,18 +983,18 @@ this.overlay.setMap(this.map);
 **Files:** Create `map-compass.component.ts`, `weather-chip.component.ts`, `ball-menu.component.ts` en
 `src/app/features/map/`
 
-- [ ] **7a. Arriba a la izquierda:** `app-player-hud` (ya existe, F1-08) con `BagService.load()` al entrar.
-- [ ] **7b. Arriba a la derecha:** `app-map-compass` (aguja que rota con `-heading`; toque → alterna "norte
+- [x] **7a. Arriba a la izquierda:** `app-player-hud` (ya existe, F1-08) con `BagService.load()` al entrar.
+- [x] **7b. Arriba a la derecha:** `app-map-compass` (aguja que rota con `-heading`; toque → alterna "norte
   arriba" / "sigue la brújula"; `aria-label` con el estado) y `app-weather-chip` (icono + texto en español del
   `weather` de `GET /spawns`; en F1-04 se pide `/spawns` una vez al tener posición solo para el clima; F1-07 lo
   sustituye por `SpawnFeedService`). Sin datos → no se muestra (nunca "undefined").
-- [ ] **7c. Abajo en el centro:** `app-ball-menu`: botón Poké Ball de 72 px (rojo `--accent`, `scale(0.97)` en
+- [x] **7c. Abajo en el centro:** `app-ball-menu`: botón Poké Ball de 72 px (rojo `--accent`, `scale(0.97)` en
   `:active`, háptico + sonido de toque como `GameButton`) que abre una hoja (`--ease-drawer`, `--dur-panel`, se cierra
   arrastrando hacia abajo o tocando fuera) con: Pokédex (`/pokedex`), Combate de prueba (`/combate/prueba`), Joystick
   sí/no (`useJoystickAt(posición actual)` / `useGps()`), Reducir efectos, Cerrar sesión. (Mis Pokémon, Equipos,
   Favoritos se añaden cuando existan, F3.)
-- [ ] **7d.** Si `settings.joystickMode` → `app-joystick` abajo a la izquierda.
-- [ ] **7e.** Lint, `ng test`, build. Commit + `/guardar`.
+- [x] **7d.** Si `settings.joystickMode` → `app-joystick` abajo a la izquierda.
+- [x] **7e.** Lint, `ng test`, build. Commit + `/guardar`.
 
 ### Paso 8 — Prueba y evidencias
 

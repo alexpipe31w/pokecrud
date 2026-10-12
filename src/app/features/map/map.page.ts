@@ -7,19 +7,30 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { ThreeJSOverlayView } from '@googlemaps/three';
 import { IonContent, ViewDidEnter, ViewWillLeave } from '@ionic/angular';
 import { fromLocalM, toLocalM, type LatLng } from '@shared/engine/geo';
+import type { Weather } from '@shared/engine/spawns';
+import type { NearbySpawns } from '@shared/protocol/spawns';
+import { firstValueFrom, timeout } from 'rxjs';
 
+import { environment } from '../../../environments/environment';
+import { AuthService } from '../../core/auth/auth.service';
 import { MAPS_MAP_ID, loadMapsLibrary, mapsAuthFailed } from '../../core/maps/google-maps.loader';
 import { joystickVelocity } from '../../game/geo/joystick-math';
 import { AvatarMotion } from '../../game/map-scene/avatar-motion';
 import { isNightLocal } from '../../game/map-scene/day-night';
 import { MapScene, REANCHOR_M } from '../../game/map-scene/map-scene';
+import { BagService } from '../../services/game/bag.service';
 import { CompassService } from '../../services/location/compass.service';
 import { DEFAULT_CENTER, LocationService } from '../../services/location/location.service';
 import { JoystickComponent, type JoystickVector } from '../../shared/ui/joystick.component';
+import { PlayerHudComponent } from '../../shared/ui/player-hud.component';
+import { BallMenuComponent } from './ball-menu.component';
 import { LocationGateComponent } from './location-gate.component';
+import { MapCompassComponent } from './map-compass.component';
+import { WeatherChipComponent } from './weather-chip.component';
 
 const ZOOM = 18;
 const TILT = 67.5;
@@ -27,6 +38,8 @@ const TILT = 67.5;
 const NIGHT_CHECK_MS = 60_000;
 /** Google avisa de una clave rechazada llamando a `gm_authFailure` poco después de cargar: se mira pasado este tiempo. */
 const AUTH_CHECK_MS = 3000;
+/** El clima del HUD sale de `GET /spawns` (F1-07 lo cambia por el feed de spawns): sin respuesta en este tiempo, sin chip. */
+const WEATHER_TIMEOUT_MS = 8000;
 
 /**
  * Pantalla principal del juego (F1-04): Google Maps vectorial inclinado que sigue al jugador (GPS filtrado o
@@ -38,13 +51,37 @@ const AUTH_CHECK_MS = 3000;
  */
 @Component({
   selector: 'app-map',
-  imports: [IonContent, JoystickComponent, LocationGateComponent],
+  imports: [
+    IonContent,
+    BallMenuComponent,
+    JoystickComponent,
+    LocationGateComponent,
+    MapCompassComponent,
+    PlayerHudComponent,
+    WeatherChipComponent,
+  ],
   template: `
     <ion-content
       [scrollY]="false"
       style="--padding-top: 0; --padding-bottom: 0; --padding-start: 0; --padding-end: 0"
     >
       <div #mapEl class="map" [class.is-night]="night()"></div>
+
+      <!-- HUD (DISENO §1): placa del jugador arriba a la izquierda; brújula y clima arriba a la derecha. -->
+      <div class="hud">
+        @if (auth.player(); as p) {
+          <app-player-hud [nickname]="p.nickname" [xp]="p.xp" [balls]="bag.balls()" />
+        }
+        <div class="hud__right">
+          <app-map-compass
+            [heading]="cameraHeading()"
+            [northUp]="northUp()"
+            (modeToggle)="northUp.set(!northUp())"
+          />
+          <app-weather-chip [weather]="weather()" [night]="night()" />
+        </div>
+      </div>
+      <app-ball-menu />
 
       <app-location-gate [mapsError]="mapsError()" (retryMaps)="retryMaps()" />
       @if (location.status() === 'joystick') {
@@ -61,18 +98,48 @@ const AUTH_CHECK_MS = 3000;
     .map.is-night {
       background: var(--ink);
     }
+    .hud {
+      position: absolute;
+      z-index: 10;
+      top: calc(var(--ion-safe-area-top, 0px) + var(--s-3));
+      left: var(--s-3);
+      right: var(--s-3);
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: var(--s-2);
+      pointer-events: none;
+    }
+    .hud > *,
+    .hud__right > * {
+      pointer-events: auto;
+    }
+    .hud__right {
+      margin-left: auto;
+      display: grid;
+      justify-items: end;
+      gap: var(--s-2);
+      pointer-events: none;
+    }
   `,
 })
 export class MapPage implements ViewDidEnter, ViewWillLeave, OnDestroy {
   private readonly mapEl = viewChild.required<ElementRef<HTMLDivElement>>('mapEl');
   protected readonly location = inject(LocationService);
   private readonly compass = inject(CompassService);
+  private readonly http = inject(HttpClient);
+  protected readonly auth = inject(AuthService);
+  protected readonly bag = inject(BagService);
 
   protected readonly night = signal(isNightLocal(new Date()));
   /** Por qué no se pudo cargar Google Maps (la pantalla de estados lo muestra con "Reintentar"). */
   protected readonly mapsError = signal<string | null>(null);
-  /** `true` = norte siempre arriba; `false` = el mapa gira con la brújula (lo alterna la brújula del HUD, paso 7). */
-  readonly northUp = signal(false);
+  /** `true` = norte siempre arriba; `false` = el mapa gira con la brújula (lo alterna la brújula del HUD). */
+  protected readonly northUp = signal(false);
+  /** Rumbo de la cámara redondeado a grados (para la aguja del HUD; no cambia en cada fotograma). */
+  protected readonly cameraHeading = signal(0);
+  /** Clima de la celda del jugador (GET /spawns); null = sin datos todavía o el servidor no respondió. */
+  protected readonly weather = signal<Weather | null>(null);
   /** Último vector del joystick (se lee en cada fotograma; no hace falta que sea signal). */
   protected joy: JoystickVector = { dx: 0, dy: 0 };
 
@@ -86,6 +153,8 @@ export class MapPage implements ViewDidEnter, ViewWillLeave, OnDestroy {
   private lastFrame = 0;
   private nightTimer?: ReturnType<typeof setInterval>;
   private active = false;
+  /** El clima se pide una vez por visita, en cuanto hay posición. */
+  private weatherAsked = false;
   private destroyed = false;
 
   constructor() {
@@ -95,6 +164,8 @@ export class MapPage implements ViewDidEnter, ViewWillLeave, OnDestroy {
   ionViewDidEnter(): void {
     if (this.active || this.destroyed) return;
     this.active = true;
+    this.weatherAsked = false;
+    void this.bag.load();
     this.compass.start();
     void this.startLocation();
     this.lastFrame = 0;
@@ -208,8 +279,14 @@ export class MapPage implements ViewDidEnter, ViewWillLeave, OnDestroy {
       const v = joystickVelocity(this.joy.dx, this.joy.dy, heading);
       if (v.east || v.north) this.location.nudge(v.east * dt, v.north * dt);
     }
+    const rounded = Math.round(heading);
+    if (rounded !== this.cameraHeading()) this.cameraHeading.set(rounded);
     const pos = this.location.position();
     if (!pos) return;
+    if (!this.weatherAsked) {
+      this.weatherAsked = true;
+      void this.loadWeather(pos);
+    }
     if (!this.origin) {
       // Primera posición: la escena se ancla aquí y el avatar aparece sin animar.
       this.origin = { lat: pos.lat, lng: pos.lng };
@@ -228,6 +305,22 @@ export class MapPage implements ViewDidEnter, ViewWillLeave, OnDestroy {
     }
     this.mapScene.setPlayer(f, now);
     this.map.moveCamera({ center: fromLocalM(this.origin, f.east, f.north), heading });
+  }
+
+  /** Clima para el HUD. Si falla (sin red, servidor durmiendo, sin SPAWN_SALT → 503), simplemente no hay chip. */
+  private async loadWeather(at: LatLng): Promise<void> {
+    try {
+      const res = await firstValueFrom(
+        this.http
+          .get<NearbySpawns>(`${environment.serverUrl}/spawns`, {
+            params: { lat: at.lat, lng: at.lng },
+          })
+          .pipe(timeout(WEATHER_TIMEOUT_MS)),
+      );
+      this.weather.set(res.weather ?? null);
+    } catch (err) {
+      console.warn('[mapa] sin clima', err);
+    }
   }
 
   /** Dónde poner la cámara al crear el mapa: el avatar si ya hay posición, si no el centro por defecto. */

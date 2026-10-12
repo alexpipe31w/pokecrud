@@ -121,7 +121,7 @@ servidor (F2-06) hechas; lo visual del encuentro espera al spike F2-01 (cámara 
 ## En curso
 
 - **F1-04 (Kenneth, rama `feature/F1-04-pantalla-mapa`)**: reclamada 2026-10-12. Sigue `docs/plan/fases/F1-mapa.md` → F1-04.
-  **Punto de guardado:** paso 1 hecho (`GET /spawns` devuelve `weather` y `night`; contrato en `shared/protocol/spawns.ts`; e2e 67/67). Paso 2 hecho (`day-night.ts`). Paso 3 hecho (rutas: `/mapa` principal con un esqueleto de `MapPage`, `/pokedex` con botón atrás, fuera las pestañas). Paso 4 hecho (`MapScene` con luces propias día/noche y spec). Paso 5 hecho (`MapPage`: mapa día/noche, overlay, bucle, cámara; pausa al salir con `ionViewWillLeave`). Paso 6 hecho (error de Maps → "No se pudo cargar el mapa" + Reintentar). Paso 7 a medias: `app-weather-chip` y `app-map-compass` hechos con tests (sin montar aún en `/mapa`); falta `app-ball-menu` y montarlo todo en `MapPage` (7a-7e).
+  **Punto de guardado:** paso 1 hecho (`GET /spawns` devuelve `weather` y `night`; contrato en `shared/protocol/spawns.ts`; e2e 67/67). Paso 2 hecho (`day-night.ts`). Paso 3 hecho (rutas: `/mapa` principal con un esqueleto de `MapPage`, `/pokedex` con botón atrás, fuera las pestañas). Paso 4 hecho (`MapScene` con luces propias día/noche y spec). Paso 5 hecho (`MapPage`: mapa día/noche, overlay, bucle, cámara; pausa al salir con `ionViewWillLeave`). Paso 6 hecho (error de Maps → "No se pudo cargar el mapa" + Reintentar). Paso 7 hecho (HUD: placa + mochila, brújula norte-arriba/sigue, chip del clima desde `GET /spawns`, menú de la Poké Ball con Pokédex, Combate, Joystick, Reducir efectos y Cerrar sesión). Sigue el paso 8 (prueba en navegador con capturas de día y de noche, y en Android).
 
 ## Siguiente paso concreto
 
