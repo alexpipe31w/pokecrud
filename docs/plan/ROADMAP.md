@@ -139,7 +139,8 @@
 
 ## F4 · Motor de combate y combate contra IA
 
-- [~] **F4-01 · Plan detallado de F4.** (@alex, 2026-10-11) Dep: F0-03.
+- [x] **F4-01 · Plan detallado de F4.** (@alex, 2026-10-11) Dep: F0-03.
+      **Hecho:** `docs/plan/fases/F4-combate.md` (contrato del motor, reglas, 550/706 movimientos en v1, pasos por tarea).
 - [ ] **F4-02 · Tabla de tipos y stats** — `type-chart.ts`, `stats.ts` con tests (18×18 completa). Dep: F4-01.
 - [ ] **F4-03 · Daño, precisión, crítico, prioridad** — `damage.ts` con tests comparados con una
       calculadora pública (anotar los casos). Dep: F4-02.

@@ -3,7 +3,7 @@
 > Se **reescribe** al cerrar cada sesión (no es histórico; el histórico es `BITACORA.md`).
 > Máximo una pantalla. Si lees esto al empezar: después lee `ROADMAP.md`.
 
-**Última actualización:** 2026-10-11 · por Alex (Claude) · rama `feature/F2-06-captura-servidor` (PR abierto)
+**Última actualización:** 2026-10-11 · por Alex (Claude) · rama `feature/F4-01-plan-combate` (PR abierto)
 
 ## Fase actual
 
@@ -11,6 +11,9 @@
 
 ## Hecho
 
+- **F4-01 (Alex, PR abierto; sale de F2-06):** plan del motor de combate en `docs/plan/fases/F4-combate.md`: contrato
+  `resolveTurn(state, actions, rng) → {state, events}`, reglas Gen V+, 550 de 706 movimientos en la v1 y el hueco del
+  dataset (falta `target` de los cambios de stats y `flinchChance`; se arregla en F4-02 paso 1).
 - **F2-06 (Alex, rama `feature/F2-06-captura-servidor`, PR abierto; sale de F2-03):** captura autoritativa.
   `GET /encounters/:id` (datos para la escena) y `POST /encounters/:id/throw` (una transacción: franja viva, ≤ 80 m,
   gasto atómico de bola/baya, RNG del servidor, `CaughtPokemon`, XP; idempotente por `clientThrowId`). `GET /spawns`
@@ -68,7 +71,6 @@
 
 ## En curso
 
-- **F4-01 (Alex, rama `feature/F4-01-plan-combate`, sale de F2-06):** plan detallado del motor de combate.
 - Esperan revisión **en orden** (ver PENDIENTES DE HUMANOS): #21 → #22 → #23 → #24 → #25.
 - **F1-01 → PENDIENTE DE KENNETH** (medir fps en su Android): rama `feature/F1-01-spike-mapa-3d`, instrucciones
   exactas en la última entrada de F1-01 de la bitácora.

@@ -500,3 +500,19 @@ transacción (maxWait 5 s, timeout 10 s) y el del test.
 **Decisiones nuevas:** D-028.
 **El siguiente debe empezar por:** mezclar en orden #21 → #22 → #23 → #24 → este. Siguiente libre sin móvil: F4-01
 (plan del motor de combate) o F2-08 (audio).
+
+## 2026-10-11 22:40 · @alex (Claude) · F4-01 · rama `feature/F4-01-plan-combate` (sale de F2-06)
+
+**Qué se hizo:** plan de la fase 4 en `docs/plan/fases/F4-combate.md`: contrato del motor (estado, acciones, eventos),
+reglas Gen V+ (stats, orden, daño con `floor` por pasos como Showdown, crítico por etapas, precisión, estados con
+inmunidades por tipo, efectos), alcance medido y pasos con casillas para F4-02…F4-06.
+**Cómo se midió el alcance (salida real, `moves.json`):**
+
+    total 706 | con poder 442 | de daño sin poder fijo 30 (guillotine, sonic-boom, seismic-toss…)
+    estado 234 | soportables (stats/estado/curación) 108 | sin efecto soportado 126 (whirlwind, reflect, metronome…)
+    multigolpe 24 | drenan 10 | retroceso 9 | prioridad≠0 49 | critRate>0 23 → v1 = 550/706 (78 %)
+
+**Hallazgo:** `moves.json` no trae `target` (a quién afectan los cambios de stats) ni `flinchChance`: sin `target`,
+"Puño Incremento" subiría el ataque del rival. Es el paso 1 de F4-02 (regenerar el dataset).
+**Quedó a medias / roto:** nada (es un documento).
+**El siguiente debe empezar por:** `/inicio F4-02` y seguir sus casillas en el plan.
