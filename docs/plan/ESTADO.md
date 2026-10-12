@@ -151,13 +151,16 @@ servidor (F2-06) hechas; lo visual del encuentro espera al spike F2-01 (cámara 
 
 **Kenneth:**
 
-- [ ] Probar el combate en su Android: APK → `/dev/ui` → "Combate de prueba"; que vaya fluido y se oigan los gritos.
+- [x] Probar el combate en su Android (2026-10-12): 2 combates enteros en el Samsung A36, fluido (mediana 104 fps), gritos y
+      vibración OK. Evidencias `F4-05_{07..10}_a36-*.jpg`.
 - [x] ~~**F1-01:** medir fps en su Android~~ → la retoma Samuel en su Redmi Note 10 (2026-10-12).
 - [x] Su `server/.env`: `SPAWN_SALT` propia (64 caracteres) y `DATABASE_URL` en 6543 comprobado. (2026-10-12)
 
 **Quien coja F2-08 (audio):**
 
 - [ ] SFX de golpe/crítico/debilitado para la escena de combate (hoy solo hay gritos y vibración).
+- [ ] Precargar los gritos del combate al elegir rival: en el A36 con datos móviles los de Pikachu y Goldeen tardaron
+      más de `CRY_TIMEOUT_MS` (6 s) y no sonaron en el primer combate (`TimeoutError`); en el segundo, sí.
 
 **Quien coja F8-02 / F8-04 (rendimiento y APK de release):**
 

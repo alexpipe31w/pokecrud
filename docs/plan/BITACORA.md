@@ -843,3 +843,24 @@ paso: tras cambiar de datos a Wi-Fi el WebView daba `ERR_NAME_NOT_RESOLVED` hast
 **Decisiones nuevas:** D-037.
 **El siguiente debe empezar por:** mezclar el PR de F1-03 y coger F1-04 siguiendo `docs/plan/fases/F1-mapa.md` desde su
 paso 1 (contrato de `/spawns` en `shared/protocol/spawns.ts`), leyendo antes la nota "Hecho (Kenneth…)" de F1-03.
+
+## 2026-10-12 14:05 · @kenneth (Claude) · F4-05 (pendiente: probar en Android) · rama `feature/F1-03-ubicacion-brujula`
+
+**Qué se hizo:** prueba del combate de prueba (`/combate/prueba`) en el Samsung A36 (pendiente de Kenneth desde F4-05).
+APK de producción de F1-03; se llegó a la pantalla por CDP (`adb forward` + `history.pushState`, D-037). Dos combates
+enteros contra Nadadora Marina (Normal), con cambios de Pokémon, críticos, parálisis, veneno y la curación del rival.
+Kenneth grabó la pantalla del segundo; de ahí salen las evidencias.
+**Archivos clave:** `docs/evidencias/F4-05_07_a36-golpe-super-eficaz.jpg`, `_08_a36-cambiar-pokemon`,
+`_09_a36-bulbasaur-eficacias`, `_10_a36-victoria`.
+**Cómo se probó (salida real):**
+
+    registro por CDP cada 2 s (requestAnimationFrame), 5 min: 130 muestras · fps min 12 · mediana 104 · max 120
+      (la única muestra baja, 1 fotograma de 2.975 ms, fue Kenneth buscando el grabador de pantalla)
+    combate 1: "¡Has derrotado a Nadadora Marina! ¡Victoria!" · combate 2: igual · 0 errores JS
+    consola: "[audio] no se pudo reproducir el grito #118 / #25 TimeoutError: signal timed out" (solo en el 1.º)
+    Kenneth: gritos al salir y al debilitarse en los 2 combates, vibración al golpear, fluido
+
+**Quedó a medias / roto:** nada. Para F2-08 (en ESTADO): precargar los gritos al elegir rival (con datos móviles el
+primero puede pasar de 6 s y no sonar) y los SFX de golpe.
+**Decisiones nuevas:** ninguna.
+**El siguiente debe empezar por:** lo mismo que la entrada anterior (mezclar el PR de F1-03 y coger F1-04).

@@ -178,7 +178,7 @@
 - [x] **F4-05 · Escena de combate** (@alex, 2026-10-11) — UI de turnos, selección de movimiento con tipo/PP/efectividad
       prevista, animaciones por tipo, cola de eventos, textos en español, cambio de Pokémon. Dep: F4-04, F0-04.
       **Hecho:** `/combate/prueba` contra los 3 entrenadores con la IA; probado entero en vista móvil 390×844 (victoria,
-      cambio forzado, eficacias). D-033. Pendiente: probarlo en Android real (Kenneth) y SFX de golpe (F2-08).
+      cambio forzado, eficacias). D-033. Probado en Android real (Kenneth, Samsung A36, 2026-10-12: fluido, gritos y vibración). Pendiente: SFX de golpe (F2-08).
       **OJO (D-034): es la escena TEMPORAL en 2D.** La definitiva es F4-07 (AR con cámara).
 - [x] **F4-06 · IA rival** (@alex, 2026-10-11) — elige el movimiento con mejor daño esperado con algo de aleatoriedad;
       entrenadores de prueba. Dep: F4-05.
