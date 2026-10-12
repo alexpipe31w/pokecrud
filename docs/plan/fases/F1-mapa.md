@@ -807,12 +807,20 @@ export class AvatarMotion {
 
 ### Paso 9 — Prueba en Android y cierre
 
-- [ ] **9a.** `npm run apk -- --install`; `/dev/mapa` → "Sígueme": aceptar el permiso; **caminar ~100 m por la calle**
+- [x] **9a.** `npm run apk -- --install`; `/dev/mapa` → "Sígueme": aceptar el permiso; **caminar ~100 m por la calle**
   y comprobar: el avatar avanza suave (sin saltos), `gait` pasa de `idle` a `walk`; trotar → `run`; el mapa gira al
   girar el móvil y no "tiembla" quieto. Denegar el permiso (Ajustes de Android → la app → Ubicación → Denegar) →
   pasa a joystick y el avatar se mueve con él. Anotar en la bitácora: precisión típica (m), si hubo saltos
   descartados (`console.debug` del filtro) y si el retraso al caminar se nota.
-- [ ] **9b.** REGLA 2 (bitácora con la salida de los tests, ROADMAP `[x]`, PR).
+- [x] **9b.** REGLA 2 (bitácora con la salida de los tests, ROADMAP `[x]`, PR).
+
+**Hecho (Kenneth, 2026-10-12). Cambios respecto a este plan (ver D-037):** `LocationService` también funciona en el
+navegador (allí `requestPermissions` no existe: el permiso lo pide `watchPosition` y la denegación llega como error
+código 1), no abre dos escuchas si `start()` se llama dos veces, y exporta `DEFAULT_CENTER`. `app-location-gate` añade
+"Reintentar" (vuelve al GPS) en el estado `denied`. `app-joystick` responde también a las flechas del teclado (PC) y
+tiene spec. En `/dev/mapa`, el avatar del spike tiene "nariz" para ver hacia dónde mira y un botón "Usar GPS".
+**Para F1-04:** `WINDOW = 4` del filtro se deja así (caminando, Kenneth: "todo funcionó correctamente"); `start()` con `joystickMode` guardado
+deja `status = 'joystick'` sin posición → la pantalla debe llamar a `useJoystickAt(...)` (como hace `/dev/mapa`).
 
 ---
 

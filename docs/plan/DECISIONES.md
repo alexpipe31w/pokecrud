@@ -429,3 +429,22 @@ reales dan ~10-20 a 200 m (D-025), así que sobra margen para el avatar, la hier
   algún `tsconfig*.json`, parar y volver a lanzar `start:dev`.**
 - Si algún día hace falta un `.js`/`.d.ts` escrito a mano en `shared/`: excepción con `!` en `.gitignore` y que no tenga
   un `.ts` del mismo nombre (si no, el script lo borraría).
+
+## D-037 · Ubicación (F1-03): permiso en el navegador, centro por defecto y joystick también con teclado (2026-10-12, Kenneth)
+
+- **En el navegador `@capacitor/geolocation` 8.2.3 no implementa `requestPermissions`** (lanza `UNIMPLEMENTED`). El
+  código del plan caía en `unavailable` ("Este dispositivo no da la ubicación") en el PC. Ahora, si lanza
+  `UNIMPLEMENTED`, `LocationService` empieza `watchPosition` igual (el navegador muestra su propio diálogo) y un error
+  de código 1 (`PERMISSION_DENIED`) en el callback pasa a `denied` + modo joystick. En el APK no cambia nada: el
+  diálogo es el de Android.
+- **Si Android tiene el permiso en "no volver a preguntar"** (dos denegaciones), `requestPermissions` devuelve
+  `denied` sin diálogo: la pantalla de permisos lo explica y ofrece "Reintentar" (útil tras activarlo en Ajustes) y
+  "Jugar con joystick". Visto en el Samsung A36.
+- `start()` es idempotente mientras escucha (un segundo toque en "Permitir" no abre otra escucha).
+- **`DEFAULT_CENTER`** (Parque Santander, Neiva) vive en `location.service.ts`: es donde arranca el joystick si nunca
+  hubo GPS. `joystickMode` se guarda en ajustes: tras una denegación la siguiente sesión arranca en joystick sin
+  posición, y la pantalla llama a `useJoystickAt(position ?? DEFAULT_CENTER)`.
+- `app-joystick` también se maneja con las flechas del teclado (PC y accesibilidad) y emite `{0,0}` al soltar.
+- **Probar en el móvil:** la captura de pantalla por CDP del WebView NO recoge el mapa (WebGL) y sale gris; usar
+  `adb shell screencap`. Para ir a `/dev/*` en el APK no hay botón: se navega por CDP (`adb forward` +
+  `history.pushState`), hasta que F1-04 traiga el menú.
