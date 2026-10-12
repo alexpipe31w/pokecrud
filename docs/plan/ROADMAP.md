@@ -73,7 +73,7 @@
       **Hecho:** migración `player_role` aplicada en Supabase; e2e 45/45 (4 nuevos casos de rol); Postman 82/82 con newman;
       app 94/94. D-023. **Pendiente de humanos:** nombrar al primer ADMIN (`npm run admin -- grant <correo>`).
       (Render despliega solo al mezclar en `develop`: no hace falta Manual Deploy.)
-- [ ] **F0-13 · Artefactos de compilación en `shared/`** — la primera `npm run build` del servidor tras D-024 dejó 42
+- [~] **F0-13 · Artefactos de compilación en `shared/`** (@samuel, 2026-10-12) — la primera `npm run build` del servidor tras D-024 dejó 42
       `.js`/`.d.ts`/`.js.map` junto a las fuentes de `shared/` (Samuel, 2026-10-12; probable `tsconfig.build.tsbuildinfo`
       viejo, no se reproduce compilando desde cero). Riesgo: subirlos por error o que Vite/Vitest/Node usen el `.js` viejo
       en vez del `.ts`. Dep: F1-06. Criterio: reproducir la causa o descartarla; `.gitignore` que impida subirlos sin

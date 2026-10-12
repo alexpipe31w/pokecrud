@@ -3,7 +3,7 @@
 > Se **reescribe** al cerrar cada sesión (no es histórico; el histórico es `BITACORA.md`).
 > Máximo una pantalla. Si lees esto al empezar: después lee `ROADMAP.md`.
 
-**Última actualización:** 2026-10-12 · por Samuel (Claude) · rama `feature/F1-01-spike-mapa-3d` (F1-01 hecha, PR abierto)
+**Última actualización:** 2026-10-12 · por Samuel (Claude) · rama `feature/F0-13-artefactos-shared` (reclama F0-13)
 
 ## 👉 RELEVO DE ALEX A SAMUEL — HECHO (2026-10-12)
 
@@ -32,7 +32,7 @@ visual del mapa ya tiene vía libre (**F1-01 hecha: plan A, D-035**); el del enc
 
 ## Hecho
 
-- **F1-01 (Alex + Samuel, PR pendiente de mezclar):** spike del mapa medido en un Redmi Note 10: three.js con 30
+- **F1-01 (Alex + Samuel, PR #32 mezclado):** spike del mapa medido en un Redmi Note 10: three.js con 30
   Pokémon a 58,4 fps y 0 % de tirones, mejor que los markers HTML (52,3). **Plan A, máximo 30 Pokémon dibujados**
   (D-035). Página de pruebas `/dev/mapa` (solo desarrollo). Desbloquea F1-02…F1-05.
 - **F4-05 (Alex, PR mezclado):** **escena de combate jugable** en `/combate/prueba` (botón en `/dev/ui`):
@@ -109,7 +109,8 @@ visual del mapa ya tiene vía libre (**F1-01 hecha: plan A, D-035**); el del enc
 
 ## En curso
 
-- Nadie (F1-01 terminada; su PR espera revisión/mezcla).
+- **F0-13 (@samuel, 2026-10-12)** — rama `feature/F0-13-artefactos-shared`. **Punto de guardado:** reclamada; paso
+  siguiente: reproducir la causa de los `.js` en `shared/` (build del servidor con y sin `tsbuildinfo`).
 
 ## Siguiente paso concreto
 
