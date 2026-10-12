@@ -65,6 +65,11 @@
       Dep: F0-09. Criterio: captura en Android real sin solapes en `/dev/ui`, login y registro.
       **Hecho:** regla global en `src/global.scss` (D-022); Samsung A36: `/dev/ui`, login y registro sin solapes ni scroll
       extra, Pokédex sin cambios. Evidencias `F0-11_0{1,2,3}_*.png`.
+- [~] **F0-12 · Solo un admin escribe en el inventario `/pokemon`** (@alex, 2026-10-11) — hoy cualquier cuenta (el registro es
+      abierto y el repo/Render son públicos) puede crear, editar o borrar los 151 del inventario compartido. Añadir rol
+      `ADMIN` a `Player` (leído de la BD en cada escritura, no del token) y exigirlo en POST/PUT/PATCH/DELETE de `/pokemon`.
+      Dep: F0-08. Criterio: jugador normal → 403, sin sesión → 401, admin → 2xx (e2e + Postman); la app oculta agregar/editar
+      a quien no es admin; script para dar/quitar el rol.
 
 ## F1 · Mapa con GPS
 

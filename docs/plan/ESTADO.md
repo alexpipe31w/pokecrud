@@ -51,7 +51,7 @@
 
 ## En curso
 
-- Nadie.
+- **F0-12 (Alex, rama `feature/F0-12-admin-inventario`):** rol ADMIN para escribir en `/pokemon`.
 
 ## Siguiente paso concreto
 
