@@ -3,7 +3,7 @@
 > Se **reescribe** al cerrar cada sesión (no es histórico; el histórico es `BITACORA.md`).
 > Máximo una pantalla. Si lees esto al empezar: después lee `ROADMAP.md`.
 
-**Última actualización:** 2026-10-11 · por Alex (Claude) · rama `feature/F4-04-reducer` (PR abierto)
+**Última actualización:** 2026-10-11 · por Alex (Claude) · rama `feature/F4-06-ia` (PR abierto)
 
 ## Fase actual
 
@@ -11,6 +11,8 @@
 
 ## Hecho
 
+- **F4-06 (Alex, PR abierto; sale de F4-04):** IA rival (`shared/engine/battle/ai.ts`, fácil/normal/difícil) y 3
+  entrenadores de prueba (`shared/data/trainers.ts`). D-032. Siguiente: **F4-05**, la escena de combate en la app.
 - **F4-04 (Alex, PR abierto; sale de F4-03):** motor de combate completo en `shared/engine/battle/battle-engine.ts`
   (`createBattle`, `resolveTurn` puro y determinista; estados, etapas, drenaje, multigolpe, retroceso, cambios,
   Forcejeo, victoria). 1.000 combates aleatorios terminan siempre. D-031. **Siguiente: F4-05 (escena) y F4-06 (IA).**
@@ -80,8 +82,7 @@
 
 ## En curso
 
-- **F4-06 (Alex, rama `feature/F4-06-ia`, sale de F4-04):** IA rival y entrenadores de prueba (solo shared/).
-- Esperan revisión **en orden** (ver PENDIENTES DE HUMANOS): #21 → #22 → #23 → #24 → #25 → #26 → #27 → #28 → #29.
+- Esperan revisión **en orden** (ver PENDIENTES DE HUMANOS): #21 → #22 → #23 → #24 → #25 → #26 → #27 → #28 → #29 → F4-06.
 - **F1-01 → PENDIENTE DE KENNETH** (medir fps en su Android): rama `feature/F1-01-spike-mapa-3d`, instrucciones
   exactas en la última entrada de F1-01 de la bitácora.
 
@@ -102,7 +103,7 @@
 ### PENDIENTES DE HUMANOS — lista única (quien termine algo, lo marca `[x]`; cada tarea nueva añade aquí lo suyo)
 
 **Kenneth o Samuel (revisión):**
-- [ ] Revisar y mezclar **en este orden**: #21 (F0-12 admin) → #22 (F1-06 spawns) → #23 (F1-08 mochila) → #24 (F2-03 fórmula) → #25 (F2-06 captura) → #26 (F4-01 plan combate) → #27 (F4-02 tipos y stats) → #28 (F4-03 daño) → #29 (F4-04 motor de combate).
+- [ ] Revisar y mezclar **en este orden**: #21 (F0-12 admin) → #22 (F1-06 spawns) → #23 (F1-08 mochila) → #24 (F2-03 fórmula) → #25 (F2-06 captura) → #26 (F4-01 plan combate) → #27 (F4-02 tipos y stats) → #28 (F4-03 daño) → #29 (F4-04 motor de combate) → PR de F4-06 (IA).
   Cada uno sale del anterior: al mezclar uno, GitHub reapunta el siguiente a `develop`.
 
 **Samuel (Render, solo él tiene acceso):**

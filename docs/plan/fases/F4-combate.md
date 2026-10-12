@@ -159,8 +159,9 @@ paralelo (la escena juega contra una IA "elige al azar" hasta que llegue F4-06).
 
 ## F4-05 · Escena de combate (app)
 
-- [ ] **Paso 1:** ruta `/combate/prueba` (con `authGuard`) que monta un combate local contra un rival de prueba con
-  `createBattle` y RNG con semilla aleatoria.
+- [ ] **Paso 1:** ruta `/combate/prueba` (con `authGuard`) que monta un combate local contra un entrenador de
+  `shared/data/trainers.ts` con `createBattle`, RNG con semilla aleatoria y la IA de F4-06 (`chooseAction` con la
+  dificultad del entrenador).
 - [ ] **Paso 2:** escena (DISENO, modo _Experience_ con `impeccable`): los dos Pokémon con arte `home`, barras de PS
   (`app-hp-bar`), nombre y nivel, menú de 4 movimientos con tipo, PP y **efectividad prevista** contra el rival,
   botón de cambiar Pokémon y de huir.
@@ -171,12 +172,12 @@ paralelo (la escena juega contra una IA "elige al azar" hasta que llegue F4-06).
 
 ## F4-06 · IA rival
 
-- [ ] **Paso 1 — `ai.ts`:** `chooseAction(state, side, rng, nivel)`: daño esperado de cada movimiento (precisión ×
+- [x] **Paso 1 — `ai.ts`:** `chooseAction(state, side, rng, nivel)`: daño esperado de cada movimiento (precisión ×
   daño medio × efectividad), un movimiento de estado útil si el rival no lo tiene ya, cambiar si su activo está en
   clara desventaja de tipos; ruido según dificultad (fácil 40 % al azar, normal 15 %, difícil 0 %).
-- [ ] **Paso 2:** 3 entrenadores de prueba en `shared/data/trainers.ts` (equipos de 3 con especies del dataset).
-- [ ] **Paso 3:** test: la IA "difícil" gana ≥ 70 % contra la "fácil" con equipos espejo en 500 combates con semilla.
-- [ ] **Paso 4:** ~~conectar en la escena de F4-05~~ → se hace en F4-05 (paso 1), que ya tendrá la IA. REGLA 2.
+- [x] **Paso 2:** 3 entrenadores de prueba en `shared/data/trainers.ts` (equipos de 3 con especies del dataset).
+- [x] **Paso 3:** test: la IA "difícil" gana ≥ 70 % contra la "fácil" con equipos espejo en 500 combates con semilla.
+- [x] **Paso 4:** ~~conectar en la escena de F4-05~~ → se hace en F4-05 (paso 1), que ya tendrá la IA. REGLA 2.
 
 ## Riesgos
 

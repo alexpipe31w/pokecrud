@@ -153,8 +153,10 @@
       terminan sin errores + instantánea de un combate completo. shared 126/126. D-031.
 - [ ] **F4-05 · Escena de combate** — UI de turnos, selección de movimiento con tipo/PP/efectividad
       prevista, animaciones por tipo, cola de eventos, textos en español, cambio de Pokémon. Dep: F4-04, F0-04.
-- [~] **F4-06 · IA rival** (@alex, 2026-10-11) — elige el movimiento con mejor daño esperado con algo de aleatoriedad;
+- [x] **F4-06 · IA rival** (@alex, 2026-10-11) — elige el movimiento con mejor daño esperado con algo de aleatoriedad;
       entrenadores de prueba. Dep: F4-05.
+      **Hecho:** `ai.ts` + 3 entrenadores; difícil gana al fácil 71,8 % (500 espejo) y al azar 95,7 %. Conectarla a la
+      escena es el paso 1 de F4-05 (D-032).
 
 ## F5 · PvP en tiempo real
 

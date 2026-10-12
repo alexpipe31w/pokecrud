@@ -587,3 +587,25 @@ Pokémon de reserva no tenía.
 **Quedó a medias / roto:** nada. Fuera de la v1 (anotado en el plan): movimientos de daño fijo y efectos especiales.
 **Decisiones nuevas:** D-031.
 **El siguiente debe empezar por:** F4-06 (IA, solo shared/, sin móvil) o F4-05 (escena; probar en vista móvil).
+
+## 2026-10-12 00:00 · @alex (Claude) · F4-06 · rama `feature/F4-06-ia` (sale de F4-04)
+
+**Qué se hizo:** `shared/engine/battle/ai.ts` (`chooseAction`, `scoreMove`, `expectedDamage`) y
+`shared/data/trainers.ts` (Excursionista Roco fácil, Nadadora Marina normal, Entrenadora As Valeria difícil). Exportado
+`STAGE_OF` del motor para no duplicar la traducción de stats. El paso "conectar en la escena" pasa a F4-05 (paso 1).
+**Cómo se probó (salida real):**
+
+    vitest ai.spec.ts → 10/10
+      casos claros (20 semillas, siempre lo mismo): remata con Rayo a Gyarados; Triturar y no Golpe Cuerpo contra
+        Gengar; Espora a un Snorlax sano y Placaje si ya está quemado; Pikachu contra Golem cambia a Lapras;
+        cambio forzado saca a Lapras contra Golem
+      [F4-06] difícil vs fácil: 71.8 % (500 combates espejo, equipos aleatorios nv 40, alternando lados)
+      [F4-06] difícil vs azar: 95.7 % · normal vs azar: 91.0 % (300)
+      300 combates IA contra IA de todas las dificultades sin una acción imposible
+    npm run test:shared → 136/136 · app lint + build · server build + 22/22
+
+Ojo: el 71,8 % pasa el criterio (≥ 70 %) con poco margen; el fácil no es "tonto", solo mete un 40 % de azar. Si se
+quiere más diferencia, subir el ruido del fácil o quitarle los cambios de estado.
+**Quedó a medias / roto:** nada.
+**Decisiones nuevas:** D-032.
+**El siguiente debe empezar por:** F4-05 (escena de combate), paso 1 del plan: `/combate/prueba` contra un entrenador.

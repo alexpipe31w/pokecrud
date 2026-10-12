@@ -329,3 +329,16 @@ son del usuario salvo Lumina Crash y Bomba Jarabe (rival). En 1 vs 1, `user-and-
 - **Doble KO** (retroceso/Forcejeo): pierde el último en debilitarse. **Rendirse:** gana el otro.
 - Eventos: lista cerrada en `types.ts` (`BattleEvent`); los textos en español los pone la UI.
 
+## D-032 · IA rival por puntuación con ruido según dificultad (F4-06) (2026-10-11, Alex)
+
+`shared/engine/battle/ai.ts`: `chooseAction(ctx, estado, lado, rng, dificultad)`, pura (usa el RNG del combate).
+Puntúa en "PS del rival": ataque = precisión × daño medio × golpes (+1000 si debilita seguro, con prioridad mejor);
+estado alterado = 15-40 % de los PS del rival si no tiene estado, no es inmune y le queda > 30 %; subir lo propio /
+bajar lo del rival = poco y solo hasta ±2 y con > 60 % de vida; curarse = lo que recupera si está por debajo del 50 %.
+Cambia (normal y difícil) si su activo hace < 15 % y uno del banquillo haría ≥ 3 veces más sin estar más amenazado. En
+un cambio forzado saca al que mejor le va contra el activo rival. Ruido: fácil 40 % de acciones al azar, normal 15 %,
+difícil 0 % (+5 % de desempate). **Medido** en combates espejo con equipos aleatorios (semillas fijas): difícil gana al
+fácil el 71,8 % de 500; a jugar al azar, difícil 95,7 % y normal 91 % de 300. La IA conoce los tipos del rival pero no
+sus movimientos (como un jugador). 3 entrenadores de prueba en `shared/data/trainers.ts` (fácil nv 14-16, normal 24-27,
+difícil 40-42).
+
