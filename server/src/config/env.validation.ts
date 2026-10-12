@@ -24,6 +24,18 @@ export function validateEnv(
     errors.push('REFRESH_TTL_DAYS debe ser un entero de 1 a 90');
   }
 
+  // Opcional a propósito: sin ella solo /spawns responde 503 y el resto del servidor sigue (D-025).
+  const salt = raw['SPAWN_SALT'];
+  if (
+    salt !== undefined &&
+    salt !== '' &&
+    (typeof salt !== 'string' || salt.length < 32)
+  ) {
+    errors.push(
+      'SPAWN_SALT, si se define, debe tener al menos 32 caracteres aleatorios',
+    );
+  }
+
   if (errors.length > 0) {
     throw new Error(
       `Configuración inválida (ver server/.env.example): ${errors.join('; ')}`,
