@@ -393,3 +393,35 @@ login/registro (tiene que volver a entrar).
 **Decisiones nuevas:** D-022.
 **El siguiente debe empezar por:** mezclar el PR de F0-11; luego `/inicio F1-01` (spike Google Maps 3D + three.js en
 Android real) — antes, leer ARQUITECTURA §4 y D-022 (el mapa anula la zona segura en su `ion-content`).
+
+## 2026-10-11 20:45 · @alex (Claude) · F0-12 · rama `feature/F0-12-admin-inventario`
+
+**Qué se hizo:** revisión de los PR #16-#20 de Kenneth (código sólido; server 11/11, app 92/92, shared 10/10, lint y
+build OK; Render sirve `/pokemon` con 151). Hallazgo: cualquier cuenta podía escribir en el inventario compartido y el
+registro es abierto → nueva tarea F0-12. Rol `PlayerRole` (`PLAYER`|`ADMIN`) en `Player`; `AdminGuard` en las 4
+escrituras de `/pokemon` (rol leído de la BD, no del token); script `npm run admin -- list|grant|revoke <correo>`;
+`role` sale en `player` de `/auth/*`; la app oculta FAB, deslizar y botones del detalle a quien no es ADMIN y
+`adminGuard` protege `/pokemon/nuevo` y `/pokemon/:id/editar`. Postman: login ADMIN con variables del entorno local,
+escrituras del inventario con `{{adminToken}}` y caso nuevo "jugador normal → 403". De paso, en el PC de Alex:
+`DATABASE_URL` → 6543, `JWT_SECRET` local generado (faltaba) y JDK 21 instalado (`openjdk 21.0.12.1`).
+**Archivos clave:** `server/src/auth/admin.guard.ts`, `server/prisma/admin.ts`,
+`server/prisma/migrations/20261012010000_player_role/`, `server/src/inventory/inventory.controller.ts`,
+`server/test/crud.e2e-spec.ts`, `src/app/core/auth/auth.guard.ts`, `backend/postman/PokeCRUD.postman_collection.json`.
+**Cómo se probó (salida real):**
+
+    prisma migrate deploy → Applying migration `20261012010000_player_role` · All migrations have been successfully applied.
+    prisma migrate diff (BD de Supabase → schema.prisma) → -- This is an empty migration.
+    server: npm test → 11/11 · npm run test:e2e (DATABASE_URL por 6543) → Test Files 4 passed · Tests 45 passed
+      (nuevos: jugador normal → 403 en POST/PUT/PATCH/DELETE sin cambiar nada; quitar el rol → 403 con el MISMO token)
+    newman (servidor local + cuenta ADMIN temporal @pokecrud.test) → requests 46 · assertions 82 · failed 0
+      (docs/evidencias/F0-12_01_newman-runner.txt; la cuenta temporal se borró después)
+    app: ng test → 94/94 · lint OK · build OK
+    BD tras las pruebas: inventario 151, 0 Pokémon de prueba, 0 ADMIN
+
+**Quedó a medias / roto:** nada en código. Pendiente de humanos: revisar/mezclar el PR; Samuel → Manual Deploy en
+Render (y su 6543); Alex → `npm run admin -- grant <correo>` con su cuenta. No se probó en el móvil (solo cambia qué
+botones se ven; la lógica está cubierta por tests).
+**Decisiones nuevas:** D-023.
+**El siguiente debe empezar por:** revisar el PR de F0-12 (`gh pr diff`), mezclarlo y pedir a Samuel el Manual Deploy;
+después `/inicio F1-01`.
+

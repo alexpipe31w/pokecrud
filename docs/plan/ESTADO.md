@@ -3,14 +3,19 @@
 > Se **reescribe** al cerrar cada sesión (no es histórico; el histórico es `BITACORA.md`).
 > Máximo una pantalla. Si lees esto al empezar: después lee `ROADMAP.md`.
 
-**Última actualización:** 2026-10-11 · por Kenneth (Claude) · rama `develop` (tras mezclar #19)
+**Última actualización:** 2026-10-11 · por Alex (Claude) · rama `feature/F0-12-admin-inventario` (PR abierto)
 
 ## Fase actual
 
-**F0 · Fundaciones — COMPLETA.** F0-01…F0-10 en `develop` (PR #8-#18); **F0-11 hecha y mezclada** (Kenneth, PR #19). Siguiente fase: **F1 · Mapa con GPS** (empieza por F1-01, el spike de Google Maps 3D en Android real).
+**F0 · Fundaciones — COMPLETA.** F0-01…F0-11 en `develop` (PR #8-#20). **F0-12 hecha, PR abierto pendiente de revisión.** Siguiente fase: **F1 · Mapa con GPS** (empieza por F1-01, el spike de Google Maps 3D en Android real).
 
 ## Hecho
 
+- **F0-12 (Alex, rama `feature/F0-12-admin-inventario`, PR abierto):** escribir en `/pokemon` exige rol ADMIN (antes
+  bastaba cualquier cuenta, y el registro es abierto). `PlayerRole` en `Player` (migración `player_role` **ya aplicada
+  en Supabase**, aditiva), `AdminGuard` (rol leído de la BD en cada escritura), `npm run admin -- list|grant|revoke`,
+  la app oculta agregar/editar/eliminar a quien no es admin. Postman: escrituras con `{{adminToken}}` (variables
+  `adminEmail`/`adminPassword` en TU entorno de Postman). D-023. **Todavía no hay ningún ADMIN.**
 - **F0-11 (Kenneth, rama `feature/F0-11-zona-segura`):** zona segura global para pantallas sin `ion-header`
   (`src/global.scss`, D-022). Probado en el Samsung A36: `/dev/ui`, login y registro sin solapes; Pokédex sin cambios.
 - **F0-10 (Kenneth, rama `feature/F0-10-transaction-pooler`):** `DATABASE_URL` por el _transaction pooler_ (6543),
@@ -51,12 +56,14 @@
 
 ## En curso
 
-- **F0-12 (Alex, rama `feature/F0-12-admin-inventario`):** rol ADMIN para escribir en `/pokemon`.
+- Nadie (F0-12 espera revisión del PR).
 
 ## Siguiente paso concreto
 
-1. **Alex y Samuel:** puerto de `DATABASE_URL` → 6543 en su `.env`;
-   **Samuel:** también en Render (ver Bloqueos).
+0. **Revisar y mezclar el PR de F0-12** (Kenneth o Samuel). Tras mezclar: **Samuel pulsa Manual Deploy en Render** y
+   Alex se nombra ADMIN: `cd server && npm run admin -- grant <su correo>` (la cuenta tiene que existir: registrarse antes).
+   Hasta el deploy, Render sigue dejando escribir a cualquier jugador (la columna `role` ya existe y no le afecta).
+1. **Samuel:** puerto de `DATABASE_URL` → 6543 en su `.env` y en Render (ver Bloqueos). Alex ya lo hizo.
 2. Siguiente: **F1-01** (spike Google Maps 3D + overlay three.js, medir fps en Android real; dep F0-09 ✔). Necesita
    `environment.local.ts` con la clave de Maps (Alex: la clave es suya) y un móvil Android con Depuración USB. OJO: mapa a pantalla completa →
    anular la zona segura en su `ion-content` (D-022).
@@ -67,7 +74,7 @@
 - **Cada compañero necesita su propio `JWT_SECRET`** en su `server/.env` para arrancar el servidor en local (SECRETOS.md).
 - **En local hacen falta dos servidores:** Nest (`cd server && npm run start:dev`, puerto **3000**) y la app (`npm start`).
   Si tu `server/.env` tiene `PORT=3001` de antes, cámbialo a 3000 (o bórralo).
-- **ACCIÓN — puerto de la base (F0-10, D-021):** cada uno cambia en su `server/.env` el puerto de `DATABASE_URL` de
+- **ACCIÓN — puerto de la base (F0-10, D-021):** (Alex: hecho 2026-10-11; falta Samuel) cada uno cambia en su `server/.env` el puerto de `DATABASE_URL` de
   **5432 a 6543** (solo ese; `DIRECT_URL` se queda en 5432). **Samuel:** lo mismo en la variable `DATABASE_URL` de Render.
   Mientras alguien siga en 5432 consume del cupo de 15 del session pooler (hoy Render: 5); no rompe nada, pero el riesgo
   vuelve si los tres se quedan en 5432.

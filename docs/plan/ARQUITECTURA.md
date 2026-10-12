@@ -221,7 +221,7 @@ servidor tenga que guardar cada spawn.
 - CRUD del curso (HU ya evaluadas): `/pokemon` (inventario IS-11, modelo en `src/app/models/pokemon.model.ts`:
   datos de PokéAPI + `price` y `stock` propios), `/teams`, `/favorites`, `/customPokemon` se mantienen con el
   **mismo contrato** que tenía JSON Server (más el filtro por jugador), y la colección de Postman se
-  actualiza. Equipos: máx. 6, ahora con ids de Pokémon **capturados** (no de especie).
+  actualiza. Escribir en `/pokemon` exige rol ADMIN (D-023). Equipos: máx. 6, ahora con ids de Pokémon **capturados** (no de especie).
 - Despliegue: **[SPIKE F0-06]** Render (gratis, se duerme a los 15 min → despertarlo antes de la demo)
   o el servidor que decida el PO. Variables: `DATABASE_URL`, `JWT_SECRET`, `JWT_REFRESH_SECRET`,
   `SPAWN_SALT`, `CORS_ORIGINS`. `.env.example` commiteado, `.env` nunca.
@@ -229,7 +229,7 @@ servidor tenga que guardar cada spawn.
 ### Modelo de datos (Prisma, resumen)
 
 ```
-Player(id, email UNIQUE, passwordHash, nickname UNIQUE, avatar, level, xp, createdAt)
+Player(id, email UNIQUE, passwordHash, nickname UNIQUE, role PLAYER|ADMIN, avatar, level, xp, createdAt)
 RefreshToken(id, playerId, tokenHash UNIQUE, expiresAt, revokedAt)
 Inventory(playerId, item, qty CHECK qty>=0, PK(playerId,item))
 CaughtPokemon(id, playerId, speciesId, nickname, level, ivs JSON, nature, gender, shiny,

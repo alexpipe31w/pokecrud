@@ -198,3 +198,20 @@ cubiertas solas. Las que llevan `ion-header` no cambian (Ionic ya lo resuelve). 
 arriba / 15 px abajo; sin scroll extra en login y registro. **Una pantalla que deba ir a pantalla completa de verdad
 (mapa F1, encuentro AR F2) anula `--padding-top/bottom` en su `ion-content`** y coloca sus controles con
 `var(--ion-safe-area-*)`. `:has()` existe desde Chrome 105: en un WebView más viejo simplemente no se aplica (como antes).
+
+## D-023 · Solo un ADMIN escribe en el inventario `/pokemon` (F0-12) (2026-10-11, Alex)
+
+Con F0-08 cualquier jugador con sesión podía crear, editar y borrar el inventario compartido, y el registro es abierto
+(repo y Render públicos): cualquiera podía vaciar los 151 en minutos. **Decisión:** enum `PlayerRole` (`PLAYER` |
+`ADMIN`, por defecto `PLAYER`) en `Player`, y `AdminGuard` (`server/src/auth/admin.guard.ts`) en POST/PUT/PATCH/DELETE
+de `/pokemon`. Sin sesión → 401; jugador normal → 403; leer sigue siendo público.
+- **El rol se lee de la BD en cada escritura, NO va en el JWT:** quitarlo surte efecto en la siguiente petición sin
+  esperar a que caduque el access token. Cuesta una consulta por escritura del inventario (pocas).
+- **No hay endpoint para nombrar admins:** solo `cd server && npm run admin -- grant|revoke <correo>` (y `list`), es
+  decir, quien tenga la contraseña de la BD. Un endpoint así sería el primer objetivo de un atacante.
+- `/auth/*` devuelve `role` en `player` para que la app oculte agregar/editar/eliminar (`AuthService.isAdmin`,
+  `adminGuard` en `/pokemon/nuevo` y `/pokemon/:id/editar`). Es solo UI: quien manda es el servidor.
+- `/teams`, `/favorites`, `/customPokemon` no cambian (ya eran de cada jugador).
+- Postman: las escrituras del inventario usan `{{adminToken}}`, que sale del login con `adminEmail`/`adminPassword`
+  del **entorno local de Postman de cada uno** (nunca en la colección: el repo es público).
+
