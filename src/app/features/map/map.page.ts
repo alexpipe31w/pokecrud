@@ -39,8 +39,14 @@ const TILT = 67.5;
 const NIGHT_CHECK_MS = 60_000;
 /** Google avisa de una clave rechazada llamando a `gm_authFailure` poco después de cargar: se mira pasado este tiempo. */
 const AUTH_CHECK_MS = 3000;
-/** Tras perder el contexto WebGL con la app visible, se espera un poco antes de rehacer el mapa. */
-const GL_RECOVER_DELAY_MS = 500;
+/**
+ * Al volver a la pantalla (o perder el contexto WebGL con ella a la vista) se espera esto antes de comprobar el mapa:
+ * Google suele recuperar solo el contexto que soltó al ocultarse, y así no se rehace sin necesidad.
+ */
+const GL_RECOVER_DELAY_MS = 1500;
+/** Tope de reconstrucciones del mapa en REBUILD_WINDOW_MS (si WebGL no vuelve, no se entra en bucle). */
+const MAX_REBUILDS = 3;
+const REBUILD_WINDOW_MS = 60_000;
 /** El clima del HUD sale de `GET /spawns` (F1-07 lo cambia por el feed de spawns): sin respuesta en este tiempo, sin chip. */
 const WEATHER_TIMEOUT_MS = 8000;
 
@@ -160,15 +166,26 @@ export class MapPage implements ViewDidEnter, ViewWillLeave, OnDestroy {
   private weatherAsked = false;
   private destroyed = false;
   private rebuilding = false;
-  /** Android quitó el contexto WebGL del mapa (app en segundo plano, pantalla bloqueada…): hay que rehacerlo. */
+  /** Cuándo se rehízo el mapa últimamente (tope de reintentos: sin WebGL no se entra en bucle). */
+  private rebuildTimes: number[] = [];
+  /**
+   * El mapa perdió su contexto WebGL y nadie lo ha devuelto. Pasa (visto en el Samsung A36) porque Google SUELTA el
+   * contexto a propósito cuando su contenedor deja de verse (Pokédex encima: la página queda `ion-page-hidden`, 0×0)
+   * y suele recuperarlo solo al volver; o porque Android lo quita con la app en segundo plano y no vuelve.
+   */
   private glLost = false;
+  private recoverTimer?: ReturnType<typeof setTimeout>;
   private readonly onContextLost = (): void => {
     console.warn('[mapa] contexto WebGL perdido');
     this.glLost = true;
-    if (!document.hidden) setTimeout(() => this.recoverIfLost(), GL_RECOVER_DELAY_MS);
+    this.scheduleRecover();
+  };
+  private readonly onContextRestored = (): void => {
+    console.warn('[mapa] contexto WebGL recuperado');
+    this.glLost = false;
   };
   private readonly onVisibility = (): void => {
-    if (!document.hidden) this.recoverIfLost();
+    if (!document.hidden) this.scheduleRecover();
   };
 
   constructor() {
@@ -179,7 +196,7 @@ export class MapPage implements ViewDidEnter, ViewWillLeave, OnDestroy {
     if (this.active || this.destroyed) return;
     this.active = true;
     this.weatherAsked = false;
-    this.recoverIfLost();
+    this.scheduleRecover();
     void this.bag.load();
     this.compass.start();
     void this.startLocation();
@@ -189,6 +206,7 @@ export class MapPage implements ViewDidEnter, ViewWillLeave, OnDestroy {
 
   ionViewWillLeave(): void {
     this.active = false;
+    clearTimeout(this.recoverTimer);
     cancelAnimationFrame(this.raf);
     void this.location.stop();
     this.compass.stop();
@@ -200,6 +218,11 @@ export class MapPage implements ViewDidEnter, ViewWillLeave, OnDestroy {
     this.ionViewWillLeave();
     clearInterval(this.nightTimer);
     this.mapEl().nativeElement.removeEventListener('webglcontextlost', this.onContextLost, true);
+    this.mapEl().nativeElement.removeEventListener(
+      'webglcontextrestored',
+      this.onContextRestored,
+      true,
+    );
     document.removeEventListener('visibilitychange', this.onVisibility);
     this.overlay?.setMap(null);
     this.mapScene.dispose();
@@ -219,38 +242,62 @@ export class MapPage implements ViewDidEnter, ViewWillLeave, OnDestroy {
     setTimeout(() => {
       if (mapsAuthFailed()) this.mapsError.set('Google rechazó la clave del mapa.');
     }, AUTH_CHECK_MS);
-    // El evento llega al canvas que crea Google dentro del div: se escucha en fase de captura.
+    // Los eventos llegan al canvas que crea Google dentro del div: se escuchan en fase de captura.
     this.mapEl().nativeElement.addEventListener('webglcontextlost', this.onContextLost, true);
+    this.mapEl().nativeElement.addEventListener(
+      'webglcontextrestored',
+      this.onContextRestored,
+      true,
+    );
     document.addEventListener('visibilitychange', this.onVisibility);
     clearInterval(this.nightTimer);
-    this.nightTimer = setInterval(() => {
-      if (isNightLocal(new Date()) !== this.night()) void this.rebuildMap('cambio de día/noche');
-      else this.recoverIfLost();
-    }, NIGHT_CHECK_MS);
+    this.nightTimer = setInterval(() => this.recoverIfLost(), NIGHT_CHECK_MS);
     // Por si Ionic disparó ionViewDidEnter antes de que el mapa existiera (primera carga).
     this.ionViewDidEnter();
   }
 
   protected retryMaps(): void {
-    void this.init();
+    this.rebuildTimes = [];
+    if (this.map) void this.rebuildMap('reintento');
+    else void this.init();
+  }
+
+  /** Comprueba el mapa pasado un momento: le da tiempo a Google a recuperar su propio contexto WebGL. */
+  private scheduleRecover(): void {
+    clearTimeout(this.recoverTimer);
+    this.recoverTimer = setTimeout(() => this.recoverIfLost(), GL_RECOVER_DELAY_MS);
   }
 
   /**
-   * Si el mapa perdió su contexto WebGL (visto en el Samsung A36 al volver de segundo plano), lo rehace. Solo se fía
-   * del evento `webglcontextlost`: NUNCA llamar a `getContext()` sobre el canvas de Google para comprobarlo; si aún no
-   * tiene contexto, esa llamada se lo crea y Google cae a mapa raster (sin capa 3D ni avatar). Pasó en F1-04.
+   * Rehace el mapa si hace falta: contexto WebGL perdido y no devuelto, mapa caído a raster (sin capa 3D ni avatar) o
+   * cambio de día/noche. **Solo con la pantalla del mapa a la vista**: rehacerlo con la página oculta (0×0) hace que
+   * Google no pueda crear el mapa vectorial y caiga a raster para siempre (pasó en F1-04 al volver de la Pokédex).
+   * Nunca llamar a `getContext()` sobre el canvas de Google para comprobar nada: si aún no tiene contexto, esa llamada
+   * se lo crea y Google también cae a raster.
    */
   private recoverIfLost(): void {
-    if (this.glLost) void this.rebuildMap('contexto WebGL perdido');
+    if (!this.active || document.hidden || !this.map) return;
+    if (this.map.getRenderingType() === 'RASTER') void this.rebuildMap('el mapa cayó a raster');
+    else if (this.glLost) void this.rebuildMap('contexto WebGL perdido');
+    else if (isNightLocal(new Date()) !== this.night()) void this.rebuildMap('cambio de día/noche');
   }
 
   /**
-   * Rehace mapa y overlay desde cero (div vacío, overlay nuevo: su renderer va atado al contexto WebGL del mapa). Al
-   * cruzar las 19:00/6:00 (el esquema de color solo se fija al crear el mapa) o si Android quitó el contexto WebGL.
+   * Rehace mapa y overlay desde cero (div vacío, overlay nuevo: su renderer va atado al contexto WebGL del mapa).
+   * Como mucho MAX_REBUILDS veces por minuto: si WebGL no vuelve, se avisa con "No se pudo cargar el mapa".
    */
   private async rebuildMap(reason: string): Promise<void> {
-    if (this.rebuilding || this.destroyed) return;
+    if (this.rebuilding || this.destroyed || !this.active) return;
+    const now = Date.now();
+    this.rebuildTimes = this.rebuildTimes.filter((t) => now - t < REBUILD_WINDOW_MS);
+    if (this.rebuildTimes.length >= MAX_REBUILDS) {
+      console.error(`[mapa] demasiados intentos de rehacer el mapa (${reason})`);
+      this.mapsError.set('El mapa 3D no está disponible ahora mismo en este móvil.');
+      return;
+    }
+    this.rebuildTimes.push(now);
     this.rebuilding = true;
+    this.mapsError.set(null);
     console.warn(`[mapa] se rehace el mapa (${reason})`);
     try {
       this.glLost = false;
@@ -291,6 +338,11 @@ export class MapPage implements ViewDidEnter, ViewWillLeave, OnDestroy {
       gestureHandling: 'greedy',
       headingInteractionEnabled: false,
       tiltInteractionEnabled: false,
+    });
+    // Si Google cae a raster (sin WebGL), la capa 3D no se dibuja: se intenta rehacer (con la pantalla a la vista).
+    const map = this.map;
+    map.addListener('renderingtype_changed', () => {
+      if (map === this.map && map.getRenderingType() === 'RASTER') this.scheduleRecover();
     });
     if (!this.overlay) {
       this.overlay = new ThreeJSOverlayView({
