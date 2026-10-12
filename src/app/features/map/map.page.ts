@@ -39,6 +39,8 @@ const TILT = 67.5;
 const NIGHT_CHECK_MS = 60_000;
 /** Google avisa de una clave rechazada llamando a `gm_authFailure` poco después de cargar: se mira pasado este tiempo. */
 const AUTH_CHECK_MS = 3000;
+/** Tras perder el contexto WebGL con la app visible, se espera un poco antes de rehacer el mapa. */
+const GL_RECOVER_DELAY_MS = 500;
 /** El clima del HUD sale de `GET /spawns` (F1-07 lo cambia por el feed de spawns): sin respuesta en este tiempo, sin chip. */
 const WEATHER_TIMEOUT_MS = 8000;
 
@@ -157,6 +159,17 @@ export class MapPage implements ViewDidEnter, ViewWillLeave, OnDestroy {
   /** El clima se pide una vez por visita, en cuanto hay posición. */
   private weatherAsked = false;
   private destroyed = false;
+  private rebuilding = false;
+  /** Android quitó el contexto WebGL del mapa (app en segundo plano, pantalla bloqueada…): hay que rehacerlo. */
+  private glLost = false;
+  private readonly onContextLost = (): void => {
+    console.warn('[mapa] contexto WebGL perdido');
+    this.glLost = true;
+    if (!document.hidden) setTimeout(() => this.recoverIfLost(), GL_RECOVER_DELAY_MS);
+  };
+  private readonly onVisibility = (): void => {
+    if (!document.hidden) this.recoverIfLost();
+  };
 
   constructor() {
     afterNextRender(() => void this.init());
@@ -166,6 +179,7 @@ export class MapPage implements ViewDidEnter, ViewWillLeave, OnDestroy {
     if (this.active || this.destroyed) return;
     this.active = true;
     this.weatherAsked = false;
+    this.recoverIfLost();
     void this.bag.load();
     this.compass.start();
     void this.startLocation();
@@ -185,6 +199,8 @@ export class MapPage implements ViewDidEnter, ViewWillLeave, OnDestroy {
     this.destroyed = true;
     this.ionViewWillLeave();
     clearInterval(this.nightTimer);
+    this.mapEl().nativeElement.removeEventListener('webglcontextlost', this.onContextLost, true);
+    document.removeEventListener('visibilitychange', this.onVisibility);
     this.overlay?.setMap(null);
     this.mapScene.dispose();
   }
@@ -203,11 +219,13 @@ export class MapPage implements ViewDidEnter, ViewWillLeave, OnDestroy {
     setTimeout(() => {
       if (mapsAuthFailed()) this.mapsError.set('Google rechazó la clave del mapa.');
     }, AUTH_CHECK_MS);
+    // El evento llega al canvas que crea Google dentro del div: se escucha en fase de captura.
+    this.mapEl().nativeElement.addEventListener('webglcontextlost', this.onContextLost, true);
+    document.addEventListener('visibilitychange', this.onVisibility);
     clearInterval(this.nightTimer);
     this.nightTimer = setInterval(() => {
-      const night = isNightLocal(new Date());
-      if (night !== this.night())
-        void this.createMap().catch((err) => console.error('[mapa] día/noche', err));
+      if (isNightLocal(new Date()) !== this.night()) void this.rebuildMap('cambio de día/noche');
+      else this.recoverIfLost();
     }, NIGHT_CHECK_MS);
     // Por si Ionic disparó ionViewDidEnter antes de que el mapa existiera (primera carga).
     this.ionViewDidEnter();
@@ -215,6 +233,35 @@ export class MapPage implements ViewDidEnter, ViewWillLeave, OnDestroy {
 
   protected retryMaps(): void {
     void this.init();
+  }
+
+  /** Si el canvas del mapa perdió su contexto WebGL (visto en el Samsung A36 al volver de segundo plano), lo rehace. */
+  private recoverIfLost(): void {
+    const canvas = this.mapEl().nativeElement.querySelector('canvas');
+    const gl = canvas ? (canvas.getContext('webgl2') ?? canvas.getContext('webgl')) : null;
+    if (this.glLost || gl?.isContextLost()) void this.rebuildMap('contexto WebGL perdido');
+  }
+
+  /**
+   * Rehace mapa y overlay desde cero (div vacío, overlay nuevo: su renderer va atado al contexto WebGL del mapa). Al
+   * cruzar las 19:00/6:00 (el esquema de color solo se fija al crear el mapa) o si Android quitó el contexto WebGL.
+   */
+  private async rebuildMap(reason: string): Promise<void> {
+    if (this.rebuilding || this.destroyed) return;
+    this.rebuilding = true;
+    console.warn(`[mapa] se rehace el mapa (${reason})`);
+    try {
+      this.glLost = false;
+      this.overlay?.setMap(null);
+      this.overlay = undefined;
+      this.mapEl().nativeElement.replaceChildren();
+      await this.createMap();
+    } catch (err) {
+      console.error('[mapa] no se pudo rehacer el mapa', err);
+      this.mapsError.set(err instanceof Error ? err.message : 'Revisa tu conexión a internet.');
+    } finally {
+      this.rebuilding = false;
+    }
   }
 
   /** (Re)crea el mapa: el esquema de color de día o de noche solo se puede fijar al crearlo. */
