@@ -168,8 +168,16 @@
       antitrampa de precisión, validación). D-028.
 - [ ] **F2-07 · Secuencia de captura/escape y shiny** — absorción, sacudidas, fanfarria, recompensas,
       pantalla de "¡Capturado!" con datos del individuo. Dep: F2-05, F2-06.
-- [~] **F2-08 · Audio del juego** (@alex, 2026-10-12) — buscar/crear SFX y música libres, `CREDITOS.md`, mezcla y volúmenes.
+- [x] **F2-08 · Audio del juego** (@alex, 2026-10-12) — buscar/crear SFX y música libres, `CREDITOS.md`, mezcla y volúmenes.
       Dep: F0-05.
+      **Hecho (SFX; la música pasa a F2-10):** 12 efectos GENERADOS en el juego (`sfx-synth.ts`: recetas de
+      osciladores y ruido, D-044), sin archivos ni licencias de terceros; sonidos del combate (golpe normal / muy
+      eficaz / poco eficaz / crítico, fallo, debilitado, curación, estadísticas, estado, victoria; `battle-sfx.ts`);
+      precarga de todos los gritos al empezar el combate (con datos móviles el primero no sonaba); mezcla en el bus
+      `sfx` con su volumen de Ajustes; `src/assets/audio/CREDITOS.md`. Para escucharlos: `docs/evidencias/F2-08_sfx/*.wav`.
+- [ ] **F2-10 · Música** — tema del mapa (bucle tranquilo, de día y de noche) y del combate, libre (CC0/CC BY con
+      atribución en CREDITOS.md) o propia; bus `music` (ya existe, con volumen en Ajustes), fundido al cambiar de
+      pantalla, nunca dos a la vez. Dep: F2-08.
 
 ## F3 · Colección y Pokédex
 

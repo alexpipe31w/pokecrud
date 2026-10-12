@@ -3,22 +3,27 @@
 > Se **reescribe** al cerrar cada sesión (no es histórico; el histórico es `BITACORA.md`).
 > Máximo una pantalla. Si lees esto al empezar: después lee `ROADMAP.md`.
 
-**Última actualización:** 2026-10-12 · por Alex (Claude) · `develop` (F1-05, F0-14 y F1-07 mezclados)
+**Última actualización:** 2026-10-12 noche · por Alex (Claude) · `develop` (hasta F2-08 mezclado)
 
-## 👉 RELEVO DE ALEX (2026-10-12, noche)
+## 👉 RELEVO DE ALEX A SAMUEL (2026-10-12, noche)
 
-1. ✅ **F1-07 (Pokémon en el mapa) y F1-05 (avatar 3D) en `develop`**, los dos a falta SOLO de la prueba en Android.
-   En `/mapa` ya salen los Pokémon salvajes del servidor: brotan agitando una mata de hierba, suena su grito bajito si
-   están cerca, al tocarlos lejos dicen "Acércate más" y al alcance (≤ 40 m) abren `/encuentro/:id` (provisional:
-   nombre, nivel y grito; la captura AR es F2-04).
-2. **Quien tenga Android (Kenneth o Samuel):** con un solo `npm run apk -- --install` se prueban las dos cosas: 7b de
-   F1-07 y 3b de F1-05 (ver "PENDIENTES DE HUMANOS"). Si van ≥ 55 fps, marcar las dos `[x]` en ROADMAP.
-3. **Leer D-040, D-041 y D-042.** Antes de abrir un encuentro se manda la posición al servidor (si no, 403), y los
-   Pokémon son `<img>` en una capa HTML encima del mapa (Google pinta sus edificios 3D encima de three.js).
-4. **Siguiente:** con Android → F2-01 (spike de cámara, desbloquea la AR). Sin móvil → F1-09, F1-10, F5-01 o F2-08.
-5. **Forma de trabajar (Alex, 2026-10-12):** cada uno mezcla su PR en `develop` en cuanto el CI esté en verde (lint +
-   test + build), sin esperar revisión; `develop` está protegida y no deja mezclar en rojo.
-6. D-038/D-039 siguen valiendo antes de tocar el mapa. Capturas del mapa en Android con `adb shell screencap`.
+Hoy (Alex) quedó todo mezclado en `develop` con el CI en verde (PR #38-#46):
+F1-05 avatar 3D · F1-07 Pokémon en el mapa (hierba, grito por cercanía, toque → `/encuentro/:id` provisional) ·
+D-042 Pokémon en HTML **encima** de los edificios 3D · F1-09 pantalla "servidor despertando" + reintentos de sesión ·
+F1-10 el HUD sigue al día/noche del mapa · F2-08 efectos de sonido generados + precarga de gritos · F0-14 CI y
+`develop` protegida · estilo del Map ID sin negocios (día y noche) · Alex ADMIN.
+
+1. **Cómo trabajamos ahora:** rama `feature/…` → PR → **lo mezclas tú mismo** en cuanto el CI esté verde (lint + test +
+   build de app y servidor). `develop` está protegida: no deja mezclar en rojo ni push directo.
+2. **Con tu Redmi (Android), lo más valioso:** `npm run apk -- --install` y en la calle: 7b de F1-07 (≥ 55 fps con
+   Pokémon, grito, toque → encuentro) y 3b de F1-05 (avatar). Mide fps por CDP. Si van bien, marca las dos `[x]`.
+   Luego F2-01 (spike cámara + giroscopio), que desbloquea la captura y el combate en AR.
+3. **Sin móvil:** F2-10 (música) o F5-01 (plan del PvP).
+4. **Leer antes de tocar el mapa:** D-038, D-039, D-040, D-041, D-042 (los Pokémon son `<img>` en `.pokemon-layer`
+   colocados desde `MapOverlay.onBeforeDraw`; la hierba y la sombra siguen en three.js). Sonido: D-044.
+5. Para probar en el navegador: servidor (`cd server && npm run start:dev`) + `npm start`, cuenta `@pokecrud.test`
+   y bórrala al acabar; joystick desde el menú de la Poké Ball. Escuchar los efectos: `docs/evidencias/F2-08_sfx/*.wav`.
+6. **No borrar** las 6 capturas `docs/evidencias/HU-02_*.jpg` sin commitear: Alex las documentará.
 
 **Importante (D-034):** la escena de combate de `/combate/prueba` es **temporal**. Alex quiere el combate **en
 realidad aumentada con la cámara**. Lo que hay debajo (motor, IA, controlador, textos, menú) se reutiliza; solo cambia
@@ -34,6 +39,8 @@ fórmula (F2-03) y captura en servidor (F2-06) hechas; lo visual del encuentro e
 
 ## Hecho
 
+- **F2-08 (Alex, mezclado):** efectos de sonido generados en el juego (D-044) y sonando en el combate; gritos
+  precargados al empezar el combate. Música → F2-10. Escuchar: `docs/evidencias/F2-08_sfx/*.wav`.
 - **F1-10 (Alex, mezclado):** el HUD del mapa sigue al día/noche del mapa, no al modo oscuro del móvil.
 - **F1-09 (Alex, mezclado):** con Render dormido ya no hay pantalla en blanco ni se pierde la sesión: reintentos con
   espera creciente y pantalla "servidor despertando" (D-043).
@@ -144,8 +151,7 @@ fórmula (F2-03) y captura en servidor (F2-06) hechas; lo visual del encuentro e
 
 ## En curso
 
-- **F2-08 (audio) — @alex, 2026-10-12**, rama `feature/F2-08-audio`.
-- F1-05 (3b) y F1-07 (7b) solo esperan la prueba en Android.
+- Nadie. F1-05 (3b) y F1-07 (7b) solo esperan la prueba en Android.
 
 ## Siguiente paso concreto
 
@@ -185,11 +191,10 @@ fórmula (F2-03) y captura en servidor (F2-06) hechas; lo visual del encuentro e
 - [x] ~~**F1-01:** medir fps en su Android~~ → la retoma Samuel en su Redmi Note 10 (2026-10-12).
 - [x] Su `server/.env`: `SPAWN_SALT` propia (64 caracteres) y `DATABASE_URL` en 6543 comprobado. (2026-10-12)
 
-**Quien coja F2-08 (audio):**
+**F2-08 (audio):** (hecho por Alex, 2026-10-12)
 
-- [ ] SFX de golpe/crítico/debilitado para la escena de combate (hoy solo hay gritos y vibración).
-- [ ] Precargar los gritos del combate al elegir rival: en el A36 con datos móviles los de Pikachu y Goldeen tardaron
-      más de `CRY_TIMEOUT_MS` (6 s) y no sonaron en el primer combate (`TimeoutError`); en el segundo, sí.
+- [x] SFX de golpe/crítico/debilitado para la escena de combate (D-044).
+- [x] Precargar los gritos del combate al empezarlo (`AudioService.preloadCries`, 20 s de margen).
 
 **Quien coja F8-02 / F8-04 (rendimiento y APK de release):**
 
