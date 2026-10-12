@@ -906,3 +906,18 @@ no el día/noche del mapa).
 **Decisiones nuevas:** D-038, D-039.
 **El siguiente debe empezar por:** mezclar el PR de F1-04 y coger F1-05 (avatar 3D) siguiendo `docs/plan/fases/F1-mapa.md`
 → F1-05, después de leer D-038 y D-039 (qué no hacer con el canvas del mapa y con el vidrio encima de él).
+
+## 2026-10-12 16:10 · @kenneth (Claude) · F1-04 (mezcla) · rama `feature/F1-04-estado-al-dia`
+
+**Qué se hizo:** mezclado el PR #37 (F1-04) en `develop` con permiso de Kenneth (sin conflictos: `develop` no había
+cambiado). Comprobado el despliegue automático de Render y ESTADO puesto al día en este PR pequeño.
+**Cómo se probó (salida real):**
+
+    gh pr merge 37 --merge → MERGED · 828b511 · develop local: F1-04 incluida
+    Render, cuenta de prueba test+f104render-… (borrada después: "borradas 1"):
+      +0,0 / +0,5 / +1,0 min · /spawns 200 · aún sin weather (versión vieja)
+      +1,6 min · /spawns 200 · weather=clear · night=false · 7 Pokémon → DESPLEGADO
+
+**Quedó a medias / roto:** nada.
+**Decisiones nuevas:** ninguna.
+**El siguiente debe empezar por:** F1-05 (avatar 3D) siguiendo `docs/plan/fases/F1-mapa.md` → F1-05, tras leer D-038 y D-039.
