@@ -109,8 +109,10 @@ visual del mapa ya tiene vía libre (**F1-01 hecha: plan A, D-035**); el del enc
 
 ## En curso
 
-- **F0-13 (@samuel, 2026-10-12)** — rama `feature/F0-13-artefactos-shared`. **Punto de guardado:** reclamada; paso
-  siguiente: reproducir la causa de los `.js` en `shared/` (build del servidor con y sin `tsbuildinfo`).
+- **F0-13 (@samuel, 2026-10-12)** — rama `feature/F0-13-artefactos-shared`. **Punto de guardado:** causa REPRODUCIDA:
+  compilar el servidor con la config anterior a D-024 (`rootDir: ./src`, p. ej. una rama vieja) sobre código que importa
+  `shared/` emite en `dist/../../shared` = `shared/` del repo (+ `server/tsconfig.build.tsbuildinfo` suelto). Y Vitest
+  USA esos `.js` en vez del `.ts` (probado). Paso siguiente: script que los borre + ganchos pre* + `.gitignore`.
 
 ## Siguiente paso concreto
 
