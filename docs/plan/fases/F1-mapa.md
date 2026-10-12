@@ -833,7 +833,7 @@ deja `status = 'joystick'` sin posición → la pantalla debe llamar a `useJoyst
 **Files:** Create `shared/protocol/spawns.ts`; Modify `server/src/spawns/spawns.service.ts`,
 `server/test/spawns.e2e-spec.ts`
 
-- [ ] **1a.** `shared/protocol/spawns.ts` (ARQUITECTURA §2: contrato app↔servidor):
+- [x] **1a.** `shared/protocol/spawns.ts` (ARQUITECTURA §2: contrato app↔servidor):
 
 ```ts
 import type { Weather } from '../engine/spawns.js';
@@ -858,10 +858,10 @@ export interface NearbySpawns {
 }
 ```
 
-- [ ] **1b. Test e2e que falla** en `server/test/spawns.e2e-spec.ts`, dentro del `describe` de `GET /spawns` (reusar
+- [x] **1b. Test e2e que falla** en `server/test/spawns.e2e-spec.ts`, dentro del `describe` de `GET /spawns` (reusar
   el jugador/token de ese archivo): `expect(['clear','cloudy','rain','snow','fog','windy']).toContain(res.body.weather)`
   y `expect(typeof res.body.night).toBe('boolean')`. `cd server && npm run test:e2e -- spawns` → FALLA.
-- [ ] **1c.** En `spawns.service.ts`: borrar las interfaces locales `VisibleSpawn`/`NearbySpawns` e importarlas de
+- [x] **1c.** En `spawns.service.ts`: borrar las interfaces locales `VisibleSpawn`/`NearbySpawns` e importarlas de
   `../../../shared/protocol/spawns.js` (D-024: ruta relativa con `.js`); en `near()`:
 
 ```ts
@@ -878,14 +878,14 @@ export interface NearbySpawns {
 
   (El clima ya está en caché por celda y franja, D-025: no añade peticiones a Open-Meteo.) `spawns.controller.ts`
   importa `NearbySpawns` del mismo sitio.
-- [ ] **1d.** e2e → PASA; `npm run build` y `npm test` del servidor en verde. Commit
+- [x] **1d.** e2e → PASA; `npm run build` y `npm test` del servidor en verde. Commit
   `F1-04: clima y noche en GET /spawns (contrato en shared/protocol)` + `/guardar`.
 
 ### Paso 2 — Día/noche (puro)
 
 **Files:** Create `src/app/game/map-scene/day-night.ts` + spec
 
-- [ ] **2a. Test:** `isNightLocal(new Date(2026, 9, 12, 19, 0))` → `true`; `5:59` → `true`; `6:00` → `false`;
+- [x] **2a. Test:** `isNightLocal(new Date(2026, 9, 12, 19, 0))` → `true`; `5:59` → `true`; `6:00` → `false`;
   `18:59` → `false`. **2b.** falla. **2c.** `export const isNightLocal = (d: Date): boolean => d.getHours() >= 19 ||
   d.getHours() < 6;` (DISENO §1: hora local del móvil, no la del servidor). **2d.** pasa. Commit.
 
@@ -895,23 +895,23 @@ export interface NearbySpawns {
 `src/app/features/pokemon-add/pokemon-add.page.ts:133`, `src/app/features/pokemon-detail/pokemon-detail.page.ts:114,132`,
 `src/app/features/pokedex/pokedex.page.html`; Delete `src/app/core/layout/tabs/`
 
-- [ ] **3a.** En `app.routes.ts`: nueva ruta `{ path: 'mapa', canActivate: [authGuard], loadComponent: () =>
+- [x] **3a.** En `app.routes.ts`: nueva ruta `{ path: 'mapa', canActivate: [authGuard], loadComponent: () =>
   import('./features/map/map.page').then((m) => m.MapPage) }`; `{ path: 'pokedex', loadComponent: …PokedexPage }`
   (pública, como antes); `{ path: 'tabs/pokedex', redirectTo: '/pokedex' }` (enlaces viejos); `''` y `'**'` →
   `redirectTo: '/mapa'`. Quitar la ruta `''` con `loadChildren` de las pestañas. Actualizar el comentario de rutas.
-- [ ] **3b.** Cambiar `'/tabs/pokedex'` → `'/pokedex'` en `auth.guard.ts`, `pokemon-add.page.ts` y
+- [x] **3b.** Cambiar `'/tabs/pokedex'` → `'/pokedex'` en `auth.guard.ts`, `pokemon-add.page.ts` y
   `pokemon-detail.page.ts`. En `pokedex.page.html`, botón atrás en la `ion-toolbar`:
   `<ion-buttons slot="start"><ion-back-button defaultHref="/mapa" text="Mapa"></ion-back-button></ion-buttons>`
   (importar `IonBackButton`, `IonButtons` de `@ionic/angular`).
-- [ ] **3c.** Borrar `src/app/core/layout/tabs/`. `grep -rn "tabs" src/app` → solo la redirección de compatibilidad.
+- [x] **3c.** Borrar `src/app/core/layout/tabs/`. `grep -rn "tabs" src/app` → solo la redirección de compatibilidad.
   Los specs que naveguen a `/tabs/...` se actualizan a `/pokedex`.
-- [ ] **3d.** `ng test`, lint, build. Tras login (`safeRedirect` → `/`) se llega a `/mapa`. Commit + `/guardar`.
+- [x] **3d.** `ng test`, lint, build. Tras login (`safeRedirect` → `/`) se llega a `/mapa`. Commit + `/guardar`.
 
 ### Paso 4 — `MapScene` (three.js, sin Angular)
 
 **Files:** Create `src/app/game/map-scene/map-scene.ts`
 
-- [ ] **4a.** Clase `MapScene` que encapsula lo que hoy está en `SpikeScene` para el juego de verdad:
+- [x] **4a.** Clase `MapScene` que encapsula lo que hoy está en `SpikeScene` para el juego de verdad:
 
 ```ts
 export const REACH_RADIUS_M = 40; // UX: el servidor permite 80 m (D-028)
@@ -931,13 +931,13 @@ export class MapScene {
 
   Geometrías y materiales compartidos, `MeshLambertMaterial`, sin sombras proyectadas (sombras = discos
   semitransparentes, como el spike medido en D-035).
-- [ ] **4b.** Lint + build. Commit + `/guardar`.
+- [x] **4b.** Lint + build. Commit + `/guardar`.
 
 ### Paso 5 — `MapPage`: mapa, overlay, bucle y cámara
 
 **Files:** Create `src/app/features/map/map.page.ts`
 
-- [ ] **5a.** Esqueleto: `ion-content` a pantalla completa anulando la zona segura (D-022:
+- [x] **5a.** Esqueleto: `ion-content` a pantalla completa anulando la zona segura (D-022:
   `--padding-top: 0; --padding-bottom: 0`), `<div #mapEl class="map">`, capas del HUD con
   `var(--ion-safe-area-*)`. `afterNextRender` → `init()`:
 
@@ -960,51 +960,68 @@ this.overlay.setMap(this.map);
   `origin` = primer `location.position()` (se espera con `app-location-gate`, F1-03 paso 7). `colorScheme` solo se fija
   al crear el mapa: si se cruza las 19:00 o las 6:00 con la pantalla abierta, se recrea el mapa (comprobar cada
   minuto). **Riesgo:** que el Map ID no tenga variante oscura en la consola → ver "Pendientes de humanos".
-- [ ] **5b.** Bucle (`requestAnimationFrame`, igual que el spike): `dt` en segundos (tope 0,1 s si la pestaña se
+- [x] **5b.** Bucle (`requestAnimationFrame`, igual que el spike): `dt` en segundos (tope 0,1 s si la pestaña se
   durmió); joystick → `nudge`; `motion.setTarget(...toLocalM(origin, position))`; `f = motion.step(dt)`;
   re-anclar si `hypot(f.east, f.north) > REANCHOR_M` (`origin = fromLocalM(origin, f.east, f.north)`,
   `overlay.setAnchor`, `motion.shift(f.east, f.north)`); `mapScene.setPlayer(f, now)`; cámara
   `map.moveCamera({ center: fromLocalM(origin, f.east, f.north), heading })` con `heading = northUp ? 0 :
   compass.heading() ?? 0`. El usuario puede pellizcar el zoom (17-20) pero el centro vuelve al avatar en cada frame.
-- [ ] **5c.** `ngOnDestroy`: cancelar el rAF, `location.stop()`, `compass.stop()`, `overlay.setMap(null)`,
+- [x] **5c.** `ngOnDestroy`: cancelar el rAF, `location.stop()`, `compass.stop()`, `overlay.setMap(null)`,
   `mapScene.dispose()`. Al volver a la pantalla todo arranca de nuevo.
-- [ ] **5d.** Lint + build. Commit + `/guardar`.
+- [x] **5d.** Lint + build. Commit + `/guardar`.
 
 ### Paso 6 — Estados diseñados en `/mapa` (DISENO §6)
 
 **Files:** Modify `src/app/features/map/location-gate.component.ts` (creado en F1-03 paso 7), `map.page.ts`
 
-- [ ] **6a.** Montar `app-location-gate` sobre el mapa y añadirle el estado de error de Maps (`MapsLoadError` /
+- [x] **6a.** Montar `app-location-gate` sobre el mapa y añadirle el estado de error de Maps (`MapsLoadError` /
   `mapsAuthFailed()`) → "No se pudo cargar el mapa" + "Reintentar" (vuelve a llamar a `init()`).
-- [ ] **6b.** Commit + `/guardar`.
+- [x] **6b.** Commit + `/guardar`.
 
 ### Paso 7 — HUD y menú de la Poké Ball (DISENO §1)
 
 **Files:** Create `map-compass.component.ts`, `weather-chip.component.ts`, `ball-menu.component.ts` en
 `src/app/features/map/`
 
-- [ ] **7a. Arriba a la izquierda:** `app-player-hud` (ya existe, F1-08) con `BagService.load()` al entrar.
-- [ ] **7b. Arriba a la derecha:** `app-map-compass` (aguja que rota con `-heading`; toque → alterna "norte
+- [x] **7a. Arriba a la izquierda:** `app-player-hud` (ya existe, F1-08) con `BagService.load()` al entrar.
+- [x] **7b. Arriba a la derecha:** `app-map-compass` (aguja que rota con `-heading`; toque → alterna "norte
   arriba" / "sigue la brújula"; `aria-label` con el estado) y `app-weather-chip` (icono + texto en español del
   `weather` de `GET /spawns`; en F1-04 se pide `/spawns` una vez al tener posición solo para el clima; F1-07 lo
   sustituye por `SpawnFeedService`). Sin datos → no se muestra (nunca "undefined").
-- [ ] **7c. Abajo en el centro:** `app-ball-menu`: botón Poké Ball de 72 px (rojo `--accent`, `scale(0.97)` en
+- [x] **7c. Abajo en el centro:** `app-ball-menu`: botón Poké Ball de 72 px (rojo `--accent`, `scale(0.97)` en
   `:active`, háptico + sonido de toque como `GameButton`) que abre una hoja (`--ease-drawer`, `--dur-panel`, se cierra
   arrastrando hacia abajo o tocando fuera) con: Pokédex (`/pokedex`), Combate de prueba (`/combate/prueba`), Joystick
   sí/no (`useJoystickAt(posición actual)` / `useGps()`), Reducir efectos, Cerrar sesión. (Mis Pokémon, Equipos,
   Favoritos se añaden cuando existan, F3.)
-- [ ] **7d.** Si `settings.joystickMode` → `app-joystick` abajo a la izquierda.
-- [ ] **7e.** Lint, `ng test`, build. Commit + `/guardar`.
+- [x] **7d.** Si `settings.joystickMode` → `app-joystick` abajo a la izquierda.
+- [x] **7e.** Lint, `ng test`, build. Commit + `/guardar`.
 
 ### Paso 8 — Prueba y evidencias
 
-- [ ] **8a.** Navegador 390×844 con joystick (sin GPS en el PC): login → `/mapa`; moverse, girar la brújula del HUD,
+- [x] **8a.** Navegador 390×844 con joystick (sin GPS en el PC): login → `/mapa`; moverse, girar la brújula del HUD,
   abrir el menú. **Capturas de día y de noche** (para la de noche, cambiar temporalmente la hora del PC o forzar
   `night` con `?noche=1` solo en desarrollo) → `docs/evidencias/F1-04_0{1,2}_*.png`.
-- [ ] **8b.** Android real: caminar, girar; medir fps con `FpsMeter` (añadir el contador oculto tras un toque largo en
+- [x] **8b.** Android real: caminar, girar; medir fps con `FpsMeter` (añadir el contador oculto tras un toque largo en
   la brújula solo en builds de desarrollo) — objetivo ≥ 55 de media. Captura → `F1-04_03_*.png`.
-- [ ] **8c.** Checklist DISENO §1: mapa protagonista, sin pestañas, vidrio, HUD en su sitio, noche 19-6, botones
+- [x] **8c.** Checklist DISENO §1: mapa protagonista, sin pestañas, vidrio, HUD en su sitio, noche 19-6, botones
   ≥ 44 px, contraste AA en los textos sobre vidrio. REGLA 2.
+
+**Hecho (Kenneth, 2026-10-12). Cambios respecto a este plan:**
+
+- **8b sin `FpsMeter` en la app:** los fps se midieron desde el PC por CDP (`requestAnimationFrame` en ventanas de
+  10 s: quieto / joystick / menú abierto). Ojo: el Samsung A36 cambia solo entre 60 y 120 Hz; "≈60" puede ser el tope
+  de la pantalla, no lentitud.
+- **Zoom 19** (no 18) y **avatar provisional ×1,8**: a 18 casi no se veía. El pellizco sigue dejando 17-20.
+- **Luces propias en `MapScene`** (día = las de `ThreeJSOverlayView`, noche más fría y tenue): overlay con
+  `addDefaultLighting: false`.
+- **Pausa fuera de pantalla:** con `ion-router-outlet` la página del mapa no se destruye; `ionViewWillLeave` para el
+  bucle, el GPS y la brújula y **desmonta la capa 3D** (`overlay.setMap(null)`), también con la app en segundo plano.
+  Sin eso la GPU del A36 se reiniciaba y el mapa volvía en raster (D-038).
+- **El mapa se rehace solo** (perdió el contexto WebGL, cayó a raster o cambió día/noche) y únicamente con la pantalla
+  a la vista, tras 1,5 s, máx. 3 veces por minuto (D-038). Error de Maps → "No se pudo cargar el mapa" + Reintentar.
+- **Vidrio sin esmerilar sobre el mapa** (token `--glass-filter: none` + `--surface-opaque` en `MapPage`): con
+  desenfoque el menú abierto iba a 42 fps; sin él, a 61 (D-039).
+- El chip del clima pide `GET /spawns` una vez por visita al tener posición (F1-07 lo cambiará por `SpawnFeedService`).
 
 ---
 

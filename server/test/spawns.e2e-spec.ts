@@ -20,6 +20,8 @@ const nextIp = (): string => {
 interface Nearby {
   slot: number;
   expiresAt: string;
+  weather: string;
+  night: boolean;
   spawns: { id: string; speciesId: number; lat: number; lng: number }[];
 }
 
@@ -105,5 +107,14 @@ describe('Spawns (e2e)', () => {
       expect(s.speciesId).toBeGreaterThanOrEqual(1);
       expect(s.speciesId).toBeLessThanOrEqual(1025);
     }
+  });
+
+  it('incluye el clima y si es de noche (para el HUD del mapa, F1-04)', async () => {
+    const body = (
+      await get(ash, `?lat=${NEIVA.lat}&lng=${NEIVA.lng}`).expect(200)
+    ).body as Nearby;
+    // Open-Meteo simulado con el código WMO 61 (lluvia) en beforeAll.
+    expect(body.weather).toBe('rain');
+    expect(typeof body.night).toBe('boolean');
   });
 });

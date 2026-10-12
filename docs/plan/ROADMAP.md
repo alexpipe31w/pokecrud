@@ -99,9 +99,20 @@
       `app-joystick`, `app-location-gate` y modo "Sígueme" en `/dev/mapa` (app 150 tests, shared 140). Samsung A36
       caminando por Neiva: `walk` 0,6-1,2 m/s, `run` 3,3 m/s, ±3-5 m, el mapa gira con la brújula; sin permiso →
       pantalla de permisos; joystick con el dedo `walk`/`run` 4 m/s/`idle`. Evidencias `F1-03_0{1..7}_*`. D-037.
-- [ ] **F1-04 · Pantalla Mapa** — mapa como ruta principal (`/mapa`), estilo día/noche, cámara que sigue
+- [x] **F1-04 · Pantalla Mapa** (@kenneth, 2026-10-12) — mapa como ruta principal (`/mapa`), estilo día/noche, cámara que sigue
       al avatar y rota con la brújula, HUD (avatar/nivel, brújula, clima, botón Poké Ball → menú).
       Quitar las pestañas de Ionic. Dep: F1-03, F0-07. Criterio: DISENO §1 cumplido; captura de día y de noche.
+      **Hecho:** `/mapa` principal (sin pestañas; `/pokedex` con botón atrás), `MapScene`, `MapPage` (día/noche, cámara,
+      pausa fuera de pantalla), HUD (placa, brújula, clima de `GET /spawns`), menú de la Poké Ball, estado de error de Maps.
+      Servidor: `weather` y `night` en `GET /spawns` (contrato en `shared/protocol/spawns.ts`). app 167 tests, shared 140,
+      server 22 + e2e 67. Samsung A36: 78/77/61 fps (quieto/joystick/menú), Pokédex ida y vuelta y segundo plano sin
+      fallos. Evidencias `F1-04_0{1..10}_*` (día y noche: 01-02). D-038, D-039.
+- [ ] **F1-09 · Pantalla de "servidor despertando"** — al abrir la app con Render dormido, el guardián espera a
+      recuperar la sesión y la pantalla queda en blanco 20-30 s (visto en el A36). DISENO §6: mensaje simpático y reintento
+      con backoff mientras `/auth/refresh` no responde. Dep: F0-07.
+- [ ] **F1-10 · El HUD sigue al mapa (día/noche), no al modo oscuro del sistema** — hoy los tokens cambian con
+      `prefers-color-scheme`: con el móvil en modo oscuro el HUD sale oscuro sobre el mapa de día (DISENO §1: "la UI sigue
+      al mapa"). Dep: F1-04.
 - [ ] **F1-05 · Avatar 3D** — personaje que camina/corre/se queda quieto según velocidad, sombra,
       círculo de alcance. Dep: F1-04.
 - [x] **F1-06 · Spawns deterministas** (@alex, 2026-10-11) — `shared/engine/spawns.ts` + `rng.ts` con tests; endpoint

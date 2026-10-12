@@ -51,7 +51,7 @@ import { BattleController } from './battle.controller';
       border-radius: var(--r-sheet) var(--r-sheet) 0 0;
       background: var(--surface);
       color: var(--surface-text);
-      backdrop-filter: blur(20px) saturate(160%);
+      backdrop-filter: var(--glass-filter);
       border-top: 1px solid var(--glass-edge);
       box-shadow: var(--shadow-lg);
       animation: up 320ms var(--ease-drawer) both;

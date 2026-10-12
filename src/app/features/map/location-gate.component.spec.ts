@@ -80,6 +80,19 @@ describe('LocationGateComponent', () => {
     expect(text()).toContain('GPS débil');
   });
 
+  it('error de Google Maps: lo explica (aunque haya GPS) y "Reintentar" avisa a la pantalla', () => {
+    const retry = vi.fn();
+    fixture.componentInstance.retryMaps.subscribe(retry);
+    show('ok');
+    fixture.componentRef.setInput('mapsError', 'Google Maps no respondió en 15 s.');
+    fixture.detectChanges();
+    expect(text()).toContain('No se pudo cargar el mapa');
+    expect(text()).toContain('Google Maps no respondió en 15 s.');
+    press('Reintentar');
+    expect(retry).toHaveBeenCalled();
+    expect(location.useGps).not.toHaveBeenCalled();
+  });
+
   it('ok y joystick: no muestra nada', () => {
     show('ok');
     expect(text().trim()).toBe('');

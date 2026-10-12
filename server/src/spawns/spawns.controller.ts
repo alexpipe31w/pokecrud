@@ -3,8 +3,9 @@ import { Throttle } from '@nestjs/throttler';
 import type { AuthPlayer } from '../auth/auth.decorators.js';
 import { CurrentPlayer } from '../auth/auth.decorators.js';
 import { LocationService } from '../location/location.service.js';
+import type { NearbySpawns } from '../../../shared/protocol/spawns.js';
 import { SpawnsQueryDto } from './spawns.dto.js';
-import { NearbySpawns, SpawnsService } from './spawns.service.js';
+import { SpawnsService } from './spawns.service.js';
 
 /**
  * `GET /spawns?lat&lng` (F1-06): Pokémon salvajes a ≤ 200 m. Exige sesión (guard global): sin cuenta no se

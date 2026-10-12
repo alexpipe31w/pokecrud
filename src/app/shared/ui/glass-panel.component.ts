@@ -11,8 +11,8 @@ import { Component, input } from '@angular/core';
       padding: var(--s-4);
       background: var(--surface);
       color: var(--surface-text);
-      backdrop-filter: blur(20px) saturate(160%);
-      -webkit-backdrop-filter: blur(20px) saturate(160%);
+      backdrop-filter: var(--glass-filter);
+      -webkit-backdrop-filter: var(--glass-filter);
       border-top: 1px solid var(--glass-edge);
       border-radius: var(--r-card);
     }

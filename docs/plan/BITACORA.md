@@ -864,3 +864,45 @@ Kenneth grabó la pantalla del segundo; de ahí salen las evidencias.
 primero puede pasar de 6 s y no sonar) y los SFX de golpe.
 **Decisiones nuevas:** ninguna.
 **El siguiente debe empezar por:** lo mismo que la entrada anterior (mezclar el PR de F1-03 y coger F1-04).
+
+## 2026-10-12 16:00 · @kenneth (Claude) · F1-04 · rama `feature/F1-04-pantalla-mapa`
+
+**Qué se hizo:** antes, mezclado el PR #36 (F1-03) con permiso de Kenneth. F1-04 siguiendo `docs/plan/fases/F1-mapa.md`
+(pasos 1-8): `weather`/`night` en `GET /spawns` con el contrato en `shared/protocol/spawns.ts`; `isNightLocal`;
+rutas (`/mapa` principal, `/pokedex` con botón "‹ Mapa", fuera `core/layout/tabs`); `MapScene` (jugador provisional,
+anillo que late, luces de día/noche); `MapPage` (mapa vectorial día/noche, overlay, bucle, cámara, pausa fuera de
+pantalla, error de Maps con Reintentar); HUD (placa + mochila, brújula, clima) y menú de la Poké Ball. En el Samsung A36
+aparecieron **dos fallos graves**, investigados con logcat y CDP y arreglados: (1) al volver de la Pokédex o de segundo
+plano el mapa quedaba en blanco o en raster: la capa 3D (`animationMode: 'always'`) seguía pidiendo fotogramas con el
+mapa oculto y **la GPU se reiniciaba** (`GL_UNKNOWN_CONTEXT_RESET_KHR`), tras lo que Chrome bloquea WebGL → ahora el
+overlay se desmonta fuera de pantalla y en segundo plano, y el mapa se rehace solo si hace falta, con la pantalla a la
+vista y con tope (D-038); (2) rendimiento: el `backdrop-filter` sobre el mapa costaba hasta 18 fps → token
+`--glass-filter`, sin esmerilar sobre el mapa (D-039). Además zoom 19 y avatar provisional ×1,8 (a 18 no se veía).
+**Errores míos durante las pruebas (para que nadie los repita):** sondear el canvas de Google con `getContext()` le
+robaba el contexto (raster); los canvas WebGL "de prueba" desde CDP, sumados, hacían que el WebView matara el del mapa;
+forzar `loseContext()` muchas veces acabó bloqueando WebGL. Todo anotado en D-038.
+**Archivos clave:** `src/app/features/map/{map.page,ball-menu,map-compass,weather-chip,location-gate}.component.ts`,
+`src/app/game/map-scene/{map-scene,day-night}.ts`, `src/app/app.routes.ts`, `src/theme/tokens.scss`,
+`shared/protocol/spawns.ts`, `server/src/spawns/spawns.service.ts`, `docs/evidencias/F1-04_*`.
+**Cómo se probó (salida real):**
+
+    lint OK · ng test: 41 archivos, 167 passed · shared: 12 archivos, 140 passed · build OK sin avisos
+    server: e2e spawns 4/4 (weather 'rain' con Open-Meteo simulado), e2e completos 67/67, unit 22/22, build OK
+    navegador 390×844 (Chrome con GPU, Nest local + ng serve, cuentas test+f104-… borradas): login → /mapa, GET /spawns
+      200, clima "Despejado", brújula aria-pressed true, menú "Pokédex | Combate de prueba | Joystick No | Reducir
+      efectos No | Cerrar sesión", joystick visible, /pokedex y vuelta, noche (zona horaria Asia/Tokyo 04:27) con
+      .map.is-night · 0 errores de consola (F1-04_01…04)
+    Samsung A36, APK de producción 11,44 MB, banco por CDP (10 s por caso, dos tandas):
+      vidrio 20 px: quieto 61,4 · joystick 57,6 · menú 42,5 | 8 px: 62,4 · 57,3 · 41,8 | sin desenfoque: 78,3 · 76,7 · 59,9
+      APK final: 78,5/77,3/61,0 y 78,8/76,8/61,0
+    Pokédex ida y vuelta ×3 (arranque en frío, sin sondas): siempre mapa vectorial (1 canvas), logcat: 0 reinicios de GPU
+      (antes: "Offscreen context lost via ARB/EXT_robustness. Reset status = GL_UNKNOWN_CONTEXT_RESET_KHR")
+    segundo plano 10 s (tecla Inicio): vuelve vectorial · Kenneth a mano: Pokédex 3-4 veces, bloquear 10 s y el
+      vidrio nuevo → "perfecto, todo va bien" (vídeo y capturas F1-04_05…10)
+
+**Quedó a medias / roto:** nada de F1-04. El clima no sale en el APK hasta que se mezcle este PR (Render). Nuevas en el
+ROADMAP: F1-09 (pantalla en blanco 20-30 s mientras Render despierta) y F1-10 (el HUD sigue el modo oscuro del sistema,
+no el día/noche del mapa).
+**Decisiones nuevas:** D-038, D-039.
+**El siguiente debe empezar por:** mezclar el PR de F1-04 y coger F1-05 (avatar 3D) siguiendo `docs/plan/fases/F1-mapa.md`
+→ F1-05, después de leer D-038 y D-039 (qué no hacer con el canvas del mapa y con el vidrio encima de él).
