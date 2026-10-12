@@ -488,3 +488,18 @@ página abierta 600 s, 0,05 m/s de diferencia son ~125 rad → piernas temblando
 gait, speed, dt)` suma la fase fotograma a fotograma (continua aunque cambien la velocidad o el paso andar/correr) y
 `limbPose(gait, phase, t)` la recibe. Vale igual para cualquier animación cíclica que dependa de la velocidad (p. ej.
 los Pokémon que anden en F1-07): acumular la fase, no multiplicar por el reloj.
+
+## D-041 · Pokémon en el mapa: la posición se manda antes del encuentro, y los edificios 3D los tapan (F1-07) (2026-10-12, Alex)
+
+- **Posición al servidor antes de `GET /encounters/:id`.** El servidor mide la distancia (≤ 80 m) desde la última
+  posición recibida por `GET /spawns` (D-028), y el feed solo pide `/spawns` al moverse > 60 m o al cambiar de franja.
+  Resultado medido: caminar 35 m hacia un Pokémon y tocarlo → 403. Ahora `MapPage` llama a
+  `SpawnFeedService.reportPosition(gps)` (espera a la petición en vuelo; nunca dos a la vez) y después navega. Cuesta
+  1 petición por toque, muy por debajo del límite de 20/min. Si el día de mañana hay un endpoint de "posición", este es
+  el sitio para cambiarlo. Lo mismo valdrá para `POST /encounters/:id/throw` si el jugador se mueve durante la captura.
+- **Los edificios 3D de Google se pintan DESPUÉS de la capa three.js** (`WebGLOverlayView`): un Pokémon detrás de una
+  casa sale cortado. Probado y descartado: `depthTest: false` (no basta) y escribir `gl_FragDepth = 0` en el sprite
+  (Google lo pinta encima igual). Lo que sí se hizo: sombra → hierba → sprite con `depthTest: false` y `renderOrder`, para
+  que la hierba nunca tape a su Pokémon. **Única salida real: edificios 2D en el estilo `pokecrud-juego`** (engranaje
+  del editor de estilos → Edificios → 2D), como Pokémon GO. Decisión pendiente de Alex (se ve peor el mapa a cambio de
+  no esconder Pokémon).

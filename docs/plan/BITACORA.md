@@ -974,3 +974,30 @@ recibirlo (y el navegador lo cachea). No hace falta tocar código: `MapPage` ya 
 **Quedó a medias / roto:** nada.
 **El siguiente debe empezar por:** lo que diga ESTADO (F1-07 sin Android; F1-05 3b / F2-01 con Android).
 
+## 2026-10-12 18:00 · @alex (Claude) · F1-07 · rama `feature/F1-07-pokemon-mapa`
+
+**Qué se hizo:** F1-07 pasos 1-7a siguiendo `docs/plan/fases/F1-mapa.md`: `spawn-diff`, `refetch`, `appear`
+(puros), `SpawnFeedService` (+ `reportPosition`), `SpriteTextures` (contador de referencias), `grass-tuft` y
+`SpawnLayer` (sprite + sombra + mata de hierba + cilindro de toque; brota agitando la hierba, se desvanece al irse,
+saltito si está lejos), `map-input` (grito por distancia ≤ 60 m, 1 cada 5 s; toque vs arrastre; NDC), `playCry` con
+volumen, `/encuentro/:id` provisional y todo conectado en `MapPage`. `EncounterView` a `shared/protocol`.
+En la prueba salieron dos cosas que se arreglaron: 403 al abrir el encuentro (D-041) y la hierba fea (pedido de Alex:
+de 10 conos a matas de 40 briznas). Y una que NO se puede arreglar desde el código: los edificios 3D tapan Pokémon (D-041).
+**Archivos clave:** `src/app/game/map-scene/{spawn-diff,refetch,appear,sprite-textures,grass-tuft,spawn-layer,map-input}.ts`,
+`src/app/services/game/spawn-feed.service.ts`, `src/app/features/map/map.page.ts`, `src/app/features/encounter/encounter.page.ts`,
+`shared/protocol/encounters.ts`, `docs/evidencias/F1-07_*`.
+**Cómo se probó (salida real):**
+
+    lint OK · ng test: 52 archivos, 236 passed (exit 0) · shared 140 passed · build OK · server: build OK, unit 22/22
+    navegador 390×844 (Nest local + ng serve, joystick, cuenta f107-prueba@pokecrud.test → "borradas 1"):
+      brotan 3 Pokémon con hierba (F1-07_01/02) · tocar uno lejos → "Acércate más para atraparlo" + saltito (F1-07_03)
+      acercarse y tocar → log: GET /spawns?lat=2.927869&lng=-75.282322 (reportPosition) y 280 ms después
+      GET /encounters/4182_-107547%3A2986407%3A0 → 200 → "Pyukumuku · Nivel 5" con su grito (F1-07_05)
+      antes del arreglo: 403 "Estás demasiado lejos" con el Pokémon dentro del anillo
+      mata de hierba a ×2,5 (densidad de móvil): F1-07_06
+
+**Quedó a medias / roto:** 7b (Android, ≥ 55 fps con Pokémon de verdad) → Kenneth o Samuel. Edificios 3D que tapan
+Pokémon: decisión de Alex (D-041).
+**Decisiones nuevas:** D-041.
+**El siguiente debe empezar por:** con Android, 7b de F1-07 y 3b de F1-05 (mismo APK). Sin Android: F1-09 / F1-10, o
+F2-02 si ya hay spike de cámara.

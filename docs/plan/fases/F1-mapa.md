@@ -1393,11 +1393,28 @@ export function disappearPose(ms: number): SpritePose {
 
 ### Paso 7 — Prueba y evidencias
 
-- [ ] **7a.** Navegador 390×844 con joystick y el servidor local (`cd server && npm run start:dev`, con
+- [x] **7a.** Navegador 390×844 con joystick y el servidor local (`cd server && npm run start:dev`, con
   `SPAWN_SALT`): aparecen Pokémon con la hierba agitándose, al acercarse con el joystick suena el grito bajito, tocar
   uno lejano → "Acércate más", uno cercano → `/encuentro/:id` con sus datos. Capturas → `docs/evidencias/F1-07_*`.
 - [ ] **7b.** Android con el APK de producción (Render): en la calle, ≥ 55 fps con los Pokémon de verdad (contador de
   F1-04 8b), grito al acercarse, toque → encuentro. Anotar cuántos Pokémon había y los fps. REGLA 2.
+
+**Hecho (Alex, 2026-10-12; falta 7b en un Android). Cambios respecto a este plan:**
+
+- **Antes de abrir el encuentro se manda la posición** (`SpawnFeedService.reportPosition`, un `GET /spawns` fuera de
+  turno): el servidor mide la distancia desde la última posición de `/spawns` y el feed solo la renueva cada 60 m, así
+  que tras acercarse a un Pokémon `GET /encounters/:id` daba **403 "demasiado lejos"** (visto en la prueba). D-041.
+- **Hierba = matas densas** (pedido de Alex: "se ve muy fea"): `grass-tuft.ts`, 40 briznas finas por mata (hoja que
+  se estrecha y se curva, base oscura y punta clara, 4 verdes, alturas 2,6-5,5 m, más tupida en el centro), en un solo
+  `InstancedMesh` (≤ 60 matas × 40 = 2.400 instancias, 1 llamada de dibujo). Tamaño exagerado como el sprite: a zoom 19
+  una hierba "real" no se ve.
+- **Toque con cilindros invisibles**, no con el sprite: `ThreeJSOverlayView.raycast` no pone la cámara en el raycaster
+  y `THREE.Sprite` la necesita.
+- **Texturas con contador de referencias**, no LRU: con LRU un Pokémon que siguiera en pantalla podía perder su
+  textura si entraban 40 especies nuevas.
+- **Los edificios 3D tapan a los Pokémon** que quedan detrás y no se puede evitar desde three.js (D-041).
+- `EncounterView` pasó a `shared/protocol/encounters.ts` (lo usan app y servidor). `/encuentro/:id` es PROVISIONAL
+  (F2-04 lo cambia por la escena AR). El chip del clima ya sale del feed (adiós a la petición aparte de F1-04).
 
 ---
 
