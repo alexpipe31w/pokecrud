@@ -954,3 +954,23 @@ build) y servidor (lint, unitarios, build). `develop` protegida: exige los dos t
 
 **Quedó a medias / roto:** nada. Los e2e del servidor no corren en CI (necesitan la base de Supabase).
 **El siguiente debe empezar por:** nada nuevo: si el CI sale en rojo en tu PR, arréglalo antes de mezclar.
+
+## 2026-10-12 17:30 · @alex (Claude) · pendientes de Alex (estilo del mapa y ADMIN) · rama `feature/F1-04-estilo-mapa`
+
+**Qué se hizo:** (1) Alex se registró y es ADMIN del inventario (`npm run admin -- grant`). (2) Estilos de Google Maps en
+el proyecto de Alex: `pokecrud-juego` (claro) y `pokecrud-juego-noche` (oscuro), con las etiquetas de Lugar de interés →
+Alimentos y bebidas, Venta minorista, Servicio, Alojamiento y Entretenimiento **desactivadas**; el claro además con
+Edificios 3D y densidad de POI "Dispersa". Asignados al modo claro y al oscuro del Map ID `5309ecf69efbfe12f3ecbc4c`.
+**Para quien toque los estilos:** un estilo nuevo nace con **Edificios 2D** (el mapa se veía plano): se cambia en el
+engranaje del editor, y solo existe en el estilo claro. Tras Guardar hay que **Publicar**; la app tarda unos minutos en
+recibirlo (y el navegador lo cachea). No hace falta tocar código: `MapPage` ya elige claro/oscuro con `colorScheme`.
+**Cómo se probó (salida real):**
+
+    npm run admin -- list → alexpipe31w@gmail.com (alexpipe31w) · davidflorezramirez1602@gmail.com (samu1630)
+    consola: "El estilo se publicó correctamente" (claro) · Map ID tras recargar: Modo claro pokecrud-juego · Modo oscuro pokecrud-juego-noche
+    /mapa 390×844 (Nest local, cuenta @pokecrud.test borrada): día sin restaurantes/tiendas/hotel y con edificios 3D
+      (F1-04_11); noche (zona horaria Asia/Kolkata, 03:00) mapa oscuro 3D con pocos POI (F1-04_12)
+
+**Quedó a medias / roto:** nada.
+**El siguiente debe empezar por:** lo que diga ESTADO (F1-07 sin Android; F1-05 3b / F2-01 con Android).
+
