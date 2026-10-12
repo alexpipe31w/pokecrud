@@ -3,11 +3,11 @@
 > Se **reescribe** al cerrar cada sesión (no es histórico; el histórico es `BITACORA.md`).
 > Máximo una pantalla. Si lees esto al empezar: después lee `ROADMAP.md`.
 
-**Última actualización:** 2026-10-12 · por Kenneth (Claude) · rama `feature/F1-04-pantalla-mapa` (PR a `develop`)
+**Última actualización:** 2026-10-12 · por Kenneth (Claude) · rama `feature/F1-04-pantalla-mapa` (PR #37 a `develop`)
 
 ## 👉 RELEVO DE KENNETH A ALEX (2026-10-12)
 
-1. **Mezclar primero el PR de F1-04** (`feature/F1-04-pantalla-mapa` → `develop`). Trae un cambio de servidor
+1. **Mezclar primero el PR #37 de F1-04** (`feature/F1-04-pantalla-mapa` → `develop`). Trae un cambio de servidor
    (`weather` y `night` en `GET /spawns`): Render lo despliega solo al mezclar; hasta entonces el APK no enseña el clima.
 2. **Lo nuevo:** al iniciar sesión se entra a **`/mapa`** (pantalla principal; ya no hay pestañas). Menú = botón Poké
    Ball: Pokédex (`/pokedex`, con botón "‹ Mapa"), Combate de prueba, Joystick sí/no, Reducir efectos, Cerrar sesión.
@@ -34,7 +34,7 @@ fórmula (F2-03) y captura en servidor (F2-06) hechas; lo visual del encuentro e
 
 ## Hecho
 
-- **F1-04 (Kenneth, rama `feature/F1-04-pantalla-mapa`, PR a `develop`):** `/mapa` como ruta principal (fuera
+- **F1-04 (Kenneth, PR #37, pendiente de mezclar):** `/mapa` como ruta principal (fuera
   `core/layout/tabs`; `/tabs/pokedex` redirige a `/pokedex`), `MapScene` (jugador provisional ×1,8, anillo que late,
   luces de día y de noche), `MapPage` (Google Maps vectorial zoom 19 / tilt 67,5°, modo oscuro 19:00-6:00 con
   `isNightLocal`, cámara que sigue al avatar y gira con la brújula, re-anclaje a 1 km, pausa fuera de pantalla, estado
@@ -138,7 +138,7 @@ fórmula (F2-03) y captura en servidor (F2-06) hechas; lo visual del encuentro e
 
 ## Siguiente paso concreto
 
-1. **Alex o Samuel:** mezclar el PR de F1-04 y comprobar que Render despliega solo (`GET /spawns` con `weather`).
+1. **Alex o Samuel:** mezclar el PR #37 de F1-04 y comprobar que Render despliega solo (`GET /spawns` con `weather`).
 2. **Siguiente tarea:** F1-05 (avatar 3D) siguiendo `docs/plan/fases/F1-mapa.md` → F1-05 (leer antes las notas "Hecho"
    de F1-03 y F1-04 en ese plan, y D-038/D-039). Con Android también → F2-01. Sin móvil → F5-01 o F2-08.
 3. **Alex:** estilo del Map ID sin POI comerciales (siguen saliendo restaurantes y tiendas); la noche ya funciona con
@@ -155,7 +155,7 @@ fórmula (F2-03) y captura en servidor (F2-06) hechas; lo visual del encuentro e
 - [x] (Samuel, 2026-10-12) Revisar y mezclar #21…#31: primero la cadena #22 → #31 y #21 al final (único con
       conflictos). GitHub NO reapuntó solo (el repo no borra las ramas mezcladas): la base se cambió a `develop` a mano.
 - [x] Mezclar el PR #36 de **F1-03** (Kenneth, 2026-10-12).
-- [ ] Mezclar el PR de **F1-04** (`feature/F1-04-pantalla-mapa`). Trae cambio de servidor: Render despliega solo.
+- [ ] Mezclar el PR #37 de **F1-04** (`feature/F1-04-pantalla-mapa`). Trae cambio de servidor: Render despliega solo.
 
 **Samuel (Render, solo él tiene acceso):**
 
