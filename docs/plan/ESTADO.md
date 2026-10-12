@@ -68,7 +68,8 @@
 
 ## En curso
 
-- Nadie. Esperan revisión **en orden** (ver PENDIENTES DE HUMANOS): #21 → #22 → #23 → #24 → #25.
+- **F4-01 (Alex, rama `feature/F4-01-plan-combate`, sale de F2-06):** plan detallado del motor de combate.
+- Esperan revisión **en orden** (ver PENDIENTES DE HUMANOS): #21 → #22 → #23 → #24 → #25.
 - **F1-01 → PENDIENTE DE KENNETH** (medir fps en su Android): rama `feature/F1-01-spike-mapa-3d`, instrucciones
   exactas en la última entrada de F1-01 de la bitácora.
 
