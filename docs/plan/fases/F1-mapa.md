@@ -937,7 +937,7 @@ export class MapScene {
 
 **Files:** Create `src/app/features/map/map.page.ts`
 
-- [ ] **5a.** Esqueleto: `ion-content` a pantalla completa anulando la zona segura (D-022:
+- [x] **5a.** Esqueleto: `ion-content` a pantalla completa anulando la zona segura (D-022:
   `--padding-top: 0; --padding-bottom: 0`), `<div #mapEl class="map">`, capas del HUD con
   `var(--ion-safe-area-*)`. `afterNextRender` → `init()`:
 
@@ -960,15 +960,15 @@ this.overlay.setMap(this.map);
   `origin` = primer `location.position()` (se espera con `app-location-gate`, F1-03 paso 7). `colorScheme` solo se fija
   al crear el mapa: si se cruza las 19:00 o las 6:00 con la pantalla abierta, se recrea el mapa (comprobar cada
   minuto). **Riesgo:** que el Map ID no tenga variante oscura en la consola → ver "Pendientes de humanos".
-- [ ] **5b.** Bucle (`requestAnimationFrame`, igual que el spike): `dt` en segundos (tope 0,1 s si la pestaña se
+- [x] **5b.** Bucle (`requestAnimationFrame`, igual que el spike): `dt` en segundos (tope 0,1 s si la pestaña se
   durmió); joystick → `nudge`; `motion.setTarget(...toLocalM(origin, position))`; `f = motion.step(dt)`;
   re-anclar si `hypot(f.east, f.north) > REANCHOR_M` (`origin = fromLocalM(origin, f.east, f.north)`,
   `overlay.setAnchor`, `motion.shift(f.east, f.north)`); `mapScene.setPlayer(f, now)`; cámara
   `map.moveCamera({ center: fromLocalM(origin, f.east, f.north), heading })` con `heading = northUp ? 0 :
   compass.heading() ?? 0`. El usuario puede pellizcar el zoom (17-20) pero el centro vuelve al avatar en cada frame.
-- [ ] **5c.** `ngOnDestroy`: cancelar el rAF, `location.stop()`, `compass.stop()`, `overlay.setMap(null)`,
+- [x] **5c.** `ngOnDestroy`: cancelar el rAF, `location.stop()`, `compass.stop()`, `overlay.setMap(null)`,
   `mapScene.dispose()`. Al volver a la pantalla todo arranca de nuevo.
-- [ ] **5d.** Lint + build. Commit + `/guardar`.
+- [x] **5d.** Lint + build. Commit + `/guardar`.
 
 ### Paso 6 — Estados diseñados en `/mapa` (DISENO §6)
 
