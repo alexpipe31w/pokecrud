@@ -430,7 +430,7 @@ zona muerta (sin salto).
 **Files:** Create `src/app/services/location/location.service.ts`, `compass.service.ts` (+ specs). Modify
 `package.json` (dependencia).
 
-- [ ] **4a. Dependencia:** `npm install --save-exact @capacitor/geolocation@8.2.3` y `npx cap sync android`. Los
+- [x] **4a. Dependencia:** `npm install --save-exact @capacitor/geolocation@8.2.3` y `npx cap sync android`. Los
   permisos ya están en `AndroidManifest.xml` (F0-09). Anotar la versión en el commit.
 - [ ] **4b. Test que falla** (`location.service.spec.ts`). Plugin por token de inyección (D-016), nada de `vi.mock`:
 
