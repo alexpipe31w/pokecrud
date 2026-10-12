@@ -15,7 +15,8 @@ F1-10 el HUD sigue al día/noche del mapa · F2-08 efectos de sonido generados +
 
 1. **Cómo trabajamos ahora:** rama `feature/…` → PR → **lo mezclas tú mismo** en cuanto el CI esté verde (lint + test +
    build de app y servidor). `develop` está protegida: no deja mezclar en rojo ni push directo.
-2. **Con tu Redmi (Android), lo más valioso:** `npm run apk -- --install` y en la calle: 7b de F1-07 (≥ 55 fps con
+2. **Con tu Redmi (Android), lo más valioso:** `npm run apk -- --install` (comprueba también que `adb logcat` ya NO
+   saca el refresh token: ver "PENDIENTES DE HUMANOS") y en la calle: 7b de F1-07 (≥ 55 fps con
    Pokémon, grito, toque → encuentro) y 3b de F1-05 (avatar). Mide fps por CDP. Si van bien, marca las dos `[x]`.
    Luego F2-01 (spike cámara + giroscopio), que desbloquea la captura y el combate en AR.
 3. **Sin móvil:** F2-10 (música) o F5-01 (plan del PvP).
@@ -198,9 +199,10 @@ fórmula (F2-03) y captura en servidor (F2-06) hechas; lo visual del encuentro e
 
 **Quien coja F8-02 / F8-04 (rendimiento y APK de release):**
 
-- [ ] El APK de **depuración** escribe en la consola del WebView lo que lee `SecureStorage`, **incluido el refresh
-      token** (registro de depuración de Capacitor; visto en F1-03 por CDP). Comprobar que el de release no lo hace
-      (`loggingBehavior` en `capacitor.config.ts`).
+- [~] (Alex, 2026-10-12) El registro de Capacitor escribía en la consola/logcat lo que lee `SecureStorage`, **incluido el
+      refresh token**, y `npm run apk` siempre compila un APK de depuración (también el de Render). Arreglado en
+      `capacitor.config.ts`: `loggingBehavior` = `'none'` salvo en el APK de desarrollo (`-- device`). **Falta (Android):**
+      `npm run apk -- --install`, iniciar sesión y comprobar con `adb logcat | grep -i SecureStorage` que no sale nada.
 - [ ] El APK pasó de 8,4 a 11,4 MB con `@capacitor/geolocation` (librería nativa de ubicación; `classes.dex` sin
       minificar). Medir con el de release (minify/R8).
 - [ ] En el Samsung A36 (pantalla de 120 Hz) `/dev/mapa` con 30 Pokémon marca 40-120 fps según la zona; medir en F8-02.
