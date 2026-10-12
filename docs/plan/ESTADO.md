@@ -3,7 +3,7 @@
 > Se **reescribe** al cerrar cada sesión (no es histórico; el histórico es `BITACORA.md`).
 > Máximo una pantalla. Si lees esto al empezar: después lee `ROADMAP.md`.
 
-**Última actualización:** 2026-10-11 · por Alex (Claude) · rama `feature/F4-01-plan-combate` (PR abierto)
+**Última actualización:** 2026-10-11 · por Alex (Claude) · rama `feature/F4-02-tipos-stats` (PR abierto)
 
 ## Fase actual
 
@@ -11,6 +11,9 @@
 
 ## Hecho
 
+- **F4-02 (Alex, PR abierto; sale de F4-01):** `shared/engine/battle/`: tabla de tipos 18×18 (= tabla oficial),
+  `calcStats` y etapas (= ejemplo de Bulbapedia), `statChangeTarget`. Dataset regenerado (v`0c1997bdfa5a`) con
+  `target`, `flinchChance` y `metaCategory` en los movimientos (D-029). La app invalidará su caché sola (versión nueva).
 - **F4-01 (Alex, PR abierto; sale de F2-06):** plan del motor de combate en `docs/plan/fases/F4-combate.md`: contrato
   `resolveTurn(state, actions, rng) → {state, events}`, reglas Gen V+, 550 de 706 movimientos en la v1 y el hueco del
   dataset (falta `target` de los cambios de stats y `flinchChance`; se arregla en F4-02 paso 1).
@@ -71,8 +74,7 @@
 
 ## En curso
 
-- **F4-02 (Alex, rama `feature/F4-02-tipos-stats`, sale de F4-01):** dataset con `target`, tabla de tipos y stats.
-- Esperan revisión **en orden** (ver PENDIENTES DE HUMANOS): #21 → #22 → #23 → #24 → #25.
+- Esperan revisión **en orden** (ver PENDIENTES DE HUMANOS): #21 → #22 → #23 → #24 → #25 → #26 → F4-02.
 - **F1-01 → PENDIENTE DE KENNETH** (medir fps en su Android): rama `feature/F1-01-spike-mapa-3d`, instrucciones
   exactas en la última entrada de F1-01 de la bitácora.
 
@@ -93,7 +95,7 @@
 ### PENDIENTES DE HUMANOS — lista única (quien termine algo, lo marca `[x]`; cada tarea nueva añade aquí lo suyo)
 
 **Kenneth o Samuel (revisión):**
-- [ ] Revisar y mezclar **en este orden**: #21 (F0-12 admin) → #22 (F1-06 spawns) → #23 (F1-08 mochila) → #24 (F2-03 fórmula) → #25 (F2-06 captura).
+- [ ] Revisar y mezclar **en este orden**: #21 (F0-12 admin) → #22 (F1-06 spawns) → #23 (F1-08 mochila) → #24 (F2-03 fórmula) → #25 (F2-06 captura) → #26 (F4-01 plan combate) → PR de F4-02.
   Cada uno sale del anterior: al mezclar uno, GitHub reapunta el siguiente a `develop`.
 
 **Samuel (Render, solo él tiene acceso):**

@@ -516,3 +516,28 @@ inmunidades por tipo, efectos), alcance medido y pasos con casillas para F4-02�
 "Puño Incremento" subiría el ataque del rival. Es el paso 1 de F4-02 (regenerar el dataset).
 **Quedó a medias / roto:** nada (es un documento).
 **El siguiente debe empezar por:** `/inicio F4-02` y seguir sus casillas en el plan.
+
+## 2026-10-11 23:00 · @alex (Claude) · F4-02 · rama `feature/F4-02-tipos-stats` (sale de F4-01)
+
+**Qué se hizo:** `shared/engine/battle/type-chart.ts` (matriz desde `types.json`), `stats.ts` (naturalezas, `calcStats`,
+etapas), `moves.ts` (`statChangeTarget`, `statChangeChance`). `build-dataset.mjs` añade `target`, `flinchChance` y
+`metaCategory` a cada movimiento; dataset regenerado (descarga completa de PokéAPI, ~10 min; `.cache/` queda en el PC
+de Alex, gitignored).
+**Cómo se probó (salida real):**
+
+    npm run dataset → OK · pokedex 972 KB · moves 256 KB · types 2 KB · v0c1997bdfa5a
+      moves.json: 706 → 706, ningún otro campo cambió (comparado contra el anterior); pokedex.json y types.json idénticos
+    npm run test:shared → 71/71 (32 nuevos)
+      tipos: 324/324 casillas = tabla oficial escrita a mano; 8 inmunidades; Hielo→Dragonite ×4, Tierra→Zapdos ×0
+      stats: Garchomp nv 78 Firme con IV/EV de Bulbapedia → 289/278/193/135/171/171 ✔
+      a quién afectan (19 movimientos reales): Danza Espada/Aullido → usuario, Gruñido/Encanto → rival,
+        Puño Incremento/A Bocajarro/Sofoco → usuario, Psíquico/Triturar → rival, Lumina Crash → rival
+    app: ng test 97/97, build OK · server: build OK, npm test 23/23
+
+**Hallazgos:** (1) el plan suponía que `target` bastaba; no, en los de daño hace falta `metaCategory` (D-029).
+(2) Dos expectativas del test de stats estaban mal calculadas a mano (ataque 135 → 150, velocidad 133 → 134); la
+fórmula ya cuadraba con Bulbapedia. Se corrigió el test.
+**Quedó a medias / roto:** nada.
+**Decisiones nuevas:** D-029.
+**El siguiente debe empezar por:** F4-03 (daño, precisión, crítico, orden), paso 1 del plan: `isSupportedMove` y
+`defaultMoves`, y que `movesAtLevel` del servidor use ese filtro.

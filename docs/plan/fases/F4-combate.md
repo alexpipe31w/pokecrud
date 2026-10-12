@@ -35,7 +35,7 @@ el daño en PvP** (REGLA 3).
 (se filtran al elegir los 4 por defecto, también en `movesAtLevel` del servidor, F2-06). Si a una especie no le
 queda ninguno, usa **Placaje** (id 33) como reserva.
 
-**Hueco del dataset (se arregla en F4-02, paso 1):** `moves.json` no trae a quién afectan los cambios de stats
+**Hueco del dataset (ARREGLADO en F4-02, ver D-029):** `moves.json` no trae a quién afectan los cambios de stats
 (`target` de PokéAPI: `user` / `selected-pokemon` / …) ni la probabilidad de **retroceso** (`flinch_chance`). Sin
 `target`, "Puño Incremento" subiría el ataque del rival. Se añaden `target` y `flinchChance` en
 `scripts/build-dataset.mjs` y se regenera (≈ 15 min la primera vez; luego sale de `.cache/`).
@@ -119,18 +119,20 @@ paralelo (la escena juega contra una IA "elige al azar" hasta que llegue F4-06).
 
 ## F4-02 · Tabla de tipos y stats
 
-- [ ] **Paso 1 — dataset:** en `build-dataset.mjs`, añadir a cada movimiento `target: m.target.name` y
+- [x] **Paso 1 — dataset:** en `build-dataset.mjs`, añadir a cada movimiento `target: m.target.name` y
   `flinchChance: m.meta?.flinch_chance ?? 0`; tipos en `dataset.types.ts`; `npm run dataset` (≈ 15 min la primera
   vez); comprobar con `npm run test:shared` que el dataset sigue válido y añadir un test de que `swords-dance` →
   `user` y `growl` → `all-opponents`. Commit del JSON regenerado.
-- [ ] **Paso 2 — `type-chart.ts`:** construir la matriz desde `types.json` (fuente: PokéAPI) y comprobarla contra la
+- [x] **Paso 2 — `type-chart.ts`:** construir la matriz desde `types.json` (fuente: PokéAPI) y comprobarla contra la
   tabla canónica escrita a mano en el test (18×18 = 324 casillas; las 0 de Normal/Lucha→Fantasma, Eléctrico→Tierra,
   Tierra→Volador, Psíquico→Siniestro, Fantasma→Normal, Veneno→Acero, Dragón→Hada). `effectiveness('ground',
   ['electric','flying']) === 0`, `('ice', ['dragon','flying']) === 4`.
-- [ ] **Paso 3 — `natures.ts` + `stats.ts`:** tabla de 25 naturalezas (5 neutras); `calcStats(base, ivs, level,
+- [x] **Paso 3 — `natures.ts` + `stats.ts`:** (hecho en un solo `stats.ts`) tabla de 25 naturalezas (5 neutras); `calcStats(base, ivs, level,
   nature)`; `stageMultiplier(stage)` y `accuracyStageMultiplier(stage)`. Tests con casos de Bulbapedia (Garchomp
   nv 78 del ejemplo de la fórmula) y extremos (nivel 1, IV 0/31).
-- [ ] **Paso 4:** `npm run test:shared`, lint y build de app y server; REGLA 2.
+- [x] **Paso 4:** `npm run test:shared`, lint y build de app y server; REGLA 2.
+- [x] **Extra (hallazgo, D-029):** `target` NO basta para los de daño → también `metaCategory`; regla en
+  `shared/engine/battle/moves.ts` (`statChangeTarget`, `statChangeChance`) con tests sobre el dataset real.
 
 ## F4-03 · Daño, precisión, crítico, prioridad
 
