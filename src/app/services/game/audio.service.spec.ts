@@ -69,6 +69,23 @@ describe('AudioService', () => {
     expect(fake.started).toHaveLength(2);
   });
 
+  it('playCry con volumen pone una ganancia propia entre el sonido y el bus de gritos (F1-07)', async () => {
+    await service.playCry(25); // crea los 3 buses
+    const buses = fake.gains.length;
+    expect(await service.playCry(25, 0.3)).toBe(true);
+    expect(fake.gains).toHaveLength(buses + 1);
+    const local = fake.gains[buses];
+    expect(local.gain.value).toBe(0.3);
+    expect(local.connect).toHaveBeenCalledWith(fake.gains[2]); // buses: music, sfx, cries
+  });
+
+  it('playCry sin volumen no añade ganancias (suena a 1)', async () => {
+    await service.playCry(25);
+    const buses = fake.gains.length;
+    await service.playCry(25);
+    expect(fake.gains).toHaveLength(buses);
+  });
+
   it(`la caché LRU expulsa el grito menos usado al pasar de ${CRY_CACHE_SIZE}`, async () => {
     for (let id = 1; id <= CRY_CACHE_SIZE; id++) await service.playCry(id);
     await service.playCry(1); // se usa: pasa a ser el más reciente
