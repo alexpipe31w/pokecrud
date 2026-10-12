@@ -73,6 +73,12 @@ Thumbs.db
 /.cache
 /server/node_modules
 /server/dist
+# F0-13: restos de compilación junto a las fuentes de shared/ (shared/ solo lleva .ts, .json y snapshots de tests).
+# Si algún día hace falta un .js o .d.ts escrito a mano ahí, añadir una excepción con "!" y anotarlo en DECISIONES.
+/shared/**/*.js
+/shared/**/*.js.map
+/shared/**/*.d.ts
+/shared/**/*.d.ts.map
 .env
 .env.*
 !.env.example

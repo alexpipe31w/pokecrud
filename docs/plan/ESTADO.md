@@ -3,7 +3,7 @@
 > Se **reescribe** al cerrar cada sesión (no es histórico; el histórico es `BITACORA.md`).
 > Máximo una pantalla. Si lees esto al empezar: después lee `ROADMAP.md`.
 
-**Última actualización:** 2026-10-12 · por Samuel (Claude) · rama `feature/F0-13-artefactos-shared` (reclama F0-13)
+**Última actualización:** 2026-10-12 · por Samuel (Claude) · rama `feature/F0-13-artefactos-shared` (F0-13 hecha, PR abierto)
 
 ## 👉 RELEVO DE ALEX A SAMUEL — HECHO (2026-10-12)
 
@@ -32,6 +32,9 @@ visual del mapa ya tiene vía libre (**F1-01 hecha: plan A, D-035**); el del enc
 
 ## Hecho
 
+- **F0-13 (Samuel, PR pendiente):** los `.js` que aparecían en `shared/` salen de compilar el servidor con la config
+  previa a D-024 (rama vieja); Vitest los usaba EN VEZ del `.ts`. Ahora `scripts/clean-shared-artifacts.mjs` los borra
+  solo antes de `start`/`build`/`test` (raíz, `server/`, APK) y `.gitignore` impide subirlos. D-036.
 - **F1-01 (Alex + Samuel, PR #32 mezclado):** spike del mapa medido en un Redmi Note 10: three.js con 30
   Pokémon a 58,4 fps y 0 % de tirones, mejor que los markers HTML (52,3). **Plan A, máximo 30 Pokémon dibujados**
   (D-035). Página de pruebas `/dev/mapa` (solo desarrollo). Desbloquea F1-02…F1-05.
@@ -109,10 +112,7 @@ visual del mapa ya tiene vía libre (**F1-01 hecha: plan A, D-035**); el del enc
 
 ## En curso
 
-- **F0-13 (@samuel, 2026-10-12)** — rama `feature/F0-13-artefactos-shared`. **Punto de guardado:** causa REPRODUCIDA:
-  compilar el servidor con la config anterior a D-024 (`rootDir: ./src`, p. ej. una rama vieja) sobre código que importa
-  `shared/` emite en `dist/../../shared` = `shared/` del repo (+ `server/tsconfig.build.tsbuildinfo` suelto). Y Vitest
-  USA esos `.js` en vez del `.ts` (probado). Paso siguiente: script que los borre + ganchos pre* + `.gitignore`.
+- Nadie (F0-13 terminada; su PR espera revisión/mezcla).
 
 ## Siguiente paso concreto
 
@@ -120,11 +120,9 @@ visual del mapa ya tiene vía libre (**F1-01 hecha: plan A, D-035**); el del enc
    puede agregar/editar/eliminar Pokémon en `/pokemon` (hoy hay 0 ADMIN en la base).
 2. **Kenneth:** poner `SPAWN_SALT` en su `server/.env`
    (`node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))"`; sin ella `/spawns` da 503).
-3. **Siguiente tarea libre:** F0-13 (pequeña) y luego **F1-02** (plan de F1; ya desbloqueada por F1-01). Con Android →
+3. **Siguiente tarea libre:** **F1-02** (plan detallado de F1 con `writing-plans`; leer D-035 y D-022). Con Android →
    F2-01 (spike de cámara y giroscopio). Sin móvil → F5-01 o F2-08.
-4. **Tarea pequeña nueva (F0-13):** que los `.js`/`.d.ts` que a veces deja la compilación del servidor dentro de
-   `shared/` no se puedan subir ni usar por error (ver Bloqueos).
-5. Para generar el APK en otro PC: JDK 21 (`winget install Microsoft.OpenJDK.21`; si da "el hash no coincide",
+4. Para generar el APK en otro PC: JDK 21 (`winget install Microsoft.OpenJDK.21`; si da "el hash no coincide",
    `winget install EclipseAdoptium.Temurin.21.JDK`) y `npm run apk`.
 
 ## Bloqueos / roto / pendiente de humanos
@@ -163,9 +161,6 @@ visual del mapa ya tiene vía libre (**F1-01 hecha: plan A, D-035**); el del enc
       hoy los 23 PR se han mezclado sin revisión.
 - [x] `server/.env` en 6543, `JWT_SECRET` y `SPAWN_SALT` locales; JDK 21 instalado (2026-10-11).
 
-- **Artefactos en `shared/` (F0-13, pendiente):** la primera `npm run build` del servidor tras traer D-024 dejó 42
-  `.js`/`.d.ts`/`.js.map` junto a las fuentes de `shared/` (probable caché incremental vieja; compilando desde cero no
-  se reproduce). No están en `.gitignore`: **no los subas**; si aparecen, bórralos (podrían usarse en lugar del `.ts`).
 - **Cada compañero necesita su propio `JWT_SECRET`** en su `server/.env` para arrancar el servidor en local (SECRETOS.md).
 - **En local hacen falta dos servidores:** Nest (`cd server && npm run start:dev`, puerto **3000**) y la app (`npm start`).
   Si tu `server/.env` tiene `PORT=3001` de antes, cámbialo a 3000 (o bórralo).
