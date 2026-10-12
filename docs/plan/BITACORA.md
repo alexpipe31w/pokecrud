@@ -734,3 +734,33 @@ Render tras #22…#27: /health/ready 200; /spawns y /bag → 401 sin sesión (ru
 **Decisiones nuevas:** ninguna (correcciones al relevo: Render despliega solo; GitHub no reapunta PR apilados aquí).
 **El siguiente debe empezar por:** Alex → `cd server && npm run admin -- grant <su correo>`; Kenneth → F1-01 en su
 Android y `SPAWN_SALT` en su `.env`; cualquiera → F0-13 (pequeña) o F5-01 / F2-08 / F2-01.
+
+## 2026-10-12 12:05 · @samuel (Claude) · F1-01 (retomo de @alex en "medir en Android") · rama `feature/F1-01-spike-mapa-3d`
+
+**Qué se hizo:** rama de Alex puesta al día con `develop` (53 commits; conflictos solo en BITACORA y ESTADO, resueltos
+conservando todo). APK de producción instalado en el Redmi Note 10 y batería de `/dev/mapa` lanzada desde el PC por el
+protocolo de depuración del WebView (`adb forward` + Chrome DevTools Protocol, sin tocar el móvil). La primera batería no
+valía: el mapa se había movido/acercado y casi no había objetos en pantalla (todo 60 fps). Se recargó y se repitió desde
+la vista inicial sin tocar → esa es la buena. Decisión **plan A** (D-035); ARQUITECTURA §4 actualizada.
+**Archivos clave:** `docs/plan/DECISIONES.md` (D-035), `docs/evidencias/F1-01_03_redmi-note10-three-60.png` (three.js ×
+60 con avatar, círculo y Pokémon visibles), `F1-01_04_redmi-note10-cerca.png` (vista acercada).
+**Cómo se probó (salida real):**
+
+    lint: All files pass linting · ng test: 29 archivos, 107 passed · shared: 11 archivos, 136 passed · build OK
+    npm run apk -- --install → BUILD SUCCESSFUL · APK (production) 8.41 MB · adb install: Success
+    [F1-01] batería {"device":{… Android 12; M2101K7BL … Chrome/153.0.8010.36 …","dpr":2.75,"viewport":"392x872",
+      "gpu":"Mali-G76","renderingType":"VECTOR"},"results":[
+      {"mode":"none","count":0,"avgFps":58.8,"p95Ms":16.8,"worstMs":132.7,"jankPct":0.2},
+      {"mode":"three","count":10,"avgFps":59.2,"p95Ms":16.8,"worstMs":49.8,"jankPct":0.2},
+      {"mode":"three","count":30,"avgFps":58.4,"p95Ms":16.8,"worstMs":33.4,"jankPct":0},
+      {"mode":"three","count":60,"avgFps":48.5,"p95Ms":33.3,"worstMs":49.8,"jankPct":0.8},
+      {"mode":"markers","count":10,"avgFps":56.7,"p95Ms":33.1,"worstMs":66.6,"jankPct":0.5},
+      {"mode":"markers","count":30,"avgFps":52.3,"p95Ms":33.3,"worstMs":49.7,"jankPct":1.7},
+      {"mode":"markers","count":60,"avgFps":43.8,"p95Ms":33.4,"worstMs":66.4,"jankPct":3.7}]}
+    temperatura de la batería: 34,4 °C → 37,4 °C tras ~6 min de pruebas
+
+**Quedó a medias / roto:** nada. Para F8-02: prueba de 10 min (calor/batería). Para F1-04: quitar POI comerciales del
+estilo del Map ID (consola de Google, Alex).
+**Decisiones nuevas:** D-035.
+**El siguiente debe empezar por:** F0-13 (artefactos `.js` en `shared/`, pequeña) o F1-02 (plan detallado de F1 con
+`writing-plans`, leyendo D-035 y D-022: el mapa anula la zona segura).
