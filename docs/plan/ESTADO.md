@@ -143,7 +143,8 @@ fórmula (F2-03) y captura en servidor (F2-06) hechas; lo visual del encuentro e
 
 ## En curso
 
-- Nadie. F1-05 (3b) y F1-07 (7b) solo esperan la prueba en Android.
+- **F1-10 (el HUD sigue al día/noche del mapa) — @alex, 2026-10-12**, rama `feature/F1-10-hud-dia-noche`.
+- F1-05 (3b) y F1-07 (7b) solo esperan la prueba en Android.
 
 ## Siguiente paso concreto
 
