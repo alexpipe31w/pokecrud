@@ -134,8 +134,8 @@ fórmula (F2-03) y captura en servidor (F2-06) hechas; lo visual del encuentro e
 
 ## En curso
 
-- **F1-05 (avatar 3D) — @alex, 2026-10-12**, rama `feature/F1-05-avatar-3d`. Punto de guardado: paso 1 (pose de
-  extremidades) sin empezar. Plan: `docs/plan/fases/F1-mapa.md` → F1-05.
+- **F1-05 (avatar 3D) — @alex, 2026-10-12**, rama `feature/F1-05-avatar-3d`. Punto de guardado: paso 1 HECHO (`limb-pose.ts`, 4 tests);
+  siguiente: paso 2 (`Avatar3D`). Plan: `docs/plan/fases/F1-mapa.md` → F1-05.
 
 ## Siguiente paso concreto
 

@@ -1034,7 +1034,7 @@ Android (≥ 55 fps con el mapa).
 
 **Files:** Create `src/app/game/map-scene/limb-pose.ts` + spec
 
-- [ ] **1a. Test que falla:**
+- [x] **1a. Test que falla:**
 
 ```ts
 import { limbPose } from './limb-pose';
@@ -1061,7 +1061,7 @@ describe('limbPose', () => {
 });
 ```
 
-- [ ] **1b.** falla. **1c. Implementación:**
+- [x] **1b.** falla. **1c. Implementación:**
 
 ```ts
 import type { Gait } from './avatar-motion';
@@ -1094,7 +1094,7 @@ export function limbPose(gait: Gait, speed: number, t: number): LimbPose {
 }
 ```
 
-- [ ] **1d.** pasa. Commit `F1-05: pose de extremidades con tests` + `/guardar`.
+- [x] **1d.** pasa. Commit `F1-05: pose de extremidades con tests` + `/guardar`.
 
 ### Paso 2 — `Avatar3D`
 
