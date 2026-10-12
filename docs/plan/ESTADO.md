@@ -85,7 +85,7 @@
 
 ## En curso
 
-- Esperan revisión **en orden** (ver PENDIENTES DE HUMANOS): #21 → #22 → #23 → #24 → #25 → #26 → #27 → #28 → #29 → #30 → F4-05.
+- Esperan revisión **en orden** (ver PENDIENTES DE HUMANOS): #21 → #22 → #23 → #24 → #25 → #26 → #27 → #28 → #29 → #30 → #31.
 - **F1-01 → PENDIENTE DE KENNETH** (medir fps en su Android): rama `feature/F1-01-spike-mapa-3d`, instrucciones
   exactas en la última entrada de F1-01 de la bitácora.
 
@@ -106,7 +106,7 @@
 ### PENDIENTES DE HUMANOS — lista única (quien termine algo, lo marca `[x]`; cada tarea nueva añade aquí lo suyo)
 
 **Kenneth o Samuel (revisión):**
-- [ ] Revisar y mezclar **en este orden**: #21 (F0-12 admin) → #22 (F1-06 spawns) → #23 (F1-08 mochila) → #24 (F2-03 fórmula) → #25 (F2-06 captura) → #26 (F4-01 plan combate) → #27 (F4-02 tipos y stats) → #28 (F4-03 daño) → #29 (F4-04 motor de combate) → #30 (F4-06 IA) → PR de F4-05 (escena de combate).
+- [ ] Revisar y mezclar **en este orden**: #21 (F0-12 admin) → #22 (F1-06 spawns) → #23 (F1-08 mochila) → #24 (F2-03 fórmula) → #25 (F2-06 captura) → #26 (F4-01 plan combate) → #27 (F4-02 tipos y stats) → #28 (F4-03 daño) → #29 (F4-04 motor de combate) → #30 (F4-06 IA) → #31 (F4-05 escena de combate).
   Cada uno sale del anterior: al mezclar uno, GitHub reapunta el siguiente a `develop`.
 
 **Samuel (Render, solo él tiene acceso):**
