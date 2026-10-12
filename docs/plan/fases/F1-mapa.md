@@ -432,7 +432,7 @@ zona muerta (sin salto).
 
 - [x] **4a. Dependencia:** `npm install --save-exact @capacitor/geolocation@8.2.3` y `npx cap sync android`. Los
   permisos ya están en `AndroidManifest.xml` (F0-09). Anotar la versión en el commit.
-- [ ] **4b. Test que falla** (`location.service.spec.ts`). Plugin por token de inyección (D-016), nada de `vi.mock`:
+- [x] **4b. Test que falla** (`location.service.spec.ts`). Plugin por token de inyección (D-016), nada de `vi.mock`:
 
 ```ts
 import { TestBed } from '@angular/core/testing';
@@ -505,8 +505,8 @@ describe('LocationService', () => {
 });
 ```
 
-- [ ] **4c.** `npx ng test --watch=false --include src/app/services/location/location.service.spec.ts` → FALLA.
-- [ ] **4d. Implementación** (`location.service.ts`):
+- [x] **4c.** `npx ng test --watch=false --include src/app/services/location/location.service.spec.ts` → FALLA.
+- [x] **4d. Implementación** (`location.service.ts`):
 
 ```ts
 import { Injectable, InjectionToken, inject, signal } from '@angular/core';
@@ -610,8 +610,8 @@ export class LocationService {
 `status` se queda en `denied`/`unavailable` hasta que la pantalla llama a `useJoystickAt` (así la pantalla de permisos
 puede explicar qué pasó antes de soltar al jugador con el joystick).
 
-- [ ] **4e.** Test → PASA (4).
-- [ ] **4f. `CompassService`** (test primero; mismo patrón). Contrato:
+- [x] **4e.** Test → PASA (4).
+- [x] **4f. `CompassService`** (test primero; mismo patrón). Contrato:
 
 ```ts
 // compass.service.ts
@@ -635,7 +635,7 @@ export class CompassService {
   Tests: un evento con `alpha 90` → `heading()` = 270; dos eventos 359 y 1 → se queda cerca de 359-0 (nunca ~180);
   sin eventos → `null`. Los eventos se disparan con `source.dispatchEvent(Object.assign(new Event(
   'deviceorientationabsolute'), { alpha: 90, absolute: true }))` sobre un `new EventTarget()` inyectado.
-- [ ] **4g.** Tests → PASAN. Commit `F1-03: LocationService y CompassService con tests` + `/guardar`.
+- [x] **4g.** Tests → PASAN. Commit `F1-03: LocationService y CompassService con tests` + `/guardar`.
 
 ### Paso 5 — Movimiento del avatar (puro)
 
