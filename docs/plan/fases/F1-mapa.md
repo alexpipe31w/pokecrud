@@ -895,17 +895,17 @@ export interface NearbySpawns {
 `src/app/features/pokemon-add/pokemon-add.page.ts:133`, `src/app/features/pokemon-detail/pokemon-detail.page.ts:114,132`,
 `src/app/features/pokedex/pokedex.page.html`; Delete `src/app/core/layout/tabs/`
 
-- [ ] **3a.** En `app.routes.ts`: nueva ruta `{ path: 'mapa', canActivate: [authGuard], loadComponent: () =>
+- [x] **3a.** En `app.routes.ts`: nueva ruta `{ path: 'mapa', canActivate: [authGuard], loadComponent: () =>
   import('./features/map/map.page').then((m) => m.MapPage) }`; `{ path: 'pokedex', loadComponent: …PokedexPage }`
   (pública, como antes); `{ path: 'tabs/pokedex', redirectTo: '/pokedex' }` (enlaces viejos); `''` y `'**'` →
   `redirectTo: '/mapa'`. Quitar la ruta `''` con `loadChildren` de las pestañas. Actualizar el comentario de rutas.
-- [ ] **3b.** Cambiar `'/tabs/pokedex'` → `'/pokedex'` en `auth.guard.ts`, `pokemon-add.page.ts` y
+- [x] **3b.** Cambiar `'/tabs/pokedex'` → `'/pokedex'` en `auth.guard.ts`, `pokemon-add.page.ts` y
   `pokemon-detail.page.ts`. En `pokedex.page.html`, botón atrás en la `ion-toolbar`:
   `<ion-buttons slot="start"><ion-back-button defaultHref="/mapa" text="Mapa"></ion-back-button></ion-buttons>`
   (importar `IonBackButton`, `IonButtons` de `@ionic/angular`).
-- [ ] **3c.** Borrar `src/app/core/layout/tabs/`. `grep -rn "tabs" src/app` → solo la redirección de compatibilidad.
+- [x] **3c.** Borrar `src/app/core/layout/tabs/`. `grep -rn "tabs" src/app` → solo la redirección de compatibilidad.
   Los specs que naveguen a `/tabs/...` se actualizan a `/pokedex`.
-- [ ] **3d.** `ng test`, lint, build. Tras login (`safeRedirect` → `/`) se llega a `/mapa`. Commit + `/guardar`.
+- [x] **3d.** `ng test`, lint, build. Tras login (`safeRedirect` → `/`) se llega a `/mapa`. Commit + `/guardar`.
 
 ### Paso 4 — `MapScene` (three.js, sin Angular)
 

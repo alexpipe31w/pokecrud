@@ -2,7 +2,9 @@ import { CurrencyPipe, TitleCasePipe } from '@angular/common';
 import { Component, computed, effect, inject, signal, untracked } from '@angular/core';
 import { Router } from '@angular/router';
 import {
+  IonBackButton,
   IonButton,
+  IonButtons,
   IonContent,
   IonFab,
   IonFabButton,
@@ -50,6 +52,8 @@ import { TypeChipsComponent } from '../../shared/components/type-chips/type-chip
     TitleCasePipe,
     IonHeader,
     IonToolbar,
+    IonButtons,
+    IonBackButton,
     IonContent,
     IonSearchbar,
     IonList,

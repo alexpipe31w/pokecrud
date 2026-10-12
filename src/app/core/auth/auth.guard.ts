@@ -23,7 +23,7 @@ export const adminGuard: CanActivateFn = async (_route, state) => {
   if (!auth.isLoggedIn()) {
     return router.createUrlTree(['/login'], { queryParams: { redirect: state.url } });
   }
-  return auth.isAdmin() ? true : router.createUrlTree(['/tabs/pokedex']);
+  return auth.isAdmin() ? true : router.createUrlTree(['/pokedex']);
 };
 
 /** /login y /registro: quien ya tiene sesión no tiene nada que hacer ahí. */

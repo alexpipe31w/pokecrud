@@ -6,7 +6,8 @@ import { adminGuard, authGuard, guestGuard } from './core/auth/auth.guard';
  *
  *  /login             → Iniciar sesión (solo sin sesión)
  *  /registro          → Crear cuenta (solo sin sesión)
- *  /tabs/pokedex      → Pokédex (listado)
+ *  /mapa              → Mapa: pantalla principal del juego (F1-04, exige sesión). "" y rutas desconocidas → aquí
+ *  /pokedex           → Pokédex (listado; pública). /tabs/pokedex → redirige aquí (enlaces viejos)
  *  /pokemon/nuevo     → Agregar un Pokémon (buscador PokéAPI + formulario)
  *  /pokemon/:id       → Detalle de un Pokémon
  *  /pokemon/:id/editar → Editar un Pokémon
@@ -62,11 +63,16 @@ export const routes: Routes = [
     loadComponent: () => import('./features/dev-map/dev-map.page').then((m) => m.DevMapPage),
   },
   {
-    path: '',
-    loadChildren: () => import('./core/layout/tabs/tabs.routes').then((m) => m.routes),
+    path: 'mapa',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/map/map.page').then((m) => m.MapPage),
   },
   {
-    path: '**',
-    redirectTo: '/tabs/pokedex',
+    path: 'pokedex',
+    loadComponent: () => import('./features/pokedex/pokedex.page').then((m) => m.PokedexPage),
   },
+  // Las pestañas de Ionic se quitaron en F1-04 (el menú es la Poké Ball del mapa): los enlaces viejos siguen valiendo.
+  { path: 'tabs/pokedex', redirectTo: '/pokedex' },
+  { path: '', pathMatch: 'full', redirectTo: '/mapa' },
+  { path: '**', redirectTo: '/mapa' },
 ];

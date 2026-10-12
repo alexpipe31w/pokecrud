@@ -1,7 +1,7 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="/tabs/pokedex" text="Pokédex"></ion-back-button>
+      <ion-back-button defaultHref="/pokedex" text="Pokédex"></ion-back-button>
     </ion-buttons>
     <ion-title>{{ pokemon() ? (pokemon()!.name | titlecase) : 'Detalle' }}</ion-title>
     @if (pokemon() && isAdmin()) {

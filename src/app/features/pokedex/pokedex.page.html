@@ -1,5 +1,9 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
+    <!-- Sin pestañas (F1-04): la Pokédex se abre desde el menú de la Poké Ball y vuelve al mapa. -->
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/mapa" text="Mapa"></ion-back-button>
+    </ion-buttons>
     <ion-searchbar
       placeholder="Buscar por número o nombre"
       [debounce]="400"
