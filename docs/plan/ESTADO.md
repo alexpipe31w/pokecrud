@@ -121,7 +121,7 @@ servidor (F2-06) hechas; lo visual del encuentro espera al spike F2-01 (cámara 
 ## En curso
 
 - **F1-04 (Kenneth, rama `feature/F1-04-pantalla-mapa`)**: reclamada 2026-10-12. Sigue `docs/plan/fases/F1-mapa.md` → F1-04.
-  **Punto de guardado:** paso 1 hecho (`GET /spawns` devuelve `weather` y `night`; contrato en `shared/protocol/spawns.ts`; e2e 67/67). Paso 2 hecho (`day-night.ts`). Paso 3 hecho (rutas: `/mapa` principal con un esqueleto de `MapPage`, `/pokedex` con botón atrás, fuera las pestañas). Paso 4 hecho (`MapScene` con luces propias día/noche y spec). Paso 5 hecho (`MapPage`: mapa día/noche, overlay, bucle, cámara; pausa al salir con `ionViewWillLeave`). Paso 6 hecho (error de Maps → "No se pudo cargar el mapa" + Reintentar). Sigue el paso 7 (HUD: placa, brújula, clima y menú de la Poké Ball).
+  **Punto de guardado:** paso 1 hecho (`GET /spawns` devuelve `weather` y `night`; contrato en `shared/protocol/spawns.ts`; e2e 67/67). Paso 2 hecho (`day-night.ts`). Paso 3 hecho (rutas: `/mapa` principal con un esqueleto de `MapPage`, `/pokedex` con botón atrás, fuera las pestañas). Paso 4 hecho (`MapScene` con luces propias día/noche y spec). Paso 5 hecho (`MapPage`: mapa día/noche, overlay, bucle, cámara; pausa al salir con `ionViewWillLeave`). Paso 6 hecho (error de Maps → "No se pudo cargar el mapa" + Reintentar). Paso 7 a medias: `app-weather-chip` y `app-map-compass` hechos con tests (sin montar aún en `/mapa`); falta `app-ball-menu` y montarlo todo en `MapPage` (7a-7e).
 
 ## Siguiente paso concreto
 
