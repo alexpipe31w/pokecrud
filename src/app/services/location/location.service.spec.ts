@@ -7,10 +7,12 @@ const O = { lat: 2.9273, lng: -75.2819 };
 
 function fakePlugin(permission: 'granted' | 'denied' | 'prompt') {
   let cb: ((p: unknown, err?: unknown) => void) | undefined;
+  const watches = { count: 0 };
   const plugin: GeoPlugin = {
     checkPermissions: async () => ({ location: permission, coarseLocation: permission }),
     requestPermissions: async () => ({ location: permission, coarseLocation: permission }),
     watchPosition: async (_opts, callback) => {
+      watches.count++;
       cb = callback as typeof cb;
       return 'w1';
     },
@@ -20,7 +22,8 @@ function fakePlugin(permission: 'granted' | 'denied' | 'prompt') {
     const p = fromLocalM(O, east, north);
     cb!({ coords: { latitude: p.lat, longitude: p.lng, accuracy }, timestamp: t });
   };
-  return { plugin, emit };
+  const emitError = (err: unknown) => cb!(null, err);
+  return { plugin, emit, emitError, watches };
 }
 
 describe('LocationService', () => {
@@ -56,6 +59,32 @@ describe('LocationService', () => {
     svc.nudge(0, 10); // 10 m al norte
     expect(svc.position()!.lat).toBeGreaterThan(O.lat);
     expect(svc.status()).toBe('joystick');
+  });
+
+  it('web: requestPermissions no implementado → escucha igual (el navegador pide el permiso)', async () => {
+    const { svc, plugin, emit } = setup('prompt');
+    plugin.requestPermissions = async () => {
+      throw Object.assign(new Error('Not implemented on web.'), { code: 'UNIMPLEMENTED' });
+    };
+    await svc.start();
+    expect(svc.status()).toBe('searching');
+    emit(0, 0, 1000);
+    expect(svc.status()).toBe('ok');
+  });
+
+  it('el navegador deniega el permiso (error código 1) → "denied" y modo joystick', async () => {
+    const { svc, emitError } = setup('granted');
+    await svc.start();
+    emitError({ code: 1, message: 'User denied Geolocation' });
+    expect(svc.status()).toBe('denied');
+    expect(TestBed.inject(SettingsService).settings().joystickMode).toBe(true);
+  });
+
+  it('llamar a start() dos veces no abre dos escuchas', async () => {
+    const { svc, watches } = setup('granted');
+    await svc.start();
+    await svc.start();
+    expect(watches.count).toBe(1);
   });
 
   it('un fix débil pone el estado "weak" (avisa, no bloquea)', async () => {

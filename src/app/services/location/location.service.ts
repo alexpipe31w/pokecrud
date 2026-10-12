@@ -1,4 +1,5 @@
 import { Injectable, InjectionToken, inject, signal } from '@angular/core';
+import type { PermissionState } from '@capacitor/core';
 import { Geolocation } from '@capacitor/geolocation';
 import { fromLocalM, type LatLng } from '@shared/engine/geo';
 import { GpsFilter, type FilteredFix } from '../../game/geo/gps-filter';
@@ -13,6 +14,9 @@ export const GEOLOCATION_PLUGIN = new InjectionToken<GeoPlugin>('GEOLOCATION_PLU
   providedIn: 'root',
   factory: () => Geolocation,
 });
+
+/** `GeolocationPositionError.PERMISSION_DENIED` (navegador): el jugador dijo que no al pedírselo el navegador. */
+const isPermissionDenied = (err: unknown): boolean => (err as { code?: unknown } | null)?.code === 1;
 
 /** Dónde arranca el modo joystick si nunca hubo GPS: Parque Santander, Neiva (el del spike F1-01). */
 export const DEFAULT_CENTER: LatLng = { lat: 2.9273, lng: -75.2819 };
@@ -33,17 +37,22 @@ export class LocationService {
   /** Pide permiso si hace falta y empieza a escuchar el GPS. Nunca lanza: los fallos van a `status`. */
   async start(): Promise<void> {
     if (this.settings.settings().joystickMode) return this.status.set('joystick');
+    if (this.watchId) return; // ya escuchando: un segundo toque en "Permitir" no abre otra escucha
     try {
       let perm = (await this.plugin.checkPermissions()).location;
       if (perm === 'prompt' || perm === 'prompt-with-rationale') {
         this.status.set('prompt');
-        perm = (await this.plugin.requestPermissions({ permissions: ['location'] })).location;
+        perm = await this.requestPermission();
       }
-      if (perm !== 'granted') return this.fallBackToJoystick('denied');
+      if (perm === 'denied') return this.fallBackToJoystick('denied');
       this.status.set('searching');
       this.watchId = await this.plugin.watchPosition(
         { enableHighAccuracy: true, timeout: 20_000, maximumAge: 0 },
         (pos, err) => {
+          if (isPermissionDenied(err)) {
+            void this.stop();
+            return this.fallBackToJoystick('denied');
+          }
           if (err || !pos) {
             if (!this.position()) this.status.set('searching');
             return;
@@ -90,6 +99,19 @@ export class LocationService {
     this.settings.update({ joystickMode: false });
     this.filter.reset();
     await this.start();
+  }
+
+  /**
+   * En el APK abre el diálogo de Android. En el navegador el plugin no lo implementa (lanza `UNIMPLEMENTED`): ahí lo
+   * pide el propio navegador al empezar `watchPosition`, y si lo deniegan llega como error de código 1.
+   */
+  private async requestPermission(): Promise<PermissionState> {
+    try {
+      return (await this.plugin.requestPermissions({ permissions: ['location'] })).location;
+    } catch (err) {
+      if ((err as { code?: unknown })?.code === 'UNIMPLEMENTED') return 'prompt';
+      throw err;
+    }
   }
 
   // `status` se queda en denied/unavailable hasta que la pantalla llama a `useJoystickAt`: así la pantalla de
