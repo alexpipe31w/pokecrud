@@ -634,3 +634,18 @@ con contorno, número grande) y la hoja marcaba "En combate" a un debilitado.
 **Quedó a medias / roto:** probar en Android real (Kenneth) y SFX de golpe (F2-08). Ambos en PENDIENTES de ESTADO.
 **Decisiones nuevas:** D-033.
 **El siguiente debe empezar por:** F5 (PvP en tiempo real, servidor con el mismo motor) — primero su plan; o F2-08.
+
+## 2026-10-12 00:45 · @alex (Claude) · cierre de sesión y relevo a Samuel · rama `feature/F4-05-escena-combate`
+
+**Qué se hizo en esta sesión (Alex):** revisión de F0-08…F0-11 de Kenneth; F0-12 (rol admin en `/pokemon`, #21);
+F1-01 spike del mapa (rama propia, **lo termina Kenneth** en su Android); F1-06 spawns (#22); F1-08 mochila y XP
+(#23); F2-03 fórmula de captura (#24); F2-06 captura en servidor (#25); F4-01 plan del combate (#26); F4-02 tipos y
+stats + dataset con `target`/`metaCategory` (#27); F4-03 daño = Showdown (#28); F4-04 motor (#29); F4-06 IA (#30);
+F4-05 escena de combate temporal (#31). Decisiones D-023…D-034.
+**Nueva decisión del PO (D-034):** el combate definitivo va en **realidad aumentada con la cámara**; la escena 2D de
+F4-05 es temporal. Tarea nueva **F4-07** (depende del spike F2-01).
+**Error y corrección:** con `git add -A docs` se subieron por accidente a la rama de F4-05 las 6 capturas
+`docs/evidencias/HU-02_*.jpg` de Alex (pendientes de su decisión); se sacaron del repo en el commit siguiente y siguen
+en su PC. No tienen datos sensibles (Postman contra localhost). Regla: añadir archivos por ruta, nunca `-A` de `docs/`.
+**El siguiente (Samuel) debe empezar por:** la sección "👉 RELEVO PARA SAMUEL" de `ESTADO.md` (mezclar #21→#31 en
+orden, Render: 6543 + `SPAWN_SALT` + Manual Deploy, su `.env`, y elegir F5-01 / F2-08 / F2-01).

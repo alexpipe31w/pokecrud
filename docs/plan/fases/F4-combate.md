@@ -157,7 +157,7 @@ paralelo (la escena juega contra una IA "elige al azar" hasta que llegue F4-06).
   (< 500 turnos) sin excepciones y sin PS fuera de [0, máx].
 - [x] **Paso 5:** REGLA 2.
 
-## F4-05 · Escena de combate (app)
+## F4-05 · Escena de combate (app) — TEMPORAL en 2D (D-034: la definitiva es F4-07, en AR)
 
 - [x] **Paso 1:** ruta `/combate/prueba` (con `authGuard`) que monta un combate local contra un entrenador de
   `shared/data/trainers.ts` con `createBattle`, RNG con semilla aleatoria y la IA de F4-06 (`chooseAction` con la

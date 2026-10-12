@@ -3,11 +3,34 @@
 > Se **reescribe** al cerrar cada sesión (no es histórico; el histórico es `BITACORA.md`).
 > Máximo una pantalla. Si lees esto al empezar: después lee `ROADMAP.md`.
 
-**Última actualización:** 2026-10-11 · por Alex (Claude) · rama `feature/F4-05-escena-combate` (PR abierto)
+**Última actualización:** 2026-10-12 · por Alex (Claude) · rama `feature/F4-05-escena-combate` (punta de la cadena de PR)
+
+## 👉 RELEVO PARA SAMUEL (léelo primero)
+
+Alex trabajó el 2026-10-11/12 en una **cadena de 11 PR** (#21 → #31). Cada uno sale del anterior, así que **este
+ESTADO solo está completo en la rama `feature/F4-05-escena-combate`** hasta que se mezclen. Haz esto, en orden:
+
+1. **Revisar y mezclar en orden** #21 → #22 → #23 → #24 → #25 → #26 → #27 → #28 → #29 → #30 → #31 (al mezclar uno,
+   GitHub reapunta el siguiente a `develop`). Resumen de cada uno en "Hecho" y en su PR.
+2. **En Render (solo tú tienes acceso):** `DATABASE_URL` al puerto **6543**; añadir **`SPAWN_SALT`** (≥ 32 caracteres
+   aleatorios, propia de Render: `node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))"`);
+   después **Manual Deploy** (no es automático). Comprobar `https://pokecrud-server.onrender.com/health/ready`.
+   Las migraciones nuevas (`player_role`, `inventory`, `capture`) **ya están aplicadas** en Supabase.
+3. **En tu `server/.env`:** puerto 6543 en `DATABASE_URL`, tu `JWT_SECRET` y tu `SPAWN_SALT`. Luego
+   `git pull && npm install && cd server && npm install` y prueba `npm test`, `npm run test:e2e`, `npm run test:shared`.
+4. **Qué coger después** (REGLA 1, una tarea): sin móvil → **F5-01** (plan del PvP; el motor ya está listo) o
+   **F2-08** (audio: faltan los SFX de golpe del combate). Con un Android → **F2-01** (spike de cámara + giroscopio):
+   es la llave de todo lo de realidad aumentada, **incluido el combate en AR que pidió Alex (D-034, F4-07)**.
+
+**Importante (D-034):** la escena de combate de `/combate/prueba` es **temporal**. Alex quiere el combate **en
+realidad aumentada con la cámara**. Lo que hay debajo (motor, IA, controlador, textos, menú) se reutiliza; solo cambia
+la parte visual (F4-07).
 
 ## Fase actual
 
-**F0 · Fundaciones — COMPLETA.** F0-01…F0-10 en `develop` (PR #8-#18); **F0-11 hecha y mezclada** (Kenneth, PR #19). Siguiente fase: **F1 · Mapa con GPS** (empieza por F1-01, el spike de Google Maps 3D en Android real).
+**F0 completa** (en `develop`). **F4 (combate) completa en código** a falta de la versión AR (F4-07). **F1 y F2 a
+medias:** spawns (F1-06), mochila/XP (F1-08), fórmula de captura (F2-03) y captura en servidor (F2-06) hechos; lo
+visual del mapa y del encuentro espera a los spikes en Android (F1-01 Kenneth, F2-01).
 
 ## Hecho
 

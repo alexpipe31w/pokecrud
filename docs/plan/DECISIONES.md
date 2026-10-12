@@ -359,3 +359,14 @@ difícil 40-42).
 - Equipo del jugador de PRUEBA (Pikachu, Bulbasaur, Squirtle, un nivel por encima del rival) hasta que F3-02 traiga
   sus capturados. Acceso: `/combate/prueba` o el botón "Combate de prueba" de `/dev/ui`.
 
+## D-034 · El combate final va en REALIDAD AUMENTADA; `/combate/prueba` es temporal (2026-10-12, Alex, PO)
+
+Pedido explícito de Alex (PO): el combate tiene que verse **con la cámara, en realidad aumentada**, como el encuentro y
+la captura (F2): los dos Pokémon anclados en el mundo real sobre el suelo, con el giroscopio. La escena 2D de F4-05
+(`/combate/prueba`, cielo y hierba dibujados) es **temporal**: sirve para probar el motor y la IA, no es la que se
+entrega. **Se conserva y se reutiliza todo lo de debajo:** el motor (`shared/engine/battle/*`), la IA, los
+entrenadores, `BattleController` (reproducción por eventos), `battle-text.ts` y el menú de movimientos (`battle-dock`,
+`battle-sheet`). Lo que cambia es la capa visual: escenario, sprites y efectos pasan a una escena three.js sobre la
+cámara (misma tecnología que F2-04). Tarea nueva **F4-07** (depende del spike F2-01). Sin cámara o sin permiso → el
+fondo ilustrado de siempre (DISENO §6), no una pantalla rota.
+
