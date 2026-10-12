@@ -235,11 +235,13 @@ export class MapPage implements ViewDidEnter, ViewWillLeave, OnDestroy {
     void this.init();
   }
 
-  /** Si el canvas del mapa perdió su contexto WebGL (visto en el Samsung A36 al volver de segundo plano), lo rehace. */
+  /**
+   * Si el mapa perdió su contexto WebGL (visto en el Samsung A36 al volver de segundo plano), lo rehace. Solo se fía
+   * del evento `webglcontextlost`: NUNCA llamar a `getContext()` sobre el canvas de Google para comprobarlo; si aún no
+   * tiene contexto, esa llamada se lo crea y Google cae a mapa raster (sin capa 3D ni avatar). Pasó en F1-04.
+   */
   private recoverIfLost(): void {
-    const canvas = this.mapEl().nativeElement.querySelector('canvas');
-    const gl = canvas ? (canvas.getContext('webgl2') ?? canvas.getContext('webgl')) : null;
-    if (this.glLost || gl?.isContextLost()) void this.rebuildMap('contexto WebGL perdido');
+    if (this.glLost) void this.rebuildMap('contexto WebGL perdido');
   }
 
   /**
