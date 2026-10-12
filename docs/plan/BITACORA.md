@@ -467,4 +467,4 @@ la correcta: se corrigió el test, no el código.)
 **Quedó a medias / roto:** nada.
 **Decisiones nuevas:** D-027.
 **El siguiente debe empezar por:** mezclar en orden #21 → #22 → #23 → este. Siguiente tarea libre sin móvil:
-F4-01 (plan de F4, motor de combate) o F2-08 (audio). F2-06 (captura en servidor) espera a F2-05 → F2-04 → F2-02 → F2-01 (móvil).
+**F2-06** (captura autoritativa en servidor: sus deps F2-03, F1-06 y F1-08 ya están hechas), F4-01 o F2-08.
