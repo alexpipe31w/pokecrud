@@ -393,3 +393,35 @@ login/registro (tiene que volver a entrar).
 **Decisiones nuevas:** D-022.
 **El siguiente debe empezar por:** mezclar el PR de F0-11; luego `/inicio F1-01` (spike Google Maps 3D + three.js en
 Android real) — antes, leer ARQUITECTURA §4 y D-022 (el mapa anula la zona segura en su `ion-content`).
+
+## 2026-10-11 21:00 · @alex (Claude) · F1-01 (a medias, pasa a Kenneth) · rama `feature/F1-01-spike-mapa-3d`
+
+**Qué se hizo:** página `/dev/mapa` (solo desarrollo, exige sesión): Google Maps vectorial (Map ID, tilt 67,5°, zoom 19,
+Parque Santander de Neiva) + la escena del juego (avatar, círculo de alcance 40 m, Pokémon como sprites con sombra y
+hierba animada en InstancedMesh). Plan A = `ThreeJSOverlayView` (`@googlemaps/three` 4.0.13); plan B =
+`AdvancedMarkerElement` con `<img>` y animación CSS; modo "Solo mapa" como línea base. Medidor de fps (`FpsMeter`, con
+tests) y botón "Medir batería": 7 configuraciones × (2 s calentando + 10 s midiendo con la cámara girando 360°).
+Cargador de Maps con timeout de 15 s y aviso si falta la clave (`src/app/core/maps/google-maps.loader.ts`).
+`environment.local.ts` ahora se importa: `scripts/ensure-local-env.mjs` lo crea desde la plantilla si falta
+(postinstall/prestart/prebuild/apk). `@googlemaps/three` no expone sus tipos con `moduleResolution: bundler` → copia
+mínima en `src/types/googlemaps-three.d.ts`.
+**Archivos clave:** `src/app/features/dev-map/`, `src/app/core/maps/google-maps.loader.ts`, `scripts/ensure-local-env.mjs`.
+**Cómo se probó (salida real):**
+
+    app: ng test → 26 archivos, 96/96 · shared 10/10 · lint OK · build OK
+    npm run apk → JDK 21: C:\Program Files\Microsoft\jdk-21.0.12.101-hotspot · BUILD SUCCESSFUL · APK 8.29 MB
+    PC (Chrome, RTX 5070, 390×844, renderingType VECTOR) — batería:
+      Solo mapa 0 → 177 fps · p95 5,9 ms · tirones 0,1 %
+      three.js 10/30/60 → 169,9 / 177 / 179,1 fps · p95 7,2 / 6 / 5,7 ms · 0 %
+      Markers 10/30/60 → 179,7 / 179,2 / 179,5 fps · p95 5,7 ms · 0 %
+    (en PC no discrimina: todo va al tope de la pantalla de 180 Hz)
+
+Evidencias `docs/evidencias/F1-01_0{1,2}_*.png`.
+**Quedó a medias / roto:** falta la medición en Android real (criterio de la tarea) y la decisión A/B. Alex no tiene
+Android → **la termina Kenneth**.
+**El siguiente debe empezar por (Kenneth):** `git fetch && git checkout feature/F1-01-spike-mapa-3d && npm install`
+(necesitas tu `environment.local.ts` con la clave de Maps), móvil por USB, `npm run apk -- --install`. En la app:
+entrar con una cuenta de Render y abrir `/dev/mapa` (desde chrome://inspect → consola: `location.href = '/dev/mapa'`).
+Pulsar "Medir batería" (~2 min, sin tocar el móvil), copiar de la consola la línea `[F1-01] batería {...}` a esta
+bitácora y escribir la decisión en DECISIONES: si three.js con 30 Pokémon da ≥ 50 fps de media y < 5 % de tirones →
+plan A; si no, plan B (o A con menos objetos). Luego `/cierre` y PR.

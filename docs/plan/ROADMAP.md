@@ -68,9 +68,12 @@
 
 ## F1 · Mapa con GPS
 
-- [~] **F1-01 · [SPIKE] Google Maps 3D + overlay three.js** (@alex, 2026-10-11) — mapa vectorial con Map ID, tilt, overlay con
+- [~] **F1-01 · [SPIKE] Google Maps 3D + overlay three.js** (@kenneth retoma de @alex, 2026-10-11) — mapa vectorial con Map ID, tilt, overlay con
       un objeto 3D; medir fps en Android real. Decidir plan A/B (ARQUITECTURA §4) y anotarlo en DECISIONES.
       Dep: F0-09. Criterio: medición de fps en la bitácora + decisión escrita.
+      **Hecho (Alex):** `/dev/mapa` con plan A (three.js) y plan B (markers), medidor y "Medir batería"; medido en PC.
+      **Falta (Kenneth, tiene Android):** rama `feature/F1-01-spike-mapa-3d` → `npm run apk -- --install` → medir en el
+      móvil → resultados en bitácora + decisión A/B en DECISIONES → PR.
 - [ ] **F1-02 · Plan detallado de F1** (`docs/plan/fases/F1-mapa.md`). Dep: F1-01.
 - [ ] **F1-03 · Ubicación y brújula** — `LocationService` (watch, suavizado, descarte de saltos),
       `CompassService`, modo joystick, pantalla de permisos diseñada.
