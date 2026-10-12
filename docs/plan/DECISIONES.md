@@ -228,3 +228,20 @@ el comando de arranque no cambia (`npm run start:prod`).
   fantasma/siniestro/psíquico de noche × 2. Celda: 0-3 Pokémon (60/28/10/2 %, ~10-20 a 200 m). Niveles 1-25 (más
   bajos más frecuentes) hasta que F3 los ligue al nivel del jugador. Shiny 1/512. Constantes en `shared/engine/spawns.ts`.
 
+## D-026 · Mochila (`Inventory`, `GET /bag`) y XP/nivel del jugador (F1-08) (2026-10-11, Alex)
+
+- **Ruta `/bag`, no `/inventory`:** "inventario" ya es la tienda del CRUD del curso (`/pokemon`, `InventoryPokemon`,
+  carpeta `server/src/inventory/`). La mochila del jugador es el modelo `Inventory` (como en ARQUITECTURA §9) servido en
+  `GET /bag` desde `server/src/bag/`. Sin id en la ruta: siempre la del jugador del token.
+- **Objetos** (`shared/engine/items.ts` = enum `InventoryItem`): `POKE_BALL`, `GREAT_BALL`, `ULTRA_BALL`, `RAZZ_BERRY`.
+  **Kit inicial** 30 / 5 / 0 / 5. Se da al registrarse en la MISMA escritura que crea el `Player` (anidada = atómica),
+  la migración se lo dio a los que ya existían, y `GET /bag` lo garantiza con `createMany … skipDuplicates`
+  (ON CONFLICT DO NOTHING) para quien se registrara entre la migración y el despliegue. Por eso **las filas no se
+  borran nunca** (al llegar a 0 se quedan): borrar una regalaría el kit otra vez. CHECK `0 ≤ qty ≤ 999` en la BD.
+- **XP → nivel** (`shared/engine/progression.ts`): XP total para el nivel L = 500·(L−1)·L, máximo 40. La misma función
+  la usan el servidor (al sumar) y la app (barra del HUD).
+- **`ProgressionService.addXp(playerId, n, tx?)`** sin endpoint: lo llamarán captura y combate DENTRO de su
+  transacción. `xp = xp + n` en la sentencia (atómico) y el nivel se sube con `WHERE level < nuevo` (nunca baja con
+  sumas concurrentes). Rechaza n ≤ 0, no entero o > 100.000.
+- La placa del jugador (`app-player-hud`) está en `/dev/ui` hasta que F1-04 la ponga arriba a la izquierda del mapa.
+

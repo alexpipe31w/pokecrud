@@ -23,6 +23,7 @@ model Player {
   teams         Team[]
   favorites     Favorite[]
   customPokemon CustomPokemon[]
+  inventory     Inventory[]
 }
 
 model RefreshToken {
@@ -100,4 +101,25 @@ model CustomPokemon {
   createdAt   DateTime @default(now())
 
   @@index([playerId, id])
+}
+
+/// Objetos del juego (F1-08). Mismas claves que ITEMS en shared/engine/items.ts.
+enum InventoryItem {
+  POKE_BALL
+  GREAT_BALL
+  ULTRA_BALL
+  RAZZ_BERRY
+}
+
+/// Bolsa del jugador: una fila por objeto. CHECK 0 ≤ qty ≤ 999 en la migración. Las filas NO se borran al llegar a
+/// 0 (el kit inicial se garantiza con INSERT … ON CONFLICT DO NOTHING; borrar una fila lo regalaría otra vez).
+/// Gastar una bola en F2 = UPDATE … SET qty = qty - 1 WHERE … AND qty >= 1 (atómico, ARQUITECTURA §6).
+model Inventory {
+  playerId  String        @db.Uuid
+  item      InventoryItem
+  qty       Int           @default(0)
+  updatedAt DateTime      @updatedAt
+  player    Player        @relation(fields: [playerId], references: [id], onDelete: Cascade)
+
+  @@id([playerId, item])
 }

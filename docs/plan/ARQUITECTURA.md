@@ -232,7 +232,7 @@ servidor tenga que guardar cada spawn.
 ```
 Player(id, email UNIQUE, passwordHash, nickname UNIQUE, avatar, level, xp, createdAt)
 RefreshToken(id, playerId, tokenHash UNIQUE, expiresAt, revokedAt)
-Inventory(playerId, item, qty CHECK qty>=0, PK(playerId,item))
+Inventory(playerId, item, qty CHECK 0..999, PK(playerId,item))   ← GET /bag (D-026)
 CaughtPokemon(id, playerId, speciesId, nickname, level, ivs JSON, nature, gender, shiny,
               heightScale, moves int[], caughtAt, caughtLat, caughtLng, ball, favorite)
 EncounterResult(id, playerId, encounterId, result[caught|fled], createdAt, UNIQUE(playerId,encounterId))
