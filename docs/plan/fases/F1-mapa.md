@@ -1034,7 +1034,7 @@ Android (≥ 55 fps con el mapa).
 
 **Files:** Create `src/app/game/map-scene/limb-pose.ts` + spec
 
-- [ ] **1a. Test que falla:**
+- [x] **1a. Test que falla:**
 
 ```ts
 import { limbPose } from './limb-pose';
@@ -1061,7 +1061,7 @@ describe('limbPose', () => {
 });
 ```
 
-- [ ] **1b.** falla. **1c. Implementación:**
+- [x] **1b.** falla. **1c. Implementación:**
 
 ```ts
 import type { Gait } from './avatar-motion';
@@ -1094,13 +1094,13 @@ export function limbPose(gait: Gait, speed: number, t: number): LimbPose {
 }
 ```
 
-- [ ] **1d.** pasa. Commit `F1-05: pose de extremidades con tests` + `/guardar`.
+- [x] **1d.** pasa. Commit `F1-05: pose de extremidades con tests` + `/guardar`.
 
 ### Paso 2 — `Avatar3D`
 
 **Files:** Create `src/app/game/map-scene/avatar-3d.ts`; Modify `map-scene.ts` (sustituye el avatar provisional)
 
-- [ ] **2a.** Personaje low-poly procedural (no hay glTF libres que valgan; D-003 ya eligió procedural para todo lo
+- [x] **2a.** Personaje low-poly procedural (no hay glTF libres que valgan; D-003 ya eligió procedural para todo lo
   que no sea arte oficial): grupo raíz → torso (cápsula, color `--accent` leído una vez con
   `getComputedStyle(document.documentElement)`), cabeza (esfera, piel), **gorra** (media esfera + visera, rojo/blanco),
   mochila (caja redondeada), brazos y piernas como cápsulas **colgadas de un pivote** (`Group` en la cadera/hombro
@@ -1108,14 +1108,29 @@ export function limbPose(gait: Gait, speed: number, t: number): LimbPose {
   `update(frame: AvatarFrame, timeS)`: aplica `limbPose(frame.gait, frame.speed, timeS)`, `rotation.y` desde
   `facingDeg`, `position.y = bob`, `rotation.x = lean`. Sombra: disco negro 30 % que se encoge un poco con el bote.
   Círculo de alcance: el anillo de `MapScene` (40 m) con pulso.
-- [ ] **2b.** Un solo material por color (compartidos), ≤ 12 mallas, sin `castShadow`. `dispose()`.
-- [ ] **2c.** `MapScene.setPlayer` llama a `avatar.update`. Lint + build. Commit + `/guardar`.
+- [x] **2b.** Un solo material por color (compartidos), ≤ 12 mallas, sin `castShadow`. `dispose()`.
+- [x] **2c.** `MapScene.setPlayer` llama a `avatar.update`. Lint + build. Commit + `/guardar`.
 
 ### Paso 3 — Prueba
 
-- [ ] **3a.** Navegador con joystick: medio joystick → camina, a tope → corre, suelto → respira. Grabar un GIF/vídeo
+- [x] **3a.** Navegador con joystick: medio joystick → camina, a tope → corre, suelto → respira. Grabar un GIF/vídeo
   corto o capturas → `docs/evidencias/F1-05_*`.
 - [ ] **3b.** Android: caminar y trotar de verdad; fps ≥ 55 con el contador del paso F1-04 8b. REGLA 2.
+
+**Hecho (Alex, 2026-10-12; falta 3b en un Android). Cambios respecto a este plan:**
+
+- **La fase de la zancada se acumula (D-040):** `limbPose(gait, speed, t)` con `t` absoluto hacía saltar las piernas
+  cada vez que `AvatarMotion` suaviza la velocidad (con la página abierta 10 min, un cambio de 0,05 m/s salta ~125 rad).
+  Ahora `advanceStride(phase, gait, speed, dt)` acumula la fase y `limbPose(gait, phase, t)` la recibe (`t` solo marca
+  la respiración en reposo). Los tests del paso 1 se reescribieron para esa firma (+5 de `advanceStride`).
+- **Pose suavizada** (τ = 0,05 s) en `Avatar3D`: al parar o al pasar de andar a correr las piernas no dan un tirón.
+  Un fotograma de más de 0,1 s (segundo plano) no cuenta como movimiento.
+- **Tamaño:** el muñeco mide ≈ 9,5 m a escala 1 y `MapScene` mantiene el ×1,8 de F1-04 (≈ 17 m en pantalla).
+- **Sombra dentro de `Avatar3D`** (encoge con el bote); el anillo de alcance sigue en `MapScene`. 12 mallas con la
+  sombra, 7 materiales compartidos.
+- **3a por Playwright (390×844, Nest local):** ratón de verdad sobre el joystick (con `PointerEvent` sintéticos falla
+  `setPointerCapture`, no es un fallo de la app). Ojo al mirar capturas sueltas: si caen en el cruce de las piernas
+  parece que no anda; la ráfaga `F1-05_05_zancada-rafaga.png` (16 fotogramas) sí enseña la zancada.
 
 ---
 

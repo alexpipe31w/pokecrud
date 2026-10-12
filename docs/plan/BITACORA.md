@@ -921,3 +921,25 @@ cambiado). Comprobado el despliegue automático de Render y ESTADO puesto al dí
 **Quedó a medias / roto:** nada.
 **Decisiones nuevas:** ninguna.
 **El siguiente debe empezar por:** F1-05 (avatar 3D) siguiendo `docs/plan/fases/F1-mapa.md` → F1-05, tras leer D-038 y D-039.
+
+## 2026-10-12 16:45 · @alex (Claude) · F1-05 · rama `feature/F1-05-avatar-3d`
+
+**Qué se hizo:** mezclado el PR #38 (docs de Kenneth). F1-05 pasos 1-3a: `limb-pose.ts` (pose de piernas, brazos, bote
+e inclinación + `advanceStride`, que acumula la fase de la zancada: D-040) y `avatar-3d.ts` (entrenador low-poly
+procedural: tronco del color `--accent`, cabeza, gorra blanca con visera roja que marca hacia dónde mira, ojos, mochila,
+brazos y piernas colgados de pivotes, sombra que encoge con el bote; 12 mallas, materiales compartidos, `dispose`).
+`MapScene` cambia el avatar provisional por `Avatar3D` (se mantiene ×1,8).
+**Archivos clave:** `src/app/game/map-scene/{limb-pose,avatar-3d,map-scene}.ts` (+ specs), `docs/evidencias/F1-05_*`.
+**Cómo se probó (salida real):**
+
+    lint: All files pass linting. · ng test: 43 archivos, 183 passed (16 nuevos) · shared: 12 archivos, 140 passed
+    build: Application bundle generation complete (sin errores)
+    navegador 390×844 (Playwright, Nest local + ng serve, cuenta f105-prueba@pokecrud.test → "borradas 1"):
+      /mapa con joystick (menú → Joystick Sí); medio joystick → anda hacia el este de perfil; a tope → corre inclinado;
+      soltar → se para y respira. Ráfaga de 16 capturas: la zancada alterna (F1-05_05). rAF 165,8 fps en el PC.
+      0 errores de consola de la app.
+
+**Quedó a medias / roto:** solo el paso 3b (Android real, ≥ 55 fps): Alex no tiene Android → Kenneth o Samuel.
+**Decisiones nuevas:** D-040.
+**El siguiente debe empezar por:** con Android, `npm run apk -- --install`, andar y trotar con el GPS y medir fps por CDP
+(como en F1-04 8b); si ≥ 55, marcar F1-05 `[x]`. Sin Android: F1-07 (Pokémon en el mapa) ya puede empezar.
