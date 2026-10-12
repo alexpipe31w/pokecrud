@@ -7,7 +7,7 @@
 
 ## Fase actual
 
-**F0 · Fundaciones** — **F0-01…F0-07 hechas y en `develop`** (PR #8-#14). **F0-08 hecha** (Kenneth, PR #16 a `develop`
+**F0 · Fundaciones** — **F0-01…F0-07 hechas y en `develop`** (PR #8-#14). **F0-08 hecha y mezclada** (Kenneth, PR #16
 pendiente de mezclar). Libres: **F0-09** APK y **F0-10** transaction pooler (nueva).
 
 ## Hecho
@@ -43,7 +43,7 @@ pendiente de mezclar). Libres: **F0-09** APK y **F0-10** transaction pooler (nue
 
 ## En curso
 
-- Nadie.
+- **F0-09** (@kenneth, rama `feature/F0-09-apk`): pipeline del APK. Punto de guardado: reclamada, sin código aún.
 
 ## Siguiente paso concreto
 

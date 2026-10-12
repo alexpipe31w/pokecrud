@@ -48,9 +48,9 @@
       Dep: F0-07. Criterio: la colección de Postman pasa entera contra el servidor nuevo (captura del runner).
       **Hecho:** Runner de Postman 79/79 (`docs/evidencias/F0-08_01_postman-runner-nest.png`) y Newman 44 peticiones /
       79 comprobaciones / 0 fallos (`F0-08_01_newman-runner.txt`). Ampliaciones respecto al plan: D-019.
-- [ ] **F0-09 · Pipeline del APK** — `npx cap add android`, permisos, icono y splash provisionales,
-      script `npm run apk` documentado, APK instalado en un Android real mostrando `/dev/ui`.
-      Dep: F0-04. Criterio: foto/captura del móvil + tamaño del APK en la bitácora.
+- [~] **F0-09 · Pipeline del APK** (@kenneth, 2026-10-11) — `npx cap add android`, permisos, icono y splash provisionales,
+  script `npm run apk` documentado, APK instalado en un Android real mostrando `/dev/ui`.
+  Dep: F0-04. Criterio: foto/captura del móvil + tamaño del APK en la bitácora.
 - [ ] **F0-10 · Conexiones a la base: transaction pooler** — el _session pooler_ de Supabase admite 15 clientes en total
       y Render + cada servidor local (pool 5) los comparten (D-019). Pasar `DATABASE_URL` al _transaction pooler_ (6543,
       `?pgbouncer=true` si Prisma lo pide) en Render y en los `.env`, dejando `DIRECT_URL` para migraciones (D-017).
