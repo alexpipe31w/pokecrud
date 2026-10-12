@@ -86,6 +86,12 @@ export interface Move {
   healing: number;
   minHits: number | null;
   maxHits: number | null;
+  /** A quién afecta (PokéAPI `target`): `user`, `selected-pokemon`, `all-opponents`… (F4-02). */
+  target: string;
+  /** Probabilidad (0-100) de que el rival retroceda (F4-02). */
+  flinchChance: number;
+  /** PokéAPI `meta.category`: `damage`, `damage+raise` (stats del usuario), `damage+lower` (del rival), `net-good-stats`… */
+  metaCategory: string | null;
 }
 
 export interface TypeInfo {

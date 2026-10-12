@@ -130,14 +130,15 @@ servidor tenga que guardar cada spawn.
 
 - Celda: rejilla de ~70 m (`cellId = floor(lat/0.0007)_floor(lng/0.0007)`; se puede pasar a S2 si hace falta).
 - Franja de tiempo: 10 min (`slot = floor(epochMinutes/10)`).
-- `spawnsForCell(cellId, slot, SPAWN_SALT)` en `shared/engine/spawns.ts`: semilla = hash(cellId, slot,
-  salt) → 0-3 Pokémon con especie, posición dentro de la celda, nivel, IVs, naturaleza, género, shiny.
+- `spawnsForCell(cellId, slot, seed, tabla)` en `shared/engine/spawns.ts`; la semilla la calcula el servidor con
+  `HMAC-SHA256(SPAWN_SALT, versión:cellId:slot)` (D-025) → 0-3 Pokémon con especie, posición dentro de la celda, nivel, IVs, naturaleza, género, shiny.
 - Pesos de especie: rareza inversa a `captureRate`/`baseExp`; legendarios y míticos casi nulos (solo
   eventos/incursiones); `isBaby` raros; **clima real** (Open-Meteo: lluvia → Agua/Eléctrico/Bicho,
   despejado → Fuego/Planta/Tierra, viento → Volador/Dragón/Psíquico, nieve → Hielo/Acero, niebla →
   Fantasma/Siniestro, nublado → Hada/Lucha/Veneno) y **hora** (noche → Fantasma/Siniestro/Psíquico).
 - El `SPAWN_SALT` vive solo en el servidor. El servidor manda al cliente la lista de spawns de las
-  celdas cercanas (`GET /spawns?lat&lng`), así nadie puede calcular spawns de lejos.
+  celdas cercanas (`GET /spawns?lat&lng` → `{slot, expiresAt, spawns: [{id, speciesId, lat, lng}]}` a ≤ 200 m),
+  así nadie puede calcular spawns de lejos. Clima por celda de 0,1° y franja (D-025).
 
 ## 6. Encuentro y captura
 
@@ -221,7 +222,7 @@ servidor tenga que guardar cada spawn.
 - CRUD del curso (HU ya evaluadas): `/pokemon` (inventario IS-11, modelo en `src/app/models/pokemon.model.ts`:
   datos de PokéAPI + `price` y `stock` propios), `/teams`, `/favorites`, `/customPokemon` se mantienen con el
   **mismo contrato** que tenía JSON Server (más el filtro por jugador), y la colección de Postman se
-  actualiza. Equipos: máx. 6, ahora con ids de Pokémon **capturados** (no de especie).
+  actualiza. Escribir en `/pokemon` exige rol ADMIN (D-023). Equipos: máx. 6, ahora con ids de Pokémon **capturados** (no de especie).
 - Despliegue: **[SPIKE F0-06]** Render (gratis, se duerme a los 15 min → despertarlo antes de la demo)
   o el servidor que decida el PO. Variables: `DATABASE_URL`, `JWT_SECRET`, `JWT_REFRESH_SECRET`,
   `SPAWN_SALT`, `CORS_ORIGINS`. `.env.example` commiteado, `.env` nunca.
@@ -229,9 +230,9 @@ servidor tenga que guardar cada spawn.
 ### Modelo de datos (Prisma, resumen)
 
 ```
-Player(id, email UNIQUE, passwordHash, nickname UNIQUE, avatar, level, xp, createdAt)
+Player(id, email UNIQUE, passwordHash, nickname UNIQUE, role PLAYER|ADMIN, avatar, level, xp, createdAt)
 RefreshToken(id, playerId, tokenHash UNIQUE, expiresAt, revokedAt)
-Inventory(playerId, item, qty CHECK qty>=0, PK(playerId,item))
+Inventory(playerId, item, qty CHECK 0..999, PK(playerId,item))   ← GET /bag (D-026)
 CaughtPokemon(id, playerId, speciesId, nickname, level, ivs JSON, nature, gender, shiny,
               heightScale, moves int[], caughtAt, caughtLat, caughtLng, ball, favorite)
 EncounterResult(id, playerId, encounterId, result[caught|fled], createdAt, UNIQUE(playerId,encounterId))

@@ -36,6 +36,7 @@ import { dexNumber, displayName, spriteUrl } from '../../core/utils/pokemon-defa
 import { Pokemon } from '../../models/pokemon.model';
 import { filterRefs } from '../../services/poke-api.service';
 import { PokemonService } from '../../services/pokemon.service';
+import { AuthService } from '../../core/auth/auth.service';
 import { UiService } from '../../services/ui.service';
 import { TypeChipsComponent } from '../../shared/components/type-chips/type-chips.component';
 
@@ -75,6 +76,8 @@ import { TypeChipsComponent } from '../../shared/components/type-chips/type-chip
 export class PokedexPage {
   private readonly pokemonService = inject(PokemonService);
   private readonly ui = inject(UiService);
+  /** Solo un ADMIN ve agregar/editar/eliminar (F0-12); el servidor lo exige igualmente. */
+  protected readonly isAdmin = inject(AuthService).isAdmin;
   private readonly router = inject(Router);
 
   protected readonly pokemon = signal<Pokemon[]>([]);

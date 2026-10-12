@@ -394,6 +394,37 @@ login/registro (tiene que volver a entrar).
 **El siguiente debe empezar por:** mezclar el PR de F0-11; luego `/inicio F1-01` (spike Google Maps 3D + three.js en
 Android real) — antes, leer ARQUITECTURA §4 y D-022 (el mapa anula la zona segura en su `ion-content`).
 
+## 2026-10-11 20:45 · @alex (Claude) · F0-12 · rama `feature/F0-12-admin-inventario`
+
+**Qué se hizo:** revisión de los PR #16-#20 de Kenneth (código sólido; server 11/11, app 92/92, shared 10/10, lint y
+build OK; Render sirve `/pokemon` con 151). Hallazgo: cualquier cuenta podía escribir en el inventario compartido y el
+registro es abierto → nueva tarea F0-12. Rol `PlayerRole` (`PLAYER`|`ADMIN`) en `Player`; `AdminGuard` en las 4
+escrituras de `/pokemon` (rol leído de la BD, no del token); script `npm run admin -- list|grant|revoke <correo>`;
+`role` sale en `player` de `/auth/*`; la app oculta FAB, deslizar y botones del detalle a quien no es ADMIN y
+`adminGuard` protege `/pokemon/nuevo` y `/pokemon/:id/editar`. Postman: login ADMIN con variables del entorno local,
+escrituras del inventario con `{{adminToken}}` y caso nuevo "jugador normal → 403". De paso, en el PC de Alex:
+`DATABASE_URL` → 6543, `JWT_SECRET` local generado (faltaba) y JDK 21 instalado (`openjdk 21.0.12.1`).
+**Archivos clave:** `server/src/auth/admin.guard.ts`, `server/prisma/admin.ts`,
+`server/prisma/migrations/20261012010000_player_role/`, `server/src/inventory/inventory.controller.ts`,
+`server/test/crud.e2e-spec.ts`, `src/app/core/auth/auth.guard.ts`, `backend/postman/PokeCRUD.postman_collection.json`.
+**Cómo se probó (salida real):**
+
+    prisma migrate deploy → Applying migration `20261012010000_player_role` · All migrations have been successfully applied.
+    prisma migrate diff (BD de Supabase → schema.prisma) → -- This is an empty migration.
+    server: npm test → 11/11 · npm run test:e2e (DATABASE_URL por 6543) → Test Files 4 passed · Tests 45 passed
+      (nuevos: jugador normal → 403 en POST/PUT/PATCH/DELETE sin cambiar nada; quitar el rol → 403 con el MISMO token)
+    newman (servidor local + cuenta ADMIN temporal @pokecrud.test) → requests 46 · assertions 82 · failed 0
+      (docs/evidencias/F0-12_01_newman-runner.txt; la cuenta temporal se borró después)
+    app: ng test → 94/94 · lint OK · build OK
+    BD tras las pruebas: inventario 151, 0 Pokémon de prueba, 0 ADMIN
+
+**Quedó a medias / roto:** nada en código. Pendiente de humanos: revisar/mezclar el PR; Samuel → Manual Deploy en
+Render (y su 6543); Alex → `npm run admin -- grant <correo>` con su cuenta. No se probó en el móvil (solo cambia qué
+botones se ven; la lógica está cubierta por tests).
+**Decisiones nuevas:** D-023.
+**El siguiente debe empezar por:** revisar el PR de F0-12 (`gh pr diff`), mezclarlo y pedir a Samuel el Manual Deploy;
+después `/inicio F1-01`.
+
 ## 2026-10-11 21:00 · @alex (Claude) · F1-01 (a medias, pasa a Kenneth) · rama `feature/F1-01-spike-mapa-3d`
 
 **Qué se hizo:** página `/dev/mapa` (solo desarrollo, exige sesión): Google Maps vectorial (Map ID, tilt 67,5°, zoom 19,
@@ -425,3 +456,281 @@ entrar con una cuenta de Render y abrir `/dev/mapa` (desde chrome://inspect → 
 Pulsar "Medir batería" (~2 min, sin tocar el móvil), copiar de la consola la línea `[F1-01] batería {...}` a esta
 bitácora y escribir la decisión en DECISIONES: si three.js con 30 Pokémon da ≥ 50 fps de media y < 5 % de tirones →
 plan A; si no, plan B (o A con menos objetos). Luego `/cierre` y PR.
+
+## 2026-10-11 21:15 · @alex (Claude) · F1-06 · rama `feature/F1-06-spawns`
+
+**Qué se hizo:** motor de spawns puro `shared/engine/spawns.ts` (`cellIdFor`, `cellsWithin`, `slotFor`, `isNightAt`,
+`buildSpawnTable`, `spawnsForCell`, `parseSpawnId`) y módulo `server/src/spawns/` (`GET /spawns`, `SpawnsService`,
+`WeatherService`). El servidor compila `shared/` por primera vez (D-024: `rootDir ..`, salida `dist/server/src/main.js`,
+`shared/package.json` ESM). Semilla HMAC con `SPAWN_SALT`, clima por celda de 0,1° y franja, datos ocultos hasta el
+encuentro, 503 si falta la sal (D-025). `SPAWN_SALT` añadida a `.env.example`, SECRETOS y validación (opcional, ≥ 32).
+**Archivos clave:** `shared/engine/spawns.ts`, `server/src/spawns/*`, `server/tsconfig.build.json`, `server/package.json`.
+**Cómo se probó (salida real):**
+
+    npm run test:shared → 3 archivos, 22/22 (12 nuevos; dataset real: 0 legendarios/míticos en 20.000 celdas, >400 especies)
+    server: npm test → 21/21 (10 nuevos) · npm run test:e2e → Test Files 5 passed · Tests 46 passed
+      (spawns: 401 sin sesión; 400 sin lng / lat 95 / lat abc / parámetro extra; dos jugadores → respuesta idéntica)
+    lint server: solo el aviso previo de auth.e2e-spec · app: ng build OK
+    npm run start:prod (dist/server/src/main) + Open-Meteo real, Neiva 2.9273,-75.2819:
+      200 1.02 s · slot 2986283 · expira 2026-10-12T02:00:00Z · 10 Pokémon
+      200 0.21 s · misma respuesta (clima en caché) · sin "weather.fallback" en el log
+
+**Quedó a medias / roto:** nada en código. Pendiente de humanos: `SPAWN_SALT` en el `server/.env` de cada uno y en
+Render (Samuel) antes del deploy. Los niveles (1-25) se ligarán al nivel del jugador en F3.
+**Decisiones nuevas:** D-024, D-025.
+**El siguiente debe empezar por:** revisar el PR de F1-06; luego `/inicio F1-08` (o F1-02 si Kenneth ya cerró F1-01).
+
+## 2026-10-11 21:35 · @alex (Claude) · F1-08 · rama `feature/F1-08-inventario-xp` (sale de F1-06)
+
+**Qué se hizo:** `shared/engine/items.ts` (objetos y kit inicial) y `shared/engine/progression.ts` (curva 500·(L−1)·L,
+`levelForXp`, `levelProgress`). Servidor: modelo `Inventory` (enum `InventoryItem`, PK (playerId, item), CHECK 0-999)
+con migración que da el kit a los jugadores existentes; kit al registrarse en la misma escritura que el `Player`;
+`GET /bag` (garantiza el kit con ON CONFLICT DO NOTHING); `ProgressionService.addXp` atómico (sin endpoint). App:
+`BagService` (se vacía al cambiar de jugador), placa `app-player-hud` (avatar, nivel, barra de XP, bolas) y mochila
+en `/dev/ui`. La rama se mezcló con `feature/F1-06-spawns` porque necesita que el servidor compile `shared/` (D-024).
+**Archivos clave:** `shared/engine/{items,progression}.ts`, `server/src/bag/`, `server/src/progression/`,
+`server/prisma/migrations/20261012020000_inventory/`, `src/app/shared/ui/player-hud.component.ts`,
+`src/app/services/game/bag.service.ts`.
+**Cómo se probó (salida real):**
+
+    prisma migrate diff (schema de develop → este) = mismo SQL que la migración (+ CHECK y kit a mano)
+    prisma migrate deploy → 20261012020000_inventory aplicada · kit: 3 jugadores × 4 filas (POKE 90, GREAT 15, ULTRA 0, RAZZ 15)
+    shared: 27/27 (5 nuevos) · app: ng test 97/97 (5 nuevos), lint OK, build OK (sin avisos de presupuesto)
+    server: npm test 21/21 · test:e2e → Test Files 6 passed · Tests 53 passed (bag: 7 nuevos)
+      kit exacto al registrarse; GET /bag dos veces no regala nada; no pisa cantidades; jugador sin filas → kit;
+      la BD rechaza qty −1 y 1000; 10 addXp(1000) simultáneos → 10.000 XP y nivel 5 en /auth/me;
+      addXp dentro de una transacción que falla → 0 XP; addXp(0 | −5 | 1,5 | 100.001) → 400
+    navegador (390×844): /dev/ui con cuenta de prueba (1.500 XP) → placa "nivel 2 · 500 / 2000 XP · 35 bolas" y
+      mochila 30/5/0/5. Arreglado el contraste de la inicial del avatar. Evidencias F1-08_0{1,2}_*.png
+
+**Quedó a medias / roto:** nada. La placa se coloca en el mapa en F1-04.
+**Decisiones nuevas:** D-026.
+**El siguiente debe empezar por:** mezclar en orden #21, #22 y el PR de F1-08 (Samuel: `SPAWN_SALT` en Render +
+Manual Deploy). Luego F1-02 en cuanto Kenneth cierre F1-01.
+
+## 2026-10-11 21:50 · @alex (Claude) · F2-03 · rama `feature/F2-03-formula-captura` (sale de F1-08)
+
+**Qué se hizo:** `shared/engine/capture.ts`: `captureValue`, `shakeThreshold`, `captureChance`, `fleeChance` y
+`resolveThrow` (RNG inyectado, siempre 5 tiradas). Tipos `BallId`/`BerryId` sacados de `items.ts`. En ESTADO, nueva
+sección **"PENDIENTES DE HUMANOS — lista única"** con responsable y casilla: quien termine algo lo marca, y cada tarea
+añade ahí lo suyo.
+**Archivos clave:** `shared/engine/capture.ts`, `shared/engine/capture.spec.ts`.
+**Cómo se probó (salida real):**
+
+    npm run test:shared → 39/39 (12 nuevos de captura)
+      captureRate 45, vida llena, Poké: a = 15, b = 38527, p = 11,95 %
+      legendario (3): 1,57 % sin ayudas · 8,94 % con Ultra + Frambu + Excelente + curva (a = 10,2, b = 35839)
+      captureRate 255 + Super + Excelente + curva → 100 %
+      40.000 lanzamientos × 3 casos: frecuencia observada = captureChance (2 decimales); huida observada = fleeChance
+      entradas imposibles → RangeError (7 casos)
+    server: npm run build → dist/shared/engine/capture.js · app: ng build OK
+
+(Un primer test fallaba porque yo había calculado mal a mano el 21 % del legendario; la fórmula daba 8,9 % y era
+la correcta: se corrigió el test, no el código.)
+**Quedó a medias / roto:** nada.
+**Decisiones nuevas:** D-027.
+**El siguiente debe empezar por:** mezclar en orden #21 → #22 → #23 → este. Siguiente tarea libre sin móvil:
+**F2-06** (captura autoritativa en servidor: sus deps F2-03, F1-06 y F1-08 ya están hechas), F4-01 o F2-08.
+
+## 2026-10-11 22:20 · @alex (Claude) · F2-06 · rama `feature/F2-06-captura-servidor` (sale de F2-03)
+
+**Qué se hizo:** módulo `server/src/encounters/` (`GET /encounters/:id`, `POST /encounters/:id/throw`), `LocationService`
+(`GET /spawns` guarda la última ubicación), `SpawnsService` ampliado (`spawnById`, `speciesDetails`, `heightScale`).
+Modelos `CaughtPokemon`, `EncounterResult` (UNIQUE jugador+encuentro), `Throw` (UNIQUE jugador+clientThrowId) y columnas
+de ubicación en `Player`, con CHECKs. Todo el lanzamiento en una transacción (D-028). `THROW_RESOLVER` inyectable.
+**Archivos clave:** `server/src/encounters/*`, `server/src/location/*`, `server/prisma/migrations/20261012030000_capture/`,
+`server/test/encounters.e2e-spec.ts`.
+**Cómo se probó (salida real):**
+
+    prisma migrate deploy → Applying migration `20261012030000_capture` · applied
+    prisma migrate diff BD → schema: solo la columna `role` de F0-12 (esa rama no está mezclada en esta) ✔
+    server: npm test → 23/23 · npm run test:e2e → Test Files 7 passed · Tests 64 passed (encuentros: 11 nuevos)
+      401 / 404 / 410; lejos (1,1 km) → 403 sin gastar; sin ubicación → 403; detalle sin IVs
+      captura (Super Ball, Genial, curva): 200, 1 bola menos, CaughtPokemon con datos del servidor, XP 160 en /auth/me,
+        2.º lanzamiento → 409 sin gastar
+      mismo clientThrowId en serie y 5 a la vez → misma respuesta, 2 lanzamientos guardados, 2 bolas en total
+      3 lanzamientos distintos a la vez que capturan → [200, 409, 409], 1 capturado, 1 bola
+      fallo con baya → gasta bola y baya, encuentro abierto; huida → cierra (409 después)
+      Ultra Ball con 0 en la bolsa → 409 y nada cambia; 12 "excellent" previos → cuenta como "great"
+      validación (MASTER_BALL, baya como bola, campo extra, UUID malo, calidad inventada) → 400
+      fórmula real sin forzar → se resuelve y se guarda
+    lint server: solo el aviso previo de auth.e2e-spec
+
+Primer intento: el test de 5 reintentos simultáneos superaba los 5 s (cada transacción ~1 s contra São Paulo y se
+esperan por el bloqueo de la fila de la mochila, que es justo lo que las hace seguras). Se subieron el tope de la
+transacción (maxWait 5 s, timeout 10 s) y el del test.
+**Quedó a medias / roto:** nada en servidor. La app aún no lo usa (F2-04/05/07). Pokédex y caramelos → F3.
+**Decisiones nuevas:** D-028.
+**El siguiente debe empezar por:** mezclar en orden #21 → #22 → #23 → #24 → este. Siguiente libre sin móvil: F4-01
+(plan del motor de combate) o F2-08 (audio).
+
+## 2026-10-11 22:40 · @alex (Claude) · F4-01 · rama `feature/F4-01-plan-combate` (sale de F2-06)
+
+**Qué se hizo:** plan de la fase 4 en `docs/plan/fases/F4-combate.md`: contrato del motor (estado, acciones, eventos),
+reglas Gen V+ (stats, orden, daño con `floor` por pasos como Showdown, crítico por etapas, precisión, estados con
+inmunidades por tipo, efectos), alcance medido y pasos con casillas para F4-02…F4-06.
+**Cómo se midió el alcance (salida real, `moves.json`):**
+
+    total 706 | con poder 442 | de daño sin poder fijo 30 (guillotine, sonic-boom, seismic-toss…)
+    estado 234 | soportables (stats/estado/curación) 108 | sin efecto soportado 126 (whirlwind, reflect, metronome…)
+    multigolpe 24 | drenan 10 | retroceso 9 | prioridad≠0 49 | critRate>0 23 → v1 = 550/706 (78 %)
+
+**Hallazgo:** `moves.json` no trae `target` (a quién afectan los cambios de stats) ni `flinchChance`: sin `target`,
+"Puño Incremento" subiría el ataque del rival. Es el paso 1 de F4-02 (regenerar el dataset).
+**Quedó a medias / roto:** nada (es un documento).
+**El siguiente debe empezar por:** `/inicio F4-02` y seguir sus casillas en el plan.
+
+## 2026-10-11 23:00 · @alex (Claude) · F4-02 · rama `feature/F4-02-tipos-stats` (sale de F4-01)
+
+**Qué se hizo:** `shared/engine/battle/type-chart.ts` (matriz desde `types.json`), `stats.ts` (naturalezas, `calcStats`,
+etapas), `moves.ts` (`statChangeTarget`, `statChangeChance`). `build-dataset.mjs` añade `target`, `flinchChance` y
+`metaCategory` a cada movimiento; dataset regenerado (descarga completa de PokéAPI, ~10 min; `.cache/` queda en el PC
+de Alex, gitignored).
+**Cómo se probó (salida real):**
+
+    npm run dataset → OK · pokedex 972 KB · moves 256 KB · types 2 KB · v0c1997bdfa5a
+      moves.json: 706 → 706, ningún otro campo cambió (comparado contra el anterior); pokedex.json y types.json idénticos
+    npm run test:shared → 71/71 (32 nuevos)
+      tipos: 324/324 casillas = tabla oficial escrita a mano; 8 inmunidades; Hielo→Dragonite ×4, Tierra→Zapdos ×0
+      stats: Garchomp nv 78 Firme con IV/EV de Bulbapedia → 289/278/193/135/171/171 ✔
+      a quién afectan (19 movimientos reales): Danza Espada/Aullido → usuario, Gruñido/Encanto → rival,
+        Puño Incremento/A Bocajarro/Sofoco → usuario, Psíquico/Triturar → rival, Lumina Crash → rival
+    app: ng test 97/97, build OK · server: build OK, npm test 23/23
+
+**Hallazgos:** (1) el plan suponía que `target` bastaba; no, en los de daño hace falta `metaCategory` (D-029).
+(2) Dos expectativas del test de stats estaban mal calculadas a mano (ataque 135 → 150, velocidad 133 → 134); la
+fórmula ya cuadraba con Bulbapedia. Se corrigió el test.
+**Quedó a medias / roto:** nada.
+**Decisiones nuevas:** D-029.
+**El siguiente debe empezar por:** F4-03 (daño, precisión, crítico, orden), paso 1 del plan: `isSupportedMove` y
+`defaultMoves`, y que `movesAtLevel` del servidor use ese filtro.
+
+## 2026-10-11 23:20 · @alex (Claude) · F4-03 · rama `feature/F4-03-dano` (sale de F4-02)
+
+**Qué se hizo:** `shared/engine/battle/damage.ts` (`damageRolls`, `rollDamage`, `critChance`, `hitChance`,
+`rollAccuracy`, `effectiveSpeed`, `firstToAct`), `moves.ts` (`isSupportedMove`, `defaultMoves`). Servidor:
+`SpawnsService.defaultMoves` (carga `moves.json`) sustituye a `movesAtLevel` en la captura. Oráculo de referencia en
+`scripts/oracles/showdown-damage.cjs`.
+**Cómo se probó (salida real):**
+
+    @smogon/calc 0.12.0 (2026-09-18) instalado aparte en %TEMP% → 10 casos, p. ej.
+      Garchomp Alegre Terremoto → Heatran: 268,276,276,280,288,288,292,292,300,300,304,304,312,312,316,324
+      Lucario −2 atk crítico A Bocajarro → Blissey +2 def: 878 … 1034
+    npm run test:shared → 99/99 (28 nuevos): las 16 tiradas de los 10 casos = Showdown, y sus stats = las nuestras
+      soportados = 548 (442 de daño + estado aplicable); ninguna especie sin movimientos a nivel 1/25/50
+    server: npm test 22/22 · test:e2e 64/64 (la captura ya usa defaultMoves) · lint: solo el aviso previo
+    app: lint OK, build OK
+
+(Todos los casos de Showdown pasaron a la primera.) No había `CaughtPokemon` de jugadores reales con movimientos no
+soportados (solo cuentas de prueba, ya borradas).
+**Quedó a medias / roto:** nada.
+**Decisiones nuevas:** D-030.
+**El siguiente debe empezar por:** F4-04 (reducer `battle-engine.ts` con estados y cambios de stats), según el plan.
+
+## 2026-10-11 23:45 · @alex (Claude) · F4-04 · rama `feature/F4-04-reducer` (sale de F4-03)
+
+**Qué se hizo:** `shared/engine/battle/types.ts` (contrato: estado, acciones, eventos, `BattleContext`, `BattleError`) y
+`battle-engine.ts` (`createBattle`, `resolveTurn`): validación, orden, PP, precisión, daño con multigolpe y crítico por
+golpe, drenaje/retroceso, estados con inmunidades, confusión, etapas con tope, retroceso del rival, residuos de fin de
+turno, debilitados con cambio forzado, Forcejeo, rendición y victoria.
+**Cómo se probó (salida real):**
+
+    vitest battle-engine.spec.ts → 27/27, 1 instantánea escrita
+      1.000 combates 3 vs 3 aleatorios (especies, niveles 20-60, IVs, naturalezas, acciones al azar): todos terminan
+        en < 500 turnos, sin excepciones, PS y PP siempre en rango (3,3 s)
+      parálisis ≈ 25 % sin moverse en 2.000 turnos; Ataque Furia 2-5 golpes ≈ 35/35/15/15 en 4.000; Mordisco solo hace
+        retroceder si va primero (0 de 500 cuando es más lento)
+      instantánea leída a mano: Fuego Fatuo quema a Blastoise (−9/turno = 1/16), Surf ×2 104, Mordisco quemado a la
+        mitad, Rayo Hielo debilita a Charizard, cambio forzado a Pikachu, Rayo ×2 debilita a Blastoise
+    npm run test:shared → 126/126 · app lint + build OK · server build + 22/22
+
+Primer intento: 4 tests mal escritos (no el motor): paralizaba a un Jolteon (Eléctrico, inmune); el sueño del turno en
+que te duermen sí cuenta; Gigadrenado no cura con la vida llena; el guion de la instantánea usaba un índice que el
+Pokémon de reserva no tenía.
+**Quedó a medias / roto:** nada. Fuera de la v1 (anotado en el plan): movimientos de daño fijo y efectos especiales.
+**Decisiones nuevas:** D-031.
+**El siguiente debe empezar por:** F4-06 (IA, solo shared/, sin móvil) o F4-05 (escena; probar en vista móvil).
+
+## 2026-10-12 00:00 · @alex (Claude) · F4-06 · rama `feature/F4-06-ia` (sale de F4-04)
+
+**Qué se hizo:** `shared/engine/battle/ai.ts` (`chooseAction`, `scoreMove`, `expectedDamage`) y
+`shared/data/trainers.ts` (Excursionista Roco fácil, Nadadora Marina normal, Entrenadora As Valeria difícil). Exportado
+`STAGE_OF` del motor para no duplicar la traducción de stats. El paso "conectar en la escena" pasa a F4-05 (paso 1).
+**Cómo se probó (salida real):**
+
+    vitest ai.spec.ts → 10/10
+      casos claros (20 semillas, siempre lo mismo): remata con Rayo a Gyarados; Triturar y no Golpe Cuerpo contra
+        Gengar; Espora a un Snorlax sano y Placaje si ya está quemado; Pikachu contra Golem cambia a Lapras;
+        cambio forzado saca a Lapras contra Golem
+      [F4-06] difícil vs fácil: 71.8 % (500 combates espejo, equipos aleatorios nv 40, alternando lados)
+      [F4-06] difícil vs azar: 95.7 % · normal vs azar: 91.0 % (300)
+      300 combates IA contra IA de todas las dificultades sin una acción imposible
+    npm run test:shared → 136/136 · app lint + build · server build + 22/22
+
+Ojo: el 71,8 % pasa el criterio (≥ 70 %) con poco margen; el fácil no es "tonto", solo mete un 40 % de azar. Si se
+quiere más diferencia, subir el ruido del fácil o quitarle los cambios de estado.
+**Quedó a medias / roto:** nada.
+**Decisiones nuevas:** D-032.
+**El siguiente debe empezar por:** F4-05 (escena de combate), paso 1 del plan: `/combate/prueba` contra un entrenador.
+
+## 2026-10-12 00:30 · @alex (Claude) · F4-05 · rama `feature/F4-05-escena-combate` (sale de F4-06)
+
+**Qué se hizo:** escena de combate en `src/app/features/battle/`: `battle.controller.ts` (motor + IA + reproducción de
+eventos al ritmo de los textos, gritos y vibración), `battle-text.ts` (eventos → español, con tests), `battle.page.ts`
+(escenario teñido por tipos, plataformas, sprites `home`, animaciones WAAPI), componentes `battle-info`, `battle-dock`
+(menú con tipo/PP/eficacia, cambiar, rendirse con confirmación, final), `battle-sheet` (cambio voluntario y forzado),
+`battle-burst` (anillo + partículas del tipo + número de daño), `battle-picker` (elegir rival). Ruta `/combate/prueba`
+(con sesión) y botón en `/dev/ui`.
+**Cómo se probó (salida real):**
+
+    app: ng test 101/101 (4 nuevos de textos) · lint OK · build OK sin avisos de presupuesto · shared 136/136
+    navegador 390×844 (Playwright, cuenta @pokecrud.test borrada después):
+      - Nadadora Marina: Impactrueno "▲ Súper eficaz" contra Goldeen → −36/−38, "¡Es superefectivo!", sacudida de la
+        escena; combate entero → "¡Has derrotado a Nadadora Marina!" + "¡Victoria!" en 6 turnos, 0 errores en consola
+      - Excursionista Roco: Impactrueno "✕ No afecta", Ataque Rápido "▼ Poco eficaz"; Pikachu debilitado → hoja
+        "¿Qué Pokémon vas a sacar?" → Bulbasaur con Látigo Cepa "▲ Súper eficaz"
+    Evidencias docs/evidencias/F4-05_0{1..6}_*.png (la 01 está en ancho de escritorio).
+
+Ajustes tras mirarlo: horizonte más alto (las plataformas flotaban en el cielo), Pikachu más pequeño (tapaba su panel),
+menú visible pero desactivado durante el turno (el panel de abajo quedaba vacío), golpe más visible (anillo, partículas
+con contorno, número grande) y la hoja marcaba "En combate" a un debilitado.
+**Quedó a medias / roto:** probar en Android real (Kenneth) y SFX de golpe (F2-08). Ambos en PENDIENTES de ESTADO.
+**Decisiones nuevas:** D-033.
+**El siguiente debe empezar por:** F5 (PvP en tiempo real, servidor con el mismo motor) — primero su plan; o F2-08.
+
+## 2026-10-12 00:45 · @alex (Claude) · cierre de sesión y relevo a Samuel · rama `feature/F4-05-escena-combate`
+
+**Qué se hizo en esta sesión (Alex):** revisión de F0-08…F0-11 de Kenneth; F0-12 (rol admin en `/pokemon`, #21);
+F1-01 spike del mapa (rama propia, **lo termina Kenneth** en su Android); F1-06 spawns (#22); F1-08 mochila y XP
+(#23); F2-03 fórmula de captura (#24); F2-06 captura en servidor (#25); F4-01 plan del combate (#26); F4-02 tipos y
+stats + dataset con `target`/`metaCategory` (#27); F4-03 daño = Showdown (#28); F4-04 motor (#29); F4-06 IA (#30);
+F4-05 escena de combate temporal (#31). Decisiones D-023…D-034.
+**Nueva decisión del PO (D-034):** el combate definitivo va en **realidad aumentada con la cámara**; la escena 2D de
+F4-05 es temporal. Tarea nueva **F4-07** (depende del spike F2-01).
+**Error y corrección:** con `git add -A docs` se subieron por accidente a la rama de F4-05 las 6 capturas
+`docs/evidencias/HU-02_*.jpg` de Alex (pendientes de su decisión); se sacaron del repo en el commit siguiente y siguen
+en su PC. No tienen datos sensibles (Postman contra localhost). Regla: añadir archivos por ruta, nunca `-A` de `docs/`.
+**El siguiente (Samuel) debe empezar por:** la sección "👉 RELEVO PARA SAMUEL" de `ESTADO.md` (mezclar #21→#31 en
+orden, Render: 6543 + `SPAWN_SALT` + Manual Deploy, su `.env`, y elegir F5-01 / F2-08 / F2-01).
+
+## 2026-10-12 11:30 · @samuel (Claude) · relevo de Alex: revisión y mezcla de #21…#31 · rama `feature/F0-12-admin-inventario`
+
+**Qué se hizo:** puesto al día (pull, `npm install` en raíz y `server/`, `server/.env` con `DATABASE_URL` en 6543 y
+`SPAWN_SALT` local). Render: `DATABASE_URL` en 6543 y `SPAWN_SALT` propia (Samuel). Montado Android en su PC: JDK 21
+(Temurin: el MSI de Microsoft daba "el hash del instalador no coincide", descarga de 211 KB) y Android Studio; APK
+instalado en un Redmi Note 10 (Android 12, MIUI 13, hay que activar "Instalar vía USB"). Revisión de los 11 PR de Alex:
+integración local develop + cadena + F0-12, y orden de mezcla cambiado: cadena #22→#31 primero (entra limpia) y #21 al
+final (único con conflictos: BITACORA, DECISIONES, ESTADO y `schema.prisma`; resueltos conservando todo y en orden).
+GitHub NO reapuntó los PR apilados (el repo no borra las ramas mezcladas): base cambiada a `develop` a mano antes de
+cada mezcla (#28…#31 los cambió y mezcló Samuel en la web). ESTADO al día y F0-13 nueva en el ROADMAP.
+**Cómo se probó (salida real):**
+integración local (develop + #22…#31 + #21): server Tests 22 passed (22) · e2e Test Files 7 passed (7), Tests 66 passed (66)
+app Tests 103 passed (103) · shared Tests 136 passed (136) · lint OK · build OK (app y servidor)
+prisma migrate diff --from-config-datasource --to-schema … --exit-code → exit 0 (esquema combinado = base real)
+diff de Alex: 0 secretos (contraseña BD, clave Maps, SPAWN_SALT/JWT_SECRET con valor, claves privadas) y 0 archivos sensibles
+BD tras los e2e: 0 jugadores @pokecrud.test · 3 jugadores · 0 ADMIN
+Render tras #22…#27: /health/ready 200; /spawns y /bag → 401 sin sesión (rutas nuevas desplegadas)
+**Quedó a medias / roto:** nada de código. F0-13 (artefactos `.js` en `shared/`) anotada. Falta nombrar ADMIN (Alex).
+**Decisiones nuevas:** ninguna (correcciones al relevo: Render despliega solo; GitHub no reapunta PR apilados aquí).
+**El siguiente debe empezar por:** Alex → `cd server && npm run admin -- grant <su correo>`; Kenneth → F1-01 en su
+Android y `SPAWN_SALT` en su `.env`; cualquiera → F0-13 (pequeña) o F5-01 / F2-08 / F2-01.

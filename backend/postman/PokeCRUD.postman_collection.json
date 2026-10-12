@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "PokéCRUD",
-    "description": "CRUD del curso contra el servidor NestJS (F0-08): /pokemon (inventario compartido; leer es público, escribir exige sesión) y /teams, /favorites, /customPokemon (de cada jugador). Mismo contrato que tenía JSON Server.\n\nAntes: `cd server && npm run start:dev` (puerto 3000). La primera carpeta registra un jugador de prueba (@pokecrud.test, lo borran los e2e del servidor) y guarda su accessToken; el resto lo usa como Bearer. Se puede ejecutar entera en el Runner las veces que haga falta.",
+    "description": "CRUD del curso contra el servidor NestJS (F0-08): /pokemon (inventario compartido; leer es público, escribir exige sesión con rol ADMIN (F0-12)) y /teams, /favorites, /customPokemon (de cada jugador). Mismo contrato que tenía JSON Server.\n\nAntes: `cd server && npm run start:dev` (puerto 3000). La primera carpeta registra un jugador de prueba (@pokecrud.test, lo borran los e2e del servidor) y guarda su accessToken; el resto lo usa como Bearer. Se puede ejecutar entera en el Runner las veces que haga falta.\n\nInventario (F0-12): las escrituras en /pokemon necesitan una cuenta ADMIN (se da con `cd server && npm run admin -- grant <correo>`). Pon su correo y contraseña en las variables `adminEmail` y `adminPassword` de TU entorno de Postman (no en la colección: el repo es público). Sin ellas, el login ADMIN falla y las escrituras del inventario dan 401.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "auth": {
@@ -21,6 +21,18 @@
     },
     {
       "key": "accessToken",
+      "value": ""
+    },
+    {
+      "key": "adminToken",
+      "value": ""
+    },
+    {
+      "key": "adminEmail",
+      "value": ""
+    },
+    {
+      "key": "adminPassword",
       "value": ""
     },
     {
@@ -90,6 +102,48 @@
               "path": [
                 "auth",
                 "register"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Login ADMIN (variables adminEmail / adminPassword de tu entorno)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"login ADMIN 200 (si falla: pon adminEmail/adminPassword en tu entorno de Postman)\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"la cuenta es ADMIN\", () => pm.expect(pm.response.json().player.role).to.eql(\"ADMIN\"));",
+                  "pm.collectionVariables.set(\"adminToken\", pm.response.json().accessToken);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{adminEmail}}\",\n  \"password\": \"{{adminPassword}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
               ]
             }
           }
@@ -325,6 +379,52 @@
               ],
               "path": [
                 "pokemon"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Crear como jugador normal → 403 (F0-12)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"responde 403: solo un ADMIN escribe en el inventario\", () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": 99150,\n  \"name\": \"mewtwo-postman\",\n  \"types\": [\n    \"psychic\"\n  ],\n  \"abilities\": [\n    \"pressure\",\n    \"unnerve\"\n  ],\n  \"imageUrl\": \"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/150.png\",\n  \"height\": 2,\n  \"weight\": 122,\n  \"baseExperience\": 340,\n  \"stats\": {\n    \"hp\": 106,\n    \"attack\": 110,\n    \"defense\": 90,\n    \"specialAttack\": 154,\n    \"specialDefense\": 90,\n    \"speed\": 130\n  },\n  \"price\": 50000,\n  \"stock\": 3,\n  \"createdAt\": \"2026-10-01T12:00:00.000Z\",\n  \"updatedAt\": \"2026-10-01T12:00:00.000Z\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/pokemon",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pokemon"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
               ]
             }
           }
@@ -572,7 +672,17 @@
             }
           }
         }
-      ]
+      ],
+      "auth": {
+        "type": "bearer",
+        "bearer": [
+          {
+            "key": "token",
+            "value": "{{adminToken}}",
+            "type": "string"
+          }
+        ]
+      }
     },
     {
       "name": "Equipos (/teams)",

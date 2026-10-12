@@ -80,6 +80,7 @@ describe('Auth (e2e)', () => {
       id: expect.any(String),
       email: user.email,
       nickname: user.nickname,
+      role: 'PLAYER',
       level: 1,
       xp: 0,
     });

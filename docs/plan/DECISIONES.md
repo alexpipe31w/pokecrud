@@ -198,3 +198,191 @@ cubiertas solas. Las que llevan `ion-header` no cambian (Ionic ya lo resuelve). 
 arriba / 15 px abajo; sin scroll extra en login y registro. **Una pantalla que deba ir a pantalla completa de verdad
 (mapa F1, encuentro AR F2) anula `--padding-top/bottom` en su `ion-content`** y coloca sus controles con
 `var(--ion-safe-area-*)`. `:has()` existe desde Chrome 105: en un WebView más viejo simplemente no se aplica (como antes).
+
+## D-023 · Solo un ADMIN escribe en el inventario `/pokemon` (F0-12) (2026-10-11, Alex)
+
+Con F0-08 cualquier jugador con sesión podía crear, editar y borrar el inventario compartido, y el registro es abierto
+(repo y Render públicos): cualquiera podía vaciar los 151 en minutos. **Decisión:** enum `PlayerRole` (`PLAYER` |
+`ADMIN`, por defecto `PLAYER`) en `Player`, y `AdminGuard` (`server/src/auth/admin.guard.ts`) en POST/PUT/PATCH/DELETE
+de `/pokemon`. Sin sesión → 401; jugador normal → 403; leer sigue siendo público.
+
+- **El rol se lee de la BD en cada escritura, NO va en el JWT:** quitarlo surte efecto en la siguiente petición sin
+  esperar a que caduque el access token. Cuesta una consulta por escritura del inventario (pocas).
+- **No hay endpoint para nombrar admins:** solo `cd server && npm run admin -- grant|revoke <correo>` (y `list`), es
+  decir, quien tenga la contraseña de la BD. Un endpoint así sería el primer objetivo de un atacante.
+- `/auth/*` devuelve `role` en `player` para que la app oculte agregar/editar/eliminar (`AuthService.isAdmin`,
+  `adminGuard` en `/pokemon/nuevo` y `/pokemon/:id/editar`). Es solo UI: quien manda es el servidor.
+- `/teams`, `/favorites`, `/customPokemon` no cambian (ya eran de cada jugador).
+- Postman: las escrituras del inventario usan `{{adminToken}}`, que sale del login con `adminEmail`/`adminPassword`
+  del **entorno local de Postman de cada uno** (nunca en la colección: el repo es público).
+
+## D-024 · El servidor compila `shared/` (F1-06) (2026-10-11, Alex)
+
+F1-06 es lo primero del servidor que usa el motor puro. **Decisión:** `server/tsconfig.build.json` con `rootDir: ".."` e
+`include: ["src", "../shared/**/*.ts"]` (sin los `*.spec.ts`). La salida pasa a ser `dist/server/src/main.js` +
+`dist/shared/…`: `start:prod` es `node dist/server/src/main` y `nest-cli.json` lleva `entryFile: server/src/main`.
+`shared/package.json` con `"type": "module"` para que `module: nodenext` lo trate como ESM (la raíz no tiene `type`).
+El servidor importa con ruta relativa y extensión: `../../../shared/engine/spawns.js`. En `shared/` las importaciones
+internas llevan `.js` (vale para Angular, Vitest y Node). Render clona el repo entero, así que `../shared` existe allí;
+el comando de arranque no cambia (`npm run start:prod`).
+
+## D-025 · Spawns: semilla HMAC, clima por celda y franja, datos ocultos hasta el encuentro (F1-06) (2026-10-11, Alex)
+
+- **Semilla** de (celda, franja) = primeros 4 bytes de `HMAC-SHA256(SPAWN_SALT, "v1:<cellId>:<slot>")`, calculada SOLO
+  en el servidor. `shared/engine/spawns.ts` recibe la semilla ya hecha: el cliente tiene el algoritmo pero no puede
+  predecir nada. FNV + sal (lo que decía ARQUITECTURA) se descartó: no es criptográfico. Si cambia `spawnsForCell`
+  (incluido el ORDEN de las tiradas), se sube `SEED_VERSION` en `spawns.service.ts`.
+- **Clima** (Open-Meteo, timeout 4 s) por celda de **0,1°** y **franja**: se pide una vez y se guarda hasta que acaba
+  la franja (máx. 2.000 entradas). Si falla → "despejado" toda la franja. Así el clima nunca hace que dos jugadores
+  vean cosas distintas, ni que los spawns cambien a mitad de franja. **Noche** = hora solar de la celda al EMPEZAR
+  la franja (18:00-6:00), sin red ni zonas horarias.
+- `GET /spawns?lat&lng` (con sesión, 20/min por IP) devuelve solo `{id, speciesId, lat, lng}` a ≤ 200 m + `slot` y
+  `expiresAt`. Nivel, IVs, naturaleza, sexo y shiny se recalculan en el servidor a partir del `id`
+  (`SpawnsService.cellSpawns`) cuando haya encuentro (F2): nada de spawns en la BD.
+- **Degradación:** sin `SPAWN_SALT` (o sin dataset) solo `/spawns` responde 503; el servidor arranca igual. Si
+  `SPAWN_SALT` se define, debe tener ≥ 32 caracteres. Cambiarla cambia todos los spawns.
+- Pesos: `captureRate/255 × min(1,5; 100/baseExp)`, bebés × 0,3, legendarios y míticos 0; tipos del clima × 2,5;
+  fantasma/siniestro/psíquico de noche × 2. Celda: 0-3 Pokémon (60/28/10/2 %, ~10-20 a 200 m). Niveles 1-25 (más
+  bajos más frecuentes) hasta que F3 los ligue al nivel del jugador. Shiny 1/512. Constantes en `shared/engine/spawns.ts`.
+
+## D-026 · Mochila (`Inventory`, `GET /bag`) y XP/nivel del jugador (F1-08) (2026-10-11, Alex)
+
+- **Ruta `/bag`, no `/inventory`:** "inventario" ya es la tienda del CRUD del curso (`/pokemon`, `InventoryPokemon`,
+  carpeta `server/src/inventory/`). La mochila del jugador es el modelo `Inventory` (como en ARQUITECTURA §9) servido en
+  `GET /bag` desde `server/src/bag/`. Sin id en la ruta: siempre la del jugador del token.
+- **Objetos** (`shared/engine/items.ts` = enum `InventoryItem`): `POKE_BALL`, `GREAT_BALL`, `ULTRA_BALL`, `RAZZ_BERRY`.
+  **Kit inicial** 30 / 5 / 0 / 5. Se da al registrarse en la MISMA escritura que crea el `Player` (anidada = atómica),
+  la migración se lo dio a los que ya existían, y `GET /bag` lo garantiza con `createMany … skipDuplicates`
+  (ON CONFLICT DO NOTHING) para quien se registrara entre la migración y el despliegue. Por eso **las filas no se
+  borran nunca** (al llegar a 0 se quedan): borrar una regalaría el kit otra vez. CHECK `0 ≤ qty ≤ 999` en la BD.
+- **XP → nivel** (`shared/engine/progression.ts`): XP total para el nivel L = 500·(L−1)·L, máximo 40. La misma función
+  la usan el servidor (al sumar) y la app (barra del HUD).
+- **`ProgressionService.addXp(playerId, n, tx?)`** sin endpoint: lo llamarán captura y combate DENTRO de su
+  transacción. `xp = xp + n` en la sentencia (atómico) y el nivel se sube con `WHERE level < nuevo` (nunca baja con
+  sumas concurrentes). Rechaza n ≤ 0, no entero o > 100.000.
+- La placa del jugador (`app-player-hud`) está en `/dev/ui` hasta que F1-04 la ponga arriba a la izquierda del mapa.
+
+## D-027 · Fórmula de captura y huida (F2-03) (2026-10-11, Alex)
+
+- `shared/engine/capture.ts` implementa ARQUITECTURA §6 tal cual: `a = ((3·PSmax − 2·PSact)·captureRate·bola·baya·
+lanzamiento·curva)/(3·PSmax)`, `b = floor(65536/(255/a)^0,1875)`, 4 comprobaciones con enteros en [0, 65535]
+  (`a ≥ 255` → segura). Bonus: Poké 1 · Super 1,5 · Ultra 2 · Frambu 1,5 · Bien 1,3 · Genial 1,7 · Excelente 2 ·
+  **curva 1,7** (ARQUITECTURA no lo fijaba; es el de Pokémon GO). Referencias: captureRate 45 sin ayudas = 11,9 %;
+  legendario (3) = 1,6 % y con todo 8,9 %; captureRate 255 con Super + Excelente + curva = 100 %.
+- **Huida** tras fallar: 5 % + 15 %·(1 − captureRate/255) + 10 %·min(velocidad,180)/180 (+10 % legendario/mítico),
+  tope 35 %. Nunca huye si se captura.
+- `resolveThrow(captura, huida, rng)` consume **siempre 5 tiradas** (4 sacudidas + huida), pase lo que pase: la
+  secuencia del RNG no depende del resultado. Cambiar el orden o el número de tiradas cambia resultados: anotarlo aquí.
+- Las entradas imposibles (captureRate fuera de 1-255, PS > máximo, una baya como bola…) lanzan `RangeError`: el
+  servidor (F2-06) valida antes con DTO, y esto es la segunda red.
+- Sin modificador por nivel del Pokémon por ahora (los spawns son 1-25); si F3 liga niveles al jugador, se revisa.
+
+## D-028 · Captura autoritativa: ubicación, idempotencia, antitrampa de precisión y retención (F2-06) (2026-10-11, Alex)
+
+- **API:** `GET /encounters/:id` (nivel, sexo, shiny, tamaño, `expiresAt`, `status` open/caught/fled; nunca IVs) y
+  `POST /encounters/:id/throw { ball, berry?, throwQuality, curve, clientThrowId }` → `{ captured, shakes, fled,
+throwQuality, xpGained, caught, bag }`. `:id` = id del spawn de `GET /spawns`. Errores: 404 no existe, 410 franja
+  acabada, 403 lejos / sin ubicación, 409 ya resuelto o sin objetos, 400 validación.
+- **Ubicación:** `GET /spawns` guarda `Player.lastLat/lastLng/lastLocatedAt` (mejor esfuerzo). Para encontrar o lanzar
+  hay que tener una ubicación de hace ≤ 5 min a ≤ 80 m del Pokémon. No para un GPS falso, pero sí lanzar contra ids de
+  cualquier sitio.
+- **Una transacción** (espera 5 s / dura 10 s como mucho): comprobar que no está resuelto → gastar bola (y baya) con
+  `UPDATE … WHERE qty >= 1` → crear `CaughtPokemon` → `EncounterResult` (UNIQUE jugador+encuentro) → XP (`addXp` con la
+  misma `tx`) → `Throw` (UNIQUE jugador+clientThrowId). Si dos lanzamientos capturan a la vez, uno gana y el otro se
+  deshace entero (no gasta su bola) y responde 409. Un reintento con el mismo `clientThrowId` devuelve el resultado
+  guardado (también tras acabar la franja) y no gasta nada. Un fallo sin huida NO cierra el encuentro.
+- **RNG del servidor:** semilla `crypto.randomInt` por lanzamiento. El resolvedor es el proveedor `THROW_RESOLVER`
+  (= `resolveThrow` de shared/) para que los e2e fuercen el resultado.
+- **Antitrampa de precisión:** si ≥ 12 de los últimos 20 lanzamientos del jugador fueron "excellent", uno nuevo cuenta
+  como "great" (y se registra en el log). La respuesta dice con qué calidad contó.
+- **XP:** capturar 100 + precisión (Bien 10 · Genial 50 · Excelente 100) + curva 10. La precisión y la curva se dan
+  aunque falle (como Pokémon GO).
+- **Datos del capturado:** todos del spawn recalculado en el servidor; tamaño XS-XL = HMAC(SPAWN_SALT, id) → 0,5-1,5;
+  movimientos = los 4 últimos aprendidos por nivel (`movesAtLevel`).
+- **Retención:** `Throw` 7 días y `EncounterResult` 1 día (la franja dura 10 min), borrados del propio jugador al
+  lanzar, fuera de la respuesta y sin romperla si falla.
+- **Fuera de alcance (anotado):** Pokédex vistos/capturados y caramelos (F3), y que el cliente lo use (F2-04/05/07).
+
+## D-029 · A quién afectan los cambios de stats: `target` + `metaCategory` (F4-02) (2026-10-11, Alex)
+
+El dataset ahora trae `target`, `flinchChance` y `metaCategory` (PokéAPI `meta.category`) en cada movimiento. **El
+`target` solo vale para los de estado**: en los de daño siempre es `selected-pokemon`, también en Puño Incremento
+(sube SU ataque) o A Bocajarro (baja SUS defensas). Para los de daño manda `metaCategory`: `damage-raise` → usuario
+(aunque el cambio sea negativo), `damage-lower` → rival. 7 movimientos de la Gen 9 vienen sin categoría: por defecto
+son del usuario salvo Lumina Crash y Bomba Jarabe (rival). En 1 vs 1, `user-and-allies` (Aullido) = usuario; `ally` y
+`all-pokemon` (Aroma Floral, Labrar) no aplican. `statChance: 0` con cambios = 100 %. Todo en
+`shared/engine/battle/moves.ts`; si PokéAPI rellena las categorías que faltan, revisar la lista.
+
+## D-030 · Daño verificado contra Showdown y solo movimientos soportados al capturar (F4-03) (2026-10-11, Alex)
+
+- `shared/engine/battle/damage.ts` replica el orden exacto de redondeos de `@smogon/calc` (motor de
+  calc.pokemonshowdown.com): base con `floor`, crítico `floor(×1,5)`, tirada `floor(×(85+i)/100)`, STAB como 6144/4096,
+  `pokeRound` (x,5 hacia abajo) antes de la efectividad, quemado `floor(/2)`, mínimo 1. El crítico ignora etapas negativas
+  del atacante y positivas del defensor. **Verificado:** 10 casos (×4, ×2, ×0,5, ×0,25, ×0, crítico, quemado, etapas,
+  nivel 5) con las 16 tiradas idénticas a las de `@smogon/calc` 0.12.0, y las stats también. El oráculo está en
+  `scripts/oracles/showdown-damage.cjs` (se instala aparte; no es dependencia).
+- Crítico Gen VII+ por etapas (1/24, 1/8, 1/2, siempre), precisión con etapas netas topadas en ±6 y tirada 0-99, orden:
+  cambiar > prioridad > velocidad efectiva (etapas, parálisis ×0,5) > empate al azar.
+- **Soportados:** 548 de 706 (todos los de daño con poder + los de estado con stats aplicables, estado alterado o
+  curación). Al capturar, `CaughtPokemon.moves` = `defaultMoves` de shared/ (los 4 últimos SOPORTADOS; si no hay,
+  Placaje). El servidor carga `moves.json` junto a `pokedex.json`. Ditto (solo Transformación) → Placaje.
+
+## D-031 · Motor de combate: firma y reglas concretas del reducer (F4-04) (2026-10-11, Alex)
+
+- **Firma:** `resolveTurn(ctx, estado, [acciónLado0, acciónLado1], rng) → { state, events }` y `createBattle(ctx, lados)`.
+  `ctx = { moves: Map<id, Move>, chart }` (datos fijos; el plan no lo tenía). Clona con `structuredClone` y nunca muta la
+  entrada; nada de estado de módulo.
+- **Debilitado:** `state.pendingSwitch[lado] = true` + evento `needs-switch`. El siguiente `resolveTurn` SOLO acepta
+  `switch` (o `forfeit`) de los lados pendientes (`null` para el otro) y no cuenta como turno.
+- **Sueño:** 1-3 turnos (`statusTurns`); el turno en que te duermen cuenta si aún no te habías movido (como los juegos).
+  **Confusión:** 2-5 turnos, 1/3 de golpearse (40 de poder, sin tipo). **Congelado:** 20 % de descongelarse al intentar
+  moverse; un ataque de Fuego lo descongela. **Tóxico:** n/16 creciente (tope 15) y se reinicia al cambiar.
+  **Inmunidades:** Fuego/quemado, Eléctrico/parálisis, Veneno-Acero/veneno, Hielo/congelado; Onda Trueno respeta la
+  inmunidad de Tierra.
+- **Efectos:** estados secundarios con su probabilidad (`ailmentChance`; 0 en los de estado = siempre), cambios de stats
+  a quien diga `statChangeTarget` (D-029), drenaje/retroceso sobre el daño hecho (mín. 1), multigolpe 35/35/15/15,
+  retroceso del rival solo si el que ataca va primero. **Forcejeo** (no está en el dataset): poder 50 sin tipo y 1/4 de
+  retroceso, solo si no queda PP en nada.
+- **Doble KO** (retroceso/Forcejeo): pierde el último en debilitarse. **Rendirse:** gana el otro.
+- Eventos: lista cerrada en `types.ts` (`BattleEvent`); los textos en español los pone la UI.
+
+## D-032 · IA rival por puntuación con ruido según dificultad (F4-06) (2026-10-11, Alex)
+
+`shared/engine/battle/ai.ts`: `chooseAction(ctx, estado, lado, rng, dificultad)`, pura (usa el RNG del combate).
+Puntúa en "PS del rival": ataque = precisión × daño medio × golpes (+1000 si debilita seguro, con prioridad mejor);
+estado alterado = 15-40 % de los PS del rival si no tiene estado, no es inmune y le queda > 30 %; subir lo propio /
+bajar lo del rival = poco y solo hasta ±2 y con > 60 % de vida; curarse = lo que recupera si está por debajo del 50 %.
+Cambia (normal y difícil) si su activo hace < 15 % y uno del banquillo haría ≥ 3 veces más sin estar más amenazado. En
+un cambio forzado saca al que mejor le va contra el activo rival. Ruido: fácil 40 % de acciones al azar, normal 15 %,
+difícil 0 % (+5 % de desempate). **Medido** en combates espejo con equipos aleatorios (semillas fijas): difícil gana al
+fácil el 71,8 % de 500; a jugar al azar, difícil 95,7 % y normal 91 % de 300. La IA conoce los tipos del rival pero no
+sus movimientos (como un jugador). 3 entrenadores de prueba en `shared/data/trainers.ts` (fácil nv 14-16, normal 24-27,
+difícil 40-42).
+
+## D-033 · Escena de combate: reproducción por eventos y componentes pequeños (F4-05) (2026-10-12, Alex)
+
+- `BattleController` (por página) envuelve el motor: el jugador elige, la IA elige (`chooseAction` con la dificultad
+  del entrenador), `resolveTurn`, y luego **reproduce los eventos uno a uno**: lo que se ve (PS, estado, quién está
+  fuera) va al ritmo de los textos, no salta al estado final. Al acabar el turno se comprueba que lo mostrado y el estado
+  real coinciden (si no, se corrige y queda un aviso en consola). En PvP (F5) el estado y los eventos vendrán del
+  servidor y esta misma reproducción los mostrará.
+- Textos en español en `battle-text.ts` (`describeEvent`), fuera del motor. Eficacia siempre con texto e icono.
+- La escena son 5 componentes (`battle.page` escenario + animaciones, `battle-info`, `battle-dock`, `battle-sheet`,
+  `battle-burst`, `battle-picker`) para respetar el presupuesto de 2 kB de estilos por componente sin subirlo.
+- Animaciones con Web Animations API (repetibles, solo transform/opacity): embestida, sacudida proporcional al daño,
+  sacudida de toda la escena si quita > 35 % de la vida, anillo + partículas del color del tipo, número de daño,
+  caída al debilitarse. "Reducir movimiento" / "Reducir efectos" → sin sacudidas y escena al doble de rápido.
+- El menú de movimientos se queda visible (desactivado) mientras se anima el turno: el diseño no salta.
+- Equipo del jugador de PRUEBA (Pikachu, Bulbasaur, Squirtle, un nivel por encima del rival) hasta que F3-02 traiga
+  sus capturados. Acceso: `/combate/prueba` o el botón "Combate de prueba" de `/dev/ui`.
+
+## D-034 · El combate final va en REALIDAD AUMENTADA; `/combate/prueba` es temporal (2026-10-12, Alex, PO)
+
+Pedido explícito de Alex (PO): el combate tiene que verse **con la cámara, en realidad aumentada**, como el encuentro y
+la captura (F2): los dos Pokémon anclados en el mundo real sobre el suelo, con el giroscopio. La escena 2D de F4-05
+(`/combate/prueba`, cielo y hierba dibujados) es **temporal**: sirve para probar el motor y la IA, no es la que se
+entrega. **Se conserva y se reutiliza todo lo de debajo:** el motor (`shared/engine/battle/*`), la IA, los
+entrenadores, `BattleController` (reproducción por eventos), `battle-text.ts` y el menú de movimientos (`battle-dock`,
+`battle-sheet`). Lo que cambia es la capa visual: escenario, sprites y efectos pasan a una escena three.js sobre la
+cámara (misma tecnología que F2-04). Tarea nueva **F4-07** (depende del spike F2-01). Sin cámara o sin permiso → el
+fondo ilustrado de siempre (DISENO §6), no una pantalla rota.
