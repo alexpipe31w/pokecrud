@@ -73,11 +73,14 @@
       **Hecho:** migración `player_role` aplicada en Supabase; e2e 45/45 (4 nuevos casos de rol); Postman 82/82 con newman;
       app 94/94. D-023. **Pendiente de humanos:** nombrar al primer ADMIN (`npm run admin -- grant <correo>`).
       (Render despliega solo al mezclar en `develop`: no hace falta Manual Deploy.)
-- [ ] **F0-13 · Artefactos de compilación en `shared/`** — la primera `npm run build` del servidor tras D-024 dejó 42
+- [x] **F0-13 · Artefactos de compilación en `shared/`** (@samuel, 2026-10-12) — la primera `npm run build` del servidor tras D-024 dejó 42
       `.js`/`.d.ts`/`.js.map` junto a las fuentes de `shared/` (Samuel, 2026-10-12; probable `tsconfig.build.tsbuildinfo`
       viejo, no se reproduce compilando desde cero). Riesgo: subirlos por error o que Vite/Vitest/Node usen el `.js` viejo
       en vez del `.ts`. Dep: F1-06. Criterio: reproducir la causa o descartarla; `.gitignore` que impida subirlos sin
       ocultar archivos legítimos (`shared/package.json`); si la causa es la caché, que `npm run build` la limpie.
+      **Hecho:** causa reproducida (compilar con la config previa a D-024 emite en `shared/`) y comprobado que Vitest usa
+      el `.js` viejo en vez del `.ts`. `scripts/clean-shared-artifacts.mjs` en los ganchos pre* de raíz, `server/` y APK,
+      y `.gitignore`. D-036.
 
 ## F1 · Mapa con GPS
 

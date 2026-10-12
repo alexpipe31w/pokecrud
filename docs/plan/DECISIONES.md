@@ -409,3 +409,23 @@ reales dan ~10-20 a 200 m (D-025), así que sobra margen para el avatar, la hier
   batería) antes de la demo.
 - **Para F1-04:** el Map ID actual muestra los POI comerciales (restaurantes, tiendas); ARQUITECTURA §4 pide un estilo
   sin ellos (se cambia en la consola de Google, cuenta de Alex).
+
+## D-036 · Restos de compilación en `shared/`: se borran solos antes de compilar o probar (F0-13) (2026-10-12, Samuel)
+
+- **Causa (reproducida):** compilar el servidor con la config anterior a D-024 (`rootDir: ./src`; p. ej. al compilar una
+  rama vieja, o a mitad de una mezcla) sobre código que ya importa `shared/`: TypeScript emite esos archivos en
+  `dist/../../shared/…`, que es **la carpeta `shared/` del repo** (hoy 21 archivos; 42 la vez que se vio), y deja
+  `server/tsconfig.build.tsbuildinfo` suelto. Con la config actual no pasa (salida en `server/dist/`).
+- **Por qué es grave:** en `shared/` se importa con `.js` (`./rng.js`, D-024). Si existe un `rng.js` de verdad, Vitest y
+  la build lo usan **en vez del `.ts`**: comprobado con un `rng.js` saboteado → 47 fallos en `test:shared`. Es decir,
+  código viejo ejecutándose sin avisar.
+- **Decisión:** `scripts/clean-shared-artifacts.mjs` borra `X.js`, `X.js.map`, `X.d.ts` y `X.d.ts.map` de `shared/`
+  **solo si existe `X.ts` al lado**, y el `server/tsconfig.build.tsbuildinfo` suelto. Corre solo en los ganchos `pre*` de
+  `start`, `build`, `test` y `test:shared` (raíz), `build`, `start`, `start:dev`, `test` y `test:e2e` (`server/`, también
+  en Render) y en `scripts/apk.mjs`. Además `.gitignore` ignora esos cuatro tipos en `shared/` para que no se suban.
+- **Visto en vivo (2026-10-12):** un `npm run start:dev` arrancado en una rama vieja y que siguió vigilando tras
+  `git checkout` a otra nueva dio `TS6059 … is not under 'rootDir' …/server/src`: recoge el `include` nuevo pero se queda
+  con el `rootDir` con el que arrancó, y así emite en `shared/`. **Regla: tras cambiar de rama (o mezclar) si cambia
+  algún `tsconfig*.json`, parar y volver a lanzar `start:dev`.**
+- Si algún día hace falta un `.js`/`.d.ts` escrito a mano en `shared/`: excepción con `!` en `.gitignore` y que no tenga
+  un `.ts` del mismo nombre (si no, el script lo borraría).

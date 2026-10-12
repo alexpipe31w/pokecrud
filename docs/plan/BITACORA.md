@@ -764,3 +764,27 @@ estilo del Map ID (consola de Google, Alex).
 **Decisiones nuevas:** D-035.
 **El siguiente debe empezar por:** F0-13 (artefactos `.js` en `shared/`, pequeña) o F1-02 (plan detallado de F1 con
 `writing-plans`, leyendo D-035 y D-022: el mapa anula la zona segura).
+
+## 2026-10-12 12:20 · @samuel (Claude) · F0-13 · rama `feature/F0-13-artefactos-shared`
+
+**Qué se hizo:** antes, mezclado el PR #32 (F1-01) con permiso de Samuel. F0-13: causa de los `.js` en `shared/`
+encontrada y reproducida en un `git worktree` aparte: con la config del servidor anterior a D-024 (`rootDir: ./src`,
+commit `be02bbf`) y código que importa `shared/`, `tsc` emite en `dist/../../shared/` = `shared/` del repo y deja
+`server/tsconfig.build.tsbuildinfo` suelto (el mismo que había en el PC de Samuel, fechado 11:30 de la integración de
+ayer). Comprobado el riesgo: un `rng.js` viejo junto a `rng.ts` lo usa Vitest en su lugar. Arreglo: script
+`scripts/clean-shared-artifacts.mjs` (solo borra artefactos con su `.ts` al lado) en los ganchos pre* y `.gitignore`. D-036.
+**Archivos clave:** `scripts/clean-shared-artifacts.mjs`, `package.json`, `server/package.json`, `scripts/apk.mjs`, `.gitignore`.
+**Cómo se probó (salida real):**
+
+    reproducción (worktree, config de be02bbf): 7 error TS6059 · git status shared → 21 restos + server/tsconfig.build.tsbuildinfo
+    rng.js saboteado (lanza "SE USO EL .js VIEJO"): test:shared → 6 archivos fallidos, 47 × "Error: SE USO EL .js VIEJO"
+    node scripts/clean-shared-artifacts.mjs → "borrados 22 restos de compilación" · después 0 · 2.ª pasada: nada
+    mismo escenario con npm run test:shared (gancho pretest:shared) → borra 22 · Tests 136 passed (136)
+    repo real: lint OK · ng test 107 passed · shared 136 passed · build OK · server build OK (dist/server/src/main.js),
+      unit 22 passed, oxlint exit 0 (1 aviso antiguo en test/auth.e2e-spec.ts) · borró 1 resto (el tsbuildinfo suelto)
+    .gitignore: shared/package.json, *.ts y el .snap siguen visibles (git check-ignore)
+
+**Quedó a medias / roto:** nada. (Aviso antiguo de oxlint en `server/test/auth.e2e-spec.ts:200`, no es de esta tarea.)
+**Decisiones nuevas:** D-036.
+**El siguiente debe empezar por:** F1-02 — plan detallado de F1 en `docs/plan/fases/F1-mapa.md` con `writing-plans`
+(leer D-035: plan A, ≤ 30 Pokémon; D-022: el mapa anula la zona segura; `/dev/mapa` y `spike-scene.ts` como base).

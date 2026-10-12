@@ -123,6 +123,7 @@ if (sdk) env.ANDROID_HOME = sdk;
 console.log(`JDK ${jdkMajor(javaHome)}: ${javaHome}${sdk ? `\nSDK: ${sdk}` : ''}`);
 
 run('node', ['scripts/ensure-local-env.mjs'], { env });
+run('node', ['scripts/clean-shared-artifacts.mjs'], { env });
 run('npx', ['ng', 'build', '--configuration', config], { env });
 run('npx', ['cap', 'sync', 'android'], { env });
 // Ruta explícita: el cmd que abre Node no busca .bat en la carpeta actual.
