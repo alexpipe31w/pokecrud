@@ -1018,3 +1018,20 @@ estado, sombra y hierba; fuera `SpriteTextures`, cilindros de toque, `isTap` y `
 **Quedó a medias / roto:** 7b en Android (ahora también medir el coste de la capa HTML).
 **Decisiones nuevas:** D-042.
 **El siguiente debe empezar por:** lo que diga ESTADO.
+
+## 2026-10-12 19:00 · @alex (Claude) · F1-09 · rama `feature/F1-09-servidor-despertando`
+
+**Qué se hizo:** reintentos al recuperar la sesión (D-043) y pantalla "servidor despertando" (`app-server-waking`).
+**Archivos clave:** `src/app/core/auth/auth.service.ts`, `src/app/shared/ui/server-waking.component.ts`,
+`src/app/app.component.{ts,html}`.
+**Cómo se probó (salida real):**
+
+    lint OK · ng test: 53 archivos, 240 passed (exit 0) · build OK
+    navegador 390×844: sesión iniciada (f109-prueba@pokecrud.test, borrada después) → servidor local APAGADO → recargar:
+      "Despertando al servidor… · Intento 2" y luego "El servidor gratis duerme cuando nadie juega. Ya casi está. ·
+      Intento 3" (F1-09_01/02); consola: 5× ERR_CONNECTION_REFUSED en /auth/refresh espaciados
+      → servidor ENCENDIDO (17:51:48) → la app entra sola a /mapa con PruebaF109 en el HUD, sin pasar por el login (F1-09_03)
+
+**Quedó a medias / roto:** nada.
+**Decisiones nuevas:** D-043.
+**El siguiente debe empezar por:** F1-10 (el HUD sigue al día/noche del mapa) sin Android; con Android, 7b/3b y F2-01.

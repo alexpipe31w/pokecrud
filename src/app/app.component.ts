@@ -3,11 +3,12 @@ import { IonApp, IonRouterOutlet } from '@ionic/angular';
 
 import { AuthService } from './core/auth/auth.service';
 import { DatasetService } from './services/game/dataset.service';
+import { ServerWakingComponent } from './shared/ui/server-waking.component';
 
 @Component({
   selector: 'app-root',
   templateUrl: 'app.component.html',
-  imports: [IonApp, IonRouterOutlet],
+  imports: [IonApp, IonRouterOutlet, ServerWakingComponent],
 })
 export class AppComponent {
   constructor() {
