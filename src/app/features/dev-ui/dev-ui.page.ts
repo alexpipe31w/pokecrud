@@ -76,6 +76,7 @@ const DEMO_MAX_HP = 120;
               }
               <div class="row session">
                 <app-game-button label="Cerrar sesión" variant="glass" (pressed)="logout()" />
+                <app-game-button label="Combate de prueba" (pressed)="goBattle()" />
                 <app-game-button
                   label="Comprobar sesión"
                   variant="gold"
@@ -349,6 +350,11 @@ export class DevUiPage {
     } catch {
       this.sessionCheck.set('La sesión no es válida.');
     }
+  }
+
+  /** F4-05: en el APK no hay barra de direcciones; esto lleva al combate de prueba. */
+  protected goBattle(): void {
+    void this.router.navigateByUrl('/combate/prueba');
   }
 
   protected async logout(): Promise<void> {

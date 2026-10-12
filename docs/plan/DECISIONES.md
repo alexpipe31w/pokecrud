@@ -342,3 +342,31 @@ fácil el 71,8 % de 500; a jugar al azar, difícil 95,7 % y normal 91 % de 300. 
 sus movimientos (como un jugador). 3 entrenadores de prueba en `shared/data/trainers.ts` (fácil nv 14-16, normal 24-27,
 difícil 40-42).
 
+## D-033 · Escena de combate: reproducción por eventos y componentes pequeños (F4-05) (2026-10-12, Alex)
+
+- `BattleController` (por página) envuelve el motor: el jugador elige, la IA elige (`chooseAction` con la dificultad
+  del entrenador), `resolveTurn`, y luego **reproduce los eventos uno a uno**: lo que se ve (PS, estado, quién está
+  fuera) va al ritmo de los textos, no salta al estado final. Al acabar el turno se comprueba que lo mostrado y el estado
+  real coinciden (si no, se corrige y queda un aviso en consola). En PvP (F5) el estado y los eventos vendrán del
+  servidor y esta misma reproducción los mostrará.
+- Textos en español en `battle-text.ts` (`describeEvent`), fuera del motor. Eficacia siempre con texto e icono.
+- La escena son 5 componentes (`battle.page` escenario + animaciones, `battle-info`, `battle-dock`, `battle-sheet`,
+  `battle-burst`, `battle-picker`) para respetar el presupuesto de 2 kB de estilos por componente sin subirlo.
+- Animaciones con Web Animations API (repetibles, solo transform/opacity): embestida, sacudida proporcional al daño,
+  sacudida de toda la escena si quita > 35 % de la vida, anillo + partículas del color del tipo, número de daño,
+  caída al debilitarse. "Reducir movimiento" / "Reducir efectos" → sin sacudidas y escena al doble de rápido.
+- El menú de movimientos se queda visible (desactivado) mientras se anima el turno: el diseño no salta.
+- Equipo del jugador de PRUEBA (Pikachu, Bulbasaur, Squirtle, un nivel por encima del rival) hasta que F3-02 traiga
+  sus capturados. Acceso: `/combate/prueba` o el botón "Combate de prueba" de `/dev/ui`.
+
+## D-034 · El combate final va en REALIDAD AUMENTADA; `/combate/prueba` es temporal (2026-10-12, Alex, PO)
+
+Pedido explícito de Alex (PO): el combate tiene que verse **con la cámara, en realidad aumentada**, como el encuentro y
+la captura (F2): los dos Pokémon anclados en el mundo real sobre el suelo, con el giroscopio. La escena 2D de F4-05
+(`/combate/prueba`, cielo y hierba dibujados) es **temporal**: sirve para probar el motor y la IA, no es la que se
+entrega. **Se conserva y se reutiliza todo lo de debajo:** el motor (`shared/engine/battle/*`), la IA, los
+entrenadores, `BattleController` (reproducción por eventos), `battle-text.ts` y el menú de movimientos (`battle-dock`,
+`battle-sheet`). Lo que cambia es la capa visual: escenario, sprites y efectos pasan a una escena three.js sobre la
+cámara (misma tecnología que F2-04). Tarea nueva **F4-07** (depende del spike F2-01). Sin cámara o sin permiso → el
+fondo ilustrado de siempre (DISENO §6), no una pantalla rota.
+

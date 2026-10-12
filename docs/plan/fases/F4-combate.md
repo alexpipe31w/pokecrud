@@ -157,18 +157,18 @@ paralelo (la escena juega contra una IA "elige al azar" hasta que llegue F4-06).
   (< 500 turnos) sin excepciones y sin PS fuera de [0, máx].
 - [x] **Paso 5:** REGLA 2.
 
-## F4-05 · Escena de combate (app)
+## F4-05 · Escena de combate (app) — TEMPORAL en 2D (D-034: la definitiva es F4-07, en AR)
 
-- [ ] **Paso 1:** ruta `/combate/prueba` (con `authGuard`) que monta un combate local contra un entrenador de
+- [x] **Paso 1:** ruta `/combate/prueba` (con `authGuard`) que monta un combate local contra un entrenador de
   `shared/data/trainers.ts` con `createBattle`, RNG con semilla aleatoria y la IA de F4-06 (`chooseAction` con la
   dificultad del entrenador).
-- [ ] **Paso 2:** escena (DISENO, modo _Experience_ con `impeccable`): los dos Pokémon con arte `home`, barras de PS
+- [x] **Paso 2:** escena (DISENO, modo _Experience_ con `impeccable`): los dos Pokémon con arte `home`, barras de PS
   (`app-hp-bar`), nombre y nivel, menú de 4 movimientos con tipo, PP y **efectividad prevista** contra el rival,
   botón de cambiar Pokémon y de huir.
-- [ ] **Paso 3:** cola de eventos: cada `BattleEvent` → texto en español + animación (golpe con partículas del tipo,
+- [x] **Paso 3:** cola de eventos: cada `BattleEvent` → texto en español + animación (golpe con partículas del tipo,
   sacudida proporcional al daño, número de daño, barra que baja, estado con icono). Respeta "reducir movimiento".
-- [ ] **Paso 4:** sonidos (gritos al entrar y al debilitarse, golpe; los SFX llegan con F2-08) y hápticos.
-- [ ] **Paso 5:** probar en vista móvil 390×844 y en un Android real; capturas en `docs/evidencias/`. REGLA 2.
+- [x] **Paso 4:** (gritos y hápticos hechos; los SFX de golpe llegan con F2-08) sonidos (gritos al entrar y al debilitarse, golpe; los SFX llegan con F2-08) y hápticos.
+- [~] **Paso 5:** vista móvil 390×844 HECHO (evidencias F4-05_0*); **Android real pendiente (Kenneth)**. Probar capturas en `docs/evidencias/`. REGLA 2.
 
 ## F4-06 · IA rival
 

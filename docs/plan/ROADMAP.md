@@ -151,12 +151,20 @@
 - [x] **F4-04 · Estados y cambios de stats** (@alex, 2026-10-11) — dentro de `battle-engine.ts` (reducer puro) con tests. Dep: F4-03.
       **Hecho:** `createBattle` + `resolveTurn` (puro, determinista); 27 tests por regla + 1.000 combates aleatorios que
       terminan sin errores + instantánea de un combate completo. shared 126/126. D-031.
-- [ ] **F4-05 · Escena de combate** — UI de turnos, selección de movimiento con tipo/PP/efectividad
+- [x] **F4-05 · Escena de combate** (@alex, 2026-10-11) — UI de turnos, selección de movimiento con tipo/PP/efectividad
       prevista, animaciones por tipo, cola de eventos, textos en español, cambio de Pokémon. Dep: F4-04, F0-04.
+      **Hecho:** `/combate/prueba` contra los 3 entrenadores con la IA; probado entero en vista móvil 390×844 (victoria,
+      cambio forzado, eficacias). D-033. Pendiente: probarlo en Android real (Kenneth) y SFX de golpe (F2-08).
+      **OJO (D-034): es la escena TEMPORAL en 2D.** La definitiva es F4-07 (AR con cámara).
 - [x] **F4-06 · IA rival** (@alex, 2026-10-11) — elige el movimiento con mejor daño esperado con algo de aleatoriedad;
       entrenadores de prueba. Dep: F4-05.
       **Hecho:** `ai.ts` + 3 entrenadores; difícil gana al fácil 71,8 % (500 espejo) y al azar 95,7 %. Conectarla a la
       escena es el paso 1 de F4-05 (D-032).
+- [ ] **F4-07 · Combate en realidad aumentada (D-034)** — la escena de combate con la cámara: los dos Pokémon anclados
+      en el suelo real (three.js sobre la cámara + giroscopio, la misma base que el encuentro F2-04), ataques con
+      partículas 3D del tipo, sacudida, número de daño. Reutiliza `BattleController`, el motor, la IA y el menú de
+      F4-05 (solo cambia la capa visual). Sin cámara → fondo ilustrado. Dep: F2-01 (spike cámara), F4-05.
+      Criterio: combate completo contra la IA en un Android real, grabado en vídeo.
 
 ## F5 · PvP en tiempo real
 
