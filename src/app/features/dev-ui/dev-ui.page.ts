@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, inject, signal } from '@angular/core';
+import { Component, effect, inject, signal, untracked } from '@angular/core';
 import { Router } from '@angular/router';
 import { IonContent } from '@ionic/angular';
 
@@ -9,10 +9,13 @@ import { AuthService } from '../../core/auth/auth.service';
 import { POKEMON_TYPE_KEYS } from '../../core/constants/pokemon-types';
 import { AudioService } from '../../services/game/audio.service';
 import { DatasetService } from '../../services/game/dataset.service';
+import { BagService } from '../../services/game/bag.service';
+import { ITEMS, ITEM_NAMES } from '@shared/engine/items';
 import { TypeChipsComponent } from '../../shared/components/type-chips/type-chips.component';
 import { GameButtonComponent } from '../../shared/ui/game-button.component';
 import { GlassPanelComponent } from '../../shared/ui/glass-panel.component';
 import { HpBarComponent } from '../../shared/ui/hp-bar.component';
+import { PlayerHudComponent } from '../../shared/ui/player-hud.component';
 import { StatBarComponent } from '../../shared/ui/stat-bar.component';
 
 const PIKACHU_STATS = [
@@ -34,6 +37,7 @@ const DEMO_MAX_HP = 120;
     GameButtonComponent,
     GlassPanelComponent,
     HpBarComponent,
+    PlayerHudComponent,
     StatBarComponent,
     TypeChipsComponent,
   ],
@@ -52,12 +56,27 @@ const DEMO_MAX_HP = 120;
           <section>
             <h2 class="section-title">Sesión</h2>
             <app-glass-panel>
-              <div class="row session">
-                <p class="session__who" data-testid="session-player">
-                  <strong>{{ player.nickname }}</strong> · nivel {{ player.level }} ·
-                  {{ player.xp }} XP
+              <!-- F1-08: la placa del HUD del mapa (F1-04 la colocará arriba a la izquierda). -->
+              <app-player-hud
+                data-testid="session-player"
+                [nickname]="player.nickname"
+                [xp]="player.xp"
+                [balls]="bag.balls()"
+              />
+              @if (bag.qty(); as qty) {
+                <p class="bag" data-testid="bag">
+                  @for (item of items; track item) {
+                    <span
+                      >{{ itemNames[item] }}: <strong>{{ qty[item] }}</strong></span
+                    >
+                  }
                 </p>
+              } @else if (bag.error(); as error) {
+                <p class="bag">{{ error }}</p>
+              }
+              <div class="row session">
                 <app-game-button label="Cerrar sesión" variant="glass" (pressed)="logout()" />
+                <app-game-button label="Combate de prueba" (pressed)="goBattle()" />
                 <app-game-button
                   label="Comprobar sesión"
                   variant="gold"
@@ -251,8 +270,11 @@ const DEMO_MAX_HP = 120;
       align-items: center;
       justify-content: space-between;
     }
-    .session__who {
-      margin: 0;
+    .bag {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--s-3);
+      font-size: 0.875rem;
     }
     .session__check {
       margin: var(--s-3) 0 0;
@@ -282,6 +304,16 @@ const DEMO_MAX_HP = 120;
 export class DevUiPage {
   protected readonly dataset = inject(DatasetService);
   protected readonly auth = inject(AuthService);
+  protected readonly bag = inject(BagService);
+  protected readonly items = ITEMS;
+
+  constructor() {
+    // Con sesión, se pide la mochila (y otra vez si cambia el jugador).
+    effect(() => {
+      if (this.auth.player()?.id) untracked(() => void this.bag.load());
+    });
+  }
+  protected readonly itemNames = ITEM_NAMES;
   private readonly router = inject(Router);
   private readonly http = inject(HttpClient);
   protected readonly sessionCheck = signal<string | null>(null);
@@ -318,6 +350,11 @@ export class DevUiPage {
     } catch {
       this.sessionCheck.set('La sesión no es válida.');
     }
+  }
+
+  /** F4-05: en el APK no hay barra de direcciones; esto lleva al combate de prueba. */
+  protected goBattle(): void {
+    void this.router.navigateByUrl('/combate/prueba');
   }
 
   protected async logout(): Promise<void> {

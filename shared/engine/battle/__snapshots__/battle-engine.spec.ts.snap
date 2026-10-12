@@ -1,0 +1,155 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`registro completo con semilla fija > mismo combate → mismos eventos (instantánea) 1`] = `
+[
+  [
+    {
+      "kind": "move",
+      "moveId": 261,
+      "side": 0,
+    },
+    {
+      "kind": "status",
+      "side": 1,
+      "status": "burn",
+    },
+    {
+      "kind": "move",
+      "moveId": 57,
+      "side": 1,
+    },
+    {
+      "amount": 104,
+      "hpAfter": 49,
+      "kind": "damage",
+      "side": 0,
+      "source": "move",
+    },
+    {
+      "kind": "effectiveness",
+      "multiplier": 2,
+      "side": 0,
+    },
+    {
+      "amount": 9,
+      "hpAfter": 145,
+      "kind": "damage",
+      "side": 1,
+      "source": "burn",
+    },
+  ],
+  [
+    {
+      "kind": "move",
+      "moveId": 53,
+      "side": 0,
+    },
+    {
+      "amount": 30,
+      "hpAfter": 115,
+      "kind": "damage",
+      "side": 1,
+      "source": "move",
+    },
+    {
+      "kind": "effectiveness",
+      "multiplier": 0.5,
+      "side": 1,
+    },
+    {
+      "kind": "move",
+      "moveId": 44,
+      "side": 1,
+    },
+    {
+      "amount": 13,
+      "hpAfter": 36,
+      "kind": "damage",
+      "side": 0,
+      "source": "move",
+    },
+    {
+      "amount": 9,
+      "hpAfter": 106,
+      "kind": "damage",
+      "side": 1,
+      "source": "burn",
+    },
+  ],
+  [
+    {
+      "kind": "move",
+      "moveId": 403,
+      "side": 0,
+    },
+    {
+      "amount": 46,
+      "hpAfter": 60,
+      "kind": "damage",
+      "side": 1,
+      "source": "move",
+    },
+    {
+      "kind": "move",
+      "moveId": 58,
+      "side": 1,
+    },
+    {
+      "amount": 36,
+      "hpAfter": 0,
+      "kind": "damage",
+      "side": 0,
+      "source": "move",
+    },
+    {
+      "kind": "faint",
+      "side": 0,
+    },
+    {
+      "amount": 9,
+      "hpAfter": 51,
+      "kind": "damage",
+      "side": 1,
+      "source": "burn",
+    },
+    {
+      "kind": "needs-switch",
+      "side": 0,
+    },
+  ],
+  [
+    {
+      "kind": "switch",
+      "side": 0,
+      "teamIndex": 1,
+    },
+  ],
+  [
+    {
+      "kind": "move",
+      "moveId": 85,
+      "side": 0,
+    },
+    {
+      "amount": 51,
+      "hpAfter": 0,
+      "kind": "damage",
+      "side": 1,
+      "source": "move",
+    },
+    {
+      "kind": "effectiveness",
+      "multiplier": 2,
+      "side": 1,
+    },
+    {
+      "kind": "faint",
+      "side": 1,
+    },
+    {
+      "kind": "needs-switch",
+      "side": 1,
+    },
+  ],
+]
+`;

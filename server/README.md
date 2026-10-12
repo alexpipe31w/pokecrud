@@ -17,7 +17,7 @@ NestJS 12 (ESM) + Prisma 7.10 + PostgreSQL (Supabase). Arquitectura en `docs/pla
 | Comando                                | Qué hace                                                              |
 | -------------------------------------- | --------------------------------------------------------------------- |
 | `npm run start:dev`                    | Servidor en modo desarrollo (recarga al guardar, logs legibles)       |
-| `npm run build` · `npm run start:prod` | Compila a `dist/` y lo arranca (logs en JSON)                         |
+| `npm run build` · `npm run start:prod` | Compila a `dist/` (con `../shared`: `dist/server/src/main.js`, D-024) y lo arranca |
 | `npm test`                             | Tests unitarios (no tocan la base)                                    |
 | `npm run test:e2e`                     | Tests e2e contra la base **real** de `server/.env`                    |
 | `npm run lint`                         | oxlint                                                                |
@@ -52,7 +52,7 @@ GitHub). El repo es público, así que no hace falta ser su dueño. **Anotar en 
 - **Start Command:** `npx prisma migrate deploy && npm run start:prod`
 - **Health Check Path:** `/health/ready`
 - **Variables:** `DATABASE_URL` y `DIRECT_URL` (copiar los valores de `server/.env`, sin las comillas),
-  `JWT_SECRET` (uno PROPIO de Render, ≥ 32 caracteres, distinto del local: ver SECRETOS.md; sin él el servidor no
+  `SPAWN_SALT` (F1-06: uno PROPIO de Render, ≥ 32 caracteres; sin ella `/spawns` da 503), `JWT_SECRET` (uno PROPIO de Render, ≥ 32 caracteres, distinto del local: ver SECRETOS.md; sin él el servidor no
   arranca), `NODE_ENV=production`, `NODE_VERSION=24`,
   `CORS_ORIGINS=http://localhost:8100,http://localhost:4200,https://localhost` (+ el origen de la app si se publica).
 - Comprobar `https://<servicio>.onrender.com/health/ready` y anotar la URL en `docs/plan/ESTADO.md` y en
