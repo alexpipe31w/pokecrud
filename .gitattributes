@@ -1,2 +1,6 @@
 * text=auto eol=lf
 *.png binary
+# Scripts de Windows (android/gradlew.bat): con LF el cmd puede romper etiquetas/goto.
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.jar binary
