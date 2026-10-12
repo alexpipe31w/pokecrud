@@ -112,7 +112,7 @@
       Servidor: `weather` y `night` en `GET /spawns` (contrato en `shared/protocol/spawns.ts`). app 167 tests, shared 140,
       server 22 + e2e 67. Samsung A36: 78/77/61 fps (quieto/joystick/menú), Pokédex ida y vuelta y segundo plano sin
       fallos. Evidencias `F1-04_0{1..10}_*` (día y noche: 01-02). D-038, D-039.
-- [ ] **F1-09 · Pantalla de "servidor despertando"** — al abrir la app con Render dormido, el guardián espera a
+- [~] **F1-09 · Pantalla de "servidor despertando"** (@alex, 2026-10-12) — al abrir la app con Render dormido, el guardián espera a
       recuperar la sesión y la pantalla queda en blanco 20-30 s (visto en el A36). DISENO §6: mensaje simpático y reintento
       con backoff mientras `/auth/refresh` no responde. Dep: F0-07.
 - [ ] **F1-10 · El HUD sigue al mapa (día/noche), no al modo oscuro del sistema** — hoy los tokens cambian con

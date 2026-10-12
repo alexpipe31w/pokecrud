@@ -141,7 +141,9 @@ fórmula (F2-03) y captura en servidor (F2-06) hechas; lo visual del encuentro e
 
 ## En curso
 
-- Nadie. F1-05 (3b) y F1-07 (7b) solo esperan la prueba en Android.
+- **F1-09 (pantalla "servidor despertando") — @alex, 2026-10-12**, rama `feature/F1-09-servidor-despertando`.
+  Punto de guardado: recién reclamada.
+- F1-05 (3b) y F1-07 (7b) solo esperan la prueba en Android.
 
 ## Siguiente paso concreto
 
