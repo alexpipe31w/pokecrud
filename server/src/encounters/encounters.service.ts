@@ -55,6 +55,11 @@ export const CURVE_XP = 10;
 /** Antitrampa de precisión: si ≥ 12 de los últimos 20 lanzamientos fueron "excellent", el nuevo cuenta como "great". */
 const PLAUSIBLE_WINDOW = 20;
 const MAX_EXCELLENT_IN_WINDOW = 12;
+/**
+ * Lanzamientos simultáneos del mismo jugador se esperan entre sí por el bloqueo de la fila de la mochila (es lo que
+ * los hace seguros). Con la BD en otro país cada transacción son ~1 s: se da margen para no cortarlas.
+ */
+const TX_OPTIONS = { maxWait: 5_000, timeout: 10_000 };
 /** Retención (D-028): los lanzamientos solo sirven para idempotencia y antitrampa; los resultados, mientras vive la franja. */
 const THROW_RETENTION_MS = 7 * 24 * 3600_000;
 const RESULT_RETENTION_MS = 24 * 3600_000;
@@ -293,7 +298,7 @@ export class EncountersService {
           },
         });
         return created;
-      });
+      }, TX_OPTIONS);
 
       this.logger.log({
         msg: 'encounter.throw',

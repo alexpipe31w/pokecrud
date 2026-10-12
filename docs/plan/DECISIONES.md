@@ -260,3 +260,29 @@ el comando de arranque no cambia (`npm run start:prod`).
   servidor (F2-06) valida antes con DTO, y esto es la segunda red.
 - Sin modificador por nivel del Pokémon por ahora (los spawns son 1-25); si F3 liga niveles al jugador, se revisa.
 
+## D-028 · Captura autoritativa: ubicación, idempotencia, antitrampa de precisión y retención (F2-06) (2026-10-11, Alex)
+
+- **API:** `GET /encounters/:id` (nivel, sexo, shiny, tamaño, `expiresAt`, `status` open/caught/fled; nunca IVs) y
+  `POST /encounters/:id/throw { ball, berry?, throwQuality, curve, clientThrowId }` → `{ captured, shakes, fled,
+  throwQuality, xpGained, caught, bag }`. `:id` = id del spawn de `GET /spawns`. Errores: 404 no existe, 410 franja
+  acabada, 403 lejos / sin ubicación, 409 ya resuelto o sin objetos, 400 validación.
+- **Ubicación:** `GET /spawns` guarda `Player.lastLat/lastLng/lastLocatedAt` (mejor esfuerzo). Para encontrar o lanzar
+  hay que tener una ubicación de hace ≤ 5 min a ≤ 80 m del Pokémon. No para un GPS falso, pero sí lanzar contra ids de
+  cualquier sitio.
+- **Una transacción** (espera 5 s / dura 10 s como mucho): comprobar que no está resuelto → gastar bola (y baya) con
+  `UPDATE … WHERE qty >= 1` → crear `CaughtPokemon` → `EncounterResult` (UNIQUE jugador+encuentro) → XP (`addXp` con la
+  misma `tx`) → `Throw` (UNIQUE jugador+clientThrowId). Si dos lanzamientos capturan a la vez, uno gana y el otro se
+  deshace entero (no gasta su bola) y responde 409. Un reintento con el mismo `clientThrowId` devuelve el resultado
+  guardado (también tras acabar la franja) y no gasta nada. Un fallo sin huida NO cierra el encuentro.
+- **RNG del servidor:** semilla `crypto.randomInt` por lanzamiento. El resolvedor es el proveedor `THROW_RESOLVER`
+  (= `resolveThrow` de shared/) para que los e2e fuercen el resultado.
+- **Antitrampa de precisión:** si ≥ 12 de los últimos 20 lanzamientos del jugador fueron "excellent", uno nuevo cuenta
+  como "great" (y se registra en el log). La respuesta dice con qué calidad contó.
+- **XP:** capturar 100 + precisión (Bien 10 · Genial 50 · Excelente 100) + curva 10. La precisión y la curva se dan
+  aunque falle (como Pokémon GO).
+- **Datos del capturado:** todos del spawn recalculado en el servidor; tamaño XS-XL = HMAC(SPAWN_SALT, id) → 0,5-1,5;
+  movimientos = los 4 últimos aprendidos por nivel (`movesAtLevel`).
+- **Retención:** `Throw` 7 días y `EncounterResult` 1 día (la franja dura 10 min), borrados del propio jugador al
+  lanzar, fuera de la respuesta y sin romperla si falla.
+- **Fuera de alcance (anotado):** Pokédex vistos/capturados y caramelos (F3), y que el cliente lo use (F2-04/05/07).
+
