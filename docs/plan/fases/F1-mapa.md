@@ -1143,7 +1143,7 @@ bajito por cercanía, toque → encuentro. Máximo 30 dibujados (D-035).
 
 **Files:** Create `src/app/game/map-scene/spawn-diff.ts` + spec
 
-- [ ] **1a. Test que falla:**
+- [x] **1a. Test que falla:**
 
 ```ts
 import { diffSpawns, nearestN } from './spawn-diff';
@@ -1164,7 +1164,7 @@ describe('spawn-diff', () => {
 });
 ```
 
-- [ ] **1b.** falla. **1c.**
+- [x] **1b.** falla. **1c.**
 
 ```ts
 import { distanceM, type LatLng } from '@shared/engine/geo';
@@ -1189,7 +1189,7 @@ export function nearestN(list: readonly VisibleSpawn[], origin: LatLng, n = MAX_
 }
 ```
 
-- [ ] **1d.** pasa. Commit + `/guardar`.
+- [x] **1d.** pasa. Commit + `/guardar`.
 
 ### Paso 2 — Cuándo volver a pedir `/spawns` (puro)
 
@@ -1200,7 +1200,7 @@ al acabar la franja (`expiresAt`, + 1 s de margen); o si el jugador se movió > 
 a la vez ni con menos de 8 s entre ellas (salvo el fin de franja). Tras un error, espera exponencial 5 s → 10 → 20 →
 máx. 60 s (servidor dormido, DISENO §6).
 
-- [ ] **2a. Test que falla:**
+- [x] **2a. Test que falla:**
 
 ```ts
 import { REFETCH_MOVE_M, shouldRefetch, type FetchState } from './refetch';
@@ -1229,7 +1229,7 @@ describe('shouldRefetch', () => {
 });
 ```
 
-- [ ] **2b.** falla. **2c.**
+- [x] **2b.** falla. **2c.**
 
 ```ts
 import { distanceM, type LatLng } from '@shared/engine/geo';
@@ -1260,7 +1260,7 @@ export function shouldRefetch(s: FetchState, now: number, pos: LatLng): boolean 
 }
 ```
 
-- [ ] **2d.** pasa. Commit + `/guardar`.
+- [x] **2d.** pasa. Commit + `/guardar`.
 
 ### Paso 3 — `SpawnFeedService`
 
@@ -1284,7 +1284,7 @@ DISENO §5: "hierba que se agita en su celda → emerge con un pequeño salto + 
 1 m) y aparece (opacidad 0 → 1, escala 0,95 → 1, nunca desde 0: DISENO §4.3); después, reposo (balanceo suave de la
 hierba). Desaparecer: 300 ms de opacidad 1 → 0 y escala → 0,95.
 
-- [ ] **4a. Test que falla:**
+- [x] **4a. Test que falla:**
 
 ```ts
 import { APPEAR_MS, DISAPPEAR_MS, appearPose, disappearPose } from './appear';
@@ -1310,7 +1310,7 @@ describe('appear', () => {
 });
 ```
 
-- [ ] **4b.** falla. **4c.**
+- [x] **4b.** falla. **4c.**
 
 ```ts
 export const SHAKE_MS = 700;
@@ -1347,7 +1347,7 @@ export function disappearPose(ms: number): SpritePose {
 ```
 
   Al final del salto (`k = 1`): `y = −2 + 3 + 0 = 1` → enlaza con el reposo sin salto visual.
-- [ ] **4d.** pasa. Commit + `/guardar`.
+- [x] **4d.** pasa. Commit + `/guardar`.
 
 ### Paso 5 — Texturas y `SpawnLayer`
 
