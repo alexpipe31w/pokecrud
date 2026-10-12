@@ -92,7 +92,7 @@ fps). En el PC se prueba con el joystick y la vista móvil 390×844.
 
 **Files:** Create `shared/engine/geo.ts`, Test `shared/engine/geo.spec.ts`
 
-- [ ] **1a. Test que falla** (`shared/engine/geo.spec.ts`):
+- [x] **1a. Test que falla** (`shared/engine/geo.spec.ts`):
 
 ```ts
 import { bearingDeg, distanceM, fromLocalM, toLocalM } from './geo.js';
@@ -125,8 +125,8 @@ describe('geo', () => {
 });
 ```
 
-- [ ] **1b.** `npm run test:shared -- geo` → FALLA (`Cannot find module './geo.js'`).
-- [ ] **1c. Implementación** (`shared/engine/geo.ts`):
+- [x] **1b.** `npm run test:shared -- geo` → FALLA (`Cannot find module './geo.js'`).
+- [x] **1c. Implementación** (`shared/engine/geo.ts`):
 
 ```ts
 /**
@@ -171,8 +171,8 @@ export function bearingDeg(a: LatLng, b: LatLng): number {
 }
 ```
 
-- [ ] **1d.** `npm run test:shared -- geo` → PASA (4 tests).
-- [ ] **1e.** Commit `F1-03: geo.ts (distancias y metros locales) con tests` + push (`/guardar`).
+- [x] **1d.** `npm run test:shared -- geo` → PASA (4 tests).
+- [x] **1e.** Commit `F1-03: geo.ts (distancias y metros locales) con tests` + push (`/guardar`).
 
 ### Paso 2 — Filtro del GPS
 
@@ -182,7 +182,7 @@ Reglas (ARQUITECTURA §4): se ignoran fixes con precisión peor de 50 m (salvo e
 descartan los **saltos de > 50 m en < 2 s** (errores del GPS); se suaviza con una media de los 4 últimos ponderada por
 `1/precisión²`; un fix con hora repetida o anterior se ignora. Señal débil = precisión > 25 m.
 
-- [ ] **2a. Test que falla:**
+- [x] **2a. Test que falla:**
 
 ```ts
 import { fromLocalM, toLocalM } from '@shared/engine/geo';
@@ -242,8 +242,8 @@ describe('GpsFilter', () => {
 });
 ```
 
-- [ ] **2b.** `npx ng test --watch=false --include src/app/game/geo/gps-filter.spec.ts` → FALLA.
-- [ ] **2c. Implementación:**
+- [x] **2b.** `npx ng test --watch=false --include src/app/game/geo/gps-filter.spec.ts` → FALLA.
+- [x] **2c. Implementación:**
 
 ```ts
 import { distanceM, type LatLng } from '@shared/engine/geo';
@@ -310,15 +310,15 @@ export class GpsFilter {
 Nota: la media de 4 fixes "arrastra" ~1-2 s al caminar; lo compensa la interpolación del avatar (paso 5), que ya va
 detrás del objetivo. Si en el móvil se nota retraso, bajar `WINDOW` a 3 (y anotarlo).
 
-- [ ] **2d.** El mismo comando → PASA (7 tests).
-- [ ] **2e.** Commit `F1-03: filtro del GPS con tests` + `/guardar`.
+- [x] **2d.** El mismo comando → PASA (7 tests).
+- [x] **2e.** Commit `F1-03: filtro del GPS con tests` + `/guardar`.
 
 ### Paso 3 — Ángulos y joystick (puros)
 
 **Files:** Create `src/app/game/geo/angles.ts`, `src/app/game/geo/joystick-math.ts`; Tests `angles.spec.ts`,
 `joystick-math.spec.ts` (misma carpeta).
 
-- [ ] **3a. Tests que fallan:**
+- [x] **3a. Tests que fallan:**
 
 ```ts
 // angles.spec.ts
@@ -370,8 +370,8 @@ describe('joystickVelocity', () => {
 });
 ```
 
-- [ ] **3b.** `npx ng test --watch=false --include "src/app/game/geo/*.spec.ts"` → FALLA.
-- [ ] **3c. Implementación:**
+- [x] **3b.** `npx ng test --watch=false --include "src/app/game/geo/*.spec.ts"` → FALLA.
+- [x] **3c. Implementación:**
 
 ```ts
 // angles.ts — grados de brújula: 0 = norte, sentido horario.
@@ -422,17 +422,17 @@ export function joystickVelocity(dx: number, dy: number, headingDeg: number): { 
 Ojo en el test "arriba del todo": con `dy = -1`, `mag = 1` → `speed = MAX`; la velocidad crece desde 0 al salir de la
 zona muerta (sin salto).
 
-- [ ] **3d.** Mismo comando → PASA (8 tests).
-- [ ] **3e.** Commit `F1-03: ángulos y joystick con tests` + `/guardar`.
+- [x] **3d.** Mismo comando → PASA (8 tests).
+- [x] **3e.** Commit `F1-03: ángulos y joystick con tests` + `/guardar`.
 
 ### Paso 4 — `LocationService` y `CompassService`
 
 **Files:** Create `src/app/services/location/location.service.ts`, `compass.service.ts` (+ specs). Modify
 `package.json` (dependencia).
 
-- [ ] **4a. Dependencia:** `npm install --save-exact @capacitor/geolocation@8.2.3` y `npx cap sync android`. Los
+- [x] **4a. Dependencia:** `npm install --save-exact @capacitor/geolocation@8.2.3` y `npx cap sync android`. Los
   permisos ya están en `AndroidManifest.xml` (F0-09). Anotar la versión en el commit.
-- [ ] **4b. Test que falla** (`location.service.spec.ts`). Plugin por token de inyección (D-016), nada de `vi.mock`:
+- [x] **4b. Test que falla** (`location.service.spec.ts`). Plugin por token de inyección (D-016), nada de `vi.mock`:
 
 ```ts
 import { TestBed } from '@angular/core/testing';
@@ -505,8 +505,8 @@ describe('LocationService', () => {
 });
 ```
 
-- [ ] **4c.** `npx ng test --watch=false --include src/app/services/location/location.service.spec.ts` → FALLA.
-- [ ] **4d. Implementación** (`location.service.ts`):
+- [x] **4c.** `npx ng test --watch=false --include src/app/services/location/location.service.spec.ts` → FALLA.
+- [x] **4d. Implementación** (`location.service.ts`):
 
 ```ts
 import { Injectable, InjectionToken, inject, signal } from '@angular/core';
@@ -610,8 +610,8 @@ export class LocationService {
 `status` se queda en `denied`/`unavailable` hasta que la pantalla llama a `useJoystickAt` (así la pantalla de permisos
 puede explicar qué pasó antes de soltar al jugador con el joystick).
 
-- [ ] **4e.** Test → PASA (4).
-- [ ] **4f. `CompassService`** (test primero; mismo patrón). Contrato:
+- [x] **4e.** Test → PASA (4).
+- [x] **4f. `CompassService`** (test primero; mismo patrón). Contrato:
 
 ```ts
 // compass.service.ts
@@ -635,13 +635,13 @@ export class CompassService {
   Tests: un evento con `alpha 90` → `heading()` = 270; dos eventos 359 y 1 → se queda cerca de 359-0 (nunca ~180);
   sin eventos → `null`. Los eventos se disparan con `source.dispatchEvent(Object.assign(new Event(
   'deviceorientationabsolute'), { alpha: 90, absolute: true }))` sobre un `new EventTarget()` inyectado.
-- [ ] **4g.** Tests → PASAN. Commit `F1-03: LocationService y CompassService con tests` + `/guardar`.
+- [x] **4g.** Tests → PASAN. Commit `F1-03: LocationService y CompassService con tests` + `/guardar`.
 
 ### Paso 5 — Movimiento del avatar (puro)
 
 **Files:** Create `src/app/game/map-scene/avatar-motion.ts`, Test `avatar-motion.spec.ts`
 
-- [ ] **5a. Test que falla:**
+- [x] **5a. Test que falla:**
 
 ```ts
 import { AvatarMotion, RUN_MIN_MS, TELEPORT_M, WALK_MIN_MS } from './avatar-motion';
@@ -693,7 +693,7 @@ describe('AvatarMotion', () => {
 });
 ```
 
-- [ ] **5b.** → FALLA. **5c. Implementación:**
+- [x] **5b.** → FALLA. **5c. Implementación:**
 
 ```ts
 import { normDeg, smoothAngle } from '../geo/angles';
@@ -760,27 +760,27 @@ export class AvatarMotion {
 
   Si "alcanza un objetivo fijo" falla por precisión del `toBeLessThanOrEqual`, es correcto que nunca lo supere: el
   acercamiento exponencial no rebasa.
-- [ ] **5d.** → PASA (6). Commit `F1-03: AvatarMotion con tests` + `/guardar`.
+- [x] **5d.** → PASA (6). Commit `F1-03: AvatarMotion con tests` + `/guardar`.
 
 ### Paso 6 — Joystick en pantalla
 
 **Files:** Create `src/app/shared/ui/joystick.component.ts`
 
-- [ ] **6a.** Componente `app-joystick` (`output vector = { dx, dy }` en radios, emite en cada `pointermove` y
+- [x] **6a.** Componente `app-joystick` (`output vector = { dx, dy }` en radios, emite en cada `pointermove` y
   `{0,0}` al soltar). Pointer Events con `setPointerCapture`, base de 120 px de vidrio (DISENO §1: `var(--surface)`,
   `backdrop-filter`), mando de 52 px que sigue al dedo 1:1 limitado al radio y vuelve al centro con
   `transition: transform var(--dur-small) var(--ease-out)` (solo al soltar). `touch-action: none`. Háptico `tap()` al
   agarrar. `aria-label="Joystick: mover al personaje"`. Posición: abajo a la izquierda, por encima de
   `var(--ion-safe-area-bottom)`.
-- [ ] **6b.** Uso en la pantalla: cada frame, `const v = joystickVelocity(dx, dy, cameraHeading)` →
+- [x] **6b.** (se hace en el paso 8, en `/dev/mapa`) Uso en la pantalla: cada frame, `const v = joystickVelocity(dx, dy, cameraHeading)` →
   `location.nudge(v.east * dt, v.north * dt)`.
-- [ ] **6c.** Lint + build. Commit `F1-03: joystick en pantalla` + `/guardar`.
+- [x] **6c.** Lint + build. Commit `F1-03: joystick en pantalla` + `/guardar`.
 
 ### Paso 7 — Pantalla de permisos diseñada (DISENO §6)
 
 **Files:** Create `src/app/features/map/location-gate.component.ts`
 
-- [ ] **7a.** Componente que cubre el mapa según `location.status()` (vidrio sobre un fondo ilustrado con los tokens,
+- [x] **7a.** Componente que cubre el mapa según `location.status()` (vidrio sobre un fondo ilustrado con los tokens,
   título en Fredoka, `app-game-button`):
   - `idle`/`prompt` → "Necesitamos tu ubicación para que aparezcan Pokémon a tu alrededor" + "Permitir ubicación"
     (llama `location.start()`) + "Jugar con joystick" (secundario).
@@ -790,29 +790,37 @@ export class AvatarMotion {
     (→ `useJoystickAt(DEFAULT_CENTER)` = Parque Santander, el del spike).
   - `unavailable` → lo mismo con "Este dispositivo no da la ubicación".
   - `weak` → **no cubre**: chip pequeño "GPS débil" arriba en el centro.
-- [ ] **7b.** Usarlo ya en `/dev/mapa` (paso 8). Commit `F1-03: pantalla de permisos` + `/guardar`.
+- [x] **7b.** Usarlo ya en `/dev/mapa` (paso 8). Commit `F1-03: pantalla de permisos` + `/guardar`.
 
 ### Paso 8 — Probarlo antes de que exista `/mapa`: modo "Sígueme" en `/dev/mapa`
 
 **Files:** Modify `src/app/features/dev-map/dev-map.page.ts`
 
-- [ ] **8a.** Botón "Sígueme" (además de los de la batería): llama a `location.start()` y `compass.start()`; con el
+- [x] **8a.** Botón "Sígueme" (además de los de la batería): llama a `location.start()` y `compass.start()`; con el
   primer `position()` re-ancla el overlay ahí (`overlay.setAnchor({ ...pos, altitude: 0 })`) y usa ese punto como
   origen; en `tick(now)`: `motion.setTarget(...toLocalM(origen, location.position()))`, `const f = motion.step(dt)`,
   avatar del spike en `(f.east, 0, -f.north)` y `rotation.y = -f.facingDeg·π/180`; cámara
   `map.moveCamera({ center: fromLocalM(origen, f.east, f.north), heading: compass.heading() ?? 0 })`. Si el estado es
   `denied`/`unavailable` → `location.useJoystickAt(CENTER)` y se muestra `app-joystick`. Texto de estado con
   `status()` y `gait`.
-- [ ] **8b.** Lint, `ng test`, build. Commit `F1-03: modo Sígueme en /dev/mapa` + `/guardar`.
+- [x] **8b.** Lint, `ng test`, build. Commit `F1-03: modo Sígueme en /dev/mapa` + `/guardar`.
 
 ### Paso 9 — Prueba en Android y cierre
 
-- [ ] **9a.** `npm run apk -- --install`; `/dev/mapa` → "Sígueme": aceptar el permiso; **caminar ~100 m por la calle**
+- [x] **9a.** `npm run apk -- --install`; `/dev/mapa` → "Sígueme": aceptar el permiso; **caminar ~100 m por la calle**
   y comprobar: el avatar avanza suave (sin saltos), `gait` pasa de `idle` a `walk`; trotar → `run`; el mapa gira al
   girar el móvil y no "tiembla" quieto. Denegar el permiso (Ajustes de Android → la app → Ubicación → Denegar) →
   pasa a joystick y el avatar se mueve con él. Anotar en la bitácora: precisión típica (m), si hubo saltos
   descartados (`console.debug` del filtro) y si el retraso al caminar se nota.
-- [ ] **9b.** REGLA 2 (bitácora con la salida de los tests, ROADMAP `[x]`, PR).
+- [x] **9b.** REGLA 2 (bitácora con la salida de los tests, ROADMAP `[x]`, PR).
+
+**Hecho (Kenneth, 2026-10-12). Cambios respecto a este plan (ver D-037):** `LocationService` también funciona en el
+navegador (allí `requestPermissions` no existe: el permiso lo pide `watchPosition` y la denegación llega como error
+código 1), no abre dos escuchas si `start()` se llama dos veces, y exporta `DEFAULT_CENTER`. `app-location-gate` añade
+"Reintentar" (vuelve al GPS) en el estado `denied`. `app-joystick` responde también a las flechas del teclado (PC) y
+tiene spec. En `/dev/mapa`, el avatar del spike tiene "nariz" para ver hacia dónde mira y un botón "Usar GPS".
+**Para F1-04:** `WINDOW = 4` del filtro se deja así (caminando, Kenneth: "todo funcionó correctamente"); `start()` con `joystickMode` guardado
+deja `status = 'joystick'` sin posición → la pantalla debe llamar a `useJoystickAt(...)` (como hace `/dev/mapa`).
 
 ---
 

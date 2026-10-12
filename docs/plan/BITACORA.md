@@ -807,3 +807,60 @@ a F1-03 (lo pide su criterio).
 **Quedó a medias / roto:** nada. Pendiente de Alex: estilo del Map ID sin POI y con variante oscura (en ESTADO).
 **Decisiones nuevas:** ninguna en DECISIONES (las del plan se anotarán al implementarlas si cambian algo).
 **El siguiente debe empezar por:** F1-03 siguiendo `docs/plan/fases/F1-mapa.md` (paso 1: `shared/engine/geo.ts`).
+
+## 2026-10-12 13:50 · @kenneth (Claude) · F1-03 · rama `feature/F1-03-ubicacion-brujula`
+
+**Qué se hizo:** F1-03 completa siguiendo `docs/plan/fases/F1-mapa.md` (pasos 1-9, TDD): `shared/engine/geo.ts`,
+`GpsFilter`, `angles.ts`, `joystick-math.ts`, `AvatarMotion`, `LocationService` + `CompassService` (plugins por token,
+D-016), `app-joystick` (dedo + flechas del teclado, con spec), `app-location-gate` (con spec) y modo "Sígueme" en
+`/dev/mapa` (el avatar del spike ahora se coloca y tiene "nariz"; botones "Sígueme", "Usar GPS", "Dejar de seguir").
+`@capacitor/geolocation` 8.2.3 exacto + `cap sync`. **Fallo del plan encontrado y arreglado:** en el navegador el
+plugin no implementa `requestPermissions` y la app decía "Sin GPS"; ahora pide el permiso el propio `watchPosition`
+(D-037). Antes: `npm install` en raíz y `server/` (faltaban los paquetes de Maps del spike) y `SPAWN_SALT` propia en
+el `server/.env` de Kenneth.
+**Archivos clave:** `shared/engine/geo.ts`, `src/app/game/geo/*`, `src/app/game/map-scene/avatar-motion.ts`,
+`src/app/services/location/*`, `src/app/shared/ui/joystick.component.ts`, `src/app/features/map/location-gate.component.ts`,
+`src/app/features/dev-map/{dev-map.page,spike-scene}.ts`, `docs/evidencias/F1-03_0{1..7}_*`.
+**Cómo se probó (salida real):**
+
+    lint: All files pass linting · ng test: 37 archivos, 150 passed · shared: 12 archivos, 140 passed · build OK sin avisos
+    navegador 390×844 (Chrome con GPU vía playwright-core, Nest local + ng serve, cuenta test+f103-… borrada después):
+      GPS simulado: quieto "ok · idle · 0.0 m/s · ±6 m" → 1,4 m/s "walk 1.0" → 4 m/s "run 3.0"
+      salto falso 300 m en 1 s → consola "[gps] salto descartado 300 m en 1010 ms" · parado → "idle 0.3"
+      sin permiso → "Sin permiso de ubicación" → "Jugar con joystick" → flecha arriba 3 s "run 3.9" · dedo a media
+      distancia "walk 1.7" · soltar "idle 0.2" · 0 errores de consola
+    Samsung A36 (Android 16), APK de producción 11,44 MB (npm run apk -- --install → Success):
+      permiso denegado (Android en "no volver a preguntar") → pantalla "Sin permiso de ubicación" (F1-03_04)
+      concedido → "ok · idle · ±7 m · rumbo 255°", mapa en su sitio real (Parque El Vergel), 77 fps (F1-03_05)
+      caminando por la calle (capturas de Kenneth): walk 0,6-1,2 m/s · run 3,3 m/s · ±3-5 m · rumbo 98°-289°,
+      el mapa gira con el móvil, avatar centrado (F1-03_06, F1-03_07). Kenneth: "todo funcionó correctamente".
+      joystick con el dedo (registro del HUD por CDP cada 1 s): idle → walk 1,3-2,7 → run 3,6-4,0 m/s → idle al soltar,
+      53-120 fps · "Usar GPS" → vuelve a "ok · ±6 m" y joystickMode = false
+
+**Quedó a medias / roto:** nada de F1-03. Anotado en ESTADO (F8-02/F8-04): el APK de depuración escribe el refresh token
+en la consola del WebView (registro de Capacitor), y el APK subió a 11,4 MB por la librería nativa de ubicación. Visto de
+paso: tras cambiar de datos a Wi-Fi el WebView daba `ERR_NAME_NOT_RESOLVED` hasta reabrir la app (no es de la app).
+**Decisiones nuevas:** D-037.
+**El siguiente debe empezar por:** mezclar el PR de F1-03 y coger F1-04 siguiendo `docs/plan/fases/F1-mapa.md` desde su
+paso 1 (contrato de `/spawns` en `shared/protocol/spawns.ts`), leyendo antes la nota "Hecho (Kenneth…)" de F1-03.
+
+## 2026-10-12 14:05 · @kenneth (Claude) · F4-05 (pendiente: probar en Android) · rama `feature/F1-03-ubicacion-brujula`
+
+**Qué se hizo:** prueba del combate de prueba (`/combate/prueba`) en el Samsung A36 (pendiente de Kenneth desde F4-05).
+APK de producción de F1-03; se llegó a la pantalla por CDP (`adb forward` + `history.pushState`, D-037). Dos combates
+enteros contra Nadadora Marina (Normal), con cambios de Pokémon, críticos, parálisis, veneno y la curación del rival.
+Kenneth grabó la pantalla del segundo; de ahí salen las evidencias.
+**Archivos clave:** `docs/evidencias/F4-05_07_a36-golpe-super-eficaz.jpg`, `_08_a36-cambiar-pokemon`,
+`_09_a36-bulbasaur-eficacias`, `_10_a36-victoria`.
+**Cómo se probó (salida real):**
+
+    registro por CDP cada 2 s (requestAnimationFrame), 5 min: 130 muestras · fps min 12 · mediana 104 · max 120
+      (la única muestra baja, 1 fotograma de 2.975 ms, fue Kenneth buscando el grabador de pantalla)
+    combate 1: "¡Has derrotado a Nadadora Marina! ¡Victoria!" · combate 2: igual · 0 errores JS
+    consola: "[audio] no se pudo reproducir el grito #118 / #25 TimeoutError: signal timed out" (solo en el 1.º)
+    Kenneth: gritos al salir y al debilitarse en los 2 combates, vibración al golpear, fluido
+
+**Quedó a medias / roto:** nada. Para F2-08 (en ESTADO): precargar los gritos al elegir rival (con datos móviles el
+primero puede pasar de 6 s y no sonar) y los SFX de golpe.
+**Decisiones nuevas:** ninguna.
+**El siguiente debe empezar por:** lo mismo que la entrada anterior (mezclar el PR de F1-03 y coger F1-04).

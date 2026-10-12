@@ -92,9 +92,13 @@
       52,3 fps. **Plan A, máximo 30 Pokémon dibujados** (D-035). Evidencias `F1-01_0{3,4}_redmi-*.png`.
 - [x] **F1-02 · Plan detallado de F1** (@samuel, 2026-10-12) (`docs/plan/fases/F1-mapa.md`). Dep: F1-01.
       **Hecho:** plan de F1-03, F1-04, F1-05 y F1-07 con archivos, código y tests (TDD), pasos con casilla y riesgos.
-- [ ] **F1-03 · Ubicación y brújula** — `LocationService` (watch, suavizado, descarte de saltos),
+- [x] **F1-03 · Ubicación y brújula** (@kenneth, 2026-10-12) — `LocationService` (watch, suavizado, descarte de saltos),
       `CompassService`, modo joystick, pantalla de permisos diseñada.
       Dep: F1-02. Criterio: tests del filtro; avatar se mueve suave caminando de verdad y con joystick.
+      **Hecho:** `geo.ts`, `GpsFilter`, ángulos, joystick, `AvatarMotion`, `LocationService`/`CompassService`,
+      `app-joystick`, `app-location-gate` y modo "Sígueme" en `/dev/mapa` (app 150 tests, shared 140). Samsung A36
+      caminando por Neiva: `walk` 0,6-1,2 m/s, `run` 3,3 m/s, ±3-5 m, el mapa gira con la brújula; sin permiso →
+      pantalla de permisos; joystick con el dedo `walk`/`run` 4 m/s/`idle`. Evidencias `F1-03_0{1..7}_*`. D-037.
 - [ ] **F1-04 · Pantalla Mapa** — mapa como ruta principal (`/mapa`), estilo día/noche, cámara que sigue
       al avatar y rota con la brújula, HUD (avatar/nivel, brújula, clima, botón Poké Ball → menú).
       Quitar las pestañas de Ionic. Dep: F1-03, F0-07. Criterio: DISENO §1 cumplido; captura de día y de noche.
@@ -174,7 +178,7 @@
 - [x] **F4-05 · Escena de combate** (@alex, 2026-10-11) — UI de turnos, selección de movimiento con tipo/PP/efectividad
       prevista, animaciones por tipo, cola de eventos, textos en español, cambio de Pokémon. Dep: F4-04, F0-04.
       **Hecho:** `/combate/prueba` contra los 3 entrenadores con la IA; probado entero en vista móvil 390×844 (victoria,
-      cambio forzado, eficacias). D-033. Pendiente: probarlo en Android real (Kenneth) y SFX de golpe (F2-08).
+      cambio forzado, eficacias). D-033. Probado en Android real (Kenneth, Samsung A36, 2026-10-12: fluido, gritos y vibración). Pendiente: SFX de golpe (F2-08).
       **OJO (D-034): es la escena TEMPORAL en 2D.** La definitiva es F4-07 (AR con cámara).
 - [x] **F4-06 · IA rival** (@alex, 2026-10-11) — elige el movimiento con mejor daño esperado con algo de aleatoriedad;
       entrenadores de prueba. Dep: F4-05.

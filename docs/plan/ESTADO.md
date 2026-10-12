@@ -3,22 +3,19 @@
 > Se **reescribe** al cerrar cada sesión (no es histórico; el histórico es `BITACORA.md`).
 > Máximo una pantalla. Si lees esto al empezar: después lee `ROADMAP.md`.
 
-**Última actualización:** 2026-10-12 · por Samuel (Claude) · `develop` (#32, #33 y #34 mezclados)
+**Última actualización:** 2026-10-12 · por Kenneth (Claude) · rama `feature/F1-03-ubicacion-brujula` (PR a `develop`)
 
-## 👉 RELEVO DE ALEX A SAMUEL — HECHO (2026-10-12)
+## 👉 RELEVO DE KENNETH (2026-10-12)
 
-1. ✅ **PR mezclados:** #22 → #31 (cadena, entró limpia) y #21 al final (único con conflictos: docs y `schema.prisma`,
-   resueltos conservando todo; esquema = base real). Antes, integración local completa: servidor 22 unitarios + 66
-   e2e, app 103, shared 136, lint y build OK. **Ojo para próximas cadenas:** este repo NO borra la rama al mezclar,
-   así que GitHub **no** reapunta solo el PR siguiente: hay que cambiar su base a `develop` a mano antes de mezclarlo.
-2. ✅ **Render (Samuel):** `DATABASE_URL` en 6543 y `SPAWN_SALT` propia puestos. **Render SÍ despliega solo** al
-   mezclar en `develop` (trigger "Branch updated"): no hace falta Manual Deploy. Probado: `/health/ready` 200, `/spawns`
-   y `/bag` existen (401 sin sesión).
-3. ✅ **`server/.env` de Samuel:** 6543, `JWT_SECRET` y `SPAWN_SALT` propios.
-4. **Samuel también montó Android:** JDK 21 (Temurin) + Android Studio; APK instalado y probado en un **Redmi Note 10**
-   (Android 12, MIUI 13): Pokédex desde Render, login, 60 fps. En Xiaomi hay que activar "Instalar vía USB".
-5. **Qué coger después** (REGLA 1, una tarea): sin móvil → **F5-01** (plan del PvP) o **F2-08** (audio). Con un
-   Android → **F2-01** (spike de cámara + giroscopio): la llave de la AR, **incluido el combate en AR (D-034, F4-07)**.
+1. ✅ **F1-03 hecha** (PR abierto a `develop`, falta mezclarlo): GPS filtrado, brújula, joystick, pantalla de permisos
+   y `AvatarMotion`, probados caminando por Neiva con el Samsung A36. Detalle en "Hecho" y en la bitácora. D-037.
+2. **Siguiente tarea: F1-04** (pantalla `/mapa` principal, HUD, menú de la Poké Ball, fuera las pestañas). Sigue
+   `docs/plan/fases/F1-mapa.md` → F1-04 (empieza por el paso 1: contrato de `/spawns` en `shared/protocol`). Lee
+   antes la nota "Hecho (Kenneth…)" al final de F1-03 en ese plan. Necesita el estilo del Map ID sin POI (Alex).
+3. **Probar en el APK:** en la app no hay botón a `/dev/ui` ni `/dev/mapa`. Se llega por el cable USB: `adb forward`
+   del WebView + `history.pushState` por CDP (D-037). Las capturas del mapa con `adb shell screencap` (la de CDP sale gris).
+4. Si al abrir la app se queda cargando la Pokédex: Render (gratis) está despertando, espera ~1 min. Si al cambiar de
+   red el móvil da `ERR_NAME_NOT_RESOLVED`, cierra y abre la app.
 
 **Importante (D-034):** la escena de combate de `/combate/prueba` es **temporal**. Alex quiere el combate **en
 realidad aumentada con la cámara**. Lo que hay debajo (motor, IA, controlador, textos, menú) se reutiliza; solo cambia
@@ -26,12 +23,20 @@ la parte visual (F4-07).
 
 ## Fase actual
 
-**F0 completa** (en `develop`). **F4 (combate) completa en código** a falta de la versión AR (F4-07). **F1 y F2 a
-medias:** spawns (F1-06), mochila/XP (F1-08), fórmula de captura (F2-03) y captura en servidor (F2-06) hechos; lo
-visual del mapa ya tiene vía libre (**F1-01 hecha: plan A, D-035**); el del encuentro espera al spike F2-01.
+**F0 completa** (en `develop`). **F4 (combate) completa en código** a falta de la versión AR (F4-07). **F1 a medias:**
+spike (F1-01, plan A), plan (F1-02), ubicación y brújula (F1-03), spawns (F1-06) y mochila/XP (F1-08) hechos; faltan la
+pantalla `/mapa` (F1-04), el avatar 3D (F1-05) y los Pokémon en el mapa (F1-07). **F2:** fórmula (F2-03) y captura en
+servidor (F2-06) hechas; lo visual del encuentro espera al spike F2-01 (cámara + giroscopio).
 
 ## Hecho
 
+- **F1-03 (Kenneth, rama `feature/F1-03-ubicacion-brujula`, PR a `develop`):** `shared/engine/geo.ts` (metros locales,
+  igual que el servidor), `GpsFilter` (descarta > 50 m de error y saltos > 50 m en < 2 s, media ponderada de 4),
+  `angles.ts`, `joystick-math.ts`, `AvatarMotion` (idle/walk/run), `LocationService` y `CompassService` (plugins por
+  token, D-016), `app-joystick` (dedo + flechas), `app-location-gate` (pedir permiso / buscando / sin permiso / sin GPS
+  / "GPS débil") y modo **"Sígueme"** en `/dev/mapa`. `@capacitor/geolocation` 8.2.3 exacto. **Samsung A36 por Neiva:**
+  `walk` 0,6-1,2 m/s, `run` 3,3 m/s, ±3-5 m, el mapa gira con la brújula; sin permiso → pantalla de permisos; joystick
+  con el dedo `walk`/`run` (4 m/s)/`idle`. App 150 tests, shared 140. D-037.
 - **F1-02 (Samuel, PR #34 mezclado):** plan de la fase del mapa en `docs/plan/fases/F1-mapa.md`: F1-03 (GPS filtrado,
   brújula, joystick, permisos), F1-04 (`/mapa` como pantalla principal, HUD, menú de la Poké Ball, adiós pestañas,
   clima en `GET /spawns`), F1-05 (avatar 3D procedural) y F1-07 (Pokémon con hierba, grito por cercanía, toque).
@@ -115,17 +120,15 @@ visual del mapa ya tiene vía libre (**F1-01 hecha: plan A, D-035**); el del enc
 
 ## En curso
 
-- Nadie. Siguiente: **F1-03** (ver "Siguiente paso concreto").
+- Nadie. Siguiente: **F1-04** (ver "Siguiente paso concreto").
 
 ## Siguiente paso concreto
 
-1. **Alex:** nombrarse ADMIN del inventario (`cd server && npm run admin -- grant <correo>`). Hasta entonces nadie
-   puede agregar/editar/eliminar Pokémon en `/pokemon` (hoy hay 0 ADMIN en la base).
-2. **Kenneth:** poner `SPAWN_SALT` en su `server/.env`
-   (`node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))"`; sin ella `/spawns` da 503).
-3. **Siguiente tarea libre:** **F1-03** (ubicación, brújula y joystick; sigue `docs/plan/fases/F1-mapa.md`, necesita
-   Android para el criterio). Con Android también →
-   F2-01 (spike de cámara y giroscopio). Sin móvil → F5-01 o F2-08.
+1. **Kenneth o Samuel:** revisar y mezclar el PR de F1-03 (`feature/F1-03-ubicacion-brujula` → `develop`).
+2. **Siguiente tarea libre: F1-04** (pantalla `/mapa`; sigue `docs/plan/fases/F1-mapa.md`, criterio con capturas de
+   día y de noche). Con Android también → F2-01 (spike de cámara y giroscopio). Sin móvil → F5-01 o F2-08.
+3. **Alex:** nombrarse ADMIN del inventario (`cd server && npm run admin -- grant <correo>`); hoy hay 0 ADMIN. Y el
+   estilo del Map ID sin POI comerciales y con variante oscura (lo necesita F1-04).
 4. Para generar el APK en otro PC: JDK 21 (`winget install Microsoft.OpenJDK.21`; si da "el hash no coincide",
    `winget install EclipseAdoptium.Temurin.21.JDK`) y `npm run apk`.
 
@@ -137,6 +140,7 @@ visual del mapa ya tiene vía libre (**F1-01 hecha: plan A, D-035**); el del enc
 
 - [x] (Samuel, 2026-10-12) Revisar y mezclar #21…#31: primero la cadena #22 → #31 y #21 al final (único con
       conflictos). GitHub NO reapuntó solo (el repo no borra las ramas mezcladas): la base se cambió a `develop` a mano.
+- [ ] Revisar y mezclar el PR de **F1-03** (`feature/F1-03-ubicacion-brujula`).
 
 **Samuel (Render, solo él tiene acceso):**
 
@@ -147,13 +151,25 @@ visual del mapa ya tiene vía libre (**F1-01 hecha: plan A, D-035**); el del enc
 
 **Kenneth:**
 
-- [ ] Probar el combate en su Android: APK → `/dev/ui` → "Combate de prueba"; que vaya fluido y se oigan los gritos.
+- [x] Probar el combate en su Android (2026-10-12): 2 combates enteros en el Samsung A36, fluido (mediana 104 fps), gritos y
+      vibración OK. Evidencias `F4-05_{07..10}_a36-*.jpg`.
 - [x] ~~**F1-01:** medir fps en su Android~~ → la retoma Samuel en su Redmi Note 10 (2026-10-12).
-- [ ] Su `server/.env`: `SPAWN_SALT` propia.
+- [x] Su `server/.env`: `SPAWN_SALT` propia (64 caracteres) y `DATABASE_URL` en 6543 comprobado. (2026-10-12)
 
 **Quien coja F2-08 (audio):**
 
 - [ ] SFX de golpe/crítico/debilitado para la escena de combate (hoy solo hay gritos y vibración).
+- [ ] Precargar los gritos del combate al elegir rival: en el A36 con datos móviles los de Pikachu y Goldeen tardaron
+      más de `CRY_TIMEOUT_MS` (6 s) y no sonaron en el primer combate (`TimeoutError`); en el segundo, sí.
+
+**Quien coja F8-02 / F8-04 (rendimiento y APK de release):**
+
+- [ ] El APK de **depuración** escribe en la consola del WebView lo que lee `SecureStorage`, **incluido el refresh
+      token** (registro de depuración de Capacitor; visto en F1-03 por CDP). Comprobar que el de release no lo hace
+      (`loggingBehavior` en `capacitor.config.ts`).
+- [ ] El APK pasó de 8,4 a 11,4 MB con `@capacitor/geolocation` (librería nativa de ubicación; `classes.dex` sin
+      minificar). Medir con el de release (minify/R8).
+- [ ] En el Samsung A36 (pantalla de 120 Hz) `/dev/mapa` con 30 Pokémon marca 40-120 fps según la zona; medir en F8-02.
 
 **Alex:**
 
@@ -170,7 +186,7 @@ visual del mapa ya tiene vía libre (**F1-01 hecha: plan A, D-035**); el del enc
 - **Cada compañero necesita su propio `JWT_SECRET`** en su `server/.env` para arrancar el servidor en local (SECRETOS.md).
 - **En local hacen falta dos servidores:** Nest (`cd server && npm run start:dev`, puerto **3000**) y la app (`npm start`).
   Si tu `server/.env` tiene `PORT=3001` de antes, cámbialo a 3000 (o bórralo).
-- **ACCIÓN — puerto de la base (F0-10, D-021):** (Alex, Samuel y Render: hecho; falta confirmar Kenneth) cada uno cambia en su `server/.env` el puerto de `DATABASE_URL` de
+- **ACCIÓN — puerto de la base (F0-10, D-021):** (Alex, Samuel, Kenneth y Render: hecho) cada uno cambia en su `server/.env` el puerto de `DATABASE_URL` de
   **5432 a 6543** (solo ese; `DIRECT_URL` se queda en 5432). **Samuel:** lo mismo en la variable `DATABASE_URL` de Render.
   Mientras alguien siga en 5432 consume del cupo de 15 del session pooler (hoy Render: 5); no rompe nada, pero el riesgo
   vuelve si los tres se quedan en 5432.
