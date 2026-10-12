@@ -43,7 +43,7 @@ pendiente de mezclar). Libres: **F0-09** APK y **F0-10** transaction pooler (nue
 
 ## En curso
 
-- **F0-09** (@kenneth, rama `feature/F0-09-apk`): pipeline del APK. Punto de guardado: reclamada, sin código aún.
+- **F0-09** (@kenneth, rama `feature/F0-09-apk`): pipeline del APK. Punto de guardado: pasos 1-2 (`android/` con Capacitor 8.5.2, permisos; APK debug compila con JDK 21: el `jbr` de Android Studio aquí es JDK 25 y Gradle 8.14.3 no lo soporta). Sigue: paso 3.
 
 ## Siguiente paso concreto
 

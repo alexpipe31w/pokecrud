@@ -1417,10 +1417,10 @@ Añadir `CHECK` en la migración SQL generada (editar antes de `migrate deploy`)
 **Requisitos:** Android Studio instalado (en el PC de Alex: sí, con `jbr` = JDK 21) y SDK en
 `%LOCALAPPDATA%\Android\Sdk`. Un móvil Android con _Depuración USB_ activada.
 
-- [ ] **Paso 1:** `npm install @capacitor/android@8.5.3 @capacitor/splash-screen@8.0.2` y
+- [x] **Paso 1:** `npm install @capacitor/android@8.5.3 @capacitor/splash-screen@8.0.2` y
       `npx cap add android`. Commitear la carpeta `android/` (D-009) — revisar que su `.gitignore` excluye
       `build/`, `.gradle/`, `local.properties` y `*.keystore`.
-- [ ] **Paso 2: permisos** — en `android/app/src/main/AndroidManifest.xml`, dentro de `<manifest>`:
+- [x] **Paso 2: permisos** — en `android/app/src/main/AndroidManifest.xml`, dentro de `<manifest>`:
 
 ```xml
 <uses-permission android:name="android.permission.INTERNET" />
