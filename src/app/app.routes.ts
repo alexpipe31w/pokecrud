@@ -11,6 +11,7 @@ import { adminGuard, authGuard, guestGuard } from './core/auth/auth.guard';
  *  /pokemon/nuevo     → Agregar un Pokémon (buscador PokéAPI + formulario)
  *  /pokemon/:id       → Detalle de un Pokémon
  *  /pokemon/:id/editar → Editar un Pokémon
+ *  /encuentro/:id     → Encuentro con un Pokémon del mapa (F1-07, PROVISIONAL hasta la escena AR de F2-04; exige sesión)
  *  /combate/prueba    → Combate de prueba contra la IA (F4-05, exige sesión)
  *  /dev/ui            → Escaparate del sistema de diseño (solo desarrollo, exige sesión)
  *  /dev/mapa          → Spike F1-01: Google Maps 3D + three.js con medidor de fps (solo desarrollo, exige sesión)
@@ -46,6 +47,11 @@ export const routes: Routes = [
     path: 'pokemon/:id',
     loadComponent: () =>
       import('./features/pokemon-detail/pokemon-detail.page').then((m) => m.PokemonDetailPage),
+  },
+  {
+    path: 'encuentro/:id',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/encounter/encounter.page').then((m) => m.EncounterPage),
   },
   {
     path: 'combate/prueba',

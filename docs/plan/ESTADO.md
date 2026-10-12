@@ -137,9 +137,9 @@ fórmula (F2-03) y captura en servidor (F2-06) hechas; lo visual del encuentro e
 
 ## En curso
 
-- **F1-07 (Pokémon en el mapa) — @alex, 2026-10-12**, rama `feature/F1-07-pokemon-mapa`. Punto de guardado: pasos 1-5 HECHOS
-  (`spawn-diff`, `refetch`, `appear`, `SpawnFeedService`, `SpriteTextures`, `SpawnLayer` en `MapScene`). Siguiente:
-  paso 6 (conectarlo en `MapPage`: grito por cercanía, toque, `/encuentro/:id`). Plan: `docs/plan/fases/F1-mapa.md` → F1-07.
+- **F1-07 (Pokémon en el mapa) — @alex, 2026-10-12**, rama `feature/F1-07-pokemon-mapa`. Punto de guardado: pasos 1-6 HECHOS
+  (Pokémon en `/mapa` con hierba, grito por cercanía, toque → `/encuentro/:id` provisional). Siguiente: paso 7a
+  (prueba en navegador + evidencias); 7b en Android. Plan: `docs/plan/fases/F1-mapa.md` → F1-07.
 - F1-05 solo espera la prueba en Android (paso 3b).
 
 ## Siguiente paso concreto

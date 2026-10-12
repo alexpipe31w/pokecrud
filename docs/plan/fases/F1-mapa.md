@@ -1374,22 +1374,22 @@ export function disappearPose(ms: number): SpritePose {
 **Files:** Modify `src/app/features/map/map.page.ts`, `src/app/services/game/audio.service.ts` (+ spec); Create
 `src/app/features/encounter/encounter.page.ts`; Modify `app.routes.ts`
 
-- [ ] **6a. `playCry` con volumen:** test nuevo en `audio.service.spec.ts` con el doble de `AudioContext` que ya
+- [x] **6a. `playCry` con volumen:** test nuevo en `audio.service.spec.ts` con el doble de `AudioContext` que ya
   usa ese archivo: `playCry(25, 0.3)` crea un `GainNode` con `gain.value = 0.3` entre la fuente y el bus `cries`;
   `playCry(25)` sigue sonando a 1 (los tests actuales no cambian). Implementación: parámetro `gain = 1` →
   `play(buffer, 'cries', gain)`; en `play`, si `gain !== 1`, `source → ctx.createGain() (value = gain) → bus`.
-- [ ] **6b.** En el bucle (cada ~1 s): `spawnFeed.tick(now, position)`; `spawnLayer.sync(nearestN(spawnFeed.spawns(),
+- [x] **6b.** En el bucle (cada ~1 s): `spawnFeed.tick(now, position)`; `spawnLayer.sync(nearestN(spawnFeed.spawns(),
   posAvatar), origin, now)`. Por cada alta (no en la primera sincronización) a ≤ 60 m: `audio.playCry(speciesId,
   clamp(1 − d/60, 0,2, 0,6))`, como mucho **uno cada 5 s** (si no, en una franja nueva sonarían 15 a la vez).
-- [ ] **6c. Toque:** en el `div` del mapa, `pointerdown` guarda punto y hora; `pointerup` a < 10 px y < 300 ms = toque
+- [x] **6c. Toque:** en el `div` del mapa, `pointerdown` guarda punto y hora; `pointerup` a < 10 px y < 300 ms = toque
   (no arrastre ni pellizco) → `ndc = ((x / w)·2 − 1, −(y / h)·2 + 1)` → `spawnLayer.pick(ndc)`:
   - a ≤ `REACH_RADIUS_M` del avatar → háptico `tap()` + `router.navigateByUrl('/encuentro/' + id)`.
   - más lejos → el sprite da un saltito y un chip "Acércate más" 1,5 s (sin navegar).
-- [ ] **6d. `/encuentro/:id` PROVISIONAL** (ruta con `authGuard`): `GET /encounters/:id` → arte `home`, nombre en
+- [x] **6d. `/encuentro/:id` PROVISIONAL** (ruta con `authGuard`): `GET /encounters/:id` → arte `home`, nombre en
   español (DatasetService), nivel, grito; "Volver al mapa". Errores del servidor (D-028) con texto: 403 "Estás
   demasiado lejos", 410 "Se ha ido…", 409 "Ya lo intentaste", 404 "Este Pokémon ya no está". Comentario
   `// PROVISIONAL (F1-07): F2-04 lo sustituye por la escena AR`. La transición de verdad (DISENO §5) es de F2-04.
-- [ ] **6e.** Lint, `ng test`, build. Commit + `/guardar`.
+- [x] **6e.** Lint, `ng test`, build. Commit + `/guardar`.
 
 ### Paso 7 — Prueba y evidencias
 
