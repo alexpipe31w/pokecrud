@@ -7,7 +7,7 @@
 
 ## Fase actual
 
-**F0 · Fundaciones** — **F0-01…F0-09 en `develop`** (PR #8-#17). **F0-10 hecha** (Kenneth, PR #18 pendiente de mezclar).
+**F0 · Fundaciones** — **F0-01…F0-09 en `develop`** (PR #8-#17). **F0-10 hecha y mezclada** (Kenneth, PR #18).
 Queda **F0-11** (zona segura Android 15+). Después, F1 (mapa).
 
 ## Hecho
@@ -50,7 +50,7 @@ Queda **F0-11** (zona segura Android 15+). Después, F1 (mapa).
 
 ## En curso
 
-- Nadie.
+- **F0-11** (@kenneth, rama `feature/F0-11-zona-segura`): zona segura Android 15+. Punto de guardado: reclamada, sin código aún.
 
 ## Siguiente paso concreto
 
