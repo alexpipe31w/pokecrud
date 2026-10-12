@@ -3,15 +3,17 @@
 > Se **reescribe** al cerrar cada sesión (no es histórico; el histórico es `BITACORA.md`).
 > Máximo una pantalla. Si lees esto al empezar: después lee `ROADMAP.md`.
 
-**Última actualización:** 2026-10-11 · por Kenneth (Claude) · rama `feature/F0-10-transaction-pooler`
+**Última actualización:** 2026-10-11 · por Kenneth (Claude) · rama `feature/F0-11-zona-segura`
 
 ## Fase actual
 
-**F0 · Fundaciones** — **F0-01…F0-09 en `develop`** (PR #8-#17). **F0-10 hecha y mezclada** (Kenneth, PR #18).
-Queda **F0-11** (zona segura Android 15+). Después, F1 (mapa).
+**F0 · Fundaciones — COMPLETA.** F0-01…F0-10 en `develop` (PR #8-#18); **F0-11 hecha** (Kenneth, PR pendiente de
+mezclar). Siguiente fase: **F1 · Mapa con GPS** (empieza por F1-01, el spike de Google Maps 3D en Android real).
 
 ## Hecho
 
+- **F0-11 (Kenneth, rama `feature/F0-11-zona-segura`):** zona segura global para pantallas sin `ion-header`
+  (`src/global.scss`, D-022). Probado en el Samsung A36: `/dev/ui`, login y registro sin solapes; Pokédex sin cambios.
 - **F0-10 (Kenneth, rama `feature/F0-10-transaction-pooler`):** `DATABASE_URL` por el _transaction pooler_ (6543),
   `DIRECT_URL` sigue en 5432. Medido: 40/40 conexiones; 2 servidores locales + Render + e2e en paralelo = 2.516
   consultas, 0 fallos. Arreglado el borrado cruzado entre archivos e2e (500 intermitente en paralelo). D-021.
@@ -50,14 +52,15 @@ Queda **F0-11** (zona segura Android 15+). Después, F1 (mapa).
 
 ## En curso
 
-- **F0-11** (@kenneth, rama `feature/F0-11-zona-segura`): zona segura Android 15+. Punto de guardado: reclamada, sin código aún.
+- Nadie.
 
 ## Siguiente paso concreto
 
-1. Revisar y mezclar el PR #18 (F0-10) en `develop`. **Alex y Samuel:** puerto de `DATABASE_URL` → 6543 en su `.env`;
+1. Revisar y mezclar el PR de F0-11 en `develop`. **Alex y Samuel:** puerto de `DATABASE_URL` → 6543 en su `.env`;
    **Samuel:** también en Render (ver Bloqueos).
-2. Siguiente tarea libre: **F0-11** (zona segura Android 15+). Luego F1 (mapa): F1-01 ya tiene su dependencia (F0-09)
-   y necesita el APK para medir fps en un Android real.
+2. Siguiente: **F1-01** (spike Google Maps 3D + overlay three.js, medir fps en Android real; dep F0-09 ✔). Necesita
+   `environment.local.ts` con la clave de Maps (Kenneth ya lo tiene) y un móvil. OJO: mapa a pantalla completa →
+   anular la zona segura en su `ion-content` (D-022).
 3. Para generar el APK en otro PC: instalar JDK 21 (`winget install Microsoft.OpenJDK.21`) y `npm run apk`.
 
 ## Bloqueos / roto / pendiente de humanos

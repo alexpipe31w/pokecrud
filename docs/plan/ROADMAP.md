@@ -59,10 +59,12 @@
       Dep: F0-08. Criterio: e2e en paralelo + Render + 2 servidores locales a la vez sin `EMAXCONNSESSION` (salida en bitácora).
       **Hecho:** 2 servidores locales + Render + e2e en paralelo: 2.516 consultas, 0 fallos; e2e en paralelo 8/8. D-021.
       **Pendiente de humanos:** Samuel cambia `DATABASE_URL` a 6543 en Render; Alex y Samuel, el puerto en su `server/.env`.
-- [~] **F0-11 · Zona segura en Android 15+ (edge-to-edge)** (@kenneth, 2026-10-11) — con `targetSdk` 36 la app se dibuja bajo la barra de
-  estado: en `/dev/ui` el título se cruza con la hora (`F0-09_01_apk-movil-dev-ui.png`); la Pokédex con `ion-header`
-  sí la respeta. Aplicar `env(safe-area-inset-*)` en el layout base para toda pantalla sin `ion-header`.
-  Dep: F0-09. Criterio: captura en Android real sin solapes en `/dev/ui`, login y registro.
+- [x] **F0-11 · Zona segura en Android 15+ (edge-to-edge)** (@kenneth, 2026-10-11) — con `targetSdk` 36 la app se dibuja bajo la barra de
+      estado: en `/dev/ui` el título se cruza con la hora (`F0-09_01_apk-movil-dev-ui.png`); la Pokédex con `ion-header`
+      sí la respeta. Aplicar `env(safe-area-inset-*)` en el layout base para toda pantalla sin `ion-header`.
+      Dep: F0-09. Criterio: captura en Android real sin solapes en `/dev/ui`, login y registro.
+      **Hecho:** regla global en `src/global.scss` (D-022); Samsung A36: `/dev/ui`, login y registro sin solapes ni scroll
+      extra, Pokédex sin cambios. Evidencias `F0-11_0{1,2,3}_*.png`.
 
 ## F1 · Mapa con GPS
 

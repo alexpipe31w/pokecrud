@@ -371,3 +371,25 @@ los locales vayan por 6543).
 **Decisiones nuevas:** D-021.
 **El siguiente debe empezar por:** mezclar el PR de F0-10 y avisar a Alex y Samuel del cambio de puerto; luego
 `/inicio F0-11` (zona segura en Android 15+, ver `docs/evidencias/F0-09_01_apk-movil-dev-ui.png`).
+
+## 2026-10-11 20:05 · @kenneth (Claude) · F0-11 · rama `feature/F0-11-zona-segura`
+
+**Qué se hizo:** mezclado el PR #18 (F0-10) con el visto bueno de Kenneth. F0-11: medido en el móvil que el WebView
+expone la zona segura (`env(safe-area-inset-top)` 36 px, bottom 15 px, `:has()` soportado) y añadida una regla global
+en `src/global.scss` para toda pantalla sin `ion-header` (D-022). APK reinstalado con `npm run apk -- production --install`.
+**Archivos clave:** `src/global.scss`, `docs/plan/DECISIONES.md` (D-022).
+**Cómo se probó (salida real):**
+
+    Samsung A36 (Android 16), WebView por CDP (adb forward):
+      /dev/ui   → título a 59 px del borde (zona segura 35 px), antes se cruzaba con la hora
+      /login    → --padding-top 35px · scroll sobrante 0 px
+      /registro → --padding-top 35px · scroll sobrante 0 px
+      /tabs/pokedex (con ion-header) → --padding-top 0px, sin cambios
+    app: npm run test:all → 92/92 + shared 10/10 · lint OK · build OK
+
+Evidencias `docs/evidencias/F0-11_0{1,2,3}_zona-segura-*.png`. Kenneth cerró su sesión en el móvil para la prueba de
+login/registro (tiene que volver a entrar).
+**Quedó a medias / roto:** nada. **F0 completa.**
+**Decisiones nuevas:** D-022.
+**El siguiente debe empezar por:** mezclar el PR de F0-11; luego `/inicio F1-01` (spike Google Maps 3D + three.js en
+Android real) — antes, leer ARQUITECTURA §4 y D-022 (el mapa anula la zona segura en su `ion-content`).
