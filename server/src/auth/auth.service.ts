@@ -15,6 +15,7 @@ import { Prisma } from '../generated/prisma/client.js';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { LoginDto, RegisterDto } from './auth.dto.js';
 import { LoginAttemptsService } from './login-attempts.service.js';
+import { starterRows } from '../bag/bag.service.js';
 
 /** Argon2id con los parámetros mínimos de OWASP (19 MiB, 2 iteraciones): aguanta en el plan gratis de Render. */
 const ARGON2_OPTIONS = {
@@ -95,7 +96,13 @@ export class AuthService implements OnModuleInit {
     try {
       // La unicidad la garantiza la BD (@unique), no un SELECT previo: dos registros simultáneos no pasan.
       player = await this.prisma.player.create({
-        data: { email: dto.email, nickname: dto.nickname, passwordHash },
+        // El kit inicial va en la MISMA sentencia (escritura anidada = una transacción): o todo o nada.
+        data: {
+          email: dto.email,
+          nickname: dto.nickname,
+          passwordHash,
+          inventory: { createMany: { data: starterRows() } },
+        },
         select: PUBLIC_PLAYER,
       });
     } catch (err) {
