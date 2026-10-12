@@ -129,7 +129,7 @@
       server unit 21/21, e2e 46/46 (dos jugadores en el mismo sitio → respuesta idéntica). Probado en vivo con Open-Meteo
       real: 10 Pokémon a 200 m en Neiva. D-024, D-025. **Pendiente de humanos:** `SPAWN_SALT` en Render (Samuel) +
       Manual Deploy; sin ella `/spawns` da 503 y lo demás sigue igual.
-- [ ] **F1-07 · Pokémon en el mapa** — sprites en el overlay, hierba agitándose, aparición/desaparición
+- [~] **F1-07 · Pokémon en el mapa** (@alex, 2026-10-12) — sprites en el overlay, hierba agitándose, aparición/desaparición
       animada, grito bajito por cercanía, toque → encuentro. Dep: F1-05, F1-06.
 - [x] **F1-08 · Inventario y XP básicos** (@alex, 2026-10-11) — modelo `Inventory`, bolas iniciales, nivel/XP del jugador en
       el HUD. Dep: F0-07.

@@ -137,7 +137,9 @@ fórmula (F2-03) y captura en servidor (F2-06) hechas; lo visual del encuentro e
 
 ## En curso
 
-- Nadie. F1-05 solo espera la prueba en Android (paso 3b, ver arriba).
+- **F1-07 (Pokémon en el mapa) — @alex, 2026-10-12**, rama `feature/F1-07-pokemon-mapa`. Punto de guardado: paso 1
+  sin empezar. Plan: `docs/plan/fases/F1-mapa.md` → F1-07.
+- F1-05 solo espera la prueba en Android (paso 3b).
 
 ## Siguiente paso concreto
 
@@ -201,7 +203,7 @@ fórmula (F2-03) y captura en servidor (F2-06) hechas; lo visual del encuentro e
 - [x] (2026-10-12) Alex registrado y ADMIN (`npm run admin -- list` → alexpipe31w@gmail.com y samu1630).
 - [ ] Postman (tras #21): poner `adminEmail`/`adminPassword` en SU entorno local de Postman.
 - [ ] Antes del **2027-01-10**: tope de Google Maps o pasar a MapLibre (ver más abajo).
-- [ ] Decidir qué hacer con las 6 capturas `docs/evidencias/HU-02_*.jpg` sin commitear.
+- [ ] Las 6 capturas `docs/evidencias/HU-02_*.jpg` se GUARDAN sin commitear: Alex las documentará más adelante (2026-10-12). No borrarlas.
 - [x] (2026-10-12, Alex) `develop` protegida + CI obligatoria (F0-14): lint + tests + build de app y servidor en cada PR;
       no hace falta revisión, pero no se puede mezclar en rojo.
 - [x] `server/.env` en 6543, `JWT_SECRET` y `SPAWN_SALT` locales; JDK 21 instalado (2026-10-11).
