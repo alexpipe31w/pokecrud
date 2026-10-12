@@ -92,7 +92,7 @@ fps). En el PC se prueba con el joystick y la vista móvil 390×844.
 
 **Files:** Create `shared/engine/geo.ts`, Test `shared/engine/geo.spec.ts`
 
-- [ ] **1a. Test que falla** (`shared/engine/geo.spec.ts`):
+- [x] **1a. Test que falla** (`shared/engine/geo.spec.ts`):
 
 ```ts
 import { bearingDeg, distanceM, fromLocalM, toLocalM } from './geo.js';
@@ -125,8 +125,8 @@ describe('geo', () => {
 });
 ```
 
-- [ ] **1b.** `npm run test:shared -- geo` → FALLA (`Cannot find module './geo.js'`).
-- [ ] **1c. Implementación** (`shared/engine/geo.ts`):
+- [x] **1b.** `npm run test:shared -- geo` → FALLA (`Cannot find module './geo.js'`).
+- [x] **1c. Implementación** (`shared/engine/geo.ts`):
 
 ```ts
 /**
@@ -171,8 +171,8 @@ export function bearingDeg(a: LatLng, b: LatLng): number {
 }
 ```
 
-- [ ] **1d.** `npm run test:shared -- geo` → PASA (4 tests).
-- [ ] **1e.** Commit `F1-03: geo.ts (distancias y metros locales) con tests` + push (`/guardar`).
+- [x] **1d.** `npm run test:shared -- geo` → PASA (4 tests).
+- [x] **1e.** Commit `F1-03: geo.ts (distancias y metros locales) con tests` + push (`/guardar`).
 
 ### Paso 2 — Filtro del GPS
 
