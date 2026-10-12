@@ -3,6 +3,7 @@ import {
   ElementRef,
   OnDestroy,
   afterNextRender,
+  computed,
   inject,
   signal,
   viewChild,
@@ -137,9 +138,17 @@ const wrapDeg = (d: number) => ((((d + 180) % 360) + 360) % 360) - 180;
             <button [class.on]="cameraOn()" [disabled]="busy()" (click)="toggleCamera()">
               Cámara
             </button>
+            <button [disabled]="busy() || backCams().length < 2" (click)="cycleCam()">
+              {{ camLabel() }}
+            </button>
+            <button [class.on]="fixed30()" [disabled]="busy()" (click)="toggleFixed30()">
+              30 fps fijos
+            </button>
             <button [class.on]="res() === 1080" [disabled]="busy()" (click)="toggleRes()">
               {{ res() }}p
             </button>
+          </div>
+          <div class="row">
             <button [class.on]="sceneOn()" [disabled]="busy()" (click)="sceneOn.set(!sceneOn())">
               Pokémon
             </button>
@@ -351,7 +360,16 @@ export class DevArPage implements OnDestroy {
   protected readonly particlesOn = signal(false);
   protected readonly dpr = signal<Dpr>('x2');
   protected readonly dexId = signal(DEX_IDS[0]);
-  protected readonly fov = signal(62);
+  /** Vertical en pantalla: el lado largo de un objetivo de 26 mm equivalentes (4:3) es ~67°. Se afina con el deslizador. */
+  protected readonly fov = signal(67);
+  /** Cámaras traseras por número de Camera2 (la 0 es la principal; `facingMode` abre el gran angular en el A36). */
+  protected readonly backCams = signal<{ n: number; id: string }[]>([]);
+  protected readonly camId = signal<string | null>(null);
+  protected readonly fixed30 = signal(false);
+  protected readonly camLabel = computed(() => {
+    const cam = this.backCams().find((c) => c.id === this.camId());
+    return cam ? `Cám. ${cam.n}` : 'Cám. ?';
+  });
   protected readonly delayMs = signal(0);
   protected readonly results = signal<BenchResult[]>([]);
   protected readonly drift = signal<DriftResult[]>([]);
@@ -412,6 +430,18 @@ export class DevArPage implements OnDestroy {
     this.cameraOn.set(!this.cameraOn());
     if (this.cameraOn()) void this.startCamera();
     else this.stopCamera();
+  }
+
+  protected cycleCam(): void {
+    const cams = this.backCams();
+    const i = cams.findIndex((c) => c.id === this.camId());
+    this.camId.set(cams[(i + 1) % cams.length].id);
+    if (this.cameraOn()) void this.startCamera();
+  }
+
+  protected toggleFixed30(): void {
+    this.fixed30.set(!this.fixed30());
+    if (this.cameraOn()) void this.startCamera();
   }
 
   protected toggleRes(): void {
@@ -593,19 +623,35 @@ export class DevArPage implements OnDestroy {
     const res = this.res();
     const t0 = performance.now();
     this.camInfo.set('pidiendo…');
+    const camId = this.camId();
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: false,
         video: {
-          facingMode: { ideal: 'environment' },
+          // Sin cámara elegida (antes del permiso no hay etiquetas): la que dé `facingMode`, y luego la principal.
+          ...(camId ? { deviceId: { exact: camId } } : { facingMode: { ideal: 'environment' } }),
           width: { ideal: res === 1080 ? 1920 : 1280 },
           height: { ideal: res },
-          frameRate: { ideal: 30 },
+          frameRate: this.fixed30() ? { min: 30, ideal: 30 } : { ideal: 30 },
         },
       });
       if (gen !== this.camGen || !this.active || !this.cameraOn()) {
         stream.getTracks().forEach((t) => t.stop());
         return;
+      }
+      if (!camId) {
+        const main = await this.listBackCams();
+        const opened = stream.getVideoTracks()[0].getSettings().deviceId;
+        this.camId.set(main?.id ?? opened ?? null);
+        if (main && main.id !== opened) {
+          console.log(
+            '[F2-01] facingMode abrió',
+            stream.getVideoTracks()[0].label,
+            '→ cambio a la principal',
+          );
+          stream.getTracks().forEach((t) => t.stop());
+          return this.startCamera();
+        }
       }
       this.stream = stream;
       const video = this.videoEl().nativeElement;
@@ -615,7 +661,7 @@ export class DevArPage implements OnDestroy {
       const track = stream.getVideoTracks()[0];
       const s = track.getSettings();
       this.camInfo.set(
-        `${s.width}×${s.height} @ ${s.frameRate} · 1.er fotograma ${Math.round(ttff)} ms`,
+        `${this.camLabel()} · ${s.width}×${s.height} @ ${s.frameRate} · 1.er fotograma ${Math.round(ttff)} ms`,
       );
       this.countVideoFrames(video, stream);
       console.log(
@@ -632,6 +678,17 @@ export class DevArPage implements OnDestroy {
       this.camInfo.set(`${name}: ${err instanceof Error ? err.message : err}`);
       console.warn('[F2-01] cámara', name, err);
     }
+  }
+
+  /** Cámaras traseras ordenadas por su número ("camera 0, facing back"); devuelve la principal (la de número menor). */
+  private async listBackCams(): Promise<{ n: number; id: string } | undefined> {
+    const devices = await navigator.mediaDevices.enumerateDevices();
+    const cams = devices
+      .filter((d) => d.kind === 'videoinput' && /back/i.test(d.label))
+      .map((d) => ({ n: Number(/(\d+)/.exec(d.label)?.[1] ?? 99), id: d.deviceId }))
+      .sort((a, b) => a.n - b.n);
+    this.backCams.set(cams);
+    return cams[0];
   }
 
   private stopCamera(): void {

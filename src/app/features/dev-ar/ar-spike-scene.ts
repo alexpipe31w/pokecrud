@@ -113,6 +113,8 @@ export class ArSpikeScene {
 
   setParticles(count: number, color = '#ffcb3d'): void {
     this.particles.geometry.setDrawRange(0, Math.min(count, MAX_PARTICLES));
+    // Con 0 puntos WebGL avisa en cada fotograma ("Render count is 0"): mejor no dibujarlas.
+    this.particles.visible = count > 0;
     this.particles.material.color.set(color);
   }
 
