@@ -16,7 +16,7 @@ import { HapticsService } from '../../services/game/haptics.service';
       [attr.aria-pressed]="northUp()"
       [attr.aria-label]="label()"
       (pointerdown)="haptics.tap()"
-      (click)="toggle.emit()"
+      (click)="modeToggle.emit()"
     >
       <svg viewBox="0 0 40 40" aria-hidden="true" [style.transform]="'rotate(' + -heading() + 'deg)'">
         <path class="n" d="M20 4 L25 20 L15 20 Z" />
@@ -69,7 +69,7 @@ export class MapCompassComponent {
   /** Rumbo de la cámara en grados (0 = norte arriba). */
   readonly heading = input(0);
   readonly northUp = input(false);
-  readonly toggle = output<void>();
+  readonly modeToggle = output<void>();
 
   protected readonly haptics = inject(HapticsService);
   protected readonly label = computed(() =>

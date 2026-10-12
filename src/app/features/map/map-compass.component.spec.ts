@@ -22,7 +22,7 @@ describe('MapCompassComponent', () => {
 
   it('al tocarla avisa (alternar) con háptico, y dice su estado al lector de pantalla', () => {
     const toggle = vi.fn();
-    fixture.componentInstance.toggle.subscribe(toggle);
+    fixture.componentInstance.modeToggle.subscribe(toggle);
     button().dispatchEvent(new Event('pointerdown'));
     button().click();
     expect(haptics.tap).toHaveBeenCalled();
