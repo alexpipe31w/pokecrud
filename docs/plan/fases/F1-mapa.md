@@ -641,7 +641,7 @@ export class CompassService {
 
 **Files:** Create `src/app/game/map-scene/avatar-motion.ts`, Test `avatar-motion.spec.ts`
 
-- [ ] **5a. Test que falla:**
+- [x] **5a. Test que falla:**
 
 ```ts
 import { AvatarMotion, RUN_MIN_MS, TELEPORT_M, WALK_MIN_MS } from './avatar-motion';
@@ -693,7 +693,7 @@ describe('AvatarMotion', () => {
 });
 ```
 
-- [ ] **5b.** → FALLA. **5c. Implementación:**
+- [x] **5b.** → FALLA. **5c. Implementación:**
 
 ```ts
 import { normDeg, smoothAngle } from '../geo/angles';
@@ -760,7 +760,7 @@ export class AvatarMotion {
 
   Si "alcanza un objetivo fijo" falla por precisión del `toBeLessThanOrEqual`, es correcto que nunca lo supere: el
   acercamiento exponencial no rebasa.
-- [ ] **5d.** → PASA (6). Commit `F1-03: AvatarMotion con tests` + `/guardar`.
+- [x] **5d.** → PASA (6). Commit `F1-03: AvatarMotion con tests` + `/guardar`.
 
 ### Paso 6 — Joystick en pantalla
 
