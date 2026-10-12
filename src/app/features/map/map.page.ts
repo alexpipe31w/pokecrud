@@ -99,6 +99,11 @@ const WEATHER_TIMEOUT_MS = 8000;
     </ion-content>
   `,
   styles: `
+    /* Vidrio sin esmerilar sobre el mapa 3D (D-039): el desenfoque costaba hasta 18 fps en el Samsung A36. */
+    :host {
+      --glass-filter: none;
+      --surface: var(--surface-opaque);
+    }
     .map {
       position: absolute;
       inset: 0;

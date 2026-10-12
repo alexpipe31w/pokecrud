@@ -80,7 +80,7 @@ import { HapticsService } from '../../services/game/haptics.service';
     .gb--glass {
       background: var(--surface);
       color: var(--surface-text);
-      backdrop-filter: blur(20px) saturate(160%);
+      backdrop-filter: var(--glass-filter);
       border-top: 1px solid var(--glass-edge);
       box-shadow: var(--shadow-sm);
     }

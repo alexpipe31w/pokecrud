@@ -41,7 +41,7 @@ const STATUS_CHIP: Record<MajorStatus, { label: string; title: string }> = {
       border-radius: 16px;
       background: var(--surface);
       color: var(--surface-text);
-      backdrop-filter: blur(20px) saturate(160%);
+      backdrop-filter: var(--glass-filter);
       border-top: 1px solid var(--glass-edge);
       box-shadow: var(--shadow-sm);
     }

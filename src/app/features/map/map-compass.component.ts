@@ -33,7 +33,7 @@ import { HapticsService } from '../../services/game/haptics.service';
       border: 0;
       border-radius: 50%;
       background: var(--surface);
-      backdrop-filter: blur(20px) saturate(160%);
+      backdrop-filter: var(--glass-filter);
       border-top: 1px solid var(--glass-edge);
       box-shadow: var(--shadow-sm);
       transition: transform var(--dur-press) var(--ease-out);

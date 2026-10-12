@@ -57,6 +57,10 @@
 
   /* Profundidad y detalles de vidrio (F0-04) */
   --glass-edge: rgb(255 255 255 / 0.35); /* borde superior claro de los paneles */
+  /* Esmerilado del vidrio. Sobre el mapa 3D vale `none` (lo pone MapPage): el desenfoque obliga a releer el fondo en
+     cada fotograma y en el Samsung A36 bajaba el menú de 60 a 42 fps (D-039). */
+  --glass-filter: blur(20px) saturate(160%);
+  --surface-opaque: rgba(251, 247, 238, 0.94); /* vidrio sin esmerilar: más opaco para que se lea igual */
   --shadow-sm: 0 2px 8px rgb(15 26 43 / 0.12); /* chips y paneles pequeños */
   --shadow-lg: 0 18px 48px rgb(15 26 43 / 0.28); /* paneles grandes */
   --shadow-accent: 0 6px 18px rgb(255 77 77 / 0.35); /* botón principal */
@@ -69,6 +73,7 @@
 @media (prefers-color-scheme: dark) {
   :root {
     --surface: rgba(15, 26, 43, 0.72);
+    --surface-opaque: rgba(15, 26, 43, 0.92);
     --surface-text: #fbf7ee;
     --shadow-sm: 0 2px 8px rgb(0 0 0 / 0.35);
     --shadow-lg: 0 18px 48px rgb(0 0 0 / 0.55);

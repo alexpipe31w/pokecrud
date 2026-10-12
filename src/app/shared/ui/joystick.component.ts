@@ -57,7 +57,7 @@ const KEYS: Record<string, [number, number]> = {
       display: grid;
       place-items: center;
       background: var(--surface);
-      backdrop-filter: blur(20px) saturate(160%);
+      backdrop-filter: var(--glass-filter);
       border-top: 1px solid var(--glass-edge);
       box-shadow: var(--shadow-sm);
       touch-action: none;

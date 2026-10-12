@@ -44,7 +44,7 @@ const WEATHER: Record<Weather, { label: string; icon: string }> = {
       border-radius: var(--r-chip);
       background: var(--surface);
       color: var(--surface-text);
-      backdrop-filter: blur(20px) saturate(160%);
+      backdrop-filter: var(--glass-filter);
       border-top: 1px solid var(--glass-edge);
       box-shadow: var(--shadow-sm);
       font: 600 0.8rem/1 var(--font-display);
