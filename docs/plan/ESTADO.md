@@ -3,11 +3,11 @@
 > Se **reescribe** al cerrar cada sesión (no es histórico; el histórico es `BITACORA.md`).
 > Máximo una pantalla. Si lees esto al empezar: después lee `ROADMAP.md`.
 
-**Última actualización:** 2026-10-11 · por Kenneth (Claude) · rama `feature/F0-11-zona-segura`
+**Última actualización:** 2026-10-11 · por Kenneth (Claude) · rama `develop` (tras mezclar #19)
 
 ## Fase actual
 
-**F0 · Fundaciones — COMPLETA.** F0-01…F0-10 en `develop` (PR #8-#18); **F0-11 hecha** (Kenneth, PR #19 pendiente de mezclar). Siguiente fase: **F1 · Mapa con GPS** (empieza por F1-01, el spike de Google Maps 3D en Android real).
+**F0 · Fundaciones — COMPLETA.** F0-01…F0-10 en `develop` (PR #8-#18); **F0-11 hecha y mezclada** (Kenneth, PR #19). Siguiente fase: **F1 · Mapa con GPS** (empieza por F1-01, el spike de Google Maps 3D en Android real).
 
 ## Hecho
 
@@ -55,10 +55,10 @@
 
 ## Siguiente paso concreto
 
-1. Revisar y mezclar el PR #19 (F0-11) en `develop`. **Alex y Samuel:** puerto de `DATABASE_URL` → 6543 en su `.env`;
+1. **Alex y Samuel:** puerto de `DATABASE_URL` → 6543 en su `.env`;
    **Samuel:** también en Render (ver Bloqueos).
 2. Siguiente: **F1-01** (spike Google Maps 3D + overlay three.js, medir fps en Android real; dep F0-09 ✔). Necesita
-   `environment.local.ts` con la clave de Maps (Kenneth ya lo tiene) y un móvil. OJO: mapa a pantalla completa →
+   `environment.local.ts` con la clave de Maps (Alex: la clave es suya) y un móvil Android con Depuración USB. OJO: mapa a pantalla completa →
    anular la zona segura en su `ion-content` (D-022).
 3. Para generar el APK en otro PC: instalar JDK 21 (`winget install Microsoft.OpenJDK.21`) y `npm run apk`.
 
