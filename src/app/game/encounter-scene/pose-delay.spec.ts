@@ -2,8 +2,12 @@ import * as THREE from 'three';
 import { PoseDelay } from './pose-delay';
 
 const yawQ = (deg: number) =>
-  new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), THREE.MathUtils.degToRad(deg));
-const angleDeg = (a: THREE.Quaternion, b: THREE.Quaternion) => THREE.MathUtils.radToDeg(a.angleTo(b));
+  new THREE.Quaternion().setFromAxisAngle(
+    new THREE.Vector3(0, 1, 0),
+    THREE.MathUtils.degToRad(deg),
+  );
+const angleDeg = (a: THREE.Quaternion, b: THREE.Quaternion) =>
+  THREE.MathUtils.radToDeg(a.angleTo(b));
 
 describe('PoseDelay', () => {
   it('sin muestras no devuelve nada', () => {

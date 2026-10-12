@@ -1,10 +1,5 @@
 import * as THREE from 'three';
-import {
-  cameraYaw,
-  deviceEventQuaternion,
-  sensorQuaternion,
-  spotInFront,
-} from './device-pose';
+import { cameraYaw, deviceEventQuaternion, sensorQuaternion, spotInFront } from './device-pose';
 
 const forward = (q: THREE.Quaternion) => new THREE.Vector3(0, 0, -1).applyQuaternion(q);
 const up = (q: THREE.Quaternion) => new THREE.Vector3(0, 1, 0).applyQuaternion(q);
