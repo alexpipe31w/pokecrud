@@ -1440,7 +1440,7 @@ Añadir `CHECK` en la migración SQL generada (editar antes de `migrate deploy`)
       por defecto `production`), `npx cap sync android` y `gradlew.bat assembleDebug` (o `./gradlew` fuera de
       Windows) con `JAVA_HOME` apuntando al `jbr` de Android Studio si no está definido; al final imprime la ruta
       y el tamaño del APK. `package.json`: `"apk": "node scripts/apk.mjs"`.
-- [ ] **Paso 5: icono y splash provisionales** — `npx @capacitor/assets generate --android` desde
+- [x] **Paso 5: icono y splash provisionales** — `npx @capacitor/assets generate --android` desde
       `resources/icon.png` (1024×1024) y `resources/splash.png` (2732×2732): Poké Ball estilizada propia
       (no usar arte oficial). Ver skill `generar-imagen` o pedirlo al humano.
 - [ ] **Paso 6: probar en el móvil** — `npm run apk`, `adb install -r android/app/build/outputs/apk/debug/app-debug.apk`,
