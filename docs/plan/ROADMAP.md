@@ -110,7 +110,7 @@
       Dep: F2-02, F1-07.
 - [ ] **F2-05 · Lanzamiento** — gesto 1:1, física, curva, círculo de precisión, bolas y bayas, hápticos.
       Dep: F2-04.
-- [ ] **F2-06 · Captura autoritativa en servidor** — `POST /encounters/:id/throw` con transacción,
+- [~] **F2-06 · Captura autoritativa en servidor** (@alex, 2026-10-11) — `POST /encounters/:id/throw` con transacción,
       descuento atómico, `UNIQUE` de idempotencia, validación de distancia (ARQUITECTURA §6); test de
       concurrencia (dos lanzamientos simultáneos). Dep: F2-03, F1-06, F1-08.
 - [ ] **F2-07 · Secuencia de captura/escape y shiny** — absorción, sacudidas, fanfarria, recompensas,
