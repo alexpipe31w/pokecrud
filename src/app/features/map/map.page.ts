@@ -169,9 +169,8 @@ export class MapPage implements ViewDidEnter, ViewWillLeave, OnDestroy {
   /** Cuándo se rehízo el mapa últimamente (tope de reintentos: sin WebGL no se entra en bucle). */
   private rebuildTimes: number[] = [];
   /**
-   * El mapa perdió su contexto WebGL y nadie lo ha devuelto. Pasa (visto en el Samsung A36) porque Google SUELTA el
-   * contexto a propósito cuando su contenedor deja de verse (Pokédex encima: la página queda `ion-page-hidden`, 0×0)
-   * y suele recuperarlo solo al volver; o porque Android lo quita con la app en segundo plano y no vuelve.
+   * El mapa perdió su contexto WebGL y nadie lo ha devuelto (fallo de la GPU, D-038). Si fue un reinicio de la GPU,
+   * Chrome suele bloquear WebGL a la página y el mapa nuevo cae a raster: el tope de reintentos lo explica en pantalla.
    */
   private glLost = false;
   private recoverTimer?: ReturnType<typeof setTimeout>;
@@ -184,8 +183,14 @@ export class MapPage implements ViewDidEnter, ViewWillLeave, OnDestroy {
     console.warn('[mapa] contexto WebGL recuperado');
     this.glLost = false;
   };
+  /** App a segundo plano (pantalla bloqueada, otra app): misma pausa de la capa 3D que al salir de la pantalla. */
   private readonly onVisibility = (): void => {
-    if (!document.hidden) this.scheduleRecover();
+    if (!this.active) return;
+    if (document.hidden) this.overlay?.setMap(null);
+    else {
+      this.attachOverlay();
+      this.scheduleRecover();
+    }
   };
 
   constructor() {
@@ -196,6 +201,7 @@ export class MapPage implements ViewDidEnter, ViewWillLeave, OnDestroy {
     if (this.active || this.destroyed) return;
     this.active = true;
     this.weatherAsked = false;
+    this.attachOverlay();
     this.scheduleRecover();
     void this.bag.load();
     this.compass.start();
@@ -206,6 +212,10 @@ export class MapPage implements ViewDidEnter, ViewWillLeave, OnDestroy {
 
   ionViewWillLeave(): void {
     this.active = false;
+    // La capa 3D va en animationMode 'always' (pide un fotograma tras otro): con el mapa oculto eso tumbaba la GPU
+    // del Samsung A36 (reinicio del contexto → WebGL bloqueado → mapa raster al volver, D-038). Fuera de pantalla,
+    // sin capa 3D.
+    this.overlay?.setMap(null);
     clearTimeout(this.recoverTimer);
     cancelAnimationFrame(this.raf);
     void this.location.stop();
@@ -262,7 +272,14 @@ export class MapPage implements ViewDidEnter, ViewWillLeave, OnDestroy {
     else void this.init();
   }
 
-  /** Comprueba el mapa pasado un momento: le da tiempo a Google a recuperar su propio contexto WebGL. */
+  /** Monta la capa 3D sobre el mapa (solo con la pantalla del mapa a la vista; ver ionViewWillLeave). */
+  private attachOverlay(): void {
+    if (this.map && this.overlay && !document.hidden && this.overlay.getMap() !== this.map) {
+      this.overlay.setMap(this.map);
+    }
+  }
+
+  /** Comprueba el mapa pasado un momento (si el WebView devolvió el contexto, no hay nada que rehacer). */
   private scheduleRecover(): void {
     clearTimeout(this.recoverTimer);
     this.recoverTimer = setTimeout(() => this.recoverIfLost(), GL_RECOVER_DELAY_MS);
@@ -270,10 +287,9 @@ export class MapPage implements ViewDidEnter, ViewWillLeave, OnDestroy {
 
   /**
    * Rehace el mapa si hace falta: contexto WebGL perdido y no devuelto, mapa caído a raster (sin capa 3D ni avatar) o
-   * cambio de día/noche. **Solo con la pantalla del mapa a la vista**: rehacerlo con la página oculta (0×0) hace que
-   * Google no pueda crear el mapa vectorial y caiga a raster para siempre (pasó en F1-04 al volver de la Pokédex).
-   * Nunca llamar a `getContext()` sobre el canvas de Google para comprobar nada: si aún no tiene contexto, esa llamada
-   * se lo crea y Google también cae a raster.
+   * cambio de día/noche. **Solo con la pantalla del mapa a la vista**: con la página oculta (0×0) Google no puede crear
+   * el mapa vectorial. Nunca llamar a `getContext()` sobre el canvas de Google para comprobar nada: si aún no tiene
+   * contexto, esa llamada se lo crea y Google cae a raster (D-038).
    */
   private recoverIfLost(): void {
     if (!this.active || document.hidden || !this.map) return;
