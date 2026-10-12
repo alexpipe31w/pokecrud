@@ -3,16 +3,20 @@
 > Se **reescribe** al cerrar cada sesión (no es histórico; el histórico es `BITACORA.md`).
 > Máximo una pantalla. Si lees esto al empezar: después lee `ROADMAP.md`.
 
-**Última actualización:** 2026-10-11 · por Kenneth (Claude) · rama `feature/F0-08-crud-nest`
+**Última actualización:** 2026-10-11 · por Kenneth (Claude) · rama `feature/F0-09-apk`
 
 ## Fase actual
 
-**F0 · Fundaciones** — **F0-01…F0-07 hechas y en `develop`** (PR #8-#14). **F0-08 hecha** (Kenneth, PR #16 a `develop`
-pendiente de mezclar). Libres: **F0-09** APK y **F0-10** transaction pooler (nueva).
+**F0 · Fundaciones** — **F0-01…F0-08 en `develop`** (PR #8-#16). **F0-09 hecha** (Kenneth, PR #17 pendiente de mezclar).
+Quedan **F0-10** (transaction pooler) y **F0-11** (zona segura Android 15+), ambas nuevas. Después, F1.
 
 ## Hecho
 
-- **F0-08 (Kenneth, rama `feature/F0-08-crud-nest`, PR a `develop`):** `/pokemon` (público para leer, sesión para escribir),
+- **F0-09 (Kenneth, rama `feature/F0-09-apk`):** `android/` (Capacitor 8.5.2) con permisos, `npm run apk` (producción →
+  Render; `-- device` → Nest del PC por IP LAN; `--install` con adb), icono y splash propios (`resources/brand.mjs`).
+  **Probado en un Samsung A36 (Android 16):** APK 8,18 MB, splash, Pokédex desde Render, registro, `/dev/ui` con sesión
+  que sobrevive a cerrar la app (Keystore OK), grito y vibración. Requiere **JDK 21** (el `jbr` reciente es 25). D-020.
+- **F0-08 (Kenneth, PR #16, mezclado; Render lo sirve):** `/pokemon` (público para leer, sesión para escribir),
   `/teams`, `/favorites`, `/customPokemon` (por jugador; lo ajeno → 404) en Nest con el contrato de JSON Server
   (`_sort`, `_order`, `name_like`, `_page`, `_limit`, `X-Total-Count`). Migración `crud_curso` **aplicada en Supabase**
   (con CHECKs), semilla `cd server && npm run db:seed` (151 + demo) **ya cargada**. App: `apiUrl` → `serverUrl` (dev :3000),
@@ -47,9 +51,10 @@ pendiente de mezclar). Libres: **F0-09** APK y **F0-10** transaction pooler (nue
 
 ## Siguiente paso concreto
 
-1. Revisar y mezclar el PR #16 (F0-08) en `develop`. Después, comprobar en Render `GET /pokemon?_limit=1` (200).
-2. Al mezclar: Render aplica la migración sola (`prisma migrate deploy` en el arranque; ya está aplicada, no hará nada).
-3. Siguiente tarea libre: **F0-10** (pooler, ver riesgo abajo) o **F0-09** (APK).
+1. Revisar y mezclar el PR #17 (F0-09) en `develop`.
+2. Siguiente tarea libre: **F0-10** (pooler, riesgo abajo) o **F0-11** (zona segura). Luego F1 (mapa): F1-01 ya
+   tiene su dependencia (F0-09) y necesita el APK para medir fps en un Android real.
+3. Para generar el APK en otro PC: instalar JDK 21 (`winget install Microsoft.OpenJDK.21`) y `npm run apk`.
 
 ## Bloqueos / roto / pendiente de humanos
 
