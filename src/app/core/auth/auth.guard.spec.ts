@@ -7,17 +7,19 @@ import {
   UrlTree,
   provideRouter,
 } from '@angular/router';
-import { authGuard, guestGuard, safeRedirect } from './auth.guard';
+import { adminGuard, authGuard, guestGuard, safeRedirect } from './auth.guard';
 import { AuthService } from './auth.service';
 
 describe('authGuard / guestGuard', () => {
   const loggedIn = signal(false);
-  const auth = { isLoggedIn: loggedIn, restore: vi.fn(() => Promise.resolve()) };
+  const admin = signal(false);
+  const auth = { isLoggedIn: loggedIn, isAdmin: admin, restore: vi.fn(() => Promise.resolve()) };
   const route = {} as ActivatedRouteSnapshot;
   const state = (url: string) => ({ url }) as RouterStateSnapshot;
 
   beforeEach(() => {
     loggedIn.set(false);
+    admin.set(false);
     auth.restore.mockClear();
     TestBed.configureTestingModule({
       providers: [provideRouter([]), { provide: AuthService, useValue: auth }],
@@ -49,6 +51,20 @@ describe('authGuard / guestGuard', () => {
     expect(TestBed.inject(Router).serializeUrl(result)).toBe('/');
     loggedIn.set(false);
     expect(await run(guestGuard, '/login')).toBe(true);
+  });
+
+  it('adminGuard (F0-12): sin sesión → /login; jugador normal → Pokédex; ADMIN pasa', async () => {
+    const router = () => TestBed.inject(Router);
+    const anon = (await run(adminGuard, '/pokemon/nuevo')) as UrlTree;
+    expect(auth.restore).toHaveBeenCalled();
+    expect(router().serializeUrl(anon)).toBe('/login?redirect=%2Fpokemon%2Fnuevo');
+
+    loggedIn.set(true);
+    const player = (await run(adminGuard, '/pokemon/nuevo')) as UrlTree;
+    expect(router().serializeUrl(player)).toBe('/tabs/pokedex');
+
+    admin.set(true);
+    expect(await run(adminGuard, '/pokemon/nuevo')).toBe(true);
   });
 
   it('safeRedirect solo acepta rutas internas', () => {

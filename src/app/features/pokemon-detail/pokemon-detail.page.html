@@ -4,7 +4,7 @@
       <ion-back-button defaultHref="/tabs/pokedex" text="Pokédex"></ion-back-button>
     </ion-buttons>
     <ion-title>{{ pokemon() ? (pokemon()!.name | titlecase) : 'Detalle' }}</ion-title>
-    @if (pokemon()) {
+    @if (pokemon() && isAdmin()) {
       <ion-buttons slot="end">
         <ion-button (click)="edit()" aria-label="Editar">
           <ion-icon slot="icon-only" name="create-outline"></ion-icon>

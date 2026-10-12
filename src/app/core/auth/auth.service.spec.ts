@@ -6,7 +6,14 @@ import { AuthService, Player, authErrorMessage } from './auth.service';
 import { TOKEN_STORE, TokenStore } from './token-store';
 
 const AUTH = `${environment.serverUrl}/auth`;
-const PLAYER: Player = { id: 'p1', email: 'ash@pokecrud.test', nickname: 'ash', level: 1, xp: 0 };
+const PLAYER: Player = {
+  id: 'p1',
+  email: 'ash@pokecrud.test',
+  role: 'PLAYER',
+  nickname: 'ash',
+  level: 1,
+  xp: 0,
+};
 
 /** TokenStore en memoria para los tests. */
 class MemoryStore implements TokenStore {
@@ -55,6 +62,16 @@ describe('AuthService (app)', () => {
     expect(auth.player()).toEqual(PLAYER);
     expect(auth.getAccessToken()).toBe('acc-1');
     expect(store.token).toBe('ref-1');
+  });
+
+  it('isAdmin solo con role ADMIN (F0-12)', async () => {
+    expect(auth.isAdmin()).toBe(false);
+    const done = auth.login({ email: PLAYER.email, password: 'clave-segura-123' });
+    http
+      .expectOne(`${AUTH}/login`)
+      .flush({ accessToken: 'acc-1', refreshToken: 'ref-1', player: { ...PLAYER, role: 'ADMIN' } });
+    await done;
+    expect(auth.isAdmin()).toBe(true);
   });
 
   it('restore sin token guardado → anónimo y sin peticiones', async () => {

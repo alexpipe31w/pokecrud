@@ -8,6 +8,8 @@ export interface Player {
   id: string;
   email: string;
   nickname: string;
+  /** Solo para mostrar u ocultar botones: quien decide es el servidor (403 si no es ADMIN). F0-12. */
+  role: 'PLAYER' | 'ADMIN';
   level: number;
   xp: number;
 }
@@ -53,6 +55,8 @@ export class AuthService {
   readonly player = this._player.asReadonly();
   readonly status = this._status.asReadonly();
   readonly isLoggedIn = computed(() => this._player() !== null);
+  /** Puede modificar el inventario `/pokemon` (F0-12). */
+  readonly isAdmin = computed(() => this._player()?.role === 'ADMIN');
 
   getAccessToken(): string | null {
     return this.accessToken;

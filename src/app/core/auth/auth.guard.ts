@@ -12,6 +12,20 @@ export const authGuard: CanActivateFn = async (_route, state) => {
     : router.createUrlTree(['/login'], { queryParams: { redirect: state.url } });
 };
 
+/**
+ * Agregar/editar del inventario (F0-12): sin sesión → /login; con sesión pero sin rol ADMIN → Pokédex.
+ * Es solo comodidad de la UI: el servidor responde 403 a cualquier escritura de quien no es ADMIN.
+ */
+export const adminGuard: CanActivateFn = async (_route, state) => {
+  const auth = inject(AuthService);
+  const router = inject(Router);
+  if (!auth.isLoggedIn()) await auth.restore();
+  if (!auth.isLoggedIn()) {
+    return router.createUrlTree(['/login'], { queryParams: { redirect: state.url } });
+  }
+  return auth.isAdmin() ? true : router.createUrlTree(['/tabs/pokedex']);
+};
+
 /** /login y /registro: quien ya tiene sesión no tiene nada que hacer ahí. */
 export const guestGuard: CanActivateFn = async () => {
   const auth = inject(AuthService);

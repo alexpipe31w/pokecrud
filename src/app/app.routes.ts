@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { authGuard, guestGuard } from './core/auth/auth.guard';
+import { adminGuard, authGuard, guestGuard } from './core/auth/auth.guard';
 
 /**
  * Rutas raíz de PokéCRUD.
@@ -14,7 +14,7 @@ import { authGuard, guestGuard } from './core/auth/auth.guard';
  *
  * Toda ruta nueva lleva `canActivate: [authGuard]`. EXCEPCIÓN (F0-08): la Pokédex y el detalle de IS-11 son de
  * solo lectura y `GET /pokemon` es público en el servidor, así que se ven sin sesión. Agregar y editar sí la
- * exigen (el servidor responde 401 a cualquier escritura sin token).
+ * exigen sesión con rol ADMIN (F0-12; el servidor responde 401 sin token y 403 si no es ADMIN).
  */
 export const routes: Routes = [
   {
@@ -29,13 +29,13 @@ export const routes: Routes = [
   },
   {
     path: 'pokemon/nuevo',
-    canActivate: [authGuard],
+    canActivate: [adminGuard],
     loadComponent: () =>
       import('./features/pokemon-add/pokemon-add.page').then((m) => m.PokemonAddPage),
   },
   {
     path: 'pokemon/:id/editar',
-    canActivate: [authGuard],
+    canActivate: [adminGuard],
     loadComponent: () =>
       import('./features/pokemon-edit/pokemon-edit.page').then((m) => m.PokemonEditPage),
   },
