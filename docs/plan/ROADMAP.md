@@ -174,6 +174,9 @@
 - [~] **F2-04b · Personalidad, efectos del tipo y entrada** (@alex, 2026-10-12) — idle/saltos por velocidad, vuelo, fantasma, partículas
       del tipo, transición desde el mapa, aterrizaje con polvo + grito + vibración, destello shiny (DISENO §5).
       Dep: F2-04a. Criterio: Android ≥ 55 fps con partículas; vídeo de la entrada.
+      **Hecho (pasos 1-9a, PR):** personalidad, saltos con semilla, partículas por tipo, aterrizaje con polvo + grito +
+      vibración, destello shiny, zoom desde el mapa; arreglo de partículas negras (D-047). App 66 archivos / 333 tests.
+      **Falta:** solo 9b (Android: fps con partículas y vídeo de la entrada).
 - [ ] **F2-05 · Lanzamiento** — gesto 1:1, física, curva, círculo de precisión, bolas y bayas, hápticos.
       Dep: F2-04b. (Fallar no llama al servidor ni gasta, D-046.)
 - [x] **F2-06 · Captura autoritativa en servidor** (@alex, 2026-10-11) — `POST /encounters/:id/throw` con transacción,

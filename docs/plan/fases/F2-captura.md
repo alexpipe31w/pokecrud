@@ -3147,7 +3147,7 @@ index a35e8a7..bf29e9a 100644
 
 ### Paso 9 — Verde y Android
 
-- [ ] **9a.** `npm run lint` · `npm run build` · `npm test -- --watch=false` · `npm run test:shared` en verde.
+- [x] **9a.** `npm run lint` · `npm run build` · `npm test -- --watch=false` · `npm run test:shared` en verde.
 - [ ] **9b.** Android: tocar un Pokémon en el mapa → crece hacia el centro → destello → cae y aterriza con polvo, grito
   y vibración a la vez. Un Volador/Bicho con alas flota; un Fantasma se ve semitransparente; un rápido (p. ej. Rattata)
   salta más a menudo que uno lento (Slowpoke). fps con partículas ≥ 55 (snippet del paso 12c de F2-04a). Vídeo

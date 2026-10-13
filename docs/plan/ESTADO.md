@@ -5,7 +5,17 @@
 
 **Última actualización:** 2026-10-12 noche · por Alex (Claude) · `develop` (F2-04a pasos 1-11 mezclados)
 
-## 👉 RELEVO DE ALEX (2026-10-12, noche): F2-04a en `develop` a falta del Android
+## ⚠️ DECISIÓN DE ALEX (2026-10-12, noche): la AR tiene que ser 3D y enseñar la ficha del Pokémon
+
+Alex: "debe ser 3d la realidad aumentada… deben salir las características del pokémon". Lo de ahora (D-045) es AR
+de orientación con el arte plano: no se puede rodear al Pokémon. **No seguir con F2-05 hasta cerrar cómo** (modelos 3D
+y seguimiento del suelo con ARCore): ver la última entrada de la BITÁCORA y D-048 cuando exista.
+
+## RELEVO DE ALEX (2026-10-12, noche): F2-04a y F2-04b en `develop` a falta del Android
+
+- **F2-04b pasos 1-9a hechos** (personalidad, partículas, aterrizaje, destello, zoom desde el mapa). Fallo encontrado
+  en el navegador y arreglado: las partículas se veían como puntos NEGROS sobre el canvas transparente (D-047).
+  App 66 archivos / 333 tests. Evidencias `F2-04b_*`.
 
 - **F2-04a pasos 1-11 hechos** copiando el plan de Kenneth tal cual con TDD (cada spec falló antes y pasó después):
   lint OK, build OK sin avisos de presupuesto, **app 63 archivos / 307 tests** (el plan decía 62/306: estaba mal
@@ -222,7 +232,7 @@ fórmula (F2-03), captura en servidor (F2-06), audio (F2-08), **spike de cámara
 ## En curso
 
 - F2-04a (@alex) · pasos 1-11 mezclados en `develop`; tarea `[~]` solo por el paso 12 (Android, ver PENDIENTES). F1-05 (3b) y F1-07 (7b) solo esperan la prueba en Android.
-- F2-04b (@alex) · rama `feature/F2-04b-personalidad-entrada` · recién reclamada; empieza en el paso 1 del plan.
+- F2-04b (@alex) · pasos 1-9a mezclados en `develop`; `[~]` solo por el 9b (Android, ver PENDIENTES).
 
 ## Siguiente paso concreto
 
@@ -262,6 +272,8 @@ fórmula (F2-03), captura en servidor (F2-06), audio (F2-08), **spike de cámara
 - [ ] **F2-04a paso 12:** `npm run apk -- --install` y seguir 12a-12e de `docs/plan/fases/F2-captura.md` (cámara
       principal, ≥ 55 fps por CDP, mapa ↔ encuentro ×3 sin "context lost" y el mapa con avatar/Pokémon al volver,
       cámara suelta en segundo plano, AR apagada y permiso revocado). Si todo va, F2-04a `[x]` en ROADMAP.
+- [ ] **F2-04b paso 9b:** tocar un Pokémon en el mapa → crece → destello → cae con polvo, grito y vibración a la vez;
+      un alado flota, un Fantasma semitransparente, un rápido salta más; fps con partículas ≥ 55; vídeo `F2-04b_*`.
 
 **Kenneth:**
 

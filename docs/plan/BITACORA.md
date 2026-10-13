@@ -1171,3 +1171,29 @@ hasta recargar — **pasa igual en `develop`** con la página provisional, así 
 **Decisiones nuevas:** ninguna.
 **El siguiente debe empezar por:** con Android, paso 12 de F2-04a (PENDIENTES de ESTADO). Sin Android: F2-04b siguiendo
 `docs/plan/fases/F2-captura.md` → "F2-04b" (rama nueva desde `develop`).
+
+## 2026-10-12 22:40 · @alex (Claude) · F2-04b · rama `feature/F2-04b-personalidad-entrada`
+
+**Qué se hizo:** pasos 1-9a de F2-04b del plan (bloques `ts` copiados y `diff` aplicados con `git apply`, TDD: cada
+test falló antes y pasó después): `personality.ts`, `pokemon-motion.ts` (aterrizaje, respiración, saltos con semilla),
+`type-fx.ts`, `css-color.ts`, partículas y ráfagas en `EncounterScene`, recetas `land`/`shiny`, la página (postura,
+efectos, grito al tocar el suelo, destello blanco) y el zoom del Pokémon tocado desde el mapa (`PokemonDom.elementOf`).
+**Fallo encontrado en el navegador (no lo ven los tests) y arreglado:** las partículas que se apagan salían como puntos
+NEGROS: el canvas es transparente y el aditivo con color × alfa deja alfa 1. Ahora RGBA por punto + alfa premultiplicado
+(D-047, test nuevo que falla sin el arreglo).
+**Archivos clave:** `src/app/game/encounter-scene/{personality,pokemon-motion,type-fx,css-color,encounter-scene}.ts`,
+`src/app/features/encounter/encounter.page.ts`, `src/app/features/map/map.page.ts`, `src/app/game/map-scene/pokemon-dom.ts`.
+**Cómo se probó (salida real):**
+
+    lint: All files pass linting. · build: complete (sin avisos de presupuesto)
+    ng test: 66 archivos, 333 passed (plan: 332 + 1 test de D-047) · shared: 12 archivos, 140 passed
+    navegador 390×844 (Nest local + ng serve, cuenta f204b@pokecrud.test → "borradas 1"): tocar Poochyena en /mapa →
+      el Pokémon crece hacia el centro → encuentro → cae y aterriza con partículas (Siniestro: motas marrones).
+      Evidencias F2-04b_01..04 (02 = ANTES del arreglo, con los puntos negros).
+    OJO: una captura salió con la webcam REAL del PC (el Chromium de Playwright tenía permiso de cámara): BORRADA sin
+      commitear. Al probar el encuentro en el PC, quitar el permiso de cámara (`context.clearPermissions()`).
+
+**Quedó a medias / roto:** 9b (Android). **Decisión de Alex al final:** la AR debe ser 3D y enseñar las
+características del Pokémon; ver ESTADO. F2-05 parado hasta decidir cómo.
+**Decisiones nuevas:** D-047.
+**El siguiente debe empezar por:** leer la decisión de ESTADO ("la AR tiene que ser 3D") y D-048 si ya existe.
