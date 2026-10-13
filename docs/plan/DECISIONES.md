@@ -707,3 +707,22 @@ le cambia la proporción. Medido en el A36: Slowpoke XL pasa de llenar la pantal
 Los pequeños y los estrechos no cambian (Pikachu 2 m; Diggersby ya cabía, ~70 %).
 **Consecuencia:** el aro y la caja del lanzamiento siguen en el CENTRO del Pokémon: en los largos se ven más pequeños
 que su cara (`F2-15_01`). Si molesta, la caja podría ir a su frente (`throwTarget`), con su test de física.
+
+## D-052 · Colección (F3): PC guardado, caramelos por cadena evolutiva, Pokédex al abrir/capturar y los IVs se enseñan a su dueño (F3-02a) (2026-10-13, Samuel)
+
+- **`CaughtPokemon.cp`** se calcula al capturar (`combatPower(calcStats(...))`, D-049) y se recalcula si cambia el nivel
+  (F3-05): así la base ordena y pagina por PC. Es opcional (`Int?`): las capturas de antes de F3-02a lo tienen vacío
+  hasta `npm run db:backfill-collection`, y mientras tanto `GET /collection` lo calcula al vuelo.
+- **Caramelos por familia = `evolutionChainId`** del dataset (Pichu, Pikachu y Raichu comparten). Capturar +3, transferir
+  +1 (`shared/engine/candy.ts`, como Pokémon GO). Se suman en la MISMA transacción que la captura; `ThrowResult.candy`
+  los devuelve (un reintento con el mismo `clientThrowId` responde lo mismo y no suma dos veces).
+- **Pokédex:** "visto" al abrir un encuentro (`GET /encounters/:id`, mejor esfuerzo: si falla, el encuentro sigue);
+  "capturado" en la transacción de la captura; `firstCaughtAt` nunca se pisa.
+- **Los IVs y las stats del individuo se devuelven SOLO en `GET /collection/:id` y solo a su dueño** (como la
+  valoración de Pokémon GO; VISION pide "IVs (barras)"). Antes de capturar siguen ocultos (D-049). Saber los IVs de lo
+  propio no ayuda a predecir spawns: la semilla es HMAC con `SPAWN_SALT` (D-025).
+- **Paginación por cursor** (`id` de la última fila) con `id` de desempate; 30 por defecto, máx. 50. Un cursor que no es
+  del jugador → 400. Filtro por tipo = `speciesId IN (…)` con las especies de ese tipo (calculadas al cargar el dataset).
+- **Despliegue:** la migración `20261013010000_collection` + `db:backfill-collection` se aplican en Supabase **ANTES** de
+  mezclar (si Render despliega antes, cada captura da 500 porque faltan las tablas). El script es idempotente: rellena el
+  PC que falte, la Pokédex de todo lo capturado y los caramelos solo a jugadores sin ninguno.

@@ -291,6 +291,8 @@
       Pokédex; abrir un encuentro marca "visto"; `GET /collection` (cursor, orden, filtros) y `GET /pokedex`; script que
       recupera lo capturado antes. **Migración + script en Supabase ANTES de mezclar.** Plan: `fases/F3-coleccion.md`.
       Dep: F3-01a.
+      **Código hecho (pasos 1-7, PR):** e2e 78/78, unitarios 22, shared 155, app 435 contra un Postgres 17 portátil;
+      script probado dos veces (idempotente). D-052. **Falta el paso 8:** migración + script en Supabase y luego mezclar.
 - [ ] **F3-02b · Mis Pokémon (pantalla)** — lista paginada con filtros (tipo, shiny, favorito), orden (PC, fecha, Nº),
       escalonado, vacía diseñada; "+3 caramelos" en "¡Capturado!". Dep: F3-02a.
 - [ ] **F3-03 · Ficha del individuo** — arte, grito, PC, IVs, naturaleza, stats calculados, movimientos,
