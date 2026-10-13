@@ -114,3 +114,12 @@ export function describeEvent(e: BattleEvent, n: Names): string | null {
         : `${n.trainer(e.side)} te ha ganado…`;
   }
 }
+
+/** Final de un combate PvP según el motivo (F5-04): [si ganas, si pierdes]. */
+export const PVP_END_TEXT: Record<'faint' | 'forfeit' | 'abandon' | 'inactive', [string, string]> =
+  {
+    faint: ['¡Ganaste el combate!', 'Perdiste el combate.'],
+    forfeit: ['Tu rival se rindió. ¡Ganaste!', 'Te rendiste.'],
+    abandon: ['Tu rival se desconectó. ¡Ganaste!', 'Perdiste por desconectarte.'],
+    inactive: ['Tu rival no eligió a tiempo. ¡Ganaste!', 'Perdiste por no elegir a tiempo.'],
+  };
