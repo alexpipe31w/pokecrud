@@ -70,6 +70,7 @@ export class CollectionService {
       playerId,
       ...(q.shiny === undefined ? {} : { shiny: q.shiny }),
       ...(q.favorite === undefined ? {} : { favorite: q.favorite }),
+      ...(q.ids ? { id: { in: q.ids } } : {}),
       ...(q.type
         ? { speciesId: { in: this.spawns.speciesIdsOfType(q.type) } }
         : {}),
@@ -181,7 +182,8 @@ export class CollectionService {
   }
 
   /**
-   * `DELETE /collection/:id` (F3-03): transferir = +1 caramelo de su familia, en UNA transacción. El `deleteMany` con
+   * `DELETE /collection/:id` (F3-03): transferir = +1 caramelo de su familia y fuera de los equipos (F3-06b), en UNA
+   * transacción. El `deleteMany` con
    * `playerId` es a la vez la autorización y el candado: de dos a la vez, el segundo ve `count = 0` → 404 y no suma.
    */
   async transfer(playerId: string, id: string): Promise<TransferResult> {
@@ -195,6 +197,11 @@ export class CollectionService {
         where: { id, playerId },
       });
       if (count !== 1) throw new NotFoundException(NOT_YOURS);
+      // F3-06b (D-054): fuera de los equipos del jugador, en la misma transacción.
+      await tx.$executeRaw`
+        UPDATE "Team"
+        SET "caughtIds" = array_remove("caughtIds", ${id}::uuid), "updatedAt" = now()
+        WHERE "playerId" = ${playerId}::uuid AND ${id}::uuid = ANY("caughtIds")`;
       const familyId = this.spawns.speciesDetails(row.speciesId)?.familyId;
       if (familyId === undefined)
         throw new NotFoundException('Esa especie no está en el juego');

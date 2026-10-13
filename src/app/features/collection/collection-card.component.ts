@@ -1,4 +1,5 @@
-import { Component, computed, inject, input, signal } from '@angular/core';
+import { NgTemplateOutlet } from '@angular/common';
+import { Component, computed, inject, input, output, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import type { CollectionItem } from '@shared/protocol/collection';
 import { POKEMON_TYPES } from '../../core/constants/pokemon-types';
@@ -11,20 +12,14 @@ const STAGGER_MAX = 12;
 
 /**
  * Tarjeta de un Pokémon de "Mis Pokémon" (F3-02b): arte, mote o nombre, PC, nivel, favorito y brillo si es shiny.
- * Tintada con el color de su tipo principal (DISENO §1). Toda la tarjeta es el enlace a su ficha (F3-03).
+ * Tintada con el color de su tipo principal (DISENO §1). Toda la tarjeta es el enlace a su ficha (F3-03); con
+ * `selectable` (editor de equipos, F3-06b) es un botón que se marca y emite su id.
  */
 @Component({
   selector: 'app-collection-card',
-  imports: [RouterLink],
+  imports: [RouterLink, NgTemplateOutlet],
   template: `
-    <a
-      class="card"
-      [class.shiny]="item().shiny"
-      [routerLink]="['/coleccion', item().id]"
-      [attr.aria-label]="label()"
-      [style.--tint]="tint()"
-      [style.animation-delay.ms]="delay()"
-    >
+    <ng-template #body>
       <span class="cp" aria-hidden="true"><small>PC</small> {{ item().cp }}</span>
       @if (item().favorite) {
         <span class="fav" aria-hidden="true">★</span>
@@ -32,7 +27,33 @@ const STAGGER_MAX = 12;
       <img [src]="src()" alt="" loading="lazy" decoding="async" (error)="nextArt()" />
       <span class="name" aria-hidden="true">{{ title() }}</span>
       <span class="level" aria-hidden="true">Nv. {{ item().level }}</span>
-    </a>
+    </ng-template>
+    @if (selectable()) {
+      <button
+        type="button"
+        class="card pick"
+        [class.shiny]="item().shiny"
+        [attr.aria-pressed]="selected()"
+        [disabled]="disabled()"
+        [attr.aria-label]="label()"
+        [style.--tint]="tint()"
+        [style.animation-delay.ms]="delay()"
+        (click)="toggled.emit(item().id)"
+      >
+        <ng-container [ngTemplateOutlet]="body" />
+      </button>
+    } @else {
+      <a
+        class="card"
+        [class.shiny]="item().shiny"
+        [routerLink]="['/coleccion', item().id]"
+        [attr.aria-label]="label()"
+        [style.--tint]="tint()"
+        [style.animation-delay.ms]="delay()"
+      >
+        <ng-container [ngTemplateOutlet]="body" />
+      </a>
+    }
   `,
   styles: `
     :host {
@@ -61,6 +82,17 @@ const STAGGER_MAX = 12;
     }
     .card:active {
       transform: scale(0.97);
+    }
+    .pick {
+      width: 100%;
+      border: 0;
+      font: inherit;
+    }
+    .pick[aria-pressed='true'] {
+      box-shadow: 0 0 0 3px var(--accent);
+    }
+    .pick:disabled {
+      opacity: 0.4;
     }
     .card:focus-visible {
       outline: 3px solid var(--accent);
@@ -123,6 +155,11 @@ export class CollectionCardComponent {
   readonly item = input.required<CollectionItem>();
   /** Posición en la página (para escalonar la entrada). */
   readonly index = input(0);
+  /** Editor de equipos (F3-06b): botón que se marca en vez de enlace. */
+  readonly selectable = input(false);
+  readonly selected = input(false);
+  readonly disabled = input(false);
+  readonly toggled = output<string>();
 
   private readonly artIndex = signal(0);
   private readonly species = computed(() => this.dataset.species().get(this.item().speciesId));

@@ -3,7 +3,7 @@
 > Se **reescribe** al cerrar cada sesión (no es histórico; el histórico es `BITACORA.md`).
 > Máximo una pantalla. Si lees esto al empezar: después lee `ROADMAP.md`.
 
-**Última actualización:** 2026-10-13 · por Samuel (Claude) · `develop` con #63…#70; F3-06a en PR
+**Última actualización:** 2026-10-13 · por Samuel (Claude) · `develop` con #63…#71
 
 ## 👉 RELEVO DE KENNETH (2026-10-12 noche): pendientes de Android probados en el Samsung A36
 
@@ -56,11 +56,14 @@ puede, F2-07 hecha) o F2-11 (ARCore, Android); pulidos F2-17/F2-18 si sobra tiem
 
 **F0 completa.** **F1:** todo hecho salvo la calle (F1-05 3b, F1-07 7b) y F1-11 (nueva). **F2:** F2-01…F2-06, F2-08,
 F2-07, F2-12, F2-13, F2-15 hechas; faltan **F2-11**/**F2-14** (ARCore), F2-10 (música) y los pulidos F2-16…F2-18.
-**F3:** F3-01…F3-05 y F3-06a hechas; faltan F3-06b/c. **F4:** completa en código salvo F4-07 (combate en AR 3D, D-048).
+**F3:** todo hecho salvo F3-06c (favoritos y personalizados). **F4:** completa en código salvo F4-07 (combate en AR 3D, D-048).
 
 ## Hecho
 
-- **F3-06a (Samuel, rama `feature/F3-06a-inventario-ui`, PR):** IS-11 con el sistema de diseño (D-055): tarjetas,
+- **F3-06b (Samuel, rama `feature/F3-06b-equipos`, PR):** equipos con Pokémon capturados (D-054): `caughtIds`,
+  migración `team_caught` **aplicada en Supabase**, transferir los quita, `GET /collection?ids`; `/equipos` y editor.
+  e2e 94, app 495, Postman 46/82/0. Evidencias `F3-06b_0{1..6}_*`.
+- **F3-06a (Samuel, #71 mezclado):** IS-11 con el sistema de diseño (D-055): tarjetas,
   ficha con confirmación propia, formulario con chips de tipo; `app-search-field`, `app-confirm-panel`, botón `danger`.
   Postman 46/82/0 en local, app 485. Evidencias `F3-06a_0{1..8}_*`.
 - **F3-05 (Samuel, #70 mezclado):** evolucionar con caramelos (D-053). `evolution.ts`
@@ -202,7 +205,7 @@ F2-07, F2-12, F2-13, F2-15 hechas; faltan **F2-11**/**F2-14** (ARCore), F2-10 (m
 
 ## En curso
 
-- Nadie. Samuel cerró **F3-06a** (rama `feature/F3-06a-inventario-ui`, PR a `develop`; sin migración). Sigue F3-06b.
+- Nadie. Samuel cerró **F3-06b** (PR a `develop`; migración `team_caught` YA aplicada en Supabase). Sigue F3-06c.
 - **Ojo:** el inventario de IS-11 está ahora en `/inventario` (la Pokédex 1025 ocupa `/pokedex`).
 
 ### PRUEBAS EN EL MÓVIL PENDIENTES (con el APK de producción, `npm run apk -- --install`)
@@ -218,8 +221,7 @@ F2-07, F2-12, F2-13, F2-15 hechas; faltan **F2-11**/**F2-14** (ARCore), F2-10 (m
 
 ## Siguiente paso concreto
 
-1. **F3-06b → F3-06c (sin móvil)**, en ese orden, según `fases/F3-coleccion.md` (parte 2). F3-06b lleva
-   migración (`team_caught`, D-054): se aplica en Supabase ANTES de mezclar, con permiso de Samuel.
+1. **F3-06c (sin móvil)** según `fases/F3-coleccion.md` (parte 2): favoritos y personalizados; contratos sin cambios.
    **Probar sin tocar Supabase:** Postgres 17 portátil (`embedded-postgres@17.10.0-beta.17` en una carpeta temporal),
    `DATABASE_URL`/`DIRECT_URL` a él, `npx prisma migrate deploy` y `npm run db:seed`; comprobar con `prisma migrate
    status` que apunta a 127.0.0.1. La app en `localhost:8100` (en el PC de Samuel el 4200 lo ocupa OTRO proyecto suyo).
@@ -246,6 +248,10 @@ F2-07, F2-12, F2-13, F2-15 hechas; faltan **F2-11**/**F2-14** (ARCore), F2-10 (m
 - [x] Añadir **`SPAWN_SALT`** en Render (≥ 32 caracteres aleatorios, propia de Render). (2026-10-12)
 - [x] ~~Manual Deploy tras cada mezcla~~: no hace falta, Render despliega solo al cambiar `develop` (comprobado).
 - [x] Su `server/.env`: puerto 6543, `JWT_SECRET` y `SPAWN_SALT` propios. (2026-10-12)
+
+**Quien haga F3-06b:**
+
+- [x] (Samuel, 2026-10-13) Migración `20261013020000_team_caught` en Supabase ANTES de mezclar (2 equipos → `caughtIds` vacío).
 
 **Quien haga F3-02a (tiene que tener `DIRECT_URL`):**
 

@@ -85,6 +85,8 @@ model Team {
   name        String
   description String   @default("")
   pokemonIds  Int[]
+  /// Ids de CaughtPokemon del jugador (F3-06b, D-054), máx. 6 (CHECK `max_six_caught`). Transferir los quita.
+  caughtIds   String[] @default([]) @db.Uuid
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 

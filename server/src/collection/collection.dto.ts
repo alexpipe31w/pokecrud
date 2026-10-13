@@ -1,6 +1,7 @@
 import { BadRequestException } from '@nestjs/common';
 import { Transform, Type } from 'class-transformer';
 import {
+  ArrayMaxSize,
   IsBoolean,
   IsIn,
   IsInt,
@@ -81,6 +82,15 @@ export class CollectionQueryDto {
   @IsOptional()
   @IsUUID()
   cursor?: string;
+
+  /** F3-06b: solo estos (`?ids=a,b,c`, ≤ 50 UUID): la app pinta los Pokémon de sus equipos de una vez. */
+  @IsOptional()
+  @Transform(({ value }: { value: unknown }) =>
+    typeof value === 'string' ? value.split(',').filter(Boolean) : value,
+  )
+  @ArrayMaxSize(COLLECTION_MAX_LIMIT)
+  @IsUUID('all', { each: true })
+  ids?: string[];
 
   @IsOptional()
   @Type(() => Number)

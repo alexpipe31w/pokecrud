@@ -1329,15 +1329,15 @@ juego (DISENO §1-§4) sin cambiar su contrato ni sus servicios (`PokemonService
 **conserva**; se añade `Team.caughtIds uuid[]` (≤ 6, ids de **tus** `CaughtPokemon`), que es lo que usará el combate
 (F4/F5). Así no se rompe el contrato del curso (D-019) y ARQUITECTURA §9 ("equipos con Pokémon capturados") se cumple.
 
-- [ ] **1. Servidor:** migración `team_caught` (`caughtIds UUID[] NOT NULL DEFAULT '{}'`, CHECK de cardinalidad ≤ 6);
+- [x] **1. Servidor:** migración `team_caught` (`caughtIds UUID[] NOT NULL DEFAULT '{}'`, CHECK de cardinalidad ≤ 6);
   DTO de `/teams` acepta `caughtIds` opcional (array de UUID únicos, ≤ 6) y el servicio comprueba que TODOS son del
   jugador (`count where id in … and playerId` = longitud) → si no, 400 "Hay Pokémon que no son tuyos"; al transferir un
   Pokémon (F3-03) se quita de los equipos que lo tengan (misma transacción del `DELETE /collection/:id`). e2e: crear con
   3 propios; con uno ajeno → 400; con 7 → 400; transferir uno → desaparece del equipo; Postman sin cambios sigue pasando.
-- [ ] **2. App:** `/equipos` (menú de la Poké Ball): lista de equipos con los 6 huecos (arte de cada capturado, PC);
+- [x] **2. App:** `/equipos` (menú de la Poké Ball): lista de equipos con los 6 huecos (arte de cada capturado, PC);
   crear/renombrar/borrar; editor que elige de "Mis Pokémon" (reutilizar `app-collection-card` en modo selección, máx. 6,
   sin repetir). Vacía diseñada ("Arma tu primer equipo").
-- [ ] **3.** Tests, lint, build, capturas `F3-06b_*`. REGLA 2.
+- [x] **3.** Tests, lint, build, capturas `F3-06b_*`. REGLA 2.
 
 ## F3-06c · Favoritos y Pokémon personalizados
 
