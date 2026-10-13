@@ -16,10 +16,14 @@ import { AudioService } from '../../services/game/audio.service';
 import { CollectionService } from '../../services/game/collection.service';
 import { DatasetService } from '../../services/game/dataset.service';
 import { HapticsService } from '../../services/game/haptics.service';
+import { PokedexService } from '../../services/game/pokedex.service';
+import { SettingsService } from '../../services/game/settings.service';
 import { TypeChipsComponent } from '../../shared/components/type-chips/type-chips.component';
 import { DetailMovesComponent } from './detail-moves.component';
 import { DetailOriginComponent } from './detail-origin.component';
 import { DetailStatsComponent } from './detail-stats.component';
+import { EvolvePanelComponent } from './evolve-panel.component';
+import { type EvolveRun, EvolveSceneComponent } from './evolve-scene.component';
 import { RenameSheetComponent } from './rename-sheet.component';
 import { TransferService } from './transfer.service';
 
@@ -43,6 +47,8 @@ import { TransferService } from './transfer.service';
     DetailMovesComponent,
     DetailOriginComponent,
     RenameSheetComponent,
+    EvolvePanelComponent,
+    EvolveSceneComponent,
   ],
   template: `
     <ion-header [translucent]="true">
@@ -104,6 +110,13 @@ import { TransferService } from './transfer.service';
         }
 
         @if (detail(); as d) {
+          <app-evolve-panel
+            [speciesId]="d.speciesId"
+            [shiny]="d.shiny"
+            [candy]="d.candy.qty"
+            [busy]="!!evolving()"
+            (evolve)="startEvolve(d, $event)"
+          />
           <app-detail-stats [ivs]="d.ivs" [stats]="d.stats" [nature]="d.nature" />
           <app-detail-moves [moves]="d.moves" />
           <app-detail-origin
@@ -150,6 +163,15 @@ import { TransferService } from './transfer.service';
       (saved)="rename($event)"
       (closed)="renaming.set(false)"
     />
+
+    @if (evolving(); as run) {
+      <app-evolve-scene
+        [run]="run"
+        [reduced]="reduceMotion()"
+        (finished)="evolved($event)"
+        (failed)="evolveFailed($event)"
+      />
+    }
   `,
   styles: `
     .page {
@@ -265,6 +287,8 @@ export class CollectionDetailPage {
   private readonly audio = inject(AudioService);
   private readonly haptics = inject(HapticsService);
   private readonly transfers = inject(TransferService);
+  private readonly pokedex = inject(PokedexService);
+  private readonly settings = inject(SettingsService);
 
   private readonly id = this.route.snapshot.paramMap.get('id') ?? '';
   protected readonly detail = signal<CollectionDetail | null>(null);
@@ -273,6 +297,13 @@ export class CollectionDetailPage {
   protected readonly renaming = signal(false);
   protected readonly saving = signal(false);
   protected readonly confirming = signal(false);
+  /** Evolución en marcha (F3-05): la escena a pantalla completa. */
+  protected readonly evolving = signal<EvolveRun | null>(null);
+  protected readonly reduceMotion = computed(
+    () =>
+      this.settings.settings().reduceEffects ||
+      (typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches),
+  );
   private readonly artIndex = signal(0);
   /** Lo que ya tenía la lista mientras llega el detalle (cabecera inmediata). */
   private readonly fromList = computed(
@@ -367,6 +398,38 @@ export class CollectionDetailPage {
     this.haptics.tap();
     this.transfers.start(d, this.title());
     void this.router.navigateByUrl('/coleccion');
+  }
+
+  /** F3-05: la petición sale ya; la escena anima mientras tanto y espera la respuesta para el destello. */
+  protected startEvolve(d: CollectionDetail, to: number): void {
+    this.haptics.tap();
+    const request = this.collection.evolve(this.id, to);
+    request.catch(() => undefined); // la escena trata el error; esto evita el aviso de promesa sin capturar
+    this.evolving.set({
+      from: d.speciesId,
+      to,
+      shiny: d.shiny,
+      title: this.title(),
+      toName: this.dataset.species().get(to)?.names.es ?? `#${to}`,
+      request,
+    });
+  }
+
+  protected evolved(d: CollectionDetail): void {
+    this.artIndex.set(0);
+    this.detail.set(d);
+    this.evolving.set(null);
+    this.pokedex.invalidate();
+  }
+
+  protected evolveFailed(message: string): void {
+    this.evolving.set(null);
+    this.flash(message);
+    // Los caramelos o la especie pudieron cambiar en otra pestaña: la ficha se pone al día sin el grito.
+    this.collection.detail(this.id).then(
+      (d) => this.detail.set(d),
+      () => undefined,
+    );
   }
 
   private applyLocal(patch: Partial<CollectionItem>): void {

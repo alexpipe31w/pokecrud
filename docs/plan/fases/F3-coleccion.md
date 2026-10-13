@@ -1292,15 +1292,15 @@ export function evolutionOptions(dex: Dex, from: number): EvolutionOption[] {
   alterna A/B con periodo que baja de 600 ms a 60 ms (`showB` cambia cada medio periodo), `glow` sube de 0,3 a 1;
   3.000-3.400 ms `burst` 0→1 (destello) y `showB = true`; ≥ 3.400 forma B en reposo. Tests: al principio `showB` falso;
   los cambios A↔B en el último segundo son ≥ 4 veces más que en el primero; al final `showB` verdadero y `burst` 0.
-- [ ] **3b. `app-evolve-panel`** en la ficha (debajo de los caramelos): un botón por opción "Evolucionar a Raichu ·
+- [x] **3b. `app-evolve-panel`** en la ficha (debajo de los caramelos): un botón por opción "Evolucionar a Raichu ·
   100 🍬" (arte pequeño del destino); deshabilitado con "Te faltan 37" si no llegan. Confirmación corta.
-- [ ] **3c. `app-evolve-scene`** (capa a pantalla completa): fondo oscuro, las dos siluetas blancas
+- [x] **3c. `app-evolve-scene`** (capa a pantalla completa): fondo oscuro, las dos siluetas blancas
   (`filter: brightness(0) invert(1)`) alternando según `evolvePose` en `requestAnimationFrame`, brillo creciente,
   destello, forma nueva a color + su grito + háptico `success` en el MISMO fotograma (DISENO §4.10), texto
   "¡Tu Pikachu evolucionó a Raichu!". La petición `POST …/evolve` sale al empezar y la animación espera su respuesta antes
   del destello (como la captura, D-046); si falla → vuelve a A con el error ("Te faltan caramelos" / "Ya evolucionó").
   "Reducir movimiento" → fundido A→B de 400 ms.
-- [ ] **3d.** Al terminar: la ficha muestra la especie nueva (`detail` de la respuesta), `collection.patchItem`,
+- [x] **3d.** Al terminar: la ficha muestra la especie nueva (`detail` de la respuesta), `collection.patchItem`,
   `pokedex.invalidate()`. Lint, `ng test`, build. Commit + `/guardar`.
 - [ ] **3e.** Navegador 390×844 contra Nest + Postgres local: Bulbasaur con 25 caramelos (sembrados) → Ivysaur;
   Eevee → elegir rama; sin caramelos → botón deshabilitado. Vídeo o capturas `docs/evidencias/F3-05_*`. REGLA 2.
