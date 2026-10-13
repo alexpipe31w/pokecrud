@@ -281,19 +281,28 @@
 
 ## F3 · Colección y Pokédex
 
-- [ ] **F3-01 · Plan detallado de F3.** Dep: F2-07.
-- [ ] **F3-02 · Mis Pokémon** — lista paginada con filtros (tipo, shiny, favorito), orden (PC, fecha, Nº),
-      escalonado, vacía diseñada. Dep: F3-01.
+- [x] **F3-01a · Plan de F3 (parte 1): colección** (@samuel, 2026-10-13) — `docs/plan/fases/F3-coleccion.md`: Mis
+      Pokémon (F3-02), ficha del individuo (F3-03) y lo que el servidor debe empezar a guardar YA al capturar (caramelos
+      por familia, Pokédex visto/capturado), para que nada capturado desde hoy se pierda. Dep: F2-07.
+      **Hecho:** plan de F3-02a, F3-02b y F3-03 con contrato, código y tests (TDD). F3-02 partida en a/b.
+- [ ] **F3-01b · Plan de F3 (parte 2): Pokédex, evolución y CRUD del curso** — mismo archivo: F3-04, F3-05, F3-06.
+      Dep: F3-01a.
+- [ ] **F3-02a · Colección en el servidor (URGENTE)** — al capturar se guarda el PC, +3 caramelos por familia y la
+      Pokédex; abrir un encuentro marca "visto"; `GET /collection` (cursor, orden, filtros) y `GET /pokedex`; script que
+      recupera lo capturado antes. **Migración + script en Supabase ANTES de mezclar.** Plan: `fases/F3-coleccion.md`.
+      Dep: F3-01a.
+- [ ] **F3-02b · Mis Pokémon (pantalla)** — lista paginada con filtros (tipo, shiny, favorito), orden (PC, fecha, Nº),
+      escalonado, vacía diseñada; "+3 caramelos" en "¡Capturado!". Dep: F3-02a.
 - [ ] **F3-03 · Ficha del individuo** — arte, grito, PC, IVs, naturaleza, stats calculados, movimientos,
-      dónde/cuándo se capturó, mapa mini, renombrar, transferir (con deshacer). Dep: F3-02.
+      dónde/cuándo se capturó, mapa mini, renombrar, transferir (con deshacer). Dep: F3-02b.
 - [ ] **F3-04 · Pokédex 1025** — vistos/capturados por generación, ficha de especie (descripción ES,
-      debilidades calculadas, cadena evolutiva, altura/peso, hábitat). Dep: F3-01.
+      debilidades calculadas, cadena evolutiva, altura/peso, hábitat). Dep: F3-01b, F3-02a.
 - [ ] **F3-05 · Evolución con caramelos** — regla de caramelos por cadena, endpoint transaccional,
       animación de evolución. Dep: F3-03.
 - [ ] **F3-06 · Inventario (IS-11), equipos, favoritos y personalizados con la nueva UI** — reutilizar los servicios,
       modelo y formulario de IS-11 (HU-03 a HU-05) y las HU del curso (HU-08 a
       HU-18) rehechas con el sistema de diseño; los personalizados pueden aparecer como spawns del grupo.
-      Dep: F0-08, F3-02.
+      Dep: F0-08, F3-02b.
 
 ## F4 · Motor de combate y combate contra IA
 

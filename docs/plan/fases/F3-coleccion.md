@@ -1,0 +1,861 @@
+# F3 · Colección y Pokédex — Plan de implementación
+
+> **Para IAs:** usa la skill `executing-plans` (o `subagent-driven-development`). Cada tarea = una tarea del ROADMAP =
+> **una rama y un PR**. Antes: REGLA 1 de `CLAUDE.md`. Al acabar: REGLA 2. Marca las casillas `- [ ]` de TU tarea en TU
+> rama según avances (son el punto de guardado). Los pasos de código siguen TDD: test que falla → código mínimo → verde
+> → commit.
+>
+> **Este archivo tiene dos partes.** Parte 1 (F3-01a, escrita): **F3-02a, F3-02b y F3-03**. Parte 2 (F3-01b, pendiente):
+> F3-04 (Pokédex 1025), F3-05 (evolución) y F3-06 (CRUD del curso con la nueva UI). La parte 1 deja el servidor
+> guardando ya todo lo que la parte 2 necesita (caramelos y Pokédex visto/capturado).
+
+**Objetivo (VISION, pilar 3):** que lo capturado se pueda ver y cuidar: **Mis Pokémon** (lista con PC, filtros y orden)
+y la **ficha del individuo** (arte, grito, PC, IVs en barras, naturaleza, stats, movimientos, dónde y cuándo se capturó,
+renombrar, favorito, transferir con deshacer). Y que desde YA cada captura sume **caramelos de su familia** y marque la
+**Pokédex** (visto/capturado), para que F3-04 y F3-05 no empiecen con los datos perdidos.
+
+**Arquitectura:**
+
+```
+shared/engine/candy.ts, iv-appraisal.ts, nickname.ts   ← reglas puras, mismas en app y servidor (tests en Node)
+shared/protocol/collection.ts                           ← contrato app↔servidor
+server/src/collection/  GET /collection, GET|PATCH|DELETE /collection/:id, GET /pokedex
+server/src/encounters/  la captura suma caramelos + Pokédex en SU transacción; abrir un encuentro marca "visto"
+src/app/services/game/collection.service.ts             ← signals + paginación por cursor
+src/app/features/collection/  /coleccion (lista) y /coleccion/:id (ficha)
+```
+
+- **El servidor manda** (REGLA 3): PC, stats, caramelos y Pokédex los calcula y guarda él. **Los IVs del individuo SÍ
+  se enseñan a su dueño** una vez capturado (como la "valoración" de Pokémon GO; VISION pide "IVs (barras)"): solo en
+  `GET /collection/:id` y solo del propio jugador (lo ajeno → 404, como D-019). Antes de capturar siguen ocultos (D-049).
+- **PC guardado en la fila** (`CaughtPokemon.cp`): se calcula al capturar con `combatPower(calcStats(...))` (D-049) y
+  se recalcula cuando cambie el nivel (evolución, F3-05). Así la base puede **ordenar y paginar por PC**.
+- **Familia de caramelos = `evolutionChainId`** del dataset (Pikachu, Pichu y Raichu comparten caramelos, como en
+  Pokémon GO). Capturar **+3**, transferir **+1**.
+- **Pokédex:** "visto" al abrir un encuentro (`GET /encounters/:id`), "capturado" al capturar. Una fila por especie.
+- **Paginación por cursor** (ARQUITECTURA §9: `take` máx. 50, cursor), orden estable con `id` de desempate.
+- **Transferir con deshacer:** la app espera 5 s con un aviso "Transferido · Deshacer" antes de llamar al servidor. Si se
+  deshace, no se llama nunca (no hace falta "des-transferir" en el servidor).
+
+**Tech stack:** NestJS 12 + Prisma 7.10 (migración nueva), Angular 22 zoneless (signals), Ionic 9 (`@ionic/angular`),
+Vitest. Sin dependencias nuevas.
+
+**Decisión a anotar al implementar F3-02a → `DECISIONES.md` D-052** (texto en F3-02a paso 9).
+
+---
+
+## Orden y paralelismo
+
+```
+F3-02a servidor (datos nuevos + GET /collection) ─> F3-02b pantalla Mis Pokémon ─> F3-03 ficha del individuo
+```
+
+**F3-02a primero y cuanto antes:** hasta que se despliegue, las capturas no suman caramelos ni Pokédex (el script de
+F3-02a paso 7 las recupera, pero mejor no acumular). **Nada de F3 necesita el móvil** salvo el último paso de cada tarea
+(mirarlo en un Android, REGLA 3); el resto se hace en el PC con la vista móvil 390×844.
+
+## Mapa de archivos
+
+| Archivo | Tarea | Responsabilidad |
+| --- | --- | --- |
+| `shared/engine/candy.ts` (+ spec) | F3-02a | `CANDY_PER_CATCH`, `CANDY_PER_TRANSFER`, `familyOf` |
+| `shared/engine/iv-appraisal.ts` (+ spec) | F3-02a | % de IVs y estrellas (0-3, o 4 = perfecto) |
+| `shared/engine/nickname.ts` (+ spec) | F3-02a | Normalizar y validar el mote (servidor y app) |
+| `shared/protocol/collection.ts` | F3-02a | Contrato de `/collection` y `/pokedex` |
+| `shared/protocol/encounters.ts` | F3-02a | `ThrowResult.candy` (caramelos ganados al capturar) |
+| `server/prisma/schema.prisma` + `migrations/20261013010000_collection/` | F3-02a | `CaughtPokemon.cp`, `Candy`, `PokedexEntry` |
+| `server/prisma/backfill-collection.ts` | F3-02a | Rellena PC, caramelos y Pokédex de lo capturado antes |
+| `server/src/spawns/spawns.service.ts` | F3-02a | `SpeciesDetails.familyId` y `types` |
+| `server/src/encounters/encounters.service.ts` | F3-02a | PC + caramelos + Pokédex en la transacción; "visto" |
+| `server/src/collection/*` (+ e2e `server/test/collection.e2e-spec.ts`) | F3-02a / F3-03 | Endpoints de la colección |
+| `src/app/services/game/collection.service.ts` (+ spec) | F3-02b | Lista paginada, filtros, orden, caché del detalle |
+| `src/app/features/collection/collection.page.ts` | F3-02b | `/coleccion`: rejilla, filtros, orden, vacía, cargando |
+| `src/app/features/collection/collection-card.component.ts` | F3-02b | Tarjeta de un Pokémon de la colección |
+| `src/app/features/collection/collection-filters.component.ts` | F3-02b | Hoja de filtros y orden |
+| `src/app/features/map/ball-menu.component.ts` | F3-02b | Entrada "Mis Pokémon" |
+| `src/app/features/encounter/caught-card.component.ts` | F3-02b | "+3 caramelos de …" en "¡Capturado!" |
+| `src/app/features/collection/pokemon-detail.page.ts` (+ subcomponentes) | F3-03 | `/coleccion/:id`: la ficha |
+| `src/app/features/collection/pending-transfer.ts` (+ spec) | F3-03 | Transferir con deshacer (puro, con reloj inyectado) |
+
+---
+
+## Contrato (lo usan F3-02a, F3-02b y F3-03)
+
+`shared/protocol/collection.ts` (se crea en F3-02a paso 3):
+
+```ts
+import type { BallId } from '../engine/capture.js';
+import type { Stats } from '../engine/battle/stats.js';
+import type { TypeName } from '../data/dataset.types.js';
+
+export type CollectionSort = 'caughtAt' | 'cp' | 'speciesId';
+export type SortOrder = 'asc' | 'desc';
+
+/** `GET /collection?…` (todo opcional). Por defecto: lo último capturado primero, 30 por página. */
+export interface CollectionQuery {
+  sort?: CollectionSort;
+  order?: SortOrder;
+  type?: TypeName;
+  shiny?: boolean;
+  favorite?: boolean;
+  /** `nextCursor` de la página anterior. */
+  cursor?: string;
+  /** 1-50 (por defecto 30). */
+  limit?: number;
+}
+
+/** Lo que pinta la rejilla: poco y ligero (sin IVs). */
+export interface CollectionItem {
+  id: string;
+  speciesId: number;
+  nickname: string | null;
+  level: number;
+  cp: number;
+  gender: 'M' | 'F' | null;
+  shiny: boolean;
+  favorite: boolean;
+  caughtAt: string;
+}
+
+export interface CollectionPage {
+  items: CollectionItem[];
+  /** null = no hay más. */
+  nextCursor: string | null;
+  /** Total con los filtros puestos (para "12 Pokémon"). */
+  total: number;
+}
+
+/** `GET /collection/:id`: la ficha completa. Los IVs SÍ salen: es SU Pokémon (D-052). */
+export interface CollectionDetail extends CollectionItem {
+  ivs: Stats;
+  nature: string;
+  /** Stats reales del individuo (`calcStats`, D-007). */
+  stats: Stats;
+  heightScale: number;
+  moves: number[];
+  ball: BallId;
+  caughtLat: number;
+  caughtLng: number;
+  /** Caramelos de su familia (para F3-05). */
+  candy: { familyId: number; qty: number };
+}
+
+/** `PATCH /collection/:id`. Mote null = quitarlo (se ve el nombre de la especie). */
+export interface CollectionPatch {
+  nickname?: string | null;
+  favorite?: boolean;
+}
+
+/** `DELETE /collection/:id` (transferir). */
+export interface TransferResult {
+  candy: { familyId: number; qty: number; gained: number };
+}
+
+/** `GET /pokedex`: solo las especies que el jugador ha visto (el resto, ni vista ni capturada). */
+export interface PokedexView {
+  entries: { speciesId: number; seen: true; caught: boolean }[];
+}
+```
+
+Y en `shared/protocol/encounters.ts`, `ThrowResult` gana (F3-02a paso 5):
+
+```ts
+  /** Caramelos ganados al capturar (null si no capturó). */
+  candy: { familyId: number; gained: number; total: number } | null;
+```
+
+---
+
+## F3-02a · Servidor: lo que se guarda al capturar + `GET /collection`
+
+**Criterio:** cada captura guarda `cp`, suma 3 caramelos a su familia y marca la Pokédex en la MISMA transacción; abrir un
+encuentro marca "visto"; `GET /collection` pagina por cursor con orden y filtros; lo capturado antes se recupera con el
+script; e2e en verde; migración aplicada en Supabase **antes** de mezclar.
+
+### Paso 1 — Reglas puras: caramelos y mote
+
+**Files:** Create `shared/engine/candy.ts`, `shared/engine/nickname.ts`; Tests `candy.spec.ts`, `nickname.spec.ts`
+
+- [ ] **1a. Tests que fallan:**
+
+```ts
+// shared/engine/candy.spec.ts
+import { CANDY_PER_CATCH, CANDY_PER_TRANSFER, familyOf } from './candy.js';
+
+describe('caramelos', () => {
+  it('capturar da más que transferir (como Pokémon GO: 3 y 1)', () => {
+    expect(CANDY_PER_CATCH).toBe(3);
+    expect(CANDY_PER_TRANSFER).toBe(1);
+  });
+  it('la familia es la cadena evolutiva: Pichu, Pikachu y Raichu comparten', () => {
+    const chain = (id: number) => ({ id, evolutionChainId: 10 });
+    expect(familyOf(chain(172))).toBe(10);
+    expect(familyOf(chain(25))).toBe(familyOf(chain(26)));
+  });
+});
+```
+
+```ts
+// shared/engine/nickname.spec.ts
+import { NICKNAME_MAX, normalizeNickname } from './nickname.js';
+
+describe('normalizeNickname', () => {
+  it('recorta espacios y junta los repetidos', () => {
+    expect(normalizeNickname('  Pika   chu ')).toBe('Pika chu');
+  });
+  it('vacío o solo espacios = sin mote (null)', () => {
+    expect(normalizeNickname('   ')).toBeNull();
+    expect(normalizeNickname(null)).toBeNull();
+  });
+  it('admite tildes, ñ, números, guion y apóstrofo', () => {
+    expect(normalizeNickname("Ñandú-2 d'Or")).toBe("Ñandú-2 d'Or");
+  });
+  it(`rechaza más de ${NICKNAME_MAX} caracteres y símbolos raros`, () => {
+    expect(() => normalizeNickname('a'.repeat(NICKNAME_MAX + 1))).toThrow(RangeError);
+    expect(() => normalizeNickname('<script>')).toThrow(RangeError);
+    expect(() => normalizeNickname('😀')).toThrow(RangeError);
+  });
+});
+```
+
+- [ ] **1b.** `npm run test:shared -- candy nickname` → FALLA (no existen los módulos).
+- [ ] **1c. Implementación:**
+
+```ts
+// shared/engine/candy.ts
+/** Caramelos (F3, D-052): por familia = cadena evolutiva del dataset. Como Pokémon GO: capturar 3, transferir 1. */
+export const CANDY_PER_CATCH = 3;
+export const CANDY_PER_TRANSFER = 1;
+
+export const familyOf = (species: { evolutionChainId: number }): number => species.evolutionChainId;
+```
+
+```ts
+// shared/engine/nickname.ts
+/** Mote de un Pokémon capturado (F3-03). Lo usan el DTO del servidor y el formulario de la app. */
+export const NICKNAME_MAX = 12;
+const ALLOWED = /^[\p{L}\p{N} '\-.]+$/u;
+
+/** Devuelve el mote limpio, `null` si queda vacío, o lanza `RangeError` si no vale. */
+export function normalizeNickname(raw: string | null | undefined): string | null {
+  const s = (raw ?? '').trim().replace(/\s+/g, ' ');
+  if (!s) return null;
+  if ([...s].length > NICKNAME_MAX) throw new RangeError(`Máximo ${NICKNAME_MAX} caracteres`);
+  if (!ALLOWED.test(s)) throw new RangeError('Solo letras, números, espacios, guion y apóstrofo');
+  return s;
+}
+```
+
+- [ ] **1d.** → PASA. Commit `F3-02a: reglas de caramelos y mote con tests` + `/guardar`.
+
+### Paso 2 — Valoración de IVs (pura; la usa la ficha de F3-03)
+
+**Files:** Create `shared/engine/iv-appraisal.ts` + spec
+
+Escala propia sobre 6 IVs de 0-31 (186 en total), con los cortes de la valoración de Pokémon GO en porcentaje:
+0★ < 51 %, 1★ < 66,7 %, 2★ < 82,2 %, 3★ hasta 99 %, y 4 = perfecto (100 %).
+
+- [ ] **2a. Test que falla:**
+
+```ts
+import { ivPercent, ivStars } from './iv-appraisal.js';
+
+const ivs = (n: number) => ({ hp: n, attack: n, defense: n, specialAttack: n, specialDefense: n, speed: n });
+
+describe('valoración de IVs', () => {
+  it('porcentaje redondeado de 186', () => {
+    expect(ivPercent(ivs(31))).toBe(100);
+    expect(ivPercent(ivs(0))).toBe(0);
+    expect(ivPercent(ivs(15))).toBe(48); // 90/186 = 48,4 %
+  });
+  it('estrellas por tramos; 4 solo con todo a 31', () => {
+    expect(ivStars(ivs(15))).toBe(0);
+    expect(ivStars(ivs(17))).toBe(1); // 54,8 %
+    expect(ivStars(ivs(22))).toBe(2); // 71 %
+    expect(ivStars(ivs(30))).toBe(3); // 96,8 %
+    expect(ivStars(ivs(31))).toBe(4);
+  });
+});
+```
+
+- [ ] **2b.** falla. **2c.**
+
+```ts
+import type { Stats } from './battle/stats.js';
+
+const TOTAL = 31 * 6;
+const sum = (v: Stats): number =>
+  v.hp + v.attack + v.defense + v.specialAttack + v.specialDefense + v.speed;
+
+export const ivPercent = (ivs: Stats): number => Math.round((sum(ivs) / TOTAL) * 100);
+
+/** 0-3 estrellas como la valoración de Pokémon GO; 4 = perfecto (todo a 31). */
+export function ivStars(ivs: Stats): 0 | 1 | 2 | 3 | 4 {
+  const s = sum(ivs);
+  if (s === TOTAL) return 4;
+  const p = s / TOTAL;
+  return p >= 0.822 ? 3 : p >= 0.667 ? 2 : p >= 0.51 ? 1 : 0;
+}
+```
+
+  (Comprobado: 17·6 = 102 → 54,8 % → 1★; 22·6 = 132 → 71 % → 2★; 30·6 = 180 → 96,8 % → 3★.)
+- [ ] **2d.** pasa. Commit + `/guardar`.
+
+### Paso 3 — Contrato
+
+- [ ] **3a.** Crear `shared/protocol/collection.ts` con el bloque de "Contrato" de arriba. `npx tsc -p
+  shared/tsconfig.json --noEmit` → sin errores. Commit `F3-02a: contrato de la colección` + `/guardar`.
+
+### Paso 4 — Esquema y migración
+
+**Files:** Modify `server/prisma/schema.prisma`; Create `server/prisma/migrations/20261013010000_collection/migration.sql`
+
+- [ ] **4a. Esquema:** en `CaughtPokemon`, `cp Int?` (null = filas de antes del script del paso 7) y
+  `@@index([playerId, cp])`, `@@index([playerId, favorite])`; en `Player`, `candies Candy[]` y `pokedex PokedexEntry[]`;
+  modelos nuevos:
+
+```prisma
+/// Caramelos por familia (cadena evolutiva del dataset, D-052). Capturar +3, transferir +1, evolucionar gasta (F3-05).
+model Candy {
+  playerId  String   @db.Uuid
+  familyId  Int
+  qty       Int      @default(0)
+  updatedAt DateTime @updatedAt
+  player    Player   @relation(fields: [playerId], references: [id], onDelete: Cascade)
+
+  @@id([playerId, familyId])
+}
+
+/// Pokédex del jugador (F3): una fila por especie vista; `caught` al capturarla alguna vez.
+model PokedexEntry {
+  playerId      String    @db.Uuid
+  speciesId     Int
+  caught        Boolean   @default(false)
+  firstSeenAt   DateTime  @default(now())
+  firstCaughtAt DateTime?
+  player        Player    @relation(fields: [playerId], references: [id], onDelete: Cascade)
+
+  @@id([playerId, speciesId])
+}
+```
+
+- [ ] **4b. Migración:** `cd server && npx prisma migrate dev --create-only --name collection` **contra el Postgres
+  portátil** (`embedded-postgres`, ver ESTADO; NUNCA `migrate dev` contra Supabase: puede pedir resetear la base). Mover
+  la carpeta a `20261013010000_collection` y añadir al final del SQL:
+
+```sql
+-- Reglas que Prisma no modela (como qty_range de Inventory).
+ALTER TABLE "Candy" ADD CONSTRAINT "candy_qty_range" CHECK ("qty" BETWEEN 0 AND 999999);
+ALTER TABLE "CaughtPokemon" ADD CONSTRAINT "cp_positive" CHECK ("cp" IS NULL OR "cp" >= 10);
+
+-- Pokédex de lo capturado antes de esta migración (idempotente). Los caramelos y el PC necesitan el dataset
+-- (familia, stats): los rellena prisma/backfill-collection.ts.
+INSERT INTO "PokedexEntry" ("playerId", "speciesId", "caught", "firstSeenAt", "firstCaughtAt")
+SELECT "playerId", "speciesId", true, MIN("caughtAt"), MIN("caughtAt")
+FROM "CaughtPokemon"
+GROUP BY "playerId", "speciesId"
+ON CONFLICT ("playerId", "speciesId") DO NOTHING;
+```
+
+- [ ] **4c.** `npx prisma migrate deploy` y `npx prisma generate` contra el Postgres portátil; `npm run build`. Commit
+  `F3-02a: migración collection (cp, Candy, PokedexEntry)` + `/guardar`.
+
+### Paso 5 — La captura guarda PC, caramelos y Pokédex; abrir un encuentro marca "visto"
+
+**Files:** Modify `server/src/spawns/spawns.service.ts`, `server/src/encounters/encounters.service.ts`,
+`shared/protocol/encounters.ts`, `server/test/encounters.e2e-spec.ts`
+
+- [ ] **5a. e2e que fallan** (en `encounters.e2e-spec.ts`, con el `forced` que ya existe):
+
+```ts
+  it('capturar guarda el PC, suma 3 caramelos a la familia y marca la Pokédex', async () => {
+    const p = await register();
+    const { spawn } = await nearbySpawn(p); // helper que ya usa este archivo para tener un spawn a ≤ 80 m
+    forced = { captured: true, shakes: 3, fled: false };
+    const res = await as(p, http().post(`/encounters/${enc(spawn.id)}/throw`).send(throwBody())).expect(201);
+    expect(res.body.candy).toEqual({ familyId: expect.any(Number), gained: 3, total: 3 });
+    const row = await prisma.caughtPokemon.findFirstOrThrow({ where: { playerId: p.id } });
+    expect(row.cp).toBeGreaterThanOrEqual(10);
+    expect(
+      await prisma.pokedexEntry.findUnique({
+        where: { playerId_speciesId: { playerId: p.id, speciesId: spawn.speciesId } },
+      }),
+    ).toMatchObject({ caught: true });
+  });
+
+  it('fallar no da caramelos; abrir el encuentro ya lo marca como visto', async () => {
+    const p = await register();
+    const { spawn } = await nearbySpawn(p);
+    await as(p, http().get(`/encounters/${enc(spawn.id)}`)).expect(200);
+    expect(
+      await prisma.pokedexEntry.findUnique({
+        where: { playerId_speciesId: { playerId: p.id, speciesId: spawn.speciesId } },
+      }),
+    ).toMatchObject({ caught: false });
+    forced = { captured: false, shakes: 1, fled: false };
+    const res = await as(p, http().post(`/encounters/${enc(spawn.id)}/throw`).send(throwBody())).expect(201);
+    expect(res.body.candy).toBeNull();
+    expect(await prisma.candy.count({ where: { playerId: p.id } })).toBe(0);
+  });
+```
+
+  (Si el archivo no tiene `nearbySpawn`/`enc`/`throwBody` con esos nombres, usar los equivalentes que ya usan sus
+  tests de captura; no duplicar helpers.) `cd server && npm run test:e2e -- encounters` → FALLA.
+- [ ] **5b.** `SpeciesDetails` gana `familyId: number` (= `familyOf(species)`) y `types: TypeName[]`, rellenados donde
+  se construye hoy (`speciesDetails`).
+- [ ] **5c.** En `details()`, tras `reachableSpawn`, marcar "visto" (fuera de cualquier transacción, mejor esfuerzo:
+  si falla, se registra y la respuesta sigue):
+
+```ts
+    await this.prisma.pokedexEntry
+      .upsert({
+        where: { playerId_speciesId: { playerId, speciesId: spawn.speciesId } },
+        create: { playerId, speciesId: spawn.speciesId },
+        update: {},
+      })
+      .catch((err) => this.logger.warn({ msg: 'pokedex.seen', playerId, err: String(err) }));
+```
+
+- [ ] **5d.** En `throw()`, dentro de la transacción, si `outcome.captured`: `cp` en el `create` de `caughtPokemon`
+  (`combatPower(calcStats(species.baseStats, spawn.ivs, spawn.level, spawn.nature))`) y después:
+
+```ts
+          const candy = await tx.candy.upsert({
+            where: { playerId_familyId: { playerId, familyId: species.familyId } },
+            create: { playerId, familyId: species.familyId, qty: CANDY_PER_CATCH },
+            update: { qty: { increment: CANDY_PER_CATCH } },
+          });
+          await tx.pokedexEntry.upsert({
+            where: { playerId_speciesId: { playerId, speciesId: spawn.speciesId } },
+            create: { playerId, speciesId: spawn.speciesId, caught: true, firstCaughtAt: new Date(now) },
+            update: { caught: true, firstCaughtAt: undefined },
+          });
+```
+
+  El `firstCaughtAt` de una fila que ya existía (solo "vista") se pone con un `updateMany` aparte
+  `where: { playerId, speciesId, firstCaughtAt: null } data: { firstCaughtAt: new Date(now) }` (así nunca se pisa la
+  primera fecha). La transacción devuelve `{ created, candy }` y la respuesta lleva
+  `candy: created ? { familyId: candy.familyId, gained: CANDY_PER_CATCH, total: candy.qty } : null`.
+- [ ] **5e. Reintentos:** `replay()` devuelve lo guardado; como `Throw` no guarda los caramelos, en un reintento de una
+  captura se lee la fila `Candy` actual (`gained: CANDY_PER_CATCH`, `total` = lo que haya). Test e2e: dos POST con el
+  mismo `clientThrowId` → el segundo da el mismo `candy.familyId` y `gained: 3`, y la base tiene 3 (no 6).
+- [ ] **5f.** `ThrowResult.candy` en `shared/protocol/encounters.ts` (bloque de "Contrato"). En la app, de momento solo
+  compila (lo pinta F3-02b). e2e → PASA; `npm run build`, `npm test`, lint del servidor; `ng test` y build de la app.
+  Commit + `/guardar`.
+
+### Paso 6 — `GET /collection` y `GET /pokedex`
+
+**Files:** Create `server/src/collection/collection.module.ts`, `collection.controller.ts`, `collection.service.ts`,
+`collection.dto.ts`; Test `server/test/collection.e2e-spec.ts`; Modify `server/src/app.module.ts`
+
+- [ ] **6a. e2e que fallan** (`collection.e2e-spec.ts`, prefijo de limpieza propio `col+`, D-021). Para crear capturas
+  sin depender de spawns, insertar filas con Prisma directamente (helper `seedCaught(p, n, over?)` que pone `speciesId`,
+  `cp`, `shiny`, `favorite`, `caughtAt` y el resto con valores válidos):
+  1. sin sesión → 401; con sesión y nada capturado → `{ items: [], nextCursor: null, total: 0 }`.
+  2. 35 capturas → página 1 con 30 y `nextCursor`, página 2 con 5 y `nextCursor: null`; sin repetidos ni huecos.
+  3. `sort=cp&order=desc` → PC no creciente en TODAS las páginas (con varios PC iguales: el desempate por `id` no
+     repite ni salta ninguno).
+  4. `type=fire` → solo especies de tipo Fuego (4, 5, 6 sí; 1 no); `shiny=true`; `favorite=true`; `total` con filtros.
+  5. lo de otro jugador no sale nunca; `limit=51` → 400; `sort=nombre` → 400; `cursor=no-uuid` → 400.
+  6. `GET /pokedex` → solo especies vistas, con `caught` correcto.
+- [ ] **6b. DTO** (`class-validator`; booleanos de query como `'true'|'false'` con `@Transform`):
+  `sort ∈ CollectionSort` (por defecto `caughtAt`), `order ∈ asc|desc` (por defecto `desc`), `type ∈ TYPE_NAMES`,
+  `shiny`, `favorite`, `cursor @IsUUID()`, `limit @IsInt() @Min(1) @Max(50)` (por defecto 30).
+- [ ] **6c. Servicio:**
+
+```ts
+  async list(playerId: string, q: CollectionQueryDto): Promise<CollectionPage> {
+    const where: Prisma.CaughtPokemonWhereInput = {
+      playerId,
+      ...(q.shiny === undefined ? {} : { shiny: q.shiny }),
+      ...(q.favorite === undefined ? {} : { favorite: q.favorite }),
+      ...(q.type ? { speciesId: { in: this.spawns.speciesIdsOfType(q.type) } } : {}),
+    };
+    const orderBy: Prisma.CaughtPokemonOrderByWithRelationInput[] = [
+      q.sort === 'cp'
+        ? { cp: { sort: q.order, nulls: 'last' } }
+        : { [q.sort]: q.order },
+      { id: 'asc' }, // desempate estable para el cursor
+    ];
+    const [rows, total] = await Promise.all([
+      this.prisma.caughtPokemon.findMany({
+        where,
+        orderBy,
+        take: q.limit + 1,
+        ...(q.cursor ? { cursor: { id: q.cursor }, skip: 1 } : {}),
+        select: ITEM_SELECT,
+      }),
+      this.prisma.caughtPokemon.count({ where }),
+    ]);
+    const page = rows.slice(0, q.limit);
+    return {
+      items: page.map(toItem),
+      nextCursor: rows.length > q.limit ? page[page.length - 1].id : null,
+      total,
+    };
+  }
+```
+
+  `toItem` convierte `caughtAt` a ISO y un `cp` null en el calculado al vuelo (`combatPower(calcStats(...))`, necesita
+  `ivs`, `nature`, `level` en `ITEM_SELECT`). Un `cursor` que no es de este jugador o no existe → Prisma no devuelve
+  nada raro (el `where` incluye `playerId`), pero un cursor inexistente lanza: capturarlo y responder 400
+  "Cursor no válido". `speciesIdsOfType(type)` se calcula una vez al cargar el dataset (`Map<TypeName, number[]>`).
+- [ ] **6d.** `GET /pokedex` → `findMany({ where: { playerId }, select: { speciesId, caught } })` → `PokedexView`.
+- [ ] **6e.** Controlador con `@CurrentPlayer()` (sesión obligatoria por el guard global) y límite propio 60/min por IP
+  (`@Throttle`), como `/spawns`. e2e → PASA; build, unitarios, lint. Commit + `/guardar`.
+
+### Paso 7 — Recuperar lo capturado antes
+
+**Files:** Create `server/prisma/backfill-collection.ts`; Modify `server/package.json`
+
+- [ ] **7a.** Script `npm run db:backfill-collection` (`tsx prisma/backfill-collection.ts`, como `admin`): carga
+  `pokedex.json`; (1) `cp` de las filas con `cp IS NULL` (por lotes de 200); (2) caramelos: **solo para jugadores sin
+  ninguna fila `Candy`** (así se puede ejecutar dos veces sin duplicar), `CANDY_PER_CATCH × capturados` por familia;
+  imprime cuántas filas tocó. La Pokédex ya la rellenó la migración.
+- [ ] **7b.** Probarlo en el Postgres portátil: sembrar 3 capturas de antes (sin `cp`, sin `Candy`) → ejecutar →
+  `cp` relleno y 9 caramelos repartidos por familia → ejecutarlo otra vez → "0 filas". Commit + `/guardar`.
+
+### Paso 8 — Aplicar en Supabase (ANTES de mezclar el PR)
+
+Render despliega solo al mezclar (ESTADO). Si el código nuevo llega antes que la migración, **cada captura daría 500**
+(las tablas no existen). Orden obligatorio:
+
+- [ ] **8a.** Quien tenga `DIRECT_URL`: `cd server && npx prisma migrate deploy` contra Supabase (aplica SOLO
+  `20261013010000_collection`; comprobar en la salida que no hay más pendientes) y `npm run db:backfill-collection`.
+  Pegar la salida (sin la URL) en la bitácora.
+- [ ] **8b.** Mezclar el PR. Tras el despliegue de Render: una captura real desde el navegador →
+  `candy.gained: 3` en la respuesta.
+
+### Paso 9 — Cierre
+
+- [ ] **9a.** Añadir **D-052** a `DECISIONES.md`:
+
+> **D-052 · Colección (F3): PC guardado, caramelos por cadena evolutiva, Pokédex al abrir/capturar y los IVs se
+> enseñan a su dueño.** `CaughtPokemon.cp` se calcula al capturar (D-049) y se recalcula si cambia el nivel (F3-05), para
+> ordenar y paginar en la base. Familia de caramelos = `evolutionChainId`; capturar +3, transferir +1 (`shared/engine/
+> candy.ts`). Pokédex: "visto" al abrir un encuentro (mejor esfuerzo), "capturado" en la transacción de la captura. Los
+> IVs y las stats del individuo se devuelven SOLO en `GET /collection/:id` y solo a su dueño (como la valoración de
+> Pokémon GO); antes de capturar siguen ocultos. Paginación por cursor con `id` de desempate; máx. 50. Migración +
+> `db:backfill-collection` se aplican en Supabase ANTES de mezclar (si no, las capturas dan 500).
+
+- [ ] **9b.** REGLA 2 (bitácora con la salida de los e2e, ROADMAP, PR).
+
+---
+
+## F3-02b · Pantalla Mis Pokémon
+
+**Criterio (ROADMAP F3-02):** lista paginada con filtros (tipo, shiny, favorito), orden (PC, fecha, Nº), entrada
+escalonada, vacía diseñada; accesible desde el menú de la Poké Ball; "+3 caramelos" en "¡Capturado!".
+
+### Paso 1 — `CollectionService`
+
+**Files:** Create `src/app/services/game/collection.service.ts` + spec
+
+- [ ] **1a. Tests que fallan** (`provideHttpClient()` + `provideHttpClientTesting()`):
+  1. `load()` pide `GET {serverUrl}/collection?sort=caughtAt&order=desc&limit=30` y publica `items`, `total`,
+     `hasMore`.
+  2. `loadMore()` manda `cursor=<nextCursor>` y AÑADE (no sustituye); con `hasMore() === false` no pide nada; dos
+     `loadMore()` seguidos hacen UNA petición (la segunda espera a la primera).
+  3. `setQuery({ sort: 'cp' })` vacía la lista y vuelve a cargar desde el principio con el nuevo orden.
+  4. Error de red → `error()` con texto en español y la lista anterior intacta.
+  5. Tras `markChanged()` (lo llama la ficha al renombrar o transferir) el siguiente `load()` no usa nada en caché.
+- [ ] **1b.** → FALLA. **1c. Implementación** (forma; seguir el estilo de `BagService`: `firstValueFrom` + `timeout`
+  de 70 s por Render dormido):
+
+```ts
+@Injectable({ providedIn: 'root' })
+export class CollectionService {
+  private readonly http = inject(HttpClient);
+  readonly query = signal<Required<Pick<CollectionQuery, 'sort' | 'order'>> & Omit<CollectionQuery, 'cursor' | 'limit'>>(
+    { sort: 'caughtAt', order: 'desc' },
+  );
+  readonly items = signal<CollectionItem[]>([]);
+  readonly total = signal<number | null>(null);
+  readonly loading = signal(false);
+  readonly error = signal<string | null>(null);
+  readonly hasMore = computed(() => this.next !== null);
+  private next: string | null = null;
+  private inFlight: Promise<void> | null = null;
+
+  setQuery(patch: Partial<CollectionQuery>): Promise<void>; // query.update + reset + load()
+  load(): Promise<void>;     // reset de items y cursor, primera página
+  loadMore(): Promise<void>; // si hay cursor y no hay otra en vuelo
+  /** Para la ficha: actualizar/quitar una fila sin recargar todo. */
+  patchItem(id: string, patch: Partial<CollectionItem>): void;
+  removeItem(id: string): void;
+  restoreItem(item: CollectionItem, index: number): void; // deshacer la transferencia
+}
+```
+
+  Los parámetros se construyen con `HttpParams` omitiendo los `undefined`. `hasMore` depende de `next`, que no es
+  signal: guardarlo también como signal privada (`nextCursor = signal<string|null>(null)`) para que `computed` repinte
+  (zoneless).
+- [ ] **1d.** → PASA. Commit + `/guardar`.
+
+### Paso 2 — Tarjeta de un Pokémon
+
+**Files:** Create `src/app/features/collection/collection-card.component.ts` (+ spec corto)
+
+- [ ] **2a.** `app-collection-card` con `input.required<CollectionItem>()` y `index` (para el retardo escalonado):
+  - Arte `home` (o `home/shiny`), con el mismo fallback de siempre (CLAUDE.md: `home` → `official-artwork` →
+    `front_default`). Si existe ya una función de URLs de sprites en la app, **reusarla** (buscar `official-artwork` en
+    `src/app`); si no, crearla en `src/app/core/utils/sprites.ts` y usarla también aquí.
+  - Mote o nombre en español (DatasetService), "PC 412" en Fredoka grande, nivel, ★ si favorito, destello dorado si
+    shiny (DISENO §5: "brillo permanente en la colección"), fondo tintado con el color del tipo principal (tokens
+    `--t-*`, nunca colores sueltos).
+  - Entrada: `opacity 0 + translateY(8px) + scale(0.97)` → normal en 220 ms `--ease-out`, `animation-delay:
+    min(index, 12) × 40 ms` (DISENO §4.9: 30-50 ms; tope para que la página 2 no espere 1 s). "Reducir movimiento" →
+    solo fundido.
+  - Es un `<a>` a `/coleccion/:id` (accesible con teclado), área ≥ 44 px, `aria-label` "Pikachu, PC 412, nivel 12,
+    shiny, favorito".
+- [ ] **2b.** Spec: el `aria-label` incluye nombre, PC y "shiny" solo si lo es. Commit + `/guardar`.
+
+### Paso 3 — Filtros y orden
+
+**Files:** Create `src/app/features/collection/collection-filters.component.ts`
+
+- [ ] **3a.** Hoja inferior (mismo patrón que `ball-menu`: `--ease-drawer`, `--dur-panel`, se cierra arrastrando o
+  tocando fuera): orden (Recientes · PC · Nº de Pokédex, y ascendente/descendente), tipo (los 18 `app-type-chip`
+  seleccionables, uno o ninguno), interruptores Shiny y Favoritos, botón "Quitar filtros". Cada cambio llama a
+  `collection.setQuery(...)` al momento (sin botón "Aplicar"). Commit + `/guardar`.
+
+### Paso 4 — Página `/coleccion`
+
+**Files:** Create `src/app/features/collection/collection.page.ts`; Modify `src/app/app.routes.ts`,
+`src/app/features/map/ball-menu.component.ts`
+
+- [ ] **4a.** Ruta `{ path: 'coleccion', canActivate: [authGuard], loadComponent: … }` (y comentario de rutas). En
+  `ball-menu`, primera opción "Mis Pokémon" → `/coleccion` (icono de Ionicons ya registrado o `addIcons` nuevo).
+- [ ] **4b.** Página con `ion-header` (botón atrás `defaultHref="/mapa"`, título "Mis Pokémon" y el total "· 12"),
+  botón "Filtros" con un punto si hay alguno activo, rejilla de 2 columnas (3 a partir de 600 px) de
+  `app-collection-card`, y al final un centinela con `IntersectionObserver` que llama a `loadMore()` (no
+  `ion-infinite-scroll`: así se controla la animación y el "cargando").
+- [ ] **4c. Estados (DISENO §6):** cargando la primera vez → 6 tarjetas esqueleto con brillo que pasa (respeta
+  "reducir movimiento"); vacía sin filtros → ilustración + "Aún no has capturado ningún Pokémon" + botón "Salir a
+  buscar" (→ `/mapa`); vacía CON filtros → "Ningún Pokémon con estos filtros" + "Quitar filtros"; error → texto +
+  "Reintentar"; servidor despertando → lo cubre ya el interceptor de F1-09 (D-043).
+- [ ] **4d.** Al volver de la ficha (`ionViewWillEnter`) NO se recarga entera: la ficha ya llamó a `patchItem` /
+  `removeItem`. Commit + `/guardar`.
+
+### Paso 5 — Caramelos en "¡Capturado!"
+
+**Files:** Modify `src/app/features/encounter/caught-card.component.ts` (+ spec), `encounter.page.ts`
+
+- [ ] **5a.** Test: con `candy = { familyId: 10, gained: 3, total: 9 }` la tarjeta muestra "+3 caramelos de Pikachu"
+  (nombre de la especie BASE de la familia: la primera de la cadena, `evolvesFrom === null` siguiendo hacia atrás en el
+  dataset) y cuenta de 0 a 3 al ritmo de la XP (`XP_COUNT_MS`); sin `candy` no sale la línea.
+- [ ] **5b.** Implementar (input `candy`), pasarle `result.candy` desde la página. Botón secundario "Ver en Mis
+  Pokémon" → `/coleccion/<caught.id>` (la ficha llega en F3-03; hasta entonces → `/coleccion`). Commit + `/guardar`.
+
+### Paso 6 — Prueba y cierre
+
+- [ ] **6a.** Navegador 390×844 con el servidor local y una cuenta `@pokecrud.test` con ~35 capturas (sembradas con el
+  helper del e2e o capturando): scroll hasta el final (2 páginas, sin repetidos), cada orden y filtro, vacía, sin
+  conexión (DevTools → Offline → error + Reintentar). Capturas `docs/evidencias/F3-02_0{1..4}_*.png`. Borrar la cuenta.
+- [ ] **6b.** Android: abrirla en el APK y comprobar el scroll fluido con 30+ tarjetas (fps por CDP ≥ 55). REGLA 2.
+
+---
+
+## F3-03 · Ficha del individuo
+
+**Criterio (ROADMAP):** arte, grito, PC, IVs, naturaleza, stats calculados, movimientos, dónde/cuándo se capturó, mapa
+mini, renombrar, transferir (con deshacer).
+
+### Paso 1 — Servidor: `GET`, `PATCH` y `DELETE /collection/:id`
+
+**Files:** Modify `server/src/collection/*`; Test `server/test/collection.e2e-spec.ts`
+
+- [ ] **1a. e2e que fallan:**
+  1. `GET /collection/:id` propio → `CollectionDetail` con `ivs`, `stats` (= `calcStats` de shared), `cp`, `candy` de su
+     familia (0 si no tiene fila); de OTRO jugador → 404; id que no es UUID → 400.
+  2. `PATCH { nickname: '  Chispa  ' }` → `nickname: 'Chispa'`; `{ nickname: null }` lo quita; 13 caracteres o `<b>` →
+     400; `{ favorite: true }`; cuerpo vacío → 400; campos desconocidos → 400 (`forbidNonWhitelisted`); de otro → 404.
+  3. `DELETE` → 200 `{ candy: { familyId, qty, gained: 1 } }`, la fila ya no existe y `qty` subió 1; repetir → 404
+     (y los caramelos NO suben otra vez); de otro → 404.
+  4. Concurrencia: dos `DELETE` a la vez del mismo → uno 200 y otro 404, y +1 caramelo (no +2).
+- [ ] **1b.** DTO del PATCH: `nickname?: string | null` con `@ValidateIf((o) => o.nickname !== null)` +
+  `@IsString()` y la normalización con `normalizeNickname` en el servicio (un `RangeError` → 400 con su mensaje);
+  `favorite?: @IsBoolean()`; validador de "al menos un campo".
+- [ ] **1c. Transferir** (una transacción; el `deleteMany` con `playerId` hace a la vez de autorización y de candado):
+
+```ts
+  async transfer(playerId: string, id: string): Promise<TransferResult> {
+    return this.prisma.$transaction(async (tx) => {
+      const row = await tx.caughtPokemon.findFirst({ where: { id, playerId }, select: { speciesId: true } });
+      if (!row) throw new NotFoundException('Ese Pokémon no está en tu colección');
+      const { count } = await tx.caughtPokemon.deleteMany({ where: { id, playerId } });
+      if (count !== 1) throw new NotFoundException('Ese Pokémon no está en tu colección');
+      const familyId = this.spawns.speciesDetails(row.speciesId)!.familyId;
+      const candy = await tx.candy.upsert({
+        where: { playerId_familyId: { playerId, familyId } },
+        create: { playerId, familyId, qty: CANDY_PER_TRANSFER },
+        update: { qty: { increment: CANDY_PER_TRANSFER } },
+      });
+      return { candy: { familyId, qty: candy.qty, gained: CANDY_PER_TRANSFER } };
+    }, { maxWait: 5_000, timeout: 10_000 });
+  }
+```
+
+  (Con dos `DELETE` simultáneos el segundo `deleteMany` espera al bloqueo de la fila y da `count = 0` → 404 y su
+  transacción no suma caramelos.) Equipos (F3-06) que apunten a ese Pokémon: se resuelve en F3-01b; anotarlo en el PR.
+- [ ] **1d.** e2e → PASA; build, unitarios, lint. Commit + `/guardar`.
+
+### Paso 2 — Transferir con deshacer (puro)
+
+**Files:** Create `src/app/features/collection/pending-transfer.ts` + spec
+
+- [ ] **2a. Test que falla** (reloj falso de Vitest):
+
+```ts
+import { PendingTransfer, UNDO_MS } from './pending-transfer';
+
+describe('PendingTransfer', () => {
+  beforeEach(() => vi.useFakeTimers());
+  afterEach(() => vi.useRealTimers());
+
+  it('confirma tras UNDO_MS si no se deshace', async () => {
+    const commit = vi.fn().mockResolvedValue(undefined);
+    const p = new PendingTransfer('id-1', commit);
+    await vi.advanceTimersByTimeAsync(UNDO_MS - 1);
+    expect(commit).not.toHaveBeenCalled();
+    await vi.advanceTimersByTimeAsync(1);
+    expect(commit).toHaveBeenCalledWith('id-1');
+    expect(p.state()).toBe('done');
+  });
+
+  it('deshacer a tiempo = nunca se llama al servidor', async () => {
+    const commit = vi.fn();
+    const p = new PendingTransfer('id-1', commit);
+    expect(p.undo()).toBe(true);
+    await vi.advanceTimersByTimeAsync(UNDO_MS * 2);
+    expect(commit).not.toHaveBeenCalled();
+    expect(p.state()).toBe('undone');
+  });
+
+  it('flush() (salir de la pantalla) confirma YA; después deshacer ya no vale', async () => {
+    const commit = vi.fn().mockResolvedValue(undefined);
+    const p = new PendingTransfer('id-1', commit);
+    await p.flush();
+    expect(commit).toHaveBeenCalledTimes(1);
+    expect(p.undo()).toBe(false);
+  });
+
+  it('si el servidor falla queda en "failed" (la ficha lo devuelve a la lista)', async () => {
+    const p = new PendingTransfer('id-1', vi.fn().mockRejectedValue(new Error('500')));
+    await vi.advanceTimersByTimeAsync(UNDO_MS);
+    expect(p.state()).toBe('failed');
+  });
+});
+```
+
+- [ ] **2b.** → FALLA. **2c.**
+
+```ts
+import { signal } from '@angular/core';
+
+export const UNDO_MS = 5_000;
+export type TransferState = 'pending' | 'committing' | 'done' | 'undone' | 'failed';
+
+/** Transferir con deshacer (F3-03): se espera UNDO_MS antes de llamar al servidor; deshacer = no llamarlo nunca. */
+export class PendingTransfer {
+  readonly state = signal<TransferState>('pending');
+  private readonly timer: ReturnType<typeof setTimeout>;
+
+  constructor(
+    readonly id: string,
+    private readonly commit: (id: string) => Promise<unknown> | unknown,
+  ) {
+    this.timer = setTimeout(() => void this.run(), UNDO_MS);
+  }
+
+  undo(): boolean {
+    if (this.state() !== 'pending') return false;
+    clearTimeout(this.timer);
+    this.state.set('undone');
+    return true;
+  }
+
+  /** Confirmar ya (al salir de la pantalla o cerrar la app). */
+  flush(): Promise<void> {
+    clearTimeout(this.timer);
+    return this.run();
+  }
+
+  private async run(): Promise<void> {
+    if (this.state() !== 'pending') return;
+    this.state.set('committing');
+    try {
+      await this.commit(this.id);
+      this.state.set('done');
+    } catch {
+      this.state.set('failed');
+    }
+  }
+}
+```
+
+- [ ] **2d.** → PASA. Commit + `/guardar`.
+
+### Paso 3 — Página de la ficha
+
+**Files:** Create `src/app/features/collection/pokemon-detail.page.ts`, `detail-stats.component.ts`,
+`detail-moves.component.ts`, `detail-origin.component.ts`; Modify `app.routes.ts`, `collection.service.ts`
+(`detail(id)`, `rename`, `setFavorite`, `transfer`)
+
+Componentes pequeños para no pasar el presupuesto de 2 kB de estilos por componente (como D-033).
+
+- [ ] **3a.** Ruta `coleccion/:id` (`authGuard`). La página pide `GET /collection/:id` (con el `CollectionItem` de la
+  lista como cabecera inmediata mientras llega el detalle: nada de pantalla en blanco). Fondo tintado por el tipo
+  principal (DISENO §1: "cada pantalla de un Pokémon se tiñe con el color de su tipo principal").
+- [ ] **3b. Cabecera:** arte grande (o shiny), entrada con `scale(0.95)+opacity` → normal, **grito al abrir** (una
+  vez; `AudioService.playCry`), PC grande en Fredoka, mote/nombre con lápiz para renombrar, ★ favorito (toque → PATCH
+  optimista; si falla, vuelve atrás con aviso), nivel, sexo, chips de tipo, altura y peso × `heightScale` (XS/XL como
+  en el encuentro).
+- [ ] **3c. `app-detail-stats`:** valoración (`ivStars` + `ivPercent`, con estrellas y texto "96 % · ★★★") y 6 barras
+  de IVs (`app-stat-bar` con `max=31`); debajo las stats reales (`stats`) con `max` = 255; naturaleza en español
+  (`shared/data/natures-es.ts`) indicando qué sube (▲) y qué baja (▼) (de la tabla de naturalezas de `stats.ts`).
+- [ ] **3d. `app-detail-moves`:** los 4 movimientos (nombre ES, `app-type-chip`, categoría física/especial/estado,
+  potencia, precisión, PP) desde `DatasetService.moves`.
+- [ ] **3e. `app-detail-origin`:** "Capturado el 13 oct 2026, 11:52 · Poké Ball" (`Intl.DateTimeFormat('es-CO')`) y
+  un **mapa mini** de 160 px con un pin: Google Maps JS con el mismo `loadMapsLibrary` (`disableDefaultUI`,
+  `gestureHandling: 'none'`, `clickableIcons: false`, zoom 16, sin inclinación) cargado **solo al hacerse visible**
+  (`IntersectionObserver`; cada mapa cuenta como una carga de Maps). Si Maps falla → texto con las coordenadas
+  redondeadas a 3 decimales, nunca un hueco gris.
+- [ ] **3f. Renombrar:** hoja con un campo (máx. `NICKNAME_MAX`, contador), validación en vivo con
+  `normalizeNickname` (mismo mensaje que el servidor), "Guardar" → PATCH → `collection.patchItem`. "Quitar mote".
+- [ ] **3g. Transferir:** botón al final (estilo peligro, texto "Transferir · +1 caramelo"), confirmación corta
+  ("¿Transferir a Chispa? Recibirás 1 caramelo de Pikachu"), luego: `collection.removeItem(id)`, volver a la lista y
+  aviso flotante "Chispa transferido · **Deshacer**" durante `UNDO_MS` (un `PendingTransfer` en un servicio
+  `providedIn: 'root'`, para que sobreviva a cambiar de pantalla). Deshacer → `restoreItem` en su sitio. Al pausar la
+  app (`document.hidden`) → `flush()`. `failed` → `restoreItem` + aviso "No se pudo transferir".
+- [ ] **3h.** Lint, `ng test`, build. Commit + `/guardar`.
+
+### Paso 4 — Prueba y cierre
+
+- [ ] **4a.** Navegador 390×844: abrir 3 fichas (una shiny), renombrar (válido, 13 letras → error, con emoji → error),
+  favorito ida y vuelta, transferir y deshacer, transferir y esperar (sale de la lista, +1 caramelo en otro de su
+  familia), mapa mini. Capturas `docs/evidencias/F3-03_0{1..5}_*.png` (el mapa mini enseña DÓNDE se capturó: usar una
+  captura hecha en un sitio público o en Neiva centro, no en casa; el repo es público).
+- [ ] **4b.** Android: abrir la ficha desde "¡Capturado!" → "Ver en Mis Pokémon"; grito, barras y mapa mini; fps al
+  desplazar ≥ 55. REGLA 2.
+
+---
+
+## Pendientes de humanos
+
+- **Quien tenga `DIRECT_URL` (Alex, Kenneth o Samuel):** F3-02a paso 8 — migración + `db:backfill-collection` en
+  Supabase **antes** de mezclar F3-02a.
+
+## Riesgos
+
+- **Desplegar sin migrar:** capturas con 500 en producción (F3-02a paso 8 lo ordena). Si pasa: aplicar la migración
+  enseguida (no hace falta revertir el código).
+- **Caramelos de capturas antiguas:** el script solo da caramelos a quien no tiene NINGUNA fila `Candy`; si alguien
+  captura con el código nuevo antes de ejecutar el script, sus capturas antiguas no suman. Por eso el script va en el
+  mismo paso que la migración, antes de mezclar.
+- **Filtro por tipo con `IN (…)`:** hasta ~150 especies por tipo; con el índice `(playerId, speciesId)` es trivial
+  para colecciones de clase. Si algún día pesa, guardar los tipos en la fila.
+- **Mapa mini y cuota de Maps:** una carga por ficha abierta (solo al verse). Dentro de la prueba gratuita (ESTADO);
+  si sube mucho, sustituir por una imagen estática.
+- **IVs visibles:** quien capture puede "valorar" sin cambiar nada del juego; los del encuentro siguen ocultos (los
+  mismos datos no permiten predecir spawns: la semilla es HMAC con `SPAWN_SALT`, D-025).
