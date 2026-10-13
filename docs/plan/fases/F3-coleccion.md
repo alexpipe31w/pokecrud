@@ -5,9 +5,9 @@
 > rama según avances (son el punto de guardado). Los pasos de código siguen TDD: test que falla → código mínimo → verde
 > → commit.
 >
-> **Este archivo tiene dos partes.** Parte 1 (F3-01a, escrita): **F3-02a, F3-02b y F3-03**. Parte 2 (F3-01b, pendiente):
-> F3-04 (Pokédex 1025), F3-05 (evolución) y F3-06 (CRUD del curso con la nueva UI). La parte 1 deja el servidor
-> guardando ya todo lo que la parte 2 necesita (caramelos y Pokédex visto/capturado).
+> **Este archivo tiene dos partes.** Parte 1 (F3-01a): **F3-02a, F3-02b y F3-03** (hechas). Parte 2 (F3-01b, al
+> final del archivo): **F3-04** (Pokédex 1025), **F3-05** (evolución con caramelos) y **F3-06a/b/c** (CRUD del curso
+> con la nueva UI).
 
 **Objetivo (VISION, pilar 3):** que lo capturado se pueda ver y cuidar: **Mis Pokémon** (lista con PC, filtros y orden)
 y la **ficha del individuo** (arte, grito, PC, IVs en barras, naturaleza, stats, movimientos, dónde y cuándo se capturó,
@@ -861,3 +861,500 @@ Componentes pequeños para no pasar el presupuesto de 2 kB de estilos por compon
   si sube mucho, sustituir por una imagen estática.
 - **IVs visibles:** quien capture puede "valorar" sin cambiar nada del juego; los del encuentro siguen ocultos (los
   mismos datos no permiten predecir spawns: la semilla es HMAC con `SPAWN_SALT`, D-025).
+
+---
+
+# Parte 2 (F3-01b): Pokédex 1025, evolución con caramelos y CRUD del curso
+
+**Objetivo (VISION, pilar 3):** "Pokédex 1025 con vistos/capturados por generación" y "evolución con caramelos
+(animación de evolución)", y el CRUD del curso (IS-11 y HU-08…HU-18) con el sistema de diseño en vez del Ionic por
+defecto.
+
+**Lo que ya existe y se aprovecha:** `GET /pokedex` (F3-02a: especies vistas/capturadas), `Candy` por familia y
+`CANDY_PER_*` (D-052), la ficha `/coleccion/:id` (F3-03), el dataset con `evolvesFrom`/`evolvesTo`/`habitat`/
+`generation`, la tabla de tipos (`shared/engine/battle/type-chart.ts`) y el CRUD del curso en el servidor (`/pokemon`,
+`/teams`, `/favorites`, `/customPokemon`, D-019/D-023) con su app de IS-11.
+
+**Choque de rutas (se resuelve en F3-04 paso 1):** hoy `/pokedex` es el **inventario de IS-11** (la tienda de la clase,
+151 con precio y stock, HU-03/04/05/14). La Pokédex de 1025 necesita esa ruta. El inventario pasa a **`/inventario`**
+("Inventario" en el menú); sus rutas de detalle, alta y edición (`/pokemon/:id`, `/pokemon/nuevo`,
+`/pokemon/:id/editar`) **no cambian** (las usan la colección de Postman y lo evaluado del curso). `/tabs/pokedex` (enlace
+viejo de IS-11) redirige a `/inventario`.
+
+**Orden y paralelismo:**
+
+```
+F3-04 Pokédex 1025 (rutas + pantalla + ficha de especie)
+F3-05 Evolución con caramelos (servidor + ficha + animación)      ← independiente de F3-04 (solo comparte shared/)
+F3-06a Inventario IS-11 con la nueva UI ─┐
+F3-06b Equipos con Pokémon capturados   ─┼─ independientes entre sí
+F3-06c Favoritos y personalizados       ─┘
+```
+
+F3-06 era demasiado grande para una sesión: **se parte en F3-06a/b/c** (ROADMAP). Nada de la parte 2 necesita el móvil
+salvo el último vistazo de cada tarea.
+
+## Mapa de archivos (parte 2)
+
+| Archivo | Tarea | Responsabilidad |
+| --- | --- | --- |
+| `shared/engine/weaknesses.ts` (+ spec) | F3-04 | Multiplicador de cada tipo atacante contra una especie, agrupado (×4, ×2, ×½, ×¼, ×0) |
+| `shared/engine/evolution-chain.ts` (+ spec) | F3-04 | Árbol de la cadena evolutiva de cualquier miembro, con el método en texto |
+| `src/app/services/game/pokedex.service.ts` (+ spec) | F3-04 | `GET /pokedex` en caché; se invalida al capturar |
+| `src/app/features/pokedex-1025/pokedex.page.ts` | F3-04 | `/pokedex`: rejilla por generación, vistos/capturados |
+| `src/app/features/pokedex-1025/species.page.ts` (+ subcomponentes) | F3-04 | `/pokedex/:id`: ficha de la especie |
+| `src/app/app.routes.ts`, `features/pokedex/` → `features/inventory/` | F3-04 | IS-11 a `/inventario` |
+| `shared/engine/evolution.ts` (+ spec) | F3-05 | Opciones de evolución y su coste en caramelos |
+| `server/src/collection/*` (+ e2e) | F3-05 | `POST /collection/:id/evolve` transaccional |
+| `src/app/features/collection/evolve-*.ts` | F3-05 | Botones en la ficha y animación de evolución |
+| `src/app/features/inventory/**` | F3-06a | IS-11 con el sistema de diseño |
+| `server/prisma` (migración `team_caught`), `server/src/teams/*`, `src/app/features/teams/**` | F3-06b | Equipos de hasta 6 Pokémon capturados |
+| `src/app/features/favorites/**`, `src/app/features/custom-pokemon/**` | F3-06c | Favoritos y personalizados |
+
+---
+
+## F3-04 · Pokédex 1025
+
+**Criterio (ROADMAP):** vistos/capturados por generación; ficha de especie (descripción ES, debilidades calculadas,
+cadena evolutiva, altura/peso, hábitat). Vista móvil 390×844 y un vistazo en Android.
+
+### Paso 1 — El inventario de IS-11 se muda a `/inventario`
+
+**Files:** Move `src/app/features/pokedex/` → `src/app/features/inventory/` (clase `PokedexPage` → `InventoryPage`,
+selector `app-inventory`); Modify `app.routes.ts`, `core/auth/auth.guard.ts` (fallback de `adminGuard`),
+`features/pokemon-add/pokemon-add.page.ts`, `features/pokemon-detail/pokemon-detail.page.ts`,
+`features/map/ball-menu.component.ts`, `README.md` (tabla de rutas)
+
+- [ ] **1a.** `git mv` de la carpeta y renombrar clase/selector/título ("Inventario de la tienda"). En `app.routes.ts`:
+  `{ path: 'inventario', loadComponent: … InventoryPage }` (pública, como hoy) y `{ path: 'tabs/pokedex', redirectTo:
+  '/inventario' }`. Quitar la ruta `pokedex` vieja (la nueva llega en el paso 4).
+- [ ] **1b.** Cambiar `'/pokedex'` → `'/inventario'` en el fallback de `adminGuard`, en `navigateBack` de
+  `pokemon-add` y `pokemon-detail`, y en el `defaultHref` del botón atrás de esas páginas.
+  `grep -rn "'/pokedex'" src/app` → solo lo que ahora es la Pokédex nueva.
+- [ ] **1c.** Menú de la Poké Ball: "Pokédex" (→ `/pokedex`, la nueva) y "Inventario" (→ `/inventario`, icono
+  `storefront-outline`). README: tabla de rutas al día.
+- [ ] **1d.** `ng test` (el spec de la página movida se renombra con ella), lint, build. Commit + `/guardar`.
+
+### Paso 2 — Debilidades (puro)
+
+**Files:** Create `shared/engine/weaknesses.ts` + spec
+
+- [ ] **2a. Test que falla** (con la tabla real de `types.json`, como `type-chart.spec.ts`):
+
+```ts
+import { readFileSync } from 'node:fs';
+import { buildTypeChart } from './battle/type-chart.js';
+import { defenseProfile } from './weaknesses.js';
+
+const chart = buildTypeChart(
+  JSON.parse(readFileSync(new URL('../../src/assets/data/types.json', import.meta.url), 'utf8')),
+);
+
+describe('defenseProfile', () => {
+  it('Charizard (fuego/volador): roca ×4; agua y eléctrico ×2; tierra ×0; planta y bicho ×¼', () => {
+    const p = defenseProfile(['fire', 'flying'], chart);
+    expect(p.x4).toEqual(['rock']);
+    expect(p.x2.sort()).toEqual(['electric', 'water']);
+    expect(p.x0).toEqual(['ground']);
+    expect(p.x025.sort()).toEqual(['bug', 'grass']);
+    expect(p.x05.sort()).toEqual(['fairy', 'fighting', 'fire', 'steel']);
+  });
+  it('un solo tipo (Normal): lucha ×2, fantasma ×0, nada más', () => {
+    const p = defenseProfile(['normal'], chart);
+    expect(p.x2).toEqual(['fighting']);
+    expect(p.x0).toEqual(['ghost']);
+    expect([...p.x4, ...p.x05, ...p.x025]).toEqual([]);
+  });
+});
+```
+
+- [ ] **2b.** falla. **2c.**
+
+```ts
+import type { TypeName } from '../data/dataset.types.js';
+import { TYPE_NAMES, type TypeChart, effectiveness } from './battle/type-chart.js';
+
+/** Cómo le afecta cada tipo atacante a una especie (ficha de la Pokédex, F3-04). Los ×1 no se listan. */
+export interface DefenseProfile {
+  x4: TypeName[];
+  x2: TypeName[];
+  x05: TypeName[];
+  x025: TypeName[];
+  x0: TypeName[];
+}
+
+export function defenseProfile(types: readonly TypeName[], chart: TypeChart): DefenseProfile {
+  const p: DefenseProfile = { x4: [], x2: [], x05: [], x025: [], x0: [] };
+  for (const atk of TYPE_NAMES) {
+    const m = effectiveness(chart, atk, types);
+    if (m === 4) p.x4.push(atk);
+    else if (m === 2) p.x2.push(atk);
+    else if (m === 0.5) p.x05.push(atk);
+    else if (m === 0.25) p.x025.push(atk);
+    else if (m === 0) p.x0.push(atk);
+  }
+  return p;
+}
+```
+
+  (`effectiveness(chart, ataque, tiposDefensor)` es la firma real de `type-chart.ts`.)
+- [ ] **2d.** pasa. Commit + `/guardar`.
+
+### Paso 3 — Cadena evolutiva (pura)
+
+**Files:** Create `shared/engine/evolution-chain.ts` + spec
+
+- [ ] **3a. Test que falla** (con `pokedex.json` real):
+
+```ts
+import { readFileSync } from 'node:fs';
+import type { Species } from '../data/dataset.types.js';
+import { evolutionTree, methodText } from './evolution-chain.js';
+
+const species = new Map(
+  (JSON.parse(readFileSync(new URL('../../src/assets/data/pokedex.json', import.meta.url), 'utf8')) as Species[]).map(
+    (s) => [s.id, s],
+  ),
+);
+const ids = (n: { id: number; next: { node: unknown }[] }): unknown => [n.id, n.next.map((e) => ids(e.node as never))];
+
+describe('evolutionTree', () => {
+  it('desde cualquier miembro sale la cadena entera desde la base: Raichu → Pichu → Pikachu → Raichu', () => {
+    expect(ids(evolutionTree(species, 26))).toEqual([172, [[25, [[26, []]]]]]);
+  });
+  it('ramas: Eevee tiene 8 evoluciones', () => {
+    expect(evolutionTree(species, 133).next).toHaveLength(8);
+  });
+  it('sin evolución: un solo nodo', () => {
+    expect(ids(evolutionTree(species, 128))).toEqual([128, []]);
+  });
+  it('método en español', () => {
+    expect(methodText({ to: 2, trigger: 'level-up', minLevel: 16, item: null })).toBe('Nivel 16');
+    expect(methodText({ to: 26, trigger: 'use-item', minLevel: null, item: 'thunder-stone' })).toBe('Piedra Trueno');
+    expect(methodText({ to: 65, trigger: 'trade', minLevel: null, item: null })).toBe('Intercambio');
+    expect(methodText({ to: 0, trigger: 'spin', minLevel: null, item: null })).toBe('Condición especial');
+  });
+});
+```
+
+- [ ] **3b.** falla. **3c.**
+
+```ts
+import type { EvolutionLink, Species } from '../data/dataset.types.js';
+
+export interface EvolutionNode {
+  id: number;
+  next: { node: EvolutionNode; link: EvolutionLink }[];
+}
+
+type Dex = ReadonlyMap<number, Pick<Species, 'id' | 'evolvesFrom' | 'evolvesTo'>>;
+const MAX_DEPTH = 10; // ninguna cadena pasa de 3; así un dato roto no cuelga
+
+/** Árbol de la cadena evolutiva de `id`, desde la especie base (F3-04). */
+export function evolutionTree(species: Dex, id: number): EvolutionNode {
+  let base = id;
+  for (let i = 0; i < MAX_DEPTH; i++) {
+    const from = species.get(base)?.evolvesFrom;
+    if (from == null || !species.has(from)) break;
+    base = from;
+  }
+  const build = (sid: number, depth: number): EvolutionNode => ({
+    id: sid,
+    next:
+      depth >= MAX_DEPTH
+        ? []
+        : (species.get(sid)?.evolvesTo ?? [])
+            .filter((l) => species.has(l.to))
+            .map((link) => ({ link, node: build(link.to, depth + 1) })),
+  });
+  return build(base, 0);
+}
+
+const ITEMS_ES: Record<string, string> = {
+  'fire-stone': 'Piedra Fuego',
+  'water-stone': 'Piedra Agua',
+  'thunder-stone': 'Piedra Trueno',
+  'leaf-stone': 'Piedra Hoja',
+  'moon-stone': 'Piedra Lunar',
+  'sun-stone': 'Piedra Solar',
+  'shiny-stone': 'Piedra Día',
+  'dusk-stone': 'Piedra Noche',
+  'dawn-stone': 'Piedra Alba',
+  'ice-stone': 'Piedra Hielo',
+};
+
+/** Cómo evoluciona en los juegos principales (informativo: aquí se evoluciona con caramelos, F3-05). */
+export function methodText(link: EvolutionLink): string {
+  if (link.trigger === 'level-up') return link.minLevel ? `Nivel ${link.minLevel}` : 'Subir de nivel';
+  if (link.trigger === 'use-item') return (link.item && ITEMS_ES[link.item]) ?? 'Objeto evolutivo';
+  if (link.trigger === 'trade') return 'Intercambio';
+  return 'Condición especial';
+}
+```
+
+- [ ] **3d.** pasa. Commit + `/guardar`.
+
+### Paso 4 — `PokedexService` y la pantalla `/pokedex`
+
+**Files:** Create `src/app/services/game/pokedex.service.ts` (+ spec), `src/app/features/pokedex-1025/pokedex.page.ts`;
+Modify `app.routes.ts`, `features/encounter/encounter.page.ts` (invalidar al capturar, como la colección)
+
+- [ ] **4a. `PokedexService`** (test primero, patrón de `CollectionService`): `load()` → `GET /pokedex` una vez y
+  publica `entries` como `Map<speciesId, 'seen' | 'caught'>`; `seenCount`, `caughtCount` (`computed`); `invalidate()`
+  (lo llama el encuentro al capturar y también al ABRIR un encuentro: el servidor marca "visto" en ese momento).
+  Tests: carga y cuenta; un segundo `load()` sin invalidar no pide nada; tras `invalidate()` sí.
+- [ ] **4b. Página `/pokedex`** (`authGuard`): cabecera "Pokédex · vistos 120 · capturados 34 / 1025"; fila de 9 chips
+  de generación (I…IX, con "x/y capturados" de cada una); rejilla de 3-4 columnas de la generación elegida (máx. 156
+  celdas: no hace falta virtualizar). Celda: Nº en `tabular-nums` y:
+  - **no visto** → silueta (el arte con `filter: brightness(0) opacity(.25)`) y "???"; no se puede abrir;
+  - **visto** → arte en color y nombre; se abre;
+  - **capturado** → arte + icono de Poké Ball; se abre.
+  Imágenes con `loading="lazy"` y el fallback de `spriteUrls`. La generación elegida se recuerda en `localStorage`
+  (conveniencia; con try/catch). Estados: cargando (esqueletos), error con "Reintentar".
+- [ ] **4c.** Commit + `/guardar`.
+
+### Paso 5 — Ficha de la especie `/pokedex/:id`
+
+**Files:** Create `src/app/features/pokedex-1025/species.page.ts`, `species-weaknesses.component.ts`,
+`evolution-chain.component.ts`
+
+- [ ] **5a.** Si la especie no está vista → pantalla "Aún no has visto este Pokémon" con su silueta (nada de datos: se
+  descubre jugando). Si está vista: arte grande teñido por su tipo, Nº, nombre, `genus` ("Pokémon Ratón"), tipos,
+  `flavor` (descripción ES), altura y peso **de la especie** (sin XS/XL), hábitat en español (`grassland` Pradera,
+  `forest` Bosque, `waters-edge` Orilla, `mountain` Montaña, `cave` Cueva, `sea` Mar, `urban` Ciudad,
+  `rough-terrain` Terreno agreste, `rare` Raro; `null` → no se muestra), generación y botón de grito.
+- [ ] **5b. `app-species-weaknesses`:** `defenseProfile(types, chart)` con el `chart` construido de
+  `DatasetService.types()`; grupos "Muy débil ×4", "Débil ×2", "Resiste ×½", "Resiste mucho ×¼", "Inmune ×0" con
+  `app-type-chips`; los grupos vacíos no salen. **Siempre texto + color** (DISENO §7).
+- [ ] **5c. `app-evolution-chain`:** el árbol de `evolutionTree` en horizontal (ramas en columnas, como Eevee), cada
+  nodo con su arte pequeño (silueta si no está visto), nombre y bajo la flecha `methodText` + **el coste en caramelos de
+  F3-05** cuando exista (`evolutionCost`, paso 1 de F3-05; hasta entonces, solo el método). Tocar un nodo visto → su
+  ficha.
+- [ ] **5d.** Desde la ficha del individuo (`/coleccion/:id`), el nombre de la especie enlaza a `/pokedex/:speciesId`.
+- [ ] **5e.** Navegador 390×844 (Chrome sin ventana con `playwright-core`, ver bitácora de F3-02b/F3-03): Pokédex
+  con una cuenta con vistos y capturados; ficha de Charizard (debilidades del test), Eevee (8 ramas), un no visto.
+  Evidencias `docs/evidencias/F3-04_0{1..4}_*.png`. REGLA 2.
+
+---
+
+## F3-05 · Evolución con caramelos
+
+**Criterio (ROADMAP):** regla de caramelos por cadena, endpoint transaccional, animación de evolución.
+
+### Paso 1 — Regla (pura) → D-053
+
+**Files:** Create `shared/engine/evolution.ts` + spec
+
+Regla a la manera de Pokémon GO, sobre la **profundidad de la cadena** (etapa = saltos de `evolvesFrom` desde la base):
+cadenas de una sola evolución (Rattata→Raticate, Magikarp→Gyarados, **Eevee** y sus 8 ramas) **50**; en cadenas de dos,
+la primera **25** y la segunda **100** (Bulbasaur→Ivysaur 25, Ivysaur→Venusaur 100; Pichu→Pikachu 25,
+Pikachu→Raichu 100; Wurmple→Silcoon 25). Sin nivel mínimo, sin piedras ni intercambios (no existen en el juego): el
+método de los juegos se enseña como información (F3-04). El nivel, IVs, naturaleza, shiny, tamaño y mote se
+**conservan**; cambian especie, stats, PC y movimientos (los 4 por defecto de la especie nueva a su nivel, D-030).
+
+- [ ] **1a. Test que falla** (dataset real):
+
+```ts
+import { readFileSync } from 'node:fs';
+import type { Species } from '../data/dataset.types.js';
+import { evolutionOptions } from './evolution.js';
+
+const species = new Map(
+  (JSON.parse(readFileSync(new URL('../../src/assets/data/pokedex.json', import.meta.url), 'utf8')) as Species[]).map(
+    (s) => [s.id, s],
+  ),
+);
+const opts = (id: number) => evolutionOptions(species, id).map((o) => [o.to, o.cost]);
+
+describe('evolutionOptions', () => {
+  it('cadena de dos evoluciones: 25 la primera, 100 la segunda', () => {
+    expect(opts(1)).toEqual([[2, 25]]);
+    expect(opts(2)).toEqual([[3, 100]]);
+    expect(opts(172)).toEqual([[25, 25]]);
+    expect(opts(25)).toEqual([[26, 100]]);
+  });
+  it('una sola evolución: 50 (también las 8 ramas de Eevee)', () => {
+    expect(opts(19)).toEqual([[20, 50]]);
+    expect(opts(129)).toEqual([[130, 50]]);
+    expect(opts(133)).toHaveLength(8);
+    expect(opts(133).every(([, c]) => c === 50)).toBe(true);
+  });
+  it('ramas en una cadena de dos (Wurmple): las dos a 25', () => {
+    expect(opts(265)).toEqual([[266, 25], [268, 25]]);
+  });
+  it('sin evolución o especie desconocida: ninguna opción', () => {
+    expect(opts(128)).toEqual([]);
+    expect(opts(99999)).toEqual([]);
+  });
+});
+```
+
+- [ ] **1b.** falla. **1c.**
+
+```ts
+import type { Species } from '../data/dataset.types.js';
+
+type Dex = ReadonlyMap<number, Pick<Species, 'id' | 'evolvesFrom' | 'evolvesTo' | 'evolutionChainId'>>;
+export interface EvolutionOption {
+  to: number;
+  cost: number;
+}
+
+const MAX_HOPS = 10;
+const stageOf = (dex: Dex, id: number): number => {
+  let n = 0;
+  for (let cur = dex.get(id)?.evolvesFrom; cur != null && n < MAX_HOPS; cur = dex.get(cur)?.evolvesFrom) n++;
+  return n;
+};
+const depthCache = new WeakMap<Dex, Map<number, number>>();
+/** Etapa máxima de una cadena (0 = no evoluciona). Se calcula una vez por mapa. */
+function chainDepth(dex: Dex, chainId: number): number {
+  let cache = depthCache.get(dex);
+  if (!cache) {
+    cache = new Map();
+    for (const s of dex.values())
+      cache.set(s.evolutionChainId, Math.max(cache.get(s.evolutionChainId) ?? 0, stageOf(dex, s.id)));
+    depthCache.set(dex, cache);
+  }
+  return cache.get(chainId) ?? 0;
+}
+
+/** Evoluciones posibles de `from` y su coste en caramelos de la familia (D-053). */
+export function evolutionOptions(dex: Dex, from: number): EvolutionOption[] {
+  const s = dex.get(from);
+  if (!s) return [];
+  const depth = chainDepth(dex, s.evolutionChainId);
+  const cost = depth <= 1 ? 50 : stageOf(dex, from) === 0 ? 25 : 100;
+  return s.evolvesTo.filter((l) => dex.has(l.to)).map((l) => ({ to: l.to, cost }));
+}
+```
+
+- [ ] **1d.** pasa. Anotar **D-053** (la regla de arriba y por qué: como Pokémon GO, sin objetos ni intercambios que el
+  juego no tiene). Commit + `/guardar`.
+
+### Paso 2 — Servidor: `POST /collection/:id/evolve`
+
+**Files:** Modify `server/src/spawns/spawns.service.ts` (`SpeciesDetails` gana `evolvesFrom`, `evolvesTo`;
+`speciesMap()` para `evolutionOptions`), `server/src/collection/*`, `shared/protocol/collection.ts`
+(`EvolveRequest { to: number }`, respuesta `CollectionDetail`); Test `server/test/collection.e2e-spec.ts`
+
+- [ ] **2a. e2e que fallan:**
+  1. Bulbasaur nv 10 con 25 caramelos de su familia → `POST …/evolve { to: 2 }` → 200, `speciesId: 2`, mismo nivel,
+     IVs, naturaleza, shiny y mote; `cp` y `stats` recalculados (= `combatPower(calcStats(base de Ivysaur, …))`);
+     caramelos 25 → 0; Pokédex de 2 = capturado.
+  2. Con 24 caramelos → 409 "Te faltan caramelos" y nada cambia.
+  3. `to` que no es una evolución suya (Bulbasaur → 3) → 400; especie sin evolución → 400; de otro jugador → 404.
+  4. Dos `evolve` a la vez del mismo con 50 caramelos → uno 200 y otro 409; caramelos 50 → 25 (no 0).
+- [ ] **2b. Servicio** (una transacción, como `transfer`):
+
+```ts
+  async evolve(playerId: string, id: string, to: number): Promise<CollectionDetail> {
+    await this.prisma.$transaction(async (tx) => {
+      const row = await tx.caughtPokemon.findFirst({ where: { id, playerId } });
+      if (!row) throw new NotFoundException(NOT_YOURS);
+      const option = evolutionOptions(this.spawns.speciesMap(), row.speciesId).find((o) => o.to === to);
+      if (!option) throw new BadRequestException('Ese Pokémon no evoluciona en esa especie');
+      const from = this.spawns.speciesDetails(row.speciesId)!;
+      const target = this.spawns.speciesDetails(to)!;
+      // Gasto condicional: con dos a la vez, el segundo no encuentra caramelos suficientes.
+      const paid = await tx.candy.updateMany({
+        where: { playerId, familyId: from.familyId, qty: { gte: option.cost } },
+        data: { qty: { decrement: option.cost } },
+      });
+      if (paid.count !== 1) throw new ConflictException('Te faltan caramelos');
+      const stats = calcStats(target.baseStats, row.ivs as unknown as Stats, row.level, row.nature as Nature);
+      // Solo si sigue siendo la especie de origen: si otra petición lo evolucionó antes, count = 0 y se deshace TODO.
+      const changed = await tx.caughtPokemon.updateMany({
+        where: { id, playerId, speciesId: row.speciesId },
+        data: { speciesId: to, cp: combatPower(stats), moves: this.spawns.defaultMoves(to, row.level) },
+      });
+      if (changed.count !== 1) throw new ConflictException('Ese Pokémon ya evolucionó');
+      await tx.pokedexEntry.upsert({
+        where: { playerId_speciesId: { playerId, speciesId: to } },
+        create: { playerId, speciesId: to, caught: true, firstCaughtAt: new Date() },
+        update: { caught: true },
+      });
+    }, TX_OPTIONS);
+    return this.detail(playerId, id);
+  }
+```
+
+  Controlador `@Post(':id/evolve')` con `ParseUUIDPipe` y DTO `{ to: @IsInt() @Min(1) }`, límite 30/min.
+- [ ] **2c.** e2e → PASA; todos los e2e, lint, unitarios, build. Commit + `/guardar`.
+
+### Paso 3 — App: evolucionar desde la ficha + animación
+
+**Files:** Create `src/app/features/collection/evolve-panel.component.ts`, `evolve-scene.component.ts`,
+`evolve-timeline.ts` (+ spec); Modify `collection-detail.page.ts`, `collection.service.ts` (`evolve(id, to)`)
+
+- [ ] **3a. `evolve-timeline.ts` (puro, test primero)** — DISENO §5: "silueta blanca pulsando entre forma A y B
+  acelerando → estallido → forma nueva". `evolvePose(ms)` → `{ showB: boolean, glow: 0..1, burst: 0..1 }`: 0-3.000 ms
+  alterna A/B con periodo que baja de 600 ms a 60 ms (`showB` cambia cada medio periodo), `glow` sube de 0,3 a 1;
+  3.000-3.400 ms `burst` 0→1 (destello) y `showB = true`; ≥ 3.400 forma B en reposo. Tests: al principio `showB` falso;
+  los cambios A↔B en el último segundo son ≥ 4 veces más que en el primero; al final `showB` verdadero y `burst` 0.
+- [ ] **3b. `app-evolve-panel`** en la ficha (debajo de los caramelos): un botón por opción "Evolucionar a Raichu ·
+  100 🍬" (arte pequeño del destino); deshabilitado con "Te faltan 37" si no llegan. Confirmación corta.
+- [ ] **3c. `app-evolve-scene`** (capa a pantalla completa): fondo oscuro, las dos siluetas blancas
+  (`filter: brightness(0) invert(1)`) alternando según `evolvePose` en `requestAnimationFrame`, brillo creciente,
+  destello, forma nueva a color + su grito + háptico `success` en el MISMO fotograma (DISENO §4.10), texto
+  "¡Tu Pikachu evolucionó a Raichu!". La petición `POST …/evolve` sale al empezar y la animación espera su respuesta antes
+  del destello (como la captura, D-046); si falla → vuelve a A con el error ("Te faltan caramelos" / "Ya evolucionó").
+  "Reducir movimiento" → fundido A→B de 400 ms.
+- [ ] **3d.** Al terminar: la ficha muestra la especie nueva (`detail` de la respuesta), `collection.patchItem`,
+  `pokedex.invalidate()`. Lint, `ng test`, build. Commit + `/guardar`.
+- [ ] **3e.** Navegador 390×844 contra Nest + Postgres local: Bulbasaur con 25 caramelos (sembrados) → Ivysaur;
+  Eevee → elegir rama; sin caramelos → botón deshabilitado. Vídeo o capturas `docs/evidencias/F3-05_*`. REGLA 2.
+
+---
+
+## F3-06a · Inventario de IS-11 con la nueva UI
+
+**Criterio:** las pantallas de IS-11 (inventario, detalle, agregar, editar; HU-03/04/05/14) se ven y se sienten como el
+juego (DISENO §1-§4) sin cambiar su contrato ni sus servicios (`PokemonService`, `PokeApiService`, modelo
+`pokemon.model.ts`, `PokemonFormComponent`), y sus tests siguen en verde.
+
+- [ ] **1.** `/inventario`: rejilla de tarjetas como "Mis Pokémon" (arte, nombre, tipos, **precio** y **stock** con
+  "Agotado" si 0), buscador con el estilo del juego, scroll infinito actual conservado, botón "Agregar" solo para ADMIN
+  (D-023).
+- [ ] **2.** `/pokemon/:id`: ficha con el tinte del tipo, stats con `app-stat-bar`, precio/stock destacados, editar y
+  eliminar (solo ADMIN) con confirmación diseñada (nada de `alert` del sistema).
+- [ ] **3.** `/pokemon/nuevo` y `/pokemon/:id/editar`: `PokemonFormComponent` con los estilos de `src/theme/forms.scss`
+  (`.form`, `.field__*`, D-018) y `app-game-button`.
+- [ ] **4.** Postman (colección del repo) sigue pasando entera contra el servidor local; `ng test`, lint, build;
+  capturas `F3-06a_*`. REGLA 2.
+
+## F3-06b · Equipos con Pokémon capturados
+
+**Decisión a anotar (D-054):** `Team.pokemonIds` (ids de **especie**, contrato de JSON Server y de Postman) se
+**conserva**; se añade `Team.caughtIds uuid[]` (≤ 6, ids de **tus** `CaughtPokemon`), que es lo que usará el combate
+(F4/F5). Así no se rompe el contrato del curso (D-019) y ARQUITECTURA §9 ("equipos con Pokémon capturados") se cumple.
+
+- [ ] **1. Servidor:** migración `team_caught` (`caughtIds UUID[] NOT NULL DEFAULT '{}'`, CHECK de cardinalidad ≤ 6);
+  DTO de `/teams` acepta `caughtIds` opcional (array de UUID únicos, ≤ 6) y el servicio comprueba que TODOS son del
+  jugador (`count where id in … and playerId` = longitud) → si no, 400 "Hay Pokémon que no son tuyos"; al transferir un
+  Pokémon (F3-03) se quita de los equipos que lo tengan (misma transacción del `DELETE /collection/:id`). e2e: crear con
+  3 propios; con uno ajeno → 400; con 7 → 400; transferir uno → desaparece del equipo; Postman sin cambios sigue pasando.
+- [ ] **2. App:** `/equipos` (menú de la Poké Ball): lista de equipos con los 6 huecos (arte de cada capturado, PC);
+  crear/renombrar/borrar; editor que elige de "Mis Pokémon" (reutilizar `app-collection-card` en modo selección, máx. 6,
+  sin repetir). Vacía diseñada ("Arma tu primer equipo").
+- [ ] **3.** Tests, lint, build, capturas `F3-06b_*`. REGLA 2.
+
+## F3-06c · Favoritos y Pokémon personalizados
+
+- [ ] **1. Favoritos** (`/favoritos`, contrato `/favorites` sin cambios): marcar una **especie** como favorita desde
+  la ficha de la Pokédex (F3-04) con nota y valoración 1-5 (estrellas táctiles ≥ 44 px); lista con el sistema de diseño.
+- [ ] **2. Personalizados** (`/personalizados`, contrato `/customPokemon` sin cambios): crear con nombre, 1-2 tipos,
+  stats (sliders con `app-stat-bar`), URL de imagen (vista previa; si no carga → silueta) y descripción; lista y edición.
+  **Que aparezcan como spawns del grupo queda fuera** (necesita reglas de spawn nuevas y moderar imágenes de terceros):
+  anotado como extra en F7.
+- [ ] **3.** Tests, lint, build, Postman entera, capturas `F3-06c_*`. REGLA 2.
+
+## Riesgos (parte 2)
+
+- **Mover IS-11 de ruta:** el profe ya evaluó `/tabs/pokedex` → se redirige a `/inventario`; las rutas `/pokemon/…` no
+  cambian. Anotarlo en el README (paso 1c de F3-04).
+- **Coste de evolución:** la regla es propia (D-053); si en la demo se quiere evolucionar sin farmear, el modo demo de
+  F8-05 puede regalar caramelos (nunca un endpoint público).
+- **Evolución y combate:** los movimientos pasan a los por defecto de la especie nueva; si F4/F5 deja elegir
+  movimientos, revisar que evolucionar no borre una elección del jugador.
+- **Equipos con capturados transferidos:** cubierto en F3-06b paso 1 (se quitan en la misma transacción).
