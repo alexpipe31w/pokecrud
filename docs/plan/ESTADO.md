@@ -200,7 +200,8 @@ F2-07, F2-12, F2-13, F2-15 hechas; faltan **F2-11**/**F2-14** (ARCore), F2-10 (m
 ## En curso
 
 - **F3-06a (Samuel, rama `feature/F3-06a-inventario-ui`):** IS-11 (inventario, detalle, agregar, editar) con el sistema
-  de diseño. Punto de guardado: recién reclamada, empieza por el paso 1 (`/inventario`). F3-05 mezclado (#70).
+  de diseño. Punto de guardado: paso 1 hecho (`/inventario` en tarjetas, 4 tests). Sigue el paso 2 (`/pokemon/:id`).
+  F3-05 mezclado (#70).
 - **Ojo:** el inventario de IS-11 está ahora en `/inventario` (la Pokédex 1025 ocupa `/pokedex`).
 
 ### PRUEBAS EN EL MÓVIL PENDIENTES (con el APK de producción, `npm run apk -- --install`)

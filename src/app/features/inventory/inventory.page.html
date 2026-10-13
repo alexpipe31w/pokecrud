@@ -4,11 +4,7 @@
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/mapa" text="Mapa"></ion-back-button>
     </ion-buttons>
-    <ion-searchbar
-      placeholder="Buscar por número o nombre"
-      [debounce]="400"
-      (ionInput)="onSearch($event)"
-    ></ion-searchbar>
+    <ion-title>Inventario</ion-title>
   </ion-toolbar>
 </ion-header>
 
@@ -17,80 +13,90 @@
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
 
-  @if (loading()) {
-    <div class="state"><ion-spinner name="crescent"></ion-spinner></div>
-  } @else if (error()) {
-    <div class="state">
-      <ion-text color="danger"
-        ><p>{{ error() }}</p></ion-text
-      >
-      <ion-button fill="outline" (click)="load()">Reintentar</ion-button>
-    </div>
-  } @else {
-    <p class="count">
-      {{ filtered().length }} de {{ pokemon().length }} Pokémon
-      @if (isAdmin()) {
-        · desliza un Pokémon para editarlo o eliminarlo
-      }
-    </p>
+  <div class="page">
+    <label class="search">
+      <span class="visually-hidden">Buscar en el inventario</span>
+      <span class="search__icon" aria-hidden="true"></span>
+      <input
+        #q
+        type="search"
+        placeholder="Buscar por número o nombre"
+        autocomplete="off"
+        enterkeyhint="search"
+        (input)="onSearch(q.value)"
+      />
+    </label>
 
-    <ion-list lines="full">
-      @for (p of visible(); track p.id) {
-        <ion-item-sliding #sliding>
-          <ion-item button detail="true" (click)="open(p)">
-            <ion-thumbnail slot="start">
-              <img [src]="spriteUrl(p.id)" [alt]="p.name" loading="lazy" />
-            </ion-thumbnail>
-            <ion-label>
-              <p class="dex">{{ dexNumber(p.id) }}</p>
-              <h2>{{ p.name | titlecase }}</h2>
-              <app-type-chips [types]="p.types"></app-type-chips>
-            </ion-label>
-            <ion-note slot="end" class="inventory">
-              <strong>{{ p.price | currency: 'COP' : 'symbol-narrow' : '1.0-0' }}</strong>
-              <span [class.out]="p.stock === 0">Stock: {{ p.stock }}</span>
-            </ion-note>
-          </ion-item>
+    @if (loading()) {
+      <p class="state" role="status">Cargando el inventario…</p>
+    } @else if (error()) {
+      <div class="state">
+        <p>{{ error() }}</p>
+        <app-game-button label="Reintentar" variant="glass" (pressed)="load()" />
+      </div>
+    } @else {
+      <p class="count">{{ filtered().length }} de {{ pokemon().length }} Pokémon</p>
 
-          @if (isAdmin()) {
-            <ion-item-options side="end">
-              <ion-item-option color="primary" (click)="edit(p, sliding)">
-                <ion-icon slot="icon-only" name="create-outline" aria-label="Editar"></ion-icon>
-              </ion-item-option>
-              <ion-item-option color="danger" (click)="remove(p, sliding)">
-                <ion-icon slot="icon-only" name="trash-outline" aria-label="Eliminar"></ion-icon>
-              </ion-item-option>
-            </ion-item-options>
-          }
-        </ion-item-sliding>
-      } @empty {
-        <div class="state">
-          @if (pokemon().length === 0) {
-            <p>
-              No hay Pokémon guardados.
-              @if (isAdmin()) {
-                Pulsa + para agregar uno.
-              }
-            </p>
-          } @else {
-            <p>No se encontró ningún Pokémon.</p>
-          }
-        </div>
-      }
-    </ion-list>
+      <ul class="grid">
+        @for (p of visible(); track p.id; let i = $index) {
+          <li>
+            <a
+              class="inv-card"
+              [class.out]="p.stock === 0"
+              [routerLink]="['/pokemon', p.id]"
+              [attr.aria-label]="label(p)"
+              [style.--tint]="tint(p)"
+              [style.animation-delay.ms]="delay(i)"
+            >
+              <span class="dex" aria-hidden="true">{{ dexNumber(p.id) }}</span>
+              <span class="stock" aria-hidden="true">
+                {{ p.stock === 0 ? 'Agotado' : p.stock + ' en stock' }}
+              </span>
+              <img
+                [src]="art(p.id)"
+                alt=""
+                width="96"
+                height="96"
+                loading="lazy"
+                decoding="async"
+                (error)="nextArt($event, p.id)"
+              />
+              <span class="name" aria-hidden="true">{{ p.name | titlecase }}</span>
+              <app-type-chips [types]="p.types" aria-hidden="true" />
+              <span class="price" aria-hidden="true">{{
+                p.price | currency: 'COP' : 'symbol-narrow' : '1.0-0'
+              }}</span>
+            </a>
+          </li>
+        } @empty {
+          <li class="state">
+            @if (pokemon().length === 0) {
+              <p>
+                No hay Pokémon en el inventario.
+                @if (isAdmin()) {
+                  Pulsa «Agregar» para traer uno de PokéAPI.
+                }
+              </p>
+            } @else {
+              <p>No se encontró ningún Pokémon.</p>
+            }
+          </li>
+        }
+      </ul>
 
-    <ion-infinite-scroll [disabled]="!hasMore()" (ionInfinite)="loadMore($any($event))">
-      <ion-infinite-scroll-content
-        loadingText="Cargando más Pokémon…"
-      ></ion-infinite-scroll-content>
-    </ion-infinite-scroll>
-  }
+      <ion-infinite-scroll [disabled]="!hasMore()" (ionInfinite)="loadMore($any($event))">
+        <ion-infinite-scroll-content
+          loadingText="Cargando más Pokémon…"
+        ></ion-infinite-scroll-content>
+      </ion-infinite-scroll>
+    }
+  </div>
 
   @if (isAdmin()) {
-    <ion-fab slot="fixed" vertical="bottom" horizontal="end">
-      <ion-fab-button (click)="add()" aria-label="Agregar Pokémon">
-        <ion-icon name="add"></ion-icon>
-      </ion-fab-button>
-    </ion-fab>
+    <div class="add" slot="fixed">
+      <app-game-button label="Agregar" ariaLabel="Agregar Pokémon" (pressed)="add()">
+        <span slot="icon" aria-hidden="true" class="plus">+</span>
+      </app-game-button>
+    </div>
   }
 </ion-content>

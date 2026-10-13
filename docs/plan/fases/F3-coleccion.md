@@ -1313,7 +1313,7 @@ export function evolutionOptions(dex: Dex, from: number): EvolutionOption[] {
 juego (DISENO §1-§4) sin cambiar su contrato ni sus servicios (`PokemonService`, `PokeApiService`, modelo
 `pokemon.model.ts`, `PokemonFormComponent`), y sus tests siguen en verde.
 
-- [ ] **1.** `/inventario`: rejilla de tarjetas como "Mis Pokémon" (arte, nombre, tipos, **precio** y **stock** con
+- [x] **1.** `/inventario`: rejilla de tarjetas como "Mis Pokémon" (arte, nombre, tipos, **precio** y **stock** con
   "Agotado" si 0), buscador con el estilo del juego, scroll infinito actual conservado, botón "Agregar" solo para ADMIN
   (D-023).
 - [ ] **2.** `/pokemon/:id`: ficha con el tinte del tipo, stats con `app-stat-bar`, precio/stock destacados, editar y
