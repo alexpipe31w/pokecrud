@@ -143,4 +143,30 @@ describe('CollectionService', () => {
     expect(svc.items().map((i) => i.id)).toEqual(['a', 'b', 'c']);
     expect(svc.total()).toBe(3);
   });
+
+  it('F3-03: detail, patch (deja la fila de la lista al día) y transfer llaman a /collection/:id', async () => {
+    const first = svc.load();
+    pending().req.flush(page(['a', 'b'], null));
+    await first;
+
+    const d = svc.detail('a');
+    const getReq = http.expectOne(`${URL}/a`);
+    expect(getReq.request.method).toBe('GET');
+    getReq.flush({ ...item('a'), stats: {} });
+    expect((await d).id).toBe('a');
+
+    const p = svc.patch('b', { nickname: 'Chispa' });
+    const patchReq = http.expectOne(`${URL}/b`);
+    expect(patchReq.request.method).toBe('PATCH');
+    expect(patchReq.request.body).toEqual({ nickname: 'Chispa' });
+    patchReq.flush(item('b', { nickname: 'Chispa' }));
+    await p;
+    expect(svc.items()[1].nickname).toBe('Chispa');
+
+    const t = svc.transfer('a');
+    const delReq = http.expectOne(`${URL}/a`);
+    expect(delReq.request.method).toBe('DELETE');
+    delReq.flush({ candy: { familyId: 10, qty: 4, gained: 1 } });
+    expect((await t).candy.gained).toBe(1);
+  });
 });

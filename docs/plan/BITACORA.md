@@ -1511,3 +1511,33 @@ lista. `spriteUrls` pasa a `src/app/core/utils/sprites.ts` (con shiny); el mapa 
 **Decisiones nuevas:** ninguna.
 **El siguiente debe empezar por:** F3-03 paso 1 (`GET/PATCH/DELETE /collection/:id`, e2e primero) en
 `fases/F3-coleccion.md`, con el Postgres portátil.
+
+## 2026-10-13 17:45 · @samuel (Claude) · F3-03 · rama `feature/F3-03-ficha`
+
+**Qué se hizo:** #66 mezclado. Servidor: `GET /collection/:id` (ficha con IVs y stats, solo del dueño), `PATCH` (mote
+con `normalizeNickname`, favorito; cuerpo vacío o campos extra → 400) y `DELETE` (transferir: `deleteMany` con
+`playerId` + `Candy` +1 en UNA transacción; dos a la vez → 200 y 404, +1). App: `CollectionService.detail/patch/
+transfer`; `PendingTransfer` (deshacer 5 s sin llamar al servidor) y `TransferService` (raíz: una a la vez, confirma al
+ir a segundo plano, devuelve a la lista si falla); `/coleccion/:id` con `app-detail-stats` (★ llenas doradas y vacías
+apagadas, %, IVs/31, stats/255 con ▲▼), `app-detail-moves`, `app-detail-origin` (mapa mini solo al verse; si falla,
+coordenadas), `app-rename-sheet` (misma regla y mensaje que el servidor) y `app-transfer-toast` en la lista.
+"Ver en Mis Pokémon" abre la ficha del capturado.
+**Cómo se probó (salida real):**
+
+    e2e colección: 4 nuevos en rojo primero → 12/12; todos: Test Files 8 passed, Tests 82 passed (Postgres portátil)
+    app: pending-transfer 4 · transfer.service 4 · collection.service 8 · detail-stats 4 passed
+    Chrome sin ventana 390×844, Nest + Postgres locales, cuenta demo+…@pokecrud.test con 35 capturas:
+      cabecera "PC 301 Chispa ✎ ☆ Pikachu ELÉCTRICO Nv. 26 · ♀ · ✦ Shiny · 0.36 m · 5.4 kg 6 caramelos de Pichu"
+      naturaleza "Miedosa · ▲ Velocidad · ▼ Ataque"; 4 movimientos con tipo/categoría/pot./prec./PP; mapa mini OK
+      13 letras → "Máximo 12 caracteres" y Guardar deshabilitado; emoji → "Solo letras, números, espacios…"
+      mote "Rayito" guardado; favorito servidor false → true → false
+      transferir + Deshacer: 29 → 30 tarjetas y sigue en el servidor; transferir y esperar: GET ficha → 404,
+      caramelos de la familia 6 → 7; 0 errores en consola. Evidencias docs/evidencias/F3-03_0{1..5}_*.png
+
+**Ojo:** los e2e de la colección borran al terminar los jugadores `col+…@pokecrud.test` (`cleanupTestPlayers`): una
+cuenta de prueba manual con ese prefijo desaparece al pasarlos. Para pruebas a mano usar `demo+…` (y aun así, los
+`@pokecrud.test` de más de 1 h se borran en cualquier e2e).
+**Quedó a medias:** F3-03 4b (mirarla en un Android), opcional, sin móvil hoy.
+**Decisiones nuevas:** ninguna.
+**El siguiente debe empezar por:** F3-01b (parte 2 del plan de `fases/F3-coleccion.md`: Pokédex 1025, evolución con
+caramelos, CRUD del curso).
