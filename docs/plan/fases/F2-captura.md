@@ -875,7 +875,7 @@ export class CameraService {
 
 **Files:** Create `src/app/services/ar/orientation.service.ts`, Test `orientation.service.spec.ts`
 
-- [ ] **6a. Test que falla:**
+- [x] **6a. Test que falla:**
 
 ```ts
 import { TestBed } from '@angular/core/testing';
@@ -987,8 +987,8 @@ describe('OrientationService', () => {
 });
 ```
 
-- [ ] **6b.** `npx ng test --include=src/app/services/ar/orientation.service.spec.ts --watch=false` → FALLA.
-- [ ] **6c. Implementación:**
+- [x] **6b.** `npx ng test --include=src/app/services/ar/orientation.service.spec.ts --watch=false` → FALLA.
+- [x] **6c. Implementación:**
 
 ```ts
 import { Injectable, InjectionToken, inject, signal } from '@angular/core';
@@ -1118,7 +1118,7 @@ export class OrientationService {
 }
 ```
 
-- [ ] **6d.** → PASA (4 tests). Commit `F2-04a: OrientationService (sensor → evento, 80 ms)` + push.
+- [x] **6d.** → PASA (4 tests). Commit `F2-04a: OrientationService (sensor → evento, 80 ms)` + push.
 
 ### Paso 7 — Abrir el encuentro desde el servidor
 
