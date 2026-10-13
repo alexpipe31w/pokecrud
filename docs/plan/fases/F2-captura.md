@@ -4112,7 +4112,7 @@ export function resolveFlight(f: Flight, box: TargetBox): ThrowHit {
 
 **Files:** Create `src/app/game/encounter-scene/precision-ring.ts`, Test `precision-ring.spec.ts`
 
-- [ ] **6a. Test que falla:**
+- [x] **6a. Test que falla:**
 
 ```ts
 import { RING_MIN, RING_PERIOD_MS, ringRadius, ringToken, throwQuality } from './precision-ring';
@@ -4141,7 +4141,7 @@ describe('precision-ring', () => {
 });
 ```
 
-- [ ] **6b.** → FALLA. **6c. Implementación:**
+- [x] **6b.** → FALLA. **6c. Implementación:**
 
 ```ts
 import type { ThrowQuality } from '@shared/engine/capture';
@@ -4184,7 +4184,7 @@ export const QUALITY_TEXT: Readonly<Record<ThrowQuality, string>> = {
 };
 ```
 
-- [ ] **6d.** → PASA (3). Commit `F2-05: aro de precisión` + push.
+- [x] **6d.** → PASA (3). Commit `F2-05: aro de precisión` + push.
 
 ### Paso 7 — La bola en 3D
 
