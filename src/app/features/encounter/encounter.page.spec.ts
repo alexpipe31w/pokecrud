@@ -11,7 +11,16 @@ import { DatasetService } from '../../services/game/dataset.service';
 import { EncounterApiService } from '../../services/game/encounter-api.service';
 import { HapticsService } from '../../services/game/haptics.service';
 import { SettingsService } from '../../services/game/settings.service';
-import { ENCOUNTER_STAGE, EncounterPage, NO_GYRO_MS, encounterErrorText } from './encounter.page';
+import * as THREE from 'three';
+
+import type { EncounterScene } from '../../game/encounter-scene/encounter-scene';
+import {
+  ENCOUNTER_STAGE,
+  EncounterPage,
+  NO_GYRO_MS,
+  POKEMON_MODEL,
+  encounterErrorText,
+} from './encounter.page';
 
 const view: EncounterView = {
   id: '12:34:5',
@@ -60,7 +69,13 @@ describe('EncounterPage', () => {
     resize: vi.fn(),
     dispose: vi.fn(),
   };
-  const createStage = vi.fn(() => stage);
+  const createStage = vi.fn((_c: HTMLCanvasElement, _w: EncounterScene) => stage);
+  /** Modelo 3D de prueba: una caja (F2-12). */
+  const cube = () => ({
+    scene: new THREE.Group().add(new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1))) as THREE.Group,
+    clips: [],
+  });
+  const loadModel = vi.fn(async (_id: number, _shiny: boolean) => cube() as ReturnType<typeof cube> | null);
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -86,6 +101,7 @@ describe('EncounterPage', () => {
         { provide: CameraService, useValue: camera },
         { provide: OrientationService, useValue: orientation },
         { provide: ENCOUNTER_STAGE, useValue: createStage },
+        { provide: POKEMON_MODEL, useValue: loadModel },
       ],
     });
   });
@@ -175,5 +191,32 @@ describe('EncounterPage', () => {
     stage.onFrame!(performance.now() + NO_GYRO_MS + 100);
     await settle(f);
     expect(text(f)).toContain('Sin giroscopio');
+  });
+
+  it('pone el modelo 3D del Pokémon (F2-12); sin modelo se queda el plano', async () => {
+    await open(Promise.resolve(view));
+    expect(loadModel).toHaveBeenCalledWith(25, false);
+    const world = createStage.mock.calls[0][1];
+    expect(world.model).not.toBeNull();
+    createStage.mockClear();
+    loadModel.mockResolvedValueOnce(null);
+    await open(Promise.resolve(view));
+    expect(createStage.mock.calls[0][1].model).toBeNull();
+  });
+
+  it('arrastrar el dedo en horizontal gira al Pokémon', async () => {
+    const f = await open(Promise.resolve(view));
+    const world = createStage.mock.calls[0][1];
+    const spin = vi.spyOn(world, 'spin');
+    const el = (f.nativeElement as HTMLElement).querySelector<HTMLElement>('.stage')!;
+    // jsdom no tiene PointerEvent: un MouseEvent con el nombre del evento de puntero trae lo que se lee (clientX).
+    const ev = (type: string, x: number) =>
+      el.dispatchEvent(new MouseEvent(type, { clientX: x, clientY: 400, bubbles: true }));
+    ev('pointerdown', 100);
+    ev('pointermove', 160);
+    ev('pointerup', 160);
+    ev('pointermove', 300); // ya soltado: no gira
+    expect(spin).toHaveBeenCalledTimes(1);
+    expect(spin.mock.calls[0][0]).toBeGreaterThan(0);
   });
 });

@@ -77,6 +77,16 @@ describe('EncounterScene', () => {
     snorlax.dispose();
   });
 
+  it('sin AR apunta también a lo que flota (los que vuelan no se salen por arriba)', () => {
+    const s = new EncounterScene(1.7);
+    s.setViewport(390, 844);
+    s.placeAt(0);
+    s.aimAtPokemon(0.6);
+    const c = s.anchor.position.clone().setY(s.anchor.position.y + 0.6 + 0.85).project(s.camera);
+    expect(c.y).toBeCloseTo(0, 6);
+    s.dispose();
+  });
+
   it('la cámara copia la orientación del móvil', () => {
     const s = new EncounterScene(0.4);
     const q = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), 1);
@@ -154,5 +164,98 @@ describe('EncounterScene', () => {
     expect([at(4, 4, 0), at(4, 4, 3)]).toEqual([255, 255]);
     expect(at(0, 4, 3)).toBe(0);
     tex.dispose();
+  });
+});
+
+describe('EncounterScene con modelo 3D (F2-12)', () => {
+  /** Modelo de prueba: una caja de 2 × 4 × 1 con el suelo a y = −1 (como un .glb cualquiera, sin normalizar). */
+  const fakeModel = (clips: THREE.AnimationClip[] = []) => {
+    const scene = new THREE.Group();
+    const mesh = new THREE.Mesh(
+      new THREE.BoxGeometry(2, 4, 1).translate(5, 1, 0),
+      new THREE.MeshStandardMaterial(),
+    );
+    mesh.name = 'cuerpo';
+    scene.add(mesh);
+    return { scene, clips };
+  };
+  const box = (s: EncounterScene) => {
+    s.anchor.updateMatrixWorld(true);
+    // la caja en el sistema de los pies (anchor), sin la rotación hacia la cámara
+    const inv = s.anchor.matrixWorld.clone().invert();
+    return new THREE.Box3().setFromObject(s.model!).applyMatrix4(inv);
+  };
+
+  it('sustituye al plano, mide su altura real con los pies en el suelo y centrado', () => {
+    const s = new EncounterScene(0.4);
+    s.placeAt(0);
+    s.setModel(fakeModel());
+    s.update(null);
+    expect(s.body.visible).toBe(false);
+    const b = box(s);
+    expect(b.max.y - b.min.y).toBeCloseTo(0.4, 6);
+    expect(b.min.y).toBeCloseTo(0, 6);
+    expect((b.min.x + b.max.x) / 2).toBeCloseTo(0, 6);
+    expect(s.artAspect).toBeCloseTo(0.5, 6); // 2 de ancho / 4 de alto
+    s.dispose();
+  });
+
+  it('la postura le afecta igual que al plano: sube, se aplasta y se inclina', () => {
+    const s = new EncounterScene(1);
+    s.placeAt(0);
+    s.setModel(fakeModel());
+    s.update(null, { lift: 0.5, squash: 0.8, lean: 0.1 });
+    const b = box(s);
+    expect(b.min.y).toBeGreaterThan(0.4);
+    expect(b.max.y - b.min.y).toBeLessThan(1);
+    expect(s.model!.rotation.z).toBeCloseTo(0.1, 6);
+    s.dispose();
+  });
+
+  it('se gira con el dedo (spin) sin moverse del sitio', () => {
+    const s = new EncounterScene(1);
+    s.placeAt(0);
+    s.setModel(fakeModel());
+    s.spin(Math.PI / 2);
+    s.update(null);
+    expect(s.model!.rotation.y).toBeCloseTo(Math.PI / 2, 6);
+    expect(s.model!.position.x).toBeCloseTo(0, 6);
+    s.dispose();
+  });
+
+  it('reproduce su animación en bucle con animate', () => {
+    const track = new THREE.NumberKeyframeTrack('cuerpo.position[y]', [0, 1], [0, 10]);
+    const s = new EncounterScene(1);
+    s.setModel(fakeModel([new THREE.AnimationClip('idle', 1, [track])]));
+    const mesh = s.model!.getObjectByName('cuerpo')!;
+    s.animate(0);
+    s.animate(0.5);
+    expect(mesh.position.y).toBeCloseTo(5, 4);
+    s.dispose();
+  });
+
+  it('con modelo hay luz; el fantasma también lo vuelve semitransparente', () => {
+    const s = new EncounterScene(1);
+    expect(s.scene.getObjectsByProperty('isLight', true)).toHaveLength(0);
+    const m = fakeModel();
+    s.setModel(m);
+    expect(s.scene.getObjectsByProperty('isLight', true).length).toBeGreaterThan(0);
+    s.setOpacity(0.7);
+    const mat = (m.scene.children[0] as THREE.Mesh).material as THREE.MeshStandardMaterial;
+    expect(mat.transparent).toBe(true);
+    expect(mat.opacity).toBeCloseTo(0.7, 6);
+    s.dispose();
+  });
+
+  it('dispose libera también el modelo', () => {
+    const s = new EncounterScene(1);
+    const m = fakeModel();
+    const mesh = m.scene.children[0] as THREE.Mesh;
+    const geo = vi.spyOn(mesh.geometry, 'dispose');
+    const mat = vi.spyOn(mesh.material as THREE.Material, 'dispose');
+    s.setModel(m);
+    s.dispose();
+    expect(geo).toHaveBeenCalled();
+    expect(mat).toHaveBeenCalled();
   });
 });

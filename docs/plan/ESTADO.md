@@ -12,7 +12,11 @@ Alex: "todo en cámara debe ser 3D… deben salir las características del poké
 para rodear al Pokémon + **ficha** junto a él (tipos, nivel, PC del servidor, altura/peso, descripción). Orden nuevo en
 ROADMAP: **F2-12 (modelo 3D) → F2-13 (ficha) → F2-11 (spike ARCore, Android) → F2-14 → F2-05 → F2-07**; F4-07 también.
 
-## RELEVO DE ALEX (2026-10-12, noche): F2-04a y F2-04b en `develop` a falta del Android
+## RELEVO DE ALEX (2026-10-12, noche): F2-04a, F2-04b y F2-12 (Pokémon en 3D) en `develop` a falta del Android
+
+- **F2-12 hecho:** el encuentro usa el modelo 3D `.glb` (D-048) con su animación, personalidad, partículas y giro con el
+  dedo; sin modelo → arte plano. Evidencias `F2-12_*`. Siguiente: **F2-13** (ficha que se abre/cierra con un botón).
+  Para MIRAR una especie concreta en el navegador: `page.route('**/encounters/*', r => r.fulfill({json: {...}}))`.
 
 - **F2-04b pasos 1-9a hechos** (personalidad, partículas, aterrizaje, destello, zoom desde el mapa). Fallo encontrado
   en el navegador y arreglado: las partículas se veían como puntos NEGROS sobre el canvas transparente (D-047).
@@ -234,6 +238,7 @@ fórmula (F2-03), captura en servidor (F2-06), audio (F2-08), **spike de cámara
 
 - F2-04a (@alex) · pasos 1-11 mezclados en `develop`; tarea `[~]` solo por el paso 12 (Android, ver PENDIENTES). F1-05 (3b) y F1-07 (7b) solo esperan la prueba en Android.
 - F2-04b (@alex) · pasos 1-9a mezclados en `develop`; `[~]` solo por el 9b (Android, ver PENDIENTES).
+- F2-12 (@alex) · pasos 1-5 mezclados en `develop`; `[~]` solo por el 6 (Android). Siguiente: **F2-13** (ficha con botón).
 
 ## Siguiente paso concreto
 
@@ -273,6 +278,8 @@ fórmula (F2-03), captura en servidor (F2-06), audio (F2-08), **spike de cámara
 - [ ] **F2-04a paso 12:** `npm run apk -- --install` y seguir 12a-12e de `docs/plan/fases/F2-captura.md` (cámara
       principal, ≥ 55 fps por CDP, mapa ↔ encuentro ×3 sin "context lost" y el mapa con avatar/Pokémon al volver,
       cámara suelta en segundo plano, AR apagada y permiso revocado). Si todo va, F2-04a `[x]` en ROADMAP.
+- [ ] **F2-12 paso 6:** encuentro con un modelo 3D (Charizard o Gengar si salen; si no, el que haya) → fps ≥ 55 con
+      modelo + partículas (snippet de F2-04a 12c) y que el modelo pesado no tarde demasiado con datos móviles.
 - [ ] **F2-04b paso 9b:** tocar un Pokémon en el mapa → crece → destello → cae con polvo, grito y vibración a la vez;
       un alado flota, un Fantasma semitransparente, un rápido salta más; fps con partículas ≥ 55; vídeo `F2-04b_*`.
 
