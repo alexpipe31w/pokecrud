@@ -196,8 +196,7 @@ F2-07, F2-12, F2-13, F2-15 hechas; faltan **F2-11**/**F2-14** (ARCore), F2-10 (m
 
 ## En curso
 
-- **F0-15 (@samuel, 2026-10-13)** — rama `feature/F0-15-tests-lentos`. **Punto de guardado:** reclamada; paso
-  siguiente: tiempo propio a los tests de simulación de `capture`, `spawns` y `rng`. Después Samuel coge F3-01.
+- **F0-15 (Samuel, PR abierto):** hecha. Samuel sigue con **F3-01**.
 - F1-05 y F1-07 siguen `[~]` (@alex) SOLO por su prueba en la calle (PENDIENTES).
 
 ## Siguiente paso concreto

@@ -11,11 +11,13 @@ describe('rng', () => {
 
   it('valores en [0, 1)', () => {
     const r = createRng(7);
+    // Un solo `expect` con los que se salen: 20.000 `expect` sueltos tardaban > 1 s (F0-15).
+    const out: number[] = [];
     for (let i = 0; i < 10_000; i++) {
       const v = r.next();
-      expect(v).toBeGreaterThanOrEqual(0);
-      expect(v).toBeLessThan(1);
+      if (!(v >= 0 && v < 1)) out.push(v);
     }
+    expect(out).toEqual([]);
   });
 
   it('int(min,max) incluye ambos extremos y es aproximadamente uniforme', () => {

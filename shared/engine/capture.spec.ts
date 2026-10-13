@@ -11,6 +11,9 @@ import {
 } from './capture.js';
 import { createRng } from './rng.js';
 
+/** Simulaciones de decenas de miles de tiradas: en un PC lento pasan de los 5 s por defecto (F0-15). */
+const SIMULATION_TIMEOUT_MS = 30_000;
+
 const base = (over: Partial<CaptureInput> = {}): CaptureInput => ({
   captureRate: 45,
   ball: 'POKE_BALL',
@@ -129,35 +132,44 @@ describe('resolveThrow', () => {
     }
   });
 
-  it('la frecuencia de captura en 40.000 lanzamientos coincide con captureChance', () => {
-    const rng = createRng(7);
-    for (const input of [
-      base(),
-      base({ captureRate: 3 }),
-      base({ captureRate: 120, berry: 'RAZZ_BERRY' }),
-    ]) {
-      let captured = 0;
-      for (let i = 0; i < 40_000; i++) if (resolveThrow(input, flee(), rng).captured) captured++;
-      expect(captured / 40_000).toBeCloseTo(captureChance(input), 2);
-    }
-  });
-
-  it('capturado ⇒ 3 sacudidas y nunca huye; fallido ⇒ 0-3 sacudidas y huye con la frecuencia esperada', () => {
-    const rng = createRng(21);
-    let failed = 0;
-    let fled = 0;
-    for (let i = 0; i < 40_000; i++) {
-      const r = resolveThrow(base(), flee({ speed: 120 }), rng);
-      if (r.captured) {
-        expect(r.shakes).toBe(3);
-        expect(r.fled).toBe(false);
-      } else {
-        expect(r.shakes).toBeGreaterThanOrEqual(0);
-        expect(r.shakes).toBeLessThanOrEqual(3);
-        failed++;
-        if (r.fled) fled++;
+  it(
+    'la frecuencia de captura en 40.000 lanzamientos coincide con captureChance',
+    () => {
+      const rng = createRng(7);
+      for (const input of [
+        base(),
+        base({ captureRate: 3 }),
+        base({ captureRate: 120, berry: 'RAZZ_BERRY' }),
+      ]) {
+        let captured = 0;
+        for (let i = 0; i < 40_000; i++) if (resolveThrow(input, flee(), rng).captured) captured++;
+        expect(captured / 40_000).toBeCloseTo(captureChance(input), 2);
       }
-    }
-    expect(fled / failed).toBeCloseTo(fleeChance(flee({ speed: 120 })), 2);
-  });
+    },
+    SIMULATION_TIMEOUT_MS,
+  );
+
+  it(
+    'capturado ⇒ 3 sacudidas y nunca huye; fallido ⇒ 0-3 sacudidas y huye con la frecuencia esperada',
+    () => {
+      const rng = createRng(21);
+      let failed = 0;
+      let fled = 0;
+      // Un solo `expect` al final con los casos raros: 40.000 × 2 `expect` sueltos tardaban 5-7 s (F0-15).
+      const wrong: { i: number; captured: boolean; shakes: number; fled: boolean }[] = [];
+      for (let i = 0; i < 40_000; i++) {
+        const r = resolveThrow(base(), flee({ speed: 120 }), rng);
+        if (r.captured) {
+          if (r.shakes !== 3 || r.fled) wrong.push({ i, ...r });
+        } else {
+          if (r.shakes < 0 || r.shakes > 3) wrong.push({ i, ...r });
+          failed++;
+          if (r.fled) fled++;
+        }
+      }
+      expect(wrong).toEqual([]);
+      expect(fled / failed).toBeCloseTo(fleeChance(flee({ speed: 120 })), 2);
+    },
+    SIMULATION_TIMEOUT_MS,
+  );
 });

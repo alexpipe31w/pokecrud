@@ -41,6 +41,8 @@ const FAKE: SpawnSpecies[] = [
 
 /** Neiva, Parque Santander. */
 const NEIVA = { lat: 2.9273, lng: -75.2819 };
+/** Simulaciones de miles de celdas: en un PC lento pasan de los 5 s por defecto (F0-15). */
+const SIMULATION_TIMEOUT_MS = 30_000;
 
 describe('celdas y franjas', () => {
   it('cellIdFor con coordenadas negativas usa floor (no trunc)', () => {
@@ -128,31 +130,38 @@ describe('spawnsForCell', () => {
     expect(differs).toBe(true);
   });
 
-  it('valores siempre dentro de rango y posiciones dentro de la celda', () => {
-    const b = cellBounds(cell);
-    let total = 0;
-    for (let seed = 0; seed < 5000; seed++) {
-      const spawns = spawnsForCell(cell, 7, seed, table);
-      expect(spawns.length).toBeLessThanOrEqual(3);
-      total += spawns.length;
-      for (const s of spawns) {
-        expect(s.id).toBe(`${cell}:7:${s.index}`);
-        expect(s.lat).toBeGreaterThanOrEqual(b.south);
-        expect(s.lat).toBeLessThan(b.north);
-        expect(s.lng).toBeGreaterThanOrEqual(b.west);
-        expect(s.lng).toBeLessThan(b.east);
-        expect(s.level).toBeGreaterThanOrEqual(MIN_LEVEL);
-        expect(s.level).toBeLessThanOrEqual(MAX_LEVEL);
-        for (const iv of Object.values(s.ivs)) expect(iv >= 0 && iv <= 31).toBe(true);
-        expect(s.speciesId).not.toBe(150);
-        if (s.speciesId === 81) expect(s.gender).toBeNull();
-        else expect(['M', 'F']).toContain(s.gender);
+  it(
+    'valores siempre dentro de rango y posiciones dentro de la celda',
+    () => {
+      const b = cellBounds(cell);
+      let total = 0;
+      // Se apuntan los fallos y hay un solo `expect` al final: ~30.000 `expect` sueltos tardaban 3-7 s (F0-15).
+      const wrong: { seed: number; problem: string }[] = [];
+      const check = (seed: number, ok: boolean, problem: string) => {
+        if (!ok) wrong.push({ seed, problem });
+      };
+      for (let seed = 0; seed < 5000; seed++) {
+        const spawns = spawnsForCell(cell, 7, seed, table);
+        check(seed, spawns.length <= 3, `${spawns.length} spawns`);
+        total += spawns.length;
+        for (const s of spawns) {
+          check(seed, s.id === `${cell}:7:${s.index}`, `id ${s.id}`);
+          check(seed, s.lat >= b.south && s.lat < b.north, `lat ${s.lat}`);
+          check(seed, s.lng >= b.west && s.lng < b.east, `lng ${s.lng}`);
+          check(seed, s.level >= MIN_LEVEL && s.level <= MAX_LEVEL, `nivel ${s.level}`);
+          for (const iv of Object.values(s.ivs)) check(seed, iv >= 0 && iv <= 31, `IV ${iv}`);
+          check(seed, s.speciesId !== 150, 'Mewtwo');
+          if (s.speciesId === 81) check(seed, s.gender === null, `Magnemite con sexo ${s.gender}`);
+          else check(seed, s.gender === 'M' || s.gender === 'F', `sexo ${s.gender}`);
+        }
       }
-    }
-    // Media esperada 0,54 por celda.
-    expect(total / 5000).toBeGreaterThan(0.48);
-    expect(total / 5000).toBeLessThan(0.6);
-  });
+      expect(wrong).toEqual([]);
+      // Media esperada 0,54 por celda.
+      expect(total / 5000).toBeGreaterThan(0.48);
+      expect(total / 5000).toBeLessThan(0.6);
+    },
+    SIMULATION_TIMEOUT_MS,
+  );
 
   it('parseSpawnId deshace el id', () => {
     expect(parseSpawnId('4181_-107546:2931234:2')).toEqual({
@@ -169,17 +178,23 @@ describe('con el dataset real (1025 especies)', () => {
     readFileSync(new URL('../../src/assets/data/pokedex.json', import.meta.url), 'utf8'),
   ) as Species[];
 
-  it('ningún legendario ni mítico en 20 000 celdas, y aparecen muchas especies distintas', () => {
-    const banned = new Set(pokedex.filter((s) => s.isLegendary || s.isMythical).map((s) => s.id));
-    expect(banned.size).toBeGreaterThan(50);
-    const table = buildSpawnTable(pokedex, 'rain', true);
-    const seen = new Set<number>();
-    for (let seed = 0; seed < 20_000; seed++) {
-      for (const s of spawnsForCell('0_0', 1, seed, table)) {
-        expect(banned.has(s.speciesId)).toBe(false);
-        seen.add(s.speciesId);
+  it(
+    'ningún legendario ni mítico en 20 000 celdas, y aparecen muchas especies distintas',
+    () => {
+      const banned = new Set(pokedex.filter((s) => s.isLegendary || s.isMythical).map((s) => s.id));
+      expect(banned.size).toBeGreaterThan(50);
+      const table = buildSpawnTable(pokedex, 'rain', true);
+      const seen = new Set<number>();
+      const legendary: number[] = [];
+      for (let seed = 0; seed < 20_000; seed++) {
+        for (const s of spawnsForCell('0_0', 1, seed, table)) {
+          if (banned.has(s.speciesId)) legendary.push(s.speciesId);
+          seen.add(s.speciesId);
+        }
       }
-    }
-    expect(seen.size).toBeGreaterThan(400);
-  });
+      expect(legendary).toEqual([]);
+      expect(seen.size).toBeGreaterThan(400);
+    },
+    SIMULATION_TIMEOUT_MS,
+  );
 });
