@@ -234,7 +234,8 @@ F2-07, F2-12, F2-13, F2-15 hechas; faltan **F2-11**/**F2-14** (ARCore), F2-10 (m
 
 **Quien haga F3-02a (tiene que tener `DIRECT_URL`):**
 
-- [ ] Migración `20261013010000_collection` + `npm run db:backfill-collection` en Supabase ANTES de mezclar el PR.
+- [x] (Samuel, 2026-10-13) Migración `20261013010000_collection` + `npm run db:backfill-collection` en Supabase
+      (12 capturas con PC, 12 filas de caramelos) ANTES de mezclar #65.
 
 **Kenneth o Samuel (Android):**
 

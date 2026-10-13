@@ -521,7 +521,8 @@ ON CONFLICT ("playerId", "speciesId") DO NOTHING;
 Render despliega solo al mezclar (ESTADO). Si el código nuevo llega antes que la migración, **cada captura daría 500**
 (las tablas no existen). Orden obligatorio:
 
-- [ ] **8a.** Quien tenga `DIRECT_URL`: `cd server && npx prisma migrate deploy` contra Supabase (aplica SOLO
+- [x] **8a.** (Samuel, 2026-10-13: `20261013010000_collection` aplicada; script → PC en 12 capturas, 12 filas de
+  caramelos para 1 jugador, Pokédex 0 nuevas porque ya la hizo la migración) Quien tenga `DIRECT_URL`: `cd server && npx prisma migrate deploy` contra Supabase (aplica SOLO
   `20261013010000_collection`; comprobar en la salida que no hay más pendientes) y `npm run db:backfill-collection`.
   Pegar la salida (sin la URL) en la bitácora.
 - [ ] **8b.** Mezclar el PR. Tras el despliegue de Render: una captura real desde el navegador →
