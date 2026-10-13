@@ -17,9 +17,20 @@ const MAX_DISTANCE_M = 12;
 export const pokemonHeightM = (heightDm: number, heightScale: number): number =>
   Math.max(MIN_HEIGHT_M, (heightDm / 10) * heightScale);
 
-/** Distancia a la que aparece: que quepa pero se note el tamaño (los pequeños a 2 m, los grandes más lejos). */
-export const encounterDistance = (heightM: number): number =>
-  Math.min(MAX_DISTANCE_M, Math.max(MIN_DISTANCE_M, heightM * 1.8));
+/** Lo que puede ocupar el Pokémon del ancho de la pantalla (F2-15). */
+export const MAX_WIDTH_FILL = 0.7;
+
+/**
+ * Distancia a la que aparece: que quepa pero se note el tamaño (los pequeños a 2 m, los grandes más lejos). En vertical
+ * la pantalla abarca ~32° de ancho frente a 64° de alto, así que también se aleja hasta que su ancho ocupe como mucho
+ * `MAX_WIDTH_FILL` de la pantalla (F2-15: Slowpoke XL la llenaba entera). `viewHalfWidthTan` = tan(campo de visión
+ * horizontal / 2) de la cámara; sin ancho ni pantalla, solo cuenta la altura.
+ */
+export const encounterDistance = (heightM: number, widthM = 0, viewHalfWidthTan = Infinity): number =>
+  Math.min(
+    MAX_DISTANCE_M,
+    Math.max(MIN_DISTANCE_M, heightM * 1.8, widthM / (2 * viewHalfWidthTan * MAX_WIDTH_FILL)),
+  );
 
 export function sizeClass(heightScale: number): 'XS' | 'XL' | null {
   if (heightScale < XS_MAX) return 'XS';

@@ -4,6 +4,7 @@ import {
   BALL_SHOW_FWD,
   BURST_COUNT,
   BURST_S,
+  ENCOUNTER_FOV_DEG,
   EncounterScene,
   blobTexture,
 } from './encounter-scene';
@@ -241,6 +242,42 @@ describe('EncounterScene con modelo 3D (F2-12)', () => {
     expect(b.min.y).toBeCloseTo(0, 6);
     expect((b.min.x + b.max.x) / 2).toBeCloseTo(0, 6);
     expect(s.artAspect).toBeCloseTo(0.5, 6); // 2 de ancho / 4 de alto
+    s.dispose();
+  });
+
+  it('F2-15: cuando llega el modelo se recoloca a la distancia que pide SU ancho, en la misma dirección', () => {
+    const a36 = Math.tan((ENCOUNTER_FOV_DEG / 2) * (Math.PI / 180)) * (384 / 832);
+    const wide = () => ({
+      scene: new THREE.Group().add(new THREE.Mesh(new THREE.BoxGeometry(4, 2, 1))) as THREE.Group,
+      clips: [],
+    });
+    const s = new EncounterScene(1.75);
+    s.setViewport(384, 832);
+    s.placeAt(Math.PI / 2); // a la izquierda (−X)
+    expect(-s.anchor.position.x).toBeCloseTo(encounterDistance(1.75, 1.75, a36), 6); // arte: tan ancho como alto
+    s.setModel(fakeModel()); // 2 × 4: estrecho → se acerca
+    expect(-s.anchor.position.x).toBeCloseTo(1.75 * 1.8, 6);
+    expect(s.anchor.position.z).toBeCloseTo(0, 6);
+    expect(s.anchor.position.y).toBe(-EYE_HEIGHT_M);
+    const w = new EncounterScene(1.75);
+    w.setViewport(384, 832);
+    w.placeAt(0);
+    w.setModel(wide()); // 4 × 2: el doble de ancho que de alto → se aleja
+    expect(-w.anchor.position.z).toBeCloseTo(encounterDistance(1.75, 3.5, a36), 6);
+    expect(w.distance).toBeCloseTo(-w.anchor.position.z, 6);
+    s.dispose();
+    w.dispose();
+  });
+
+  it('si el arte plano llega DESPUÉS del modelo, mandan la proporción y la distancia del modelo', () => {
+    const s = new EncounterScene(1.75);
+    s.setViewport(384, 832);
+    s.placeAt(0);
+    s.setModel(fakeModel());
+    const z = s.anchor.position.z;
+    s.setTexture(new THREE.Texture({ width: 512, height: 512 } as unknown as HTMLImageElement));
+    expect(s.artAspect).toBeCloseTo(0.5, 6);
+    expect(s.anchor.position.z).toBe(z);
     s.dispose();
   });
 
