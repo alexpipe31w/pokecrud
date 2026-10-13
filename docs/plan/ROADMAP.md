@@ -164,10 +164,13 @@
       Dep: F0-03.
       **Hecho:** fórmula Gen III+ de ARQUITECTURA §6, huida por rareza/velocidad, `resolveThrow` con RNG inyectado;
       12 tests (casos calculados a mano + 40.000 lanzamientos que cuadran con la probabilidad). D-027.
-- [ ] **F2-04a · Escena de encuentro en AR (base)** — `/encuentro/:id` definitivo: cámara trasera principal de fondo
+- [~] **F2-04a · Escena de encuentro en AR (base)** (@alex, 2026-10-12) — `/encuentro/:id` definitivo: cámara trasera principal de fondo
       (o fondo ilustrado sin permiso / sin cámara / AR apagada), Pokémon a tamaño real con XS/XL anclado con el
       giroscopio, placa, "Huir", estados de error; cámara y sensores se sueltan al salir (D-045). Dep: F2-02, F1-07.
       Criterio: Android ≥ 55 fps; mapa ↔ encuentro ×3 sin perder el contexto WebGL. Plan: `fases/F2-captura.md`.
+      **Hecho (pasos 1-11, PR):** `/encuentro/:id` definitivo; lint/build OK, app 63 archivos / 307 tests. Navegador
+      390×844: escena con fondo ilustrado, aviso sin permiso, interruptor AR, "Huir", mapa ↔ encuentro ×3 sin errores.
+      **Falta:** solo el paso 12 (Android: cámara principal, ≥ 55 fps, ×3 sin perder contexto, AR apagada / sin permiso).
 - [ ] **F2-04b · Personalidad, efectos del tipo y entrada** — idle/saltos por velocidad, vuelo, fantasma, partículas
       del tipo, transición desde el mapa, aterrizaje con polvo + grito + vibración, destello shiny (DISENO §5).
       Dep: F2-04a. Criterio: Android ≥ 55 fps con partículas; vídeo de la entrada.

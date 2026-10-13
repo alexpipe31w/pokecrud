@@ -128,7 +128,7 @@ se sueltan al salir y en segundo plano. **Android:** ≥ 55 fps; mapa ↔ encuen
 
 **Files:** Create `src/app/game/encounter-scene/encounter-layout.ts`, Test `src/app/game/encounter-scene/encounter-layout.spec.ts`
 
-- [ ] **1a. Test que falla:**
+- [x] **1a. Test que falla:**
 
 ```ts
 import { artUrls, encounterDistance, pokemonHeightM, sizeClass } from './encounter-layout';
@@ -164,8 +164,8 @@ describe('encounter-layout', () => {
 });
 ```
 
-- [ ] **1b.** `npx ng test --include=src/app/game/encounter-scene/encounter-layout.spec.ts --watch=false` → FALLA (no existe el módulo).
-- [ ] **1c. Implementación:**
+- [x] **1b.** `npx ng test --include=src/app/game/encounter-scene/encounter-layout.spec.ts --watch=false` → FALLA (no existe el módulo).
+- [x] **1c. Implementación:**
 
 ```ts
 /**
@@ -210,14 +210,14 @@ export function artUrls(id: number, shiny: boolean): string[] {
 }
 ```
 
-- [ ] **1d.** El mismo comando → PASA (4 tests).
-- [ ] **1e.** Commit `F2-04a: tamaño, distancia y arte del Pokémon del encuentro` + push (`/guardar`).
+- [x] **1d.** El mismo comando → PASA (4 tests).
+- [x] **1e.** Commit `F2-04a: tamaño, distancia y arte del Pokémon del encuentro` + push (`/guardar`).
 
 ### Paso 2 — Cargar el arte (con su cadena de alternativas)
 
 **Files:** Create `src/app/game/encounter-scene/art-texture.ts`, Test `art-texture.spec.ts`
 
-- [ ] **2a. Test que falla:**
+- [x] **2a. Test que falla:**
 
 ```ts
 import * as THREE from 'three';
@@ -244,8 +244,8 @@ describe('loadFirstTexture', () => {
 });
 ```
 
-- [ ] **2b.** `npx ng test --include=src/app/game/encounter-scene/art-texture.spec.ts --watch=false` → FALLA.
-- [ ] **2c. Implementación:**
+- [x] **2b.** `npx ng test --include=src/app/game/encounter-scene/art-texture.spec.ts --watch=false` → FALLA.
+- [x] **2c. Implementación:**
 
 ```ts
 import * as THREE from 'three';
@@ -276,7 +276,7 @@ export async function loadFirstTexture(
 }
 ```
 
-- [ ] **2d.** → PASA (2 tests). Commit `F2-04a: carga del arte con alternativas` + push.
+- [x] **2d.** → PASA (2 tests). Commit `F2-04a: carga del arte con alternativas` + push.
 
 ### Paso 3 — La escena three.js (sin renderer)
 
@@ -286,7 +286,7 @@ horizonte para que el fondo ilustrado coincida. La sombra es una `DataTexture` (
 
 **Files:** Create `src/app/game/encounter-scene/encounter-scene.ts`, Test `encounter-scene.spec.ts`
 
-- [ ] **3a. Test que falla:**
+- [x] **3a. Test que falla:**
 
 ```ts
 import * as THREE from 'three';
@@ -383,8 +383,8 @@ describe('EncounterScene', () => {
 });
 ```
 
-- [ ] **3b.** `npx ng test --include=src/app/game/encounter-scene/encounter-scene.spec.ts --watch=false` → FALLA.
-- [ ] **3c. Implementación** (ojo: `project()` usa la matriz de la cámara y `lookAt()` no la actualiza: por eso los
+- [x] **3b.** `npx ng test --include=src/app/game/encounter-scene/encounter-scene.spec.ts --watch=false` → FALLA.
+- [x] **3c. Implementación** (ojo: `project()` usa la matriz de la cámara y `lookAt()` no la actualiza: por eso los
   `updateMatrixWorld()`):
 
 ```ts
@@ -543,7 +543,7 @@ export function blobTexture(size = 64): THREE.DataTexture {
 }
 ```
 
-- [ ] **3d.** → PASA (8 tests). Commit `F2-04a: escena del encuentro (Pokémon a tamaño real, sombra, sin AR)` + push.
+- [x] **3d.** → PASA (8 tests). Commit `F2-04a: escena del encuentro (Pokémon a tamaño real, sombra, sin AR)` + push.
 
 ### Paso 4 — El escenario (renderer y bucle)
 
@@ -551,7 +551,7 @@ Sin test unitario (WebGL no existe en jsdom): la página lo recibe por un token 
 
 **Files:** Create `src/app/game/encounter-scene/encounter-stage.ts`
 
-- [ ] **4a.** Crear:
+- [x] **4a.** Crear:
 
 ```ts
 import * as THREE from 'three';
@@ -621,13 +621,13 @@ export class EncounterStage implements EncounterStageLike {
 }
 ```
 
-- [ ] **4b.** `npm run build` → compila. Commit `F2-04a: escenario del encuentro (un contexto WebGL que se suelta)` + push.
+- [x] **4b.** `npm run build` → compila. Commit `F2-04a: escenario del encuentro (un contexto WebGL que se suelta)` + push.
 
 ### Paso 5 — Cámara principal
 
 **Files:** Create `src/app/services/ar/camera.service.ts`, Test `src/app/services/ar/camera.service.spec.ts`
 
-- [ ] **5a. Test que falla** (el doble de `getUserMedia` abre el gran angular con `facingMode`, como el A36):
+- [x] **5a. Test que falla** (el doble de `getUserMedia` abre el gran angular con `facingMode`, como el A36):
 
 ```ts
 import { TestBed } from '@angular/core/testing';
@@ -738,8 +738,8 @@ describe('CameraService', () => {
 });
 ```
 
-- [ ] **5b.** `npx ng test --include=src/app/services/ar/camera.service.spec.ts --watch=false` → FALLA.
-- [ ] **5c. Implementación:**
+- [x] **5b.** `npx ng test --include=src/app/services/ar/camera.service.spec.ts --watch=false` → FALLA.
+- [x] **5c. Implementación:**
 
 ```ts
 import { Injectable, InjectionToken, inject, signal } from '@angular/core';
@@ -869,13 +869,13 @@ export class CameraService {
 }
 ```
 
-- [ ] **5d.** → PASA (6 tests). Commit `F2-04a: CameraService (cámara trasera principal, D-045)` + push.
+- [x] **5d.** → PASA (6 tests). Commit `F2-04a: CameraService (cámara trasera principal, D-045)` + push.
 
 ### Paso 6 — Orientación
 
 **Files:** Create `src/app/services/ar/orientation.service.ts`, Test `orientation.service.spec.ts`
 
-- [ ] **6a. Test que falla:**
+- [x] **6a. Test que falla:**
 
 ```ts
 import { TestBed } from '@angular/core/testing';
@@ -987,8 +987,8 @@ describe('OrientationService', () => {
 });
 ```
 
-- [ ] **6b.** `npx ng test --include=src/app/services/ar/orientation.service.spec.ts --watch=false` → FALLA.
-- [ ] **6c. Implementación:**
+- [x] **6b.** `npx ng test --include=src/app/services/ar/orientation.service.spec.ts --watch=false` → FALLA.
+- [x] **6c. Implementación:**
 
 ```ts
 import { Injectable, InjectionToken, inject, signal } from '@angular/core';
@@ -1118,7 +1118,7 @@ export class OrientationService {
 }
 ```
 
-- [ ] **6d.** → PASA (4 tests). Commit `F2-04a: OrientationService (sensor → evento, 80 ms)` + push.
+- [x] **6d.** → PASA (4 tests). Commit `F2-04a: OrientationService (sensor → evento, 80 ms)` + push.
 
 ### Paso 7 — Abrir el encuentro desde el servidor
 
@@ -1126,7 +1126,7 @@ En F2-04a el servicio solo tiene `view()`; F2-05 lo amplía con `throw()` (paso 
 
 **Files:** Create `src/app/services/game/encounter-api.service.ts`, Test `encounter-api.service.spec.ts`
 
-- [ ] **7a. Test que falla:**
+- [x] **7a. Test que falla:**
 
 ```ts
 import { provideHttpClient } from '@angular/common/http';
@@ -1156,7 +1156,7 @@ describe('EncounterApiService', () => {
 });
 ```
 
-- [ ] **7b.** → FALLA. **7c. Implementación:**
+- [x] **7b.** → FALLA. **7c. Implementación:**
 
 ```ts
 import { HttpClient } from '@angular/common/http';
@@ -1186,13 +1186,13 @@ export class EncounterApiService {
 }
 ```
 
-- [ ] **7d.** → PASA (1 test). Commit `F2-04a: EncounterApiService.view` + push.
+- [x] **7d.** → PASA (1 test). Commit `F2-04a: EncounterApiService.view` + push.
 
 ### Paso 8 — Ajuste "AR activada"
 
 **Files:** Modify `src/app/services/game/settings.service.ts`, `settings.service.spec.ts`
 
-- [ ] **8a.** Test (añadir `arEnabled: true` a lo esperado en "arranca con los valores por defecto") y código:
+- [x] **8a.** Test (añadir `arEnabled: true` a lo esperado en "arranca con los valores por defecto") y código:
 
 ```diff
 --- a/src/app/services/game/settings.service.spec.ts
@@ -1225,13 +1225,13 @@ export class EncounterApiService {
  /** Preferencias del jugador (no sensibles) persistidas en localStorage. */
 ```
 
-- [ ] **8b.** `npx ng test --include=src/app/services/game/settings.service.spec.ts --watch=false` → PASA (4). Commit + push.
+- [x] **8b.** `npx ng test --include=src/app/services/game/settings.service.spec.ts --watch=false` → PASA (4). Commit + push.
 
 ### Paso 9 — Cabecera del encuentro
 
 **Files:** Create `src/app/features/encounter/encounter-hud.component.ts`
 
-- [ ] **9a.** Crear (la prueba la hace el spec de la página, paso 10):
+- [x] **9a.** Crear (la prueba la hace el spec de la página, paso 10):
 
 ```ts
 import { Component, input, output } from '@angular/core';
@@ -1351,7 +1351,7 @@ el horizonte de la escena. Al pasar de un modo al otro el Pokémon se vuelve a p
 
 **Files:** Modify (reescribir) `src/app/features/encounter/encounter.page.ts`, `encounter.page.spec.ts`
 
-- [ ] **10a. Test que falla** (reescribir el spec entero; los dobles evitan WebGL, cámara y sensores):
+- [x] **10a. Test que falla** (reescribir el spec entero; los dobles evitan WebGL, cámara y sensores):
 
 ```ts
 import { HttpErrorResponse } from '@angular/common/http';
@@ -1508,8 +1508,8 @@ describe('EncounterPage', () => {
 });
 ```
 
-- [ ] **10b.** `npx ng test --include=src/app/features/encounter/encounter.page.spec.ts --watch=false` → FALLA.
-- [ ] **10c. Implementación** (reescribir el archivo entero):
+- [x] **10b.** `npx ng test --include=src/app/features/encounter/encounter.page.spec.ts --watch=false` → FALLA.
+- [x] **10c. Implementación** (reescribir el archivo entero):
 
 ```ts
 import { HttpErrorResponse } from '@angular/common/http';
@@ -1951,11 +1951,11 @@ function firstFrame(video: HTMLVideoElement): Promise<void> {
 }
 ```
 
-- [ ] **10d.** → PASA (7 tests). Commit `F2-04a: pantalla del encuentro en AR` + push.
+- [x] **10d.** → PASA (7 tests). Commit `F2-04a: pantalla del encuentro en AR` + push.
 
 ### Paso 11 — Todo en verde
 
-- [ ] **11a.** `npm run lint` · `npm run build` (sin avisos de presupuesto) · `npm test -- --watch=false` · `npm run test:shared`.
+- [x] **11a.** `npm run lint` · `npm run build` (sin avisos de presupuesto) · `npm test -- --watch=false` · `npm run test:shared`.
   Referencia al escribir el plan: lint OK, build OK, **62 archivos / 306 tests**.
 
 ### Paso 12 — Android (criterio)

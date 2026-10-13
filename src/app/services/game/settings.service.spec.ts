@@ -16,6 +16,7 @@ describe('SettingsService', () => {
       reduceEffects: false,
       joystickMode: false,
       haptics: true,
+      arEnabled: true,
     });
   });
 

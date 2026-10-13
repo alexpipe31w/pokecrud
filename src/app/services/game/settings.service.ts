@@ -7,6 +7,8 @@ export interface GameSettings {
   reduceEffects: boolean;
   joystickMode: boolean;
   haptics: boolean;
+  /** Encuentro con la cámara (AR). Apagada → fondo ilustrado y cámara quieta (DISENO §6, F2-04a). */
+  arEnabled: boolean;
 }
 
 const KEY = 'pokecrud.settings.v1';
@@ -17,6 +19,7 @@ const DEFAULTS: GameSettings = {
   reduceEffects: false,
   joystickMode: false,
   haptics: true,
+  arEnabled: true,
 };
 
 /** Preferencias del jugador (no sensibles) persistidas en localStorage. */
