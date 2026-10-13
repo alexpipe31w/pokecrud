@@ -2,6 +2,7 @@ import * as THREE from 'three';
 
 import { spotInFront } from './device-pose';
 import { EYE_HEIGHT_M, encounterDistance } from './encounter-layout';
+import type { PokemonModel } from './pokemon-model';
 import { FX_COUNT, particleAt, type FxKind, type FxPoint } from './type-fx';
 
 /** Postura del Pokémon en un fotograma (la da `motionAt` en F2-04b; quieto hasta entonces). */
@@ -25,8 +26,9 @@ const horizon = new THREE.Vector3();
 
 /**
  * Escena three.js del encuentro (F2-04a), sin renderer (lo pone `EncounterStage`): así se prueba en jsdom. Metros, Y
- * arriba, la cámara (el móvil) en el origen y el suelo a −EYE_HEIGHT_M (D-045). El Pokémon es su arte en un plano que
- * siempre mira a la cámara (girando solo sobre Y), con los pies en `anchor` y su sombra en el suelo.
+ * arriba, la cámara (el móvil) en el origen y el suelo a −EYE_HEIGHT_M (D-045). El Pokémon es su modelo 3D (F2-12,
+ * D-048) o, si no hay, su arte en un plano; los dos miran a la cámara (girando solo sobre Y), con los pies en `anchor`
+ * y su sombra en el suelo.
  */
 export class EncounterScene {
   readonly scene = new THREE.Scene();
@@ -39,6 +41,14 @@ export class EncounterScene {
   readonly fx: THREE.Points<THREE.BufferGeometry, THREE.PointsMaterial>;
   /** Ráfaga: polvo por el suelo o chispas que suben (F2-04b; estrellas en F2-07). */
   readonly burst: THREE.Points<THREE.BufferGeometry, THREE.PointsMaterial>;
+  /**
+   * Modelo 3D (F2-12): un grupo con los pies en su origen al que se aplica la postura; dentro, el `.glb` normalizado a
+   * su altura real. Va AL LADO del plano `body` (no dentro: su escala no uniforme deformaría el giro). null = plano.
+   */
+  model: THREE.Group | null = null;
+  private mixer: THREE.AnimationMixer | null = null;
+  private lastAnimT = Number.NaN;
+  private spinY = 0;
   private readonly shadowTex: THREE.Texture;
   private readonly glowTex: THREE.Texture;
   private aspect = 1;
@@ -93,10 +103,53 @@ export class EncounterScene {
     if (img?.width && img.height) this.aspect = img.width / img.height;
   }
 
+  /**
+   * Cambia el plano por el modelo 3D (F2-12): lo escala a su altura real con su caja, pies en el suelo y centrado;
+   * reproduce en bucle su primera animación (si trae) y enciende la luz que necesitan sus materiales.
+   */
+  setModel({ scene: gltf, clips }: PokemonModel): void {
+    const box = new THREE.Box3().setFromObject(gltf);
+    const size = box.getSize(new THREE.Vector3());
+    if (size.y <= 0) return; // modelo vacío: se queda el plano
+    const k = this.heightM / size.y;
+    gltf.scale.setScalar(k);
+    gltf.position.set(
+      (-(box.min.x + box.max.x) / 2) * k,
+      -box.min.y * k,
+      (-(box.min.z + box.max.z) / 2) * k,
+    );
+    // Las mallas con huesos se recortarían con la caja de su pose de reposo al animarse.
+    gltf.traverse((o) => (o.frustumCulled = false));
+    const pivot = new THREE.Group();
+    pivot.add(gltf);
+    this.anchor.add(pivot);
+    this.model = pivot;
+    this.aspect = size.x / size.y;
+    this.body.visible = false;
+    if (clips.length) {
+      this.mixer = new THREE.AnimationMixer(gltf);
+      this.mixer.clipAction(clips[0]).play();
+    }
+    if (!this.scene.getObjectsByProperty('isLight', true).length) {
+      const sun = new THREE.DirectionalLight(0xffffff, 1.8);
+      sun.position.set(1, 4, 2);
+      this.scene.add(new THREE.HemisphereLight(0xffffff, 0x8d7b68, 2.2), sun);
+    }
+  }
+
+  /** Gira el modelo sobre sí mismo (arrastrar el dedo, F2-12), en radianes. */
+  spin(radians: number): void {
+    this.spinY += radians;
+  }
+
   /** Fantasma semitransparente (F2-04b) o fundidos (aparecer, huir). */
   setOpacity(alpha: number): void {
     this.body.material.opacity = alpha;
     this.shadow.material.opacity = Math.min(1, alpha * 1.2);
+    eachMaterial(this.model, (m) => {
+      m.transparent = alpha < 1;
+      m.opacity = alpha;
+    });
   }
 
   /** Pone al Pokémon en el suelo delante de hacia donde mira el móvil (`yaw` de `cameraYaw`). */
@@ -140,6 +193,12 @@ export class EncounterScene {
     this.body.scale.set(h * this.aspect * (2 - pose.squash), h * pose.squash, 1);
     this.body.position.y = pose.lift - h * (1 - ART_FILL) * 0.5;
     this.body.rotation.z = pose.lean;
+    const m = this.model;
+    if (m) {
+      m.position.y = pose.lift;
+      m.scale.set(2 - pose.squash, pose.squash, 2 - pose.squash);
+      m.rotation.set(0, this.spinY, pose.lean);
+    }
     // La sombra se queda en el suelo y encoge cuanto más alto está.
     const away = Math.min(0.6, pose.lift / (this.heightM + 0.5));
     this.shadow.scale.setScalar(Math.max(0.35, this.heightM * 0.9) * (1 - away));
@@ -162,6 +221,12 @@ export class EncounterScene {
 
   /** Anima partículas y ráfaga; `tSec` = segundos desde que empezó el encuentro. */
   animate(tSec: number): void {
+    if (this.mixer) {
+      // Tope de 1 s: al volver de segundo plano no da un salto enorme.
+      const dt = Number.isNaN(this.lastAnimT) ? 0 : Math.min(1, Math.max(0, tSec - this.lastAnimT));
+      this.mixer.update(dt);
+    }
+    this.lastAnimT = tSec;
     const radius = Math.max(0.25, this.heightM * 0.45 * this.aspect);
     if (this.fxKind) {
       const pos = attr(this.fx, 'position');
@@ -207,6 +272,12 @@ export class EncounterScene {
   }
 
   dispose(): void {
+    this.mixer?.stopAllAction();
+    this.model?.traverse((o) => (o as THREE.Mesh).geometry?.dispose());
+    eachMaterial(this.model, (m) => {
+      for (const v of Object.values(m)) if (v instanceof THREE.Texture) v.dispose();
+      m.dispose();
+    });
     for (const p of [this.fx, this.burst]) {
       p.geometry.dispose();
       p.material.dispose();
@@ -272,6 +343,14 @@ function glowPoints(
   );
   p.frustumCulled = false;
   return p;
+}
+
+/** Cada material de las mallas de `root` (los `.glb` pueden traer varios por malla). */
+function eachMaterial(root: THREE.Object3D | null, fn: (m: THREE.Material) => void): void {
+  root?.traverse((o) => {
+    const mat = (o as THREE.Mesh).material;
+    if (mat) for (const m of Array.isArray(mat) ? mat : [mat]) fn(m);
+  });
 }
 
 const attr = (p: THREE.Points, name: string): THREE.BufferAttribute =>
