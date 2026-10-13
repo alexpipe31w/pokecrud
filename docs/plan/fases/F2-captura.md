@@ -128,7 +128,7 @@ se sueltan al salir y en segundo plano. **Android:** ≥ 55 fps; mapa ↔ encuen
 
 **Files:** Create `src/app/game/encounter-scene/encounter-layout.ts`, Test `src/app/game/encounter-scene/encounter-layout.spec.ts`
 
-- [ ] **1a. Test que falla:**
+- [x] **1a. Test que falla:**
 
 ```ts
 import { artUrls, encounterDistance, pokemonHeightM, sizeClass } from './encounter-layout';
@@ -164,8 +164,8 @@ describe('encounter-layout', () => {
 });
 ```
 
-- [ ] **1b.** `npx ng test --include=src/app/game/encounter-scene/encounter-layout.spec.ts --watch=false` → FALLA (no existe el módulo).
-- [ ] **1c. Implementación:**
+- [x] **1b.** `npx ng test --include=src/app/game/encounter-scene/encounter-layout.spec.ts --watch=false` → FALLA (no existe el módulo).
+- [x] **1c. Implementación:**
 
 ```ts
 /**
@@ -210,8 +210,8 @@ export function artUrls(id: number, shiny: boolean): string[] {
 }
 ```
 
-- [ ] **1d.** El mismo comando → PASA (4 tests).
-- [ ] **1e.** Commit `F2-04a: tamaño, distancia y arte del Pokémon del encuentro` + push (`/guardar`).
+- [x] **1d.** El mismo comando → PASA (4 tests).
+- [x] **1e.** Commit `F2-04a: tamaño, distancia y arte del Pokémon del encuentro` + push (`/guardar`).
 
 ### Paso 2 — Cargar el arte (con su cadena de alternativas)
 
