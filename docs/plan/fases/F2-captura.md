@@ -627,7 +627,7 @@ export class EncounterStage implements EncounterStageLike {
 
 **Files:** Create `src/app/services/ar/camera.service.ts`, Test `src/app/services/ar/camera.service.spec.ts`
 
-- [ ] **5a. Test que falla** (el doble de `getUserMedia` abre el gran angular con `facingMode`, como el A36):
+- [x] **5a. Test que falla** (el doble de `getUserMedia` abre el gran angular con `facingMode`, como el A36):
 
 ```ts
 import { TestBed } from '@angular/core/testing';
@@ -738,8 +738,8 @@ describe('CameraService', () => {
 });
 ```
 
-- [ ] **5b.** `npx ng test --include=src/app/services/ar/camera.service.spec.ts --watch=false` → FALLA.
-- [ ] **5c. Implementación:**
+- [x] **5b.** `npx ng test --include=src/app/services/ar/camera.service.spec.ts --watch=false` → FALLA.
+- [x] **5c. Implementación:**
 
 ```ts
 import { Injectable, InjectionToken, inject, signal } from '@angular/core';
@@ -869,7 +869,7 @@ export class CameraService {
 }
 ```
 
-- [ ] **5d.** → PASA (6 tests). Commit `F2-04a: CameraService (cámara trasera principal, D-045)` + push.
+- [x] **5d.** → PASA (6 tests). Commit `F2-04a: CameraService (cámara trasera principal, D-045)` + push.
 
 ### Paso 6 — Orientación
 
