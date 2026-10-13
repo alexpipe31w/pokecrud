@@ -204,7 +204,7 @@ fórmula (F2-03), captura en servidor (F2-06), audio (F2-08), **spike de cámara
 
 ## En curso
 
-- F2-04a (@alex) · rama `feature/F2-04a-escena-encuentro-ar` · recién reclamada; empieza en el paso 1 del plan. F1-05 (3b) y F1-07 (7b) solo esperan la prueba en Android.
+- F2-04a (@alex) · rama `feature/F2-04a-escena-encuentro-ar` · **Punto de guardado 2026-10-12 20:56**: hechos pasos 1-11 (lint OK, build OK, app 63 archivos / 307 tests, shared 140); ahora en el paso 12 (Android); siguiente: prueba en navegador 390×844 y paso 12 con el A36/Redmi; estado: compila ✅. F1-05 (3b) y F1-07 (7b) solo esperan la prueba en Android.
 
 ## Siguiente paso concreto
 

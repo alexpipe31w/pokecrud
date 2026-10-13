@@ -1955,7 +1955,7 @@ function firstFrame(video: HTMLVideoElement): Promise<void> {
 
 ### Paso 11 — Todo en verde
 
-- [ ] **11a.** `npm run lint` · `npm run build` (sin avisos de presupuesto) · `npm test -- --watch=false` · `npm run test:shared`.
+- [x] **11a.** `npm run lint` · `npm run build` (sin avisos de presupuesto) · `npm test -- --watch=false` · `npm run test:shared`.
   Referencia al escribir el plan: lint OK, build OK, **62 archivos / 306 tests**.
 
 ### Paso 12 — Android (criterio)
