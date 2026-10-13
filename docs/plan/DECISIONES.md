@@ -659,3 +659,13 @@ cámara debe ser 3D"** y **"deben salir las características del Pokémon"**.
 entrada se aplican al modelo 3D igual que al plano.
 **Riesgos:** el repo de modelos es de terceros (si desaparece, los Pokémon vuelven al arte plano; se puede espejar en
 un almacenamiento privado); modelos de hasta 14 MB (cargar con barra y caché); ARCore solo en móviles compatibles.
+
+## D-049 · PC (puntos de combate): fórmula propia sobre las stats reales, la calcula el servidor (F2-13) (2026-10-12, Alex)
+
+**Contexto:** la ficha del encuentro (D-048) y la colección (VISION, F3) enseñan "PC", pero no había fórmula: el
+juego usa las stats de los juegos principales (`calcStats`, D-007), no las de Pokémon GO.
+**Decisión:** `shared/engine/combat-power.ts`, a la manera de Pokémon GO sobre las stats REALES del individuo:
+ataque = 7/8 del mayor + 1/8 del menor de (Ataque, At. Esp.); defensa = 5/8 del mayor + 3/8 del menor de (Defensa,
+Def. Esp.); `PC = max(10, floor(ataque · √defensa · √PS / 10))`. Ejemplos: Pikachu Nv. 12 con IVs 15 → 46; Kricketot
+Nv. 22 → 81. **Lo calcula el servidor** (`EncounterView.cp`; los IVs y la naturaleza no salen de él, REGLA 3).
+La colección (F3-02/F3-03) debe usar la MISMA función. Peso del individuo = peso × heightScale (lineal).

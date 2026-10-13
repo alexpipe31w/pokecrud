@@ -23,6 +23,17 @@ export const BURST_COUNT = 28;
 export const BURST_S = 0.8;
 
 const horizon = new THREE.Vector3();
+const boxTmp = new THREE.Box3();
+const cornerTmp = new THREE.Vector3();
+const cornerCam = new THREE.Vector3();
+
+/** Caja en píxeles de la pantalla (0,0 arriba a la izquierda). */
+export interface ScreenBox {
+  left: number;
+  top: number;
+  right: number;
+  bottom: number;
+}
 
 /**
  * Escena three.js del encuentro (F2-04a), sin renderer (lo pone `EncounterStage`): así se prueba en jsdom. Metros, Y
@@ -178,6 +189,40 @@ export class EncounterScene {
     if (horizon.lengthSq() < 1e-9) return 0.5;
     horizon.normalize().multiplyScalar(1000).project(this.camera);
     return Math.min(1, Math.max(0, (1 - horizon.y) / 2));
+  }
+
+  /**
+   * Dónde está el Pokémon en la pantalla, en píxeles (la ficha de F2-13 se pone a su lado). null si aún no está
+   * colocado o si queda detrás de la cámara (en AR, al mirar hacia otro lado).
+   */
+  screenBox(width: number, height: number): ScreenBox | null {
+    if (!this.placed) return null;
+    this.anchor.updateMatrixWorld(true);
+    this.camera.updateMatrixWorld();
+    boxTmp.setFromObject(this.model ?? this.body);
+    if (boxTmp.isEmpty()) return null;
+    let left = Infinity;
+    let top = Infinity;
+    let right = -Infinity;
+    let bottom = -Infinity;
+    for (let i = 0; i < 8; i++) {
+      cornerTmp.set(
+        i & 1 ? boxTmp.max.x : boxTmp.min.x,
+        i & 2 ? boxTmp.max.y : boxTmp.min.y,
+        i & 4 ? boxTmp.max.z : boxTmp.min.z,
+      );
+      // Detrás de la cámara la proyección se da la vuelta: mejor no decir nada.
+      if (cornerCam.copy(cornerTmp).applyMatrix4(this.camera.matrixWorldInverse).z > -this.camera.near)
+        return null;
+      cornerTmp.project(this.camera);
+      const x = ((cornerTmp.x + 1) / 2) * width;
+      const y = ((1 - cornerTmp.y) / 2) * height;
+      left = Math.min(left, x);
+      right = Math.max(right, x);
+      top = Math.min(top, y);
+      bottom = Math.max(bottom, y);
+    }
+    return { left, top, right, bottom };
   }
 
   setViewport(width: number, height: number): void {

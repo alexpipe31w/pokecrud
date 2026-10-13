@@ -16,6 +16,9 @@ ROADMAP: **F2-12 (modelo 3D) → F2-13 (ficha) → F2-11 (spike ARCore, Android)
 
 - **F2-12 hecho:** el encuentro usa el modelo 3D `.glb` (D-048) con su animación, personalidad, partículas y giro con el
   dedo; sin modelo → arte plano. Evidencias `F2-12_*`. Siguiente: **F2-13** (ficha que se abre/cierra con un botón).
+- **F2-13 hecho:** botón ⓘ en la cabecera del encuentro abre/cierra la ficha (tipos, nivel, PC del servidor, altura,
+  peso, categoría, descripción). Siguiente: con Android, **F2-11 (spike ARCore)**; sin Android, **F2-05**
+  (lanzamiento: solo depende de F2-04b y F2-12, se hace en el PC).
   Para MIRAR una especie concreta en el navegador: `page.route('**/encounters/*', r => r.fulfill({json: {...}}))`.
 
 - **F2-04b pasos 1-9a hechos** (personalidad, partículas, aterrizaje, destello, zoom desde el mapa). Fallo encontrado
@@ -239,6 +242,7 @@ fórmula (F2-03), captura en servidor (F2-06), audio (F2-08), **spike de cámara
 - F2-04a (@alex) · pasos 1-11 mezclados en `develop`; tarea `[~]` solo por el paso 12 (Android, ver PENDIENTES). F1-05 (3b) y F1-07 (7b) solo esperan la prueba en Android.
 - F2-04b (@alex) · pasos 1-9a mezclados en `develop`; `[~]` solo por el 9b (Android, ver PENDIENTES).
 - F2-12 (@alex) · pasos 1-5 mezclados en `develop`; `[~]` solo por el 6 (Android). Siguiente: **F2-13** (ficha con botón).
+- F2-13 hecha (ficha con botón, PC del servidor, D-049).
 
 ## Siguiente paso concreto
 

@@ -6,7 +6,17 @@ import {
   type ThrowOutcome,
   resolveThrow,
 } from '../../shared/engine/capture.js';
-import { slotEndsAt, slotFor } from '../../shared/engine/spawns.js';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+import type { Species } from '../../shared/data/dataset.types.js';
+import { calcStats } from '../../shared/engine/battle/stats.js';
+import { combatPower } from '../../shared/engine/combat-power.js';
+import {
+  type Ivs,
+  type Nature,
+  slotEndsAt,
+  slotFor,
+} from '../../shared/engine/spawns.js';
 import { AppModule } from '../src/app.module.js';
 import {
   CAPTURE_XP,
@@ -174,7 +184,7 @@ describe('Encuentros y captura (e2e)', { timeout: 60_000 }, () => {
     await throwAt(nobody, spawn).expect(403);
   });
 
-  it('detalle del encuentro: nivel, sexo, shiny y tamaño, sin IVs', async () => {
+  it('detalle del encuentro: nivel, sexo, shiny, tamaño y PC, sin IVs', async () => {
     const { p, spawn } = await playerAtSpawn();
     const res = await as(
       p,
@@ -182,6 +192,7 @@ describe('Encuentros y captura (e2e)', { timeout: 60_000 }, () => {
     ).expect(200);
     expect(Object.keys(res.body).sort()).toEqual(
       [
+        'cp',
         'expiresAt',
         'gender',
         'heightScale',
@@ -199,6 +210,30 @@ describe('Encuentros y captura (e2e)', { timeout: 60_000 }, () => {
     });
     expect(res.body.heightScale).toBeGreaterThanOrEqual(0.5);
     expect(res.body.heightScale).toBeLessThanOrEqual(1.5);
+
+    // El PC (D-049) es el de sus stats reales: se comprueba con los IVs que el servidor guarda al capturarlo.
+    forced = CAUGHT;
+    await throwAt(p, spawn).expect(200);
+    const [stored] = await prisma.caughtPokemon.findMany({
+      where: { playerId: p.id },
+    });
+    const dataset = JSON.parse(
+      readFileSync(
+        resolve(process.cwd(), '../src/assets/data/pokedex.json'),
+        'utf8',
+      ),
+    ) as Species[];
+    const base = dataset.find((s) => s.id === spawn.speciesId)!.baseStats;
+    expect(res.body.cp).toBe(
+      combatPower(
+        calcStats(
+          base,
+          stored.ivs as unknown as Ivs,
+          stored.level,
+          stored.nature as Nature,
+        ),
+      ),
+    );
   });
 
   it('captura: gasta 1 bola, guarda el Pokémon con los datos del servidor, da XP y no se puede repetir', async () => {

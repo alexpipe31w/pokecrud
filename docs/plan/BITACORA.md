@@ -1223,3 +1223,27 @@ F2-04b escalan con la altura): mirar en Android. Alex preguntó por los sonidos:
 juegos no dicen su nombre (solo Pikachu, "¡Pika!") y las voces del anime tienen copyright.
 **Decisiones nuevas:** D-048 (y en F2-13: la ficha se abre y se cierra con un botón).
 **El siguiente debe empezar por:** F2-13 (ficha con botón). Para el PC: servidor añade `cp` a `GET /encounters/:id`.
+
+## 2026-10-12 23:50 · @alex (Claude) · F2-13 · rama `feature/F2-13-ficha-encuentro`
+
+**Qué se hizo:** plan `docs/plan/fases/F2-13-ficha.md`. `shared/engine/combat-power.ts` (PC, D-049, valores a mano);
+el servidor añade `cp` a `GET /encounters/:id` (`SpeciesDetails.baseStats`, `calcStats` con IVs y naturaleza);
+`EncounterScene.screenBox()` (caja del Pokémon en píxeles); `app-encounter-card` (solo pinta) y botón ⓘ en
+`app-encounter-hud` con `aria-expanded`; la página abre/cierra la ficha (cerrada por defecto, como pidió Alex) y la
+coloca al lado del Pokémon cada fotograma escribiendo el `transform` (sin signals).
+**Archivos clave:** `shared/engine/combat-power.ts`, `server/src/encounters/encounters.service.ts`,
+`server/src/spawns/spawns.service.ts`, `src/app/features/encounter/{encounter-card.component,encounter-hud.component,encounter.page}.ts`.
+**Cómo se probó (salida real):**
+
+    shared: combat-power 4 tests (1060 y 46 calculados a mano) → test:shared 144 passed
+    servidor: build OK · lint (solo el aviso viejo de auth.e2e) · unitarios 22 passed · e2e encuentros 11 passed
+      (el `cp` del detalle = combatPower(calcStats(...)) con los IVs que guarda al capturar)
+    app: lint OK · build OK (sin avisos de presupuesto) · ng test 67 archivos, 350 passed
+    navegador 390×844 sin permiso de cámara, encuentro REAL (cuenta f213@pokecrud.test → "borradas 1"):
+      GET /encounters → {"speciesId":401,"level":22,"heightScale":1.23,"cp":81,...}; ficha: "Pokémon Grillo · BICHO ·
+      Nv. 22 · PC 81 · 0,37 m · 2,7 kg · Si choca sus antenas…"; el botón la cierra. Evidencias F2-13_01/02.
+
+**Quedó a medias / roto:** nada. (En Android: comprobar que la ficha sigue al Pokémon en AR al girar.)
+**Decisiones nuevas:** D-049.
+**El siguiente debe empezar por:** con Android, F2-11 (spike ARCore). Sin Android: F2-05 (lanzamiento) siguiendo
+`docs/plan/fases/F2-captura.md` → "F2-05"; ojo, la caja del Pokémon ahora sale de `artAspect` del modelo 3D (D-048).

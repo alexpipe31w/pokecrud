@@ -13,6 +13,8 @@ import {
   type ThrowQuality,
   resolveThrow,
 } from '../../../shared/engine/capture.js';
+import { calcStats } from '../../../shared/engine/battle/stats.js';
+import { combatPower } from '../../../shared/engine/combat-power.js';
 import { createRng } from '../../../shared/engine/rng.js';
 import {
   type WildSpawn,
@@ -136,6 +138,10 @@ export class EncountersService {
       where: { playerId_encounterId: { playerId, encounterId } },
       select: { outcome: true },
     });
+    const species = this.spawns.speciesDetails(spawn.speciesId);
+    if (!species) {
+      throw new ServiceUnavailableException('Faltan los datos de esa especie');
+    }
     return {
       id: spawn.id,
       speciesId: spawn.speciesId,
@@ -143,6 +149,10 @@ export class EncountersService {
       gender: spawn.gender,
       shiny: spawn.shiny,
       heightScale: this.spawns.heightScale(spawn.id),
+      // D-049: con los IVs y la naturaleza, que no salen del servidor.
+      cp: combatPower(
+        calcStats(species.baseStats, spawn.ivs, spawn.level, spawn.nature),
+      ),
       expiresAt: new Date(slotEndsAt(spawn.slot)).toISOString(),
       status: !result
         ? 'open'

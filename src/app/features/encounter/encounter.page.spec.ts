@@ -29,6 +29,7 @@ const view: EncounterView = {
   gender: 'M',
   shiny: false,
   heightScale: 1.45,
+  cp: 312,
   expiresAt: '2026-10-12T20:10:00Z',
   status: 'open',
 };
@@ -36,7 +37,10 @@ const view: EncounterView = {
 /** Lo que la pantalla lee de la ficha (tamaño, tipo y personalidad). */
 const PIKACHU = {
   names: { es: 'Pikachu' },
+  genus: 'Pokémon Ratón',
+  flavor: 'Cuando se enfada, descarga la energía que almacena en sus mejillas.',
   height: 4,
+  weight: 60,
   types: ['electric'],
   baseStats: { hp: 35, atk: 55, def: 40, spa: 50, spd: 50, spe: 90 },
   captureRate: 190,
@@ -218,5 +222,30 @@ describe('EncounterPage', () => {
     ev('pointermove', 300); // ya soltado: no gira
     expect(spin).toHaveBeenCalledTimes(1);
     expect(spin.mock.calls[0][0]).toBeGreaterThan(0);
+  });
+
+  it('la ficha (F2-13) está cerrada; el botón la abre con sus datos y otra vez la esconde', async () => {
+    const f = await open(Promise.resolve(view));
+    const el = f.nativeElement as HTMLElement;
+    const btn = el.querySelector<HTMLButtonElement>('[aria-label="Ficha del Pokémon"]')!;
+    expect(btn.getAttribute('aria-expanded')).toBe('false');
+    expect(text(f)).not.toContain('Pokémon Ratón');
+
+    btn.click();
+    await settle(f);
+    expect(btn.getAttribute('aria-expanded')).toBe('true');
+    const card = el.querySelector('app-encounter-card')!.textContent ?? '';
+    expect(card).toContain('Pokémon Ratón');
+    expect(card).toContain('descarga la energía');
+    expect(card).toContain('PC 312');
+    expect(card).toContain('Eléctrico');
+    expect(card).toContain('Nv. 12');
+    expect(card).toContain('0,58 m'); // 0,4 m × 1,45
+    expect(card).toContain('8,7 kg'); // 6 kg × 1,45
+
+    btn.click();
+    await settle(f);
+    expect(btn.getAttribute('aria-expanded')).toBe('false');
+    expect(el.querySelector('app-encounter-card')).toBeNull();
   });
 });
