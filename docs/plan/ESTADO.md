@@ -222,6 +222,7 @@ fórmula (F2-03), captura en servidor (F2-06), audio (F2-08), **spike de cámara
 ## En curso
 
 - F2-04a (@alex) · pasos 1-11 mezclados en `develop`; tarea `[~]` solo por el paso 12 (Android, ver PENDIENTES). F1-05 (3b) y F1-07 (7b) solo esperan la prueba en Android.
+- F2-04b (@alex) · rama `feature/F2-04b-personalidad-entrada` · recién reclamada; empieza en el paso 1 del plan.
 
 ## Siguiente paso concreto
 

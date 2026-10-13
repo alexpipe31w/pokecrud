@@ -171,7 +171,7 @@
       **Hecho (pasos 1-11, PR):** `/encuentro/:id` definitivo; lint/build OK, app 63 archivos / 307 tests. Navegador
       390×844: escena con fondo ilustrado, aviso sin permiso, interruptor AR, "Huir", mapa ↔ encuentro ×3 sin errores.
       **Falta:** solo el paso 12 (Android: cámara principal, ≥ 55 fps, ×3 sin perder contexto, AR apagada / sin permiso).
-- [ ] **F2-04b · Personalidad, efectos del tipo y entrada** — idle/saltos por velocidad, vuelo, fantasma, partículas
+- [~] **F2-04b · Personalidad, efectos del tipo y entrada** (@alex, 2026-10-12) — idle/saltos por velocidad, vuelo, fantasma, partículas
       del tipo, transición desde el mapa, aterrizaje con polvo + grito + vibración, destello shiny (DISENO §5).
       Dep: F2-04a. Criterio: Android ≥ 55 fps con partículas; vídeo de la entrada.
 - [ ] **F2-05 · Lanzamiento** — gesto 1:1, física, curva, círculo de precisión, bolas y bayas, hápticos.
