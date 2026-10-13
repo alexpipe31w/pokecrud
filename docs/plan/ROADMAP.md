@@ -275,7 +275,7 @@
       eficaz / poco eficaz / crítico, fallo, debilitado, curación, estadísticas, estado, victoria; `battle-sfx.ts`);
       precarga de todos los gritos al empezar el combate (con datos móviles el primero no sonaba); mezcla en el bus
       `sfx` con su volumen de Ajustes; `src/assets/audio/CREDITOS.md`. Para escucharlos: `docs/evidencias/F2-08_sfx/*.wav`.
-- [ ] **F2-10 · Música** — tema del mapa (bucle tranquilo, de día y de noche) y del combate, libre (CC0/CC BY con
+- [~] **F2-10 · Música** (@samuel, 2026-10-13) — tema del mapa (bucle tranquilo, de día y de noche) y del combate, libre (CC0/CC BY con
       atribución en CREDITOS.md) o propia; bus `music` (ya existe, con volumen en Ajustes), fundido al cambiar de
       pantalla, nunca dos a la vez. Dep: F2-08.
 

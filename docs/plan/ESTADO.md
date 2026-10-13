@@ -220,7 +220,9 @@ F2-07, F2-12, F2-13, F2-15 hechas; faltan **F2-11**/**F2-14** (ARCore), F2-10 (m
 
 ## En curso
 
-- Nadie. **F5-03** (Alex) hecha: `/pvp` ("Combate en vivo" en el menú). **Siguiente: F5-04** (turnos, tiempo, reconexión, tabla `Battle`).
+- **F2-10 (Samuel, rama `feature/F2-10-musica`):** música generada en el juego (como los SFX, D-044): mapa día/noche y
+  combate, fundido al cambiar, nunca dos a la vez. Punto de guardado: recién reclamada. (F5-04 en el PR #78, `[~]` a la
+  espera de los dos móviles.)
 - Cuentas de prueba locales: `demo+alex@pokecrud.test` y `demo+rival@pokecrud.test` (contraseña: pídesela a Alex; no va en el repo), con equipo "Arena" de 3. `test:e2e` las borra pasada 1 h: se recrean registrándolas y con el script de la bitácora de F5-03.
 - Samuel cerró **F3-06c** (#73 mezclado; sin migración). **Con esto la F3 está completa en código.**
 - **Ojo:** el inventario de IS-11 está ahora en `/inventario` (la Pokédex 1025 ocupa `/pokedex`).
