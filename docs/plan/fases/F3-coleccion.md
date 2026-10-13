@@ -553,7 +553,7 @@ escalonada, vacía diseñada; accesible desde el menú de la Poké Ball; "+3 car
 
 **Files:** Create `src/app/services/game/collection.service.ts` + spec
 
-- [ ] **1a. Tests que fallan** (`provideHttpClient()` + `provideHttpClientTesting()`):
+- [x] **1a. Tests que fallan** (`provideHttpClient()` + `provideHttpClientTesting()`):
   1. `load()` pide `GET {serverUrl}/collection?sort=caughtAt&order=desc&limit=30` y publica `items`, `total`,
      `hasMore`.
   2. `loadMore()` manda `cursor=<nextCursor>` y AÑADE (no sustituye); con `hasMore() === false` no pide nada; dos
@@ -561,7 +561,7 @@ escalonada, vacía diseñada; accesible desde el menú de la Poké Ball; "+3 car
   3. `setQuery({ sort: 'cp' })` vacía la lista y vuelve a cargar desde el principio con el nuevo orden.
   4. Error de red → `error()` con texto en español y la lista anterior intacta.
   5. Tras `markChanged()` (lo llama la ficha al renombrar o transferir) el siguiente `load()` no usa nada en caché.
-- [ ] **1b.** → FALLA. **1c. Implementación** (forma; seguir el estilo de `BagService`: `firstValueFrom` + `timeout`
+- [x] **1b.** → FALLA. **1c. Implementación** (forma; seguir el estilo de `BagService`: `firstValueFrom` + `timeout`
   de 70 s por Render dormido):
 
 ```ts
@@ -592,7 +592,7 @@ export class CollectionService {
   Los parámetros se construyen con `HttpParams` omitiendo los `undefined`. `hasMore` depende de `next`, que no es
   signal: guardarlo también como signal privada (`nextCursor = signal<string|null>(null)`) para que `computed` repinte
   (zoneless).
-- [ ] **1d.** → PASA. Commit + `/guardar`.
+- [x] **1d.** → PASA. Commit + `/guardar`.
 
 ### Paso 2 — Tarjeta de un Pokémon
 
