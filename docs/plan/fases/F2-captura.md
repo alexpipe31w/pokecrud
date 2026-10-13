@@ -3179,7 +3179,7 @@ El servidor los tenía en `encounters.service.ts`/`bag.service.ts`; pasan a `sha
 **Files:** Modify `shared/protocol/encounters.ts`, `server/src/encounters/encounters.service.ts`,
 `server/src/encounters/encounters.dto.ts`, `server/src/bag/bag.service.ts`
 
-- [ ] **1a.** Aplicar:
+- [x] **1a.** Aplicar:
 
 ```diff
 --- a/shared/protocol/encounters.ts
@@ -3331,7 +3331,7 @@ El servidor los tenía en `encounters.service.ts`/`bag.service.ts`; pasan a `sha
  export const starterRows = (): { item: ItemId; qty: number }[] =>
 ```
 
-- [ ] **1b.** `cd server && npm run lint && npm run build && npm test` → compila, 22 tests (el único aviso de lint,
+- [x] **1b.** `cd server && npm run lint && npm run build && npm test` → compila, 22 tests (el único aviso de lint,
   `require-array-sort-compare` en `test/auth.e2e-spec.ts`, ya estaba). Commit `F2-05: tipos del lanzamiento en shared/protocol` + push.
 
 ### Paso 2 — Lo que se actualiza con la respuesta
