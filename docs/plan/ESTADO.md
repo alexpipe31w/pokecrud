@@ -3,115 +3,57 @@
 > Se **reescribe** al cerrar cada sesión (no es histórico; el histórico es `BITACORA.md`).
 > Máximo una pantalla. Si lees esto al empezar: después lee `ROADMAP.md`.
 
-**Última actualización:** 2026-10-12 noche · por Alex (Claude) · `develop` (F2-04a pasos 1-11 mezclados)
+**Última actualización:** 2026-10-13 madrugada · por Alex (Claude) · `develop` en `0e4f0de` (PR #50…#57, CI verde)
 
-## ⚠️ DECISIÓN DE ALEX (2026-10-12, noche): la AR tiene que ser 3D y enseñar la ficha del Pokémon
+## 👉 RELEVO DE ALEX A SAMUEL (2026-10-13)
 
-Alex: "todo en cámara debe ser 3D… deben salir las características del pokémon". **Decidido: D-048** — modelos
-`.glb` de `Pokemon-3D-api/assets` (968/1025, cargados desde su URL, NO al repo) + **ARCore** con plugin nativo propio
-para rodear al Pokémon + **ficha** junto a él (tipos, nivel, PC del servidor, altura/peso, descripción). Orden nuevo en
-ROADMAP: **F2-12 (modelo 3D) → F2-13 (ficha) → F2-11 (spike ARCore, Android) → F2-14 → F2-05 → F2-07**; F4-07 también.
+**Lo grande de ayer — DECISIÓN DE ALEX (D-048): la AR es 3D.** "Todo en cámara debe ser 3D" y "deben salir las
+características del Pokémon". Por eso: los Pokémon del encuentro son **modelos 3D `.glb`** de
+`github.com/Pokemon-3D-api/assets` (968/1025; se cargan desde su URL, **NO se suben al repo**: son de Nintendo), con
+**ARCore** para rodearlos andando (pendiente: F2-11/F2-14) y una **ficha** que se abre y se cierra con el botón ⓘ.
+Leer **D-045…D-049** antes de tocar el encuentro.
 
-## RELEVO DE ALEX (2026-10-12, noche): F2-04a, F2-04b y F2-12 (Pokémon en 3D) en `develop` a falta del Android
+**Mezclado en `develop` (todo con TDD, lint/build/tests en verde; app 73 archivos / 398 tests, shared 144, servidor 22):**
+- **F2-04a** escena AR base · **F2-04b** personalidad, partículas del tipo, aterrizaje con grito y vibración (D-047:
+  partículas por alfa) · **F2-12** Pokémon en 3D con su animación, giro con el dedo; sin modelo → arte plano ·
+  **F2-13** ficha (tipos, nivel, **PC** que calcula el servidor con los IVs — fórmula D-049 —, altura/peso, categoría y
+  descripción) · **F2-05** lanzamiento (gesto, física, curva, aro de precisión, Poké/Super/Ultra/Frambu; fallar no
+  llama al servidor ni gasta, D-046).
+- Arreglos que vio Alex: la ficha ya no tapa ni tiembla, los modelos con huesos ya pisan el suelo, la bola entra
+  desde abajo.
+- Probado en el navegador con encuentros REALES del servidor: captura de Whismur → mochila 30→29, +110 XP.
+  **Sin probar: el móvil.** Todo lo que pide Android está en PENDIENTES (abajo) y esas tareas siguen en `[~]`.
 
-- **F2-12 hecho:** el encuentro usa el modelo 3D `.glb` (D-048) con su animación, personalidad, partículas y giro con el
-  dedo; sin modelo → arte plano. Evidencias `F2-12_*`. Siguiente: **F2-13** (ficha que se abre/cierra con un botón).
-- **F2-13 hecho:** botón ⓘ en la cabecera del encuentro abre/cierra la ficha (tipos, nivel, PC del servidor, altura,
-  peso, categoría, descripción). Siguiente: con Android, **F2-11 (spike ARCore)**; sin Android, **F2-05**
-  (lanzamiento: solo depende de F2-04b y F2-12, se hace en el PC).
-  Para MIRAR una especie concreta en el navegador: `page.route('**/encounters/*', r => r.fulfill({json: {...}}))`.
+**Samuel, por orden (tú tienes el Android):**
+1. `git pull` en `develop`, `npm install` (raíz y `server/`), `/inicio`.
+2. **Una sesión con el Redmi** (`npm run apk -- --install`) para tachar PENDIENTES de golpe: F2-04a 12, F2-04b 9b,
+   F2-12 6, F2-05 12b, y de paso F1-07 7b y F1-05 3b. Fps por CDP con el snippet de F2-04a 12c. Lo que vaya bien → `[x]`
+   en ROADMAP; lo que falle → nueva tarea o arreglo.
+3. Después, **F2-11 · spike ARCore** (necesita Android): plugin nativo de Capacitor propio (Kotlin) que pase a three.js
+   la pose del móvil y el suelo detectado, para rodear al Pokémon. Antes, comprobar que el Redmi Note 10 está en la
+   lista de dispositivos de ARCore. Sin ARCore → se queda la AR de orientación actual (no se tira nada).
+4. Sin móvil a mano: **F2-07** (coreografía de captura: absorber, caer, sacudidas, "¡Capturado!", shiny) siguiendo
+   `fases/F2-captura.md` → "F2-07". OJO: sus diffs tocan el plano `body`; hay que aplicar lo mismo al modelo 3D
+   (`model`), ver `fases/F2-12-pokemon-3d.md`. Los diffs ya no encajan solos: aplicarlos a mano donde F2-12/F2-13/F2-05
+   cambiaron el contexto (como se hizo en F2-05; ver su entrada en la BITÁCORA).
 
-- **F2-04b pasos 1-9a hechos** (personalidad, partículas, aterrizaje, destello, zoom desde el mapa). Fallo encontrado
-  en el navegador y arreglado: las partículas se veían como puntos NEGROS sobre el canvas transparente (D-047).
-  App 66 archivos / 333 tests. Evidencias `F2-04b_*`.
-
-- **F2-04a pasos 1-11 hechos** copiando el plan de Kenneth tal cual con TDD (cada spec falló antes y pasó después):
-  lint OK, build OK sin avisos de presupuesto, **app 63 archivos / 307 tests** (el plan decía 62/306: estaba mal
-  contado por uno; `develop` tenía 57/278, −3 del spec provisional + 32 nuevos = 307), shared 140.
-- **Navegador 390×844** (Nest local + `ng serve`): Gulpin y Chansey reales a su tamaño con sombra, fondo ilustrado,
-  "Sin permiso de cámara: modo sin AR.", AR apagada → "Sin giroscopio…", "Huir" vuelve a `/mapa` y destruye la página;
-  mapa ↔ encuentro ×3 sin ningún error de consola. Evidencias `F2-04a_00/02/04_navegador-*`.
-- **Ojo al probar:** entrar con `history.pushState` + `popstate` deja VIVO el encuentro anterior (Ionic no lo destruye)
-  y el segundo `WebGLRenderer` falla ("reading 'precision'"). En la app real no pasa: se entra con
-  `router.navigateByUrl` (en consola: `ng.getComponent(document.querySelector('app-map')).router.navigateByUrl('/encuentro/<id>')`).
-  Antes, mandar la posición (`GET /spawns?lat&lng` a ≤ 80 m) o da 403.
-- **Visto en el navegador, también en `develop` (no es de F2-04a):** al volver de CUALQUIER encuentro, el avatar y los
-  Pokémon del mapa no se repintan en Chromium headless hasta recargar. Mirarlo en Android en el paso 12d.
-- **Siguiente:** paso 12 de F2-04a con el A36 o el Redmi (está en PENDIENTES). Sin móvil se puede seguir con
-  **F2-04b** (plan, sección F2-04b), que se apoya en este código.
-
-## 👉 RELEVO DE KENNETH A ALEX (2026-10-12, noche)
-
-Todo mezclado en `develop` con el CI en verde (PR #48 y #49):
-
-1. **F2-01 · spike de cámara + giroscopio (PR #48, D-045)**, medido en el Samsung A36 con `/dev/ar`:
-   - `getUserMedia` funciona en el WebView → sin plugin nativo (camera-preview descartado).
-   - 60 fps con Pokémon + 400 partículas, 0 % tirones. El vídeo va a ~24 fps en interior (autoexposición): aceptado.
-   - **`facingMode: 'environment'` abre el GRAN ANGULAR en el A36**: hay que elegir "camera 0" por `deviceId`.
-   - Orientación con `RelativeOrientationSensor` (56 Hz, más suave); `deviceorientation` deja de llegar con el móvil
-     quieto. Calibrado a ojo: campo de visión vertical **64°** y retraso de la orientación **80 ms**.
-   - Sin WebXR en el WebView → AR solo de orientación (como el AR clásico de Pokémon GO).
-   - Cámara y sensores se sueltan al salir y en segundo plano; mapa ↔ AR ×3 sin perder el contexto WebGL (D-038).
-   - Sin permiso → fondo ilustrado. Un `<video>` vacío pinta un póster gris con "play": ocultarlo hasta su 1.er fotograma.
-   - Código reutilizable: `src/app/game/encounter-scene/device-pose.ts` y `pose-delay.ts`.
-2. **Seguridad del APK (#47):** comprobado en el A36 → logcat ya NO saca el refresh token (ver PENDIENTES).
-3. **F2-02 · plan de F2 (PR #49, D-046):** `docs/plan/fases/F2-captura.md` con F2-04a, F2-04b, F2-05 y F2-07 (F2-04
-   partida en a/b). **Todo su código se escribió y se probó capa a capa antes de subir el plan** y luego se borró:
-   estado final app 393 tests, shared 143, servidor 22, lint y build OK; los diffs del plan aplicados en orden dan ese
-   código byte a byte. Ejecutarlo = seguir los pasos con TDD copiando el código; lo único sin probar es el móvil.
-   D-046: la app solo decide si la bola TOCA; el servidor todo lo demás; **fallar no llama al servidor ni gasta**; el
-   mismo gesto vale a 2 m o a 12 m; curva = girar el dedo ~1 vuelta alrededor de la bola; el aro es la zona real que
-   cuenta; la animación de captura empieza al golpear y tapa lo que tarda Render.
-
-**Cómo empezar:** `/inicio` (y `npm install` en la raíz y en `server/`; no cambiaron dependencias). Leer D-045 y D-046.
-Del plan, solo la cabecera ("Antes de empezar") y la sección de tu tarea (~6.400 líneas porque trae todo el código).
-
-**Siguiente tarea: F2-04a · escena del encuentro en AR (base).** Pasos 1-11: código y tests copiados del plan (al
-acabar: lint OK, build OK, 62 archivos / 306 tests). El paso 12 necesita un Android (el A36 de Kenneth o el Redmi de
-Samuel): ≥ 55 fps, cámara principal, mapa ↔ encuentro ×3, AR apagada y sin permiso; si no hay móvil, el 12 a
-PENDIENTES y la tarea en `[~]`. Después: F2-04b → F2-05 → F2-07 (cada una su rama y su PR).
-
-**Trucos:** a `/dev/ar` (el spike, sigue para medir otros móviles) no hay botón: por CDP,
-`adb forward tcp:9222 localabstract:webview_devtools_remote_<pid>` y en la consola
-`history.pushState({}, '', '/dev/ar'); dispatchEvent(new PopStateEvent('popstate', { state: {} }))`. Capturas del
-móvil con `adb exec-out screencap -p > captura.png` (por CDP no salen ni WebGL ni la cámara). Para abrir un encuentro
-sin salir a la calle: joystick (menú de la Poké Ball) hasta ≤ 40 m de un Pokémon y tocarlo.
-
-**Samuel, lo tuyo sigue igual:** 7b de F1-07 y 3b de F1-05 con tu Redmi, y si puedes, abre `/dev/ar` en el Redmi para
-comprobar el campo de visión (en el A36 fue 64°; ver PENDIENTES).
-
-## RELEVO DE ALEX A SAMUEL (2026-10-12, noche)
-
-Hoy (Alex) quedó todo mezclado en `develop` con el CI en verde (PR #38-#46):
-F1-05 avatar 3D · F1-07 Pokémon en el mapa (hierba, grito por cercanía, toque → `/encuentro/:id` provisional) ·
-D-042 Pokémon en HTML **encima** de los edificios 3D · F1-09 pantalla "servidor despertando" + reintentos de sesión ·
-F1-10 el HUD sigue al día/noche del mapa · F2-08 efectos de sonido generados + precarga de gritos · F0-14 CI y
-`develop` protegida · estilo del Map ID sin negocios (día y noche) · Alex ADMIN.
-
-1. **Cómo trabajamos ahora:** rama `feature/…` → PR → **lo mezclas tú mismo** en cuanto el CI esté verde (lint + test +
-   build de app y servidor). `develop` está protegida: no deja mezclar en rojo ni push directo.
-2. **Con tu Redmi (Android), lo más valioso:** `npm run apk -- --install` y en la calle: 7b de F1-07 (≥ 55 fps con
-   Pokémon, grito, toque → encuentro) y 3b de F1-05 (avatar). Mide fps por CDP. Si van bien, marca las dos `[x]`.
-   ~~Lo de logcat~~, ~~F2-01~~ y ~~F2-02~~: hechos por Kenneth (ver arriba). Lo siguiente de la AR es F2-04a.
-3. **Sin móvil:** F2-10 (música) o F5-01 (plan del PvP).
-4. **Leer antes de tocar el mapa:** D-038, D-039, D-040, D-041, D-042 (los Pokémon son `<img>` en `.pokemon-layer`
-   colocados desde `MapOverlay.onBeforeDraw`; la hierba y la sombra siguen en three.js). Sonido: D-044.
-5. Para probar en el navegador: servidor (`cd server && npm run start:dev`) + `npm start`, cuenta `@pokecrud.test`
-   y bórrala al acabar; joystick desde el menú de la Poké Ball. Escuchar los efectos: `docs/evidencias/F2-08_sfx/*.wav`.
-6. **No borrar** las 6 capturas `docs/evidencias/HU-02_*.jpg` sin commitear: Alex las documentará.
-
-**Importante (D-034):** la escena de combate de `/combate/prueba` es **temporal**. Alex quiere el combate **en
-realidad aumentada con la cámara**. Lo que hay debajo (motor, IA, controlador, textos, menú) se reutiliza; solo cambia
-la parte visual (F4-07).
+**Trucos para probar en el PC:**
+- Servidor (`cd server && npm run start:dev`) + `npm start`; cuenta `...@pokecrud.test` y **bórrala al acabar**.
+- Abrir un encuentro: `ng.getComponent(document.querySelector('app-map')).router.navigateByUrl('/encuentro/<id>')`
+  con un id de `GET /spawns`, después de mandar tu posición a ≤ 80 m (`GET /spawns?lat&lng`), si no da 403. **No**
+  uses `history.pushState`: deja vivo el encuentro anterior y rompe el segundo WebGL.
+- Ver una especie concreta: en Playwright `page.route('**/encounters/*', r => r.fulfill({ json: {...} }))`.
+- **Quita el permiso de cámara al Chromium de Playwright** (`context.clearPermissions()`): una captura salió con la
+  webcam real del PC. Revisa las capturas antes de subirlas (el repo es público).
+- La ventana del Chromium de Playwright corta la parte de abajo de la pantalla simulada (la mano y las bolas): fíate
+  de las capturas, no de la ventana.
+- `TaskStop` no mata `ng serve` ni Nest: párales por puerto (3000 y 4200).
 
 ## Fase actual
 
-**F0 completa** (en `develop`). **F4 (combate) completa en código** a falta de la versión AR (F4-07). **F1 a medias:**
-spike (F1-01), plan (F1-02), ubicación y brújula (F1-03), **pantalla `/mapa` (F1-04)**,
-spawns (F1-06), mochila/XP (F1-08) y **avatar 3D (F1-05, falta probarlo en Android)** hechos; faltan los Pokémon en
-el mapa (F1-07). **F2:**
-fórmula (F2-03), captura en servidor (F2-06), audio (F2-08), **spike de cámara + giroscopio (F2-01)** y **plan
-(F2-02)** hechos; lo siguiente es F2-04a → F2-04b → F2-05 → F2-07 siguiendo `docs/plan/fases/F2-captura.md`.
+**F0 completa.** **F1:** todo hecho salvo pruebas en Android (F1-05 3b, F1-07 7b). **F2:** F2-01, F2-02, F2-03, F2-06,
+F2-08, F2-13 hechas; F2-04a, F2-04b, F2-05, F2-12 hechas a falta de Android; faltan **F2-07** (coreografía), **F2-11**
+y **F2-14** (ARCore) y F2-10 (música). **F4:** completa en código salvo F4-07 (combate en AR 3D, D-048).
 
 ## Hecho
 
@@ -239,19 +181,14 @@ fórmula (F2-03), captura en servidor (F2-06), audio (F2-08), **spike de cámara
 
 ## En curso
 
-- F2-04a (@alex) · pasos 1-11 mezclados en `develop`; tarea `[~]` solo por el paso 12 (Android, ver PENDIENTES). F1-05 (3b) y F1-07 (7b) solo esperan la prueba en Android.
-- F2-04b (@alex) · pasos 1-9a mezclados en `develop`; `[~]` solo por el 9b (Android, ver PENDIENTES).
-- F2-12 (@alex) · pasos 1-5 mezclados en `develop`; `[~]` solo por el 6 (Android). Siguiente: **F2-13** (ficha con botón).
-- F2-13 hecha (ficha con botón, PC del servidor, D-049).
-- F2-05 (@alex) · pasos 1-12a mezclados en `develop`; `[~]` solo por el 12b (Android). Siguiente sin Android: **F2-07**.
+- Nadie. F2-04a, F2-04b, F2-05 y F2-12 (@alex) están en `develop` y en `[~]` SOLO por su prueba en Android (PENDIENTES).
 
 ## Siguiente paso concreto
 
-1. **F2-04a · escena del encuentro en AR** siguiendo `docs/plan/fases/F2-captura.md` (skill `executing-plans`):
-   el código está en el plan, paso a paso con TDD; el criterio es probarlo en un Android (fps, cámara, ida y vuelta).
-2. **Con Android:** 7b de F1-07 y 3b de F1-05 (Samuel, en la calle); FOV de `/dev/ar` en el Redmi.
-3. **Sin Android:** F2-10 (música) o F5-01 (plan del PvP).
-3. Para generar el APK en otro PC: JDK 21 (`winget install Microsoft.OpenJDK.21`; si da "el hash no coincide",
+1. **Samuel, con el Redmi:** la tanda de PENDIENTES de Android (ver el relevo de arriba).
+2. **F2-11 · spike ARCore** (Android).
+3. **Sin móvil:** F2-07 (coreografía de captura); o F2-10 (música), F5-01 (plan del PvP).
+4. APK en otro PC: JDK 21 (`winget install Microsoft.OpenJDK.21`; si da "el hash no coincide",
    `winget install EclipseAdoptium.Temurin.21.JDK`) y `npm run apk`.
 
 ## Bloqueos / roto / pendiente de humanos
