@@ -400,7 +400,7 @@
       `BattleRoomsService` empieza el combate de verdad y sabe rendirse, `viewFor` en `shared/`) y pantalla `/pvp`
       (arena: elegir equipo, invitar, escribir código, buscar rival, cara a cara con el tipo de cada Pokémon). En el
       menú de la Poké Ball: "Combate en vivo". Los turnos llegan en F5-04. D-057.
-- [ ] **F5-04 · Combate PvP completo** — servidor aplica el engine, temporizador 30 s, abandono 60 s,
+- [~] **F5-04 · Combate PvP completo** (@samuel, 2026-10-13) — servidor aplica el engine, temporizador 30 s, abandono 60 s,
       resultado persistido; la escena de F4-05 reutilizada. Dep: F5-03, F4-05. Criterio: combate entre dos
       móviles reales grabado en vídeo.
 - [ ] **F5-05 · Espectadores.** Dep: F5-04.
