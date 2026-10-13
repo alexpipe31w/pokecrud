@@ -2715,7 +2715,7 @@ Puntos redondos con una `DataTexture` (sin canvas, D-038) en mezcla aditiva: el 
 
 **Files:** Modify `src/app/services/game/sfx-synth.ts` (su spec ya prueba TODAS las recetas: que suenen, no saturen y duren < 1 s)
 
-- [ ] **6a.** Añadir dentro de `SFX_RECIPES`, antes del `} satisfies …`:
+- [x] **6a.** Añadir dentro de `SFX_RECIPES`, antes del `} satisfies …`:
 
 ```ts
   /** El Pokémon aterriza en el encuentro (F2-04b): golpe sordo con polvo. */
@@ -2731,7 +2731,7 @@ Puntos redondos con una `DataTexture` (sin canvas, D-038) en mezcla aditiva: el 
   ],
 ```
 
-- [ ] **6b.** `npx ng test --include=src/app/services/game/sfx-synth.spec.ts --watch=false` → PASA. Commit + push.
+- [x] **6b.** `npx ng test --include=src/app/services/game/sfx-synth.spec.ts --watch=false` → PASA. Commit + push.
   **Ojo:** no llames a una receta `throw`: el spec de `AudioService` usa `'throw'` como sonido de ARCHIVO del catálogo y
   una receta con ese nombre le gana (por eso en F2-05 es `'ball-throw'`).
 
