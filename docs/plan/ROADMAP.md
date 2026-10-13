@@ -177,8 +177,8 @@
       **Hecho (pasos 1-9a, PR):** personalidad, saltos con semilla, partículas por tipo, aterrizaje con polvo + grito +
       vibración, destello shiny, zoom desde el mapa; arreglo de partículas negras (D-047). App 66 archivos / 333 tests.
       **Falta:** solo 9b (Android: fps con partículas y vídeo de la entrada).
-- [ ] **F2-12 · Pokémon en 3D (.glb) en el encuentro (D-048)** — el arte plano pasa a ser el modelo 3D de
-      `Pokemon-3D-api/assets` (cargado desde su URL, NO se sube al repo): `GLTFLoader` + `DRACOLoader` (decodificador
+- [~] **F2-12 · Pokémon en 3D (.glb) en el encuentro (D-048)** — el arte plano pasa a ser el modelo 3D de
+      `Pokemon-3D-api/assets` (@alex, 2026-10-12) (cargado desde su URL, NO se sube al repo): `GLTFLoader` + `DRACOLoader` (decodificador
       servido por la app), tamaño real por su caja (altura PokéAPI × XS/XL), animación si la trae, giro hacia la cámara,
       sombra; los 57 sin modelo y los shiny sin modelo → el arte plano de ahora (o tinte shiny). Con la AR de orientación
       actual; arrastrar con el dedo lo gira. Dep: F2-04b. Criterio: navegador + Android ≥ 55 fps con el modelo.
