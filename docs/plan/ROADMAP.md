@@ -335,7 +335,7 @@
       chips (máx. 2); agregar desde PokéAPI con tarjetas de resultado. Servicios, modelo y contrato sin cambios.
       Postman 46 peticiones / 82 comprobaciones / 0 fallos contra el servidor local (`F3-06a_01`). App 485 tests.
       Probado en vista móvil como admin y como jugador (`F3-06a_0{2..8}_*`).
-- [ ] **F3-06b · Equipos con Pokémon capturados** — `Team.caughtIds` (≤ 6, solo tuyos; `pokemonIds` se conserva por
+- [~] **F3-06b · Equipos con Pokémon capturados** (@samuel, 2026-10-13) — `Team.caughtIds` (≤ 6, solo tuyos; `pokemonIds` se conserva por
       el contrato del curso, D-054), quitar del equipo al transferir; pantalla `/equipos` que elige de "Mis Pokémon".
       Dep: F0-08, F3-02b.
 - [ ] **F3-06c · Favoritos y Pokémon personalizados** — `/favoritos` (desde la ficha de la Pokédex, nota y 1-5) y

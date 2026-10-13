@@ -3,7 +3,7 @@
 > Se **reescribe** al cerrar cada sesión (no es histórico; el histórico es `BITACORA.md`).
 > Máximo una pantalla. Si lees esto al empezar: después lee `ROADMAP.md`.
 
-**Última actualización:** 2026-10-13 · por Samuel (Claude) · `develop` con #63…#70; F3-06a en PR
+**Última actualización:** 2026-10-13 · por Samuel (Claude) · `develop` con #63…#71
 
 ## 👉 RELEVO DE KENNETH (2026-10-12 noche): pendientes de Android probados en el Samsung A36
 
@@ -60,7 +60,7 @@ F2-07, F2-12, F2-13, F2-15 hechas; faltan **F2-11**/**F2-14** (ARCore), F2-10 (m
 
 ## Hecho
 
-- **F3-06a (Samuel, rama `feature/F3-06a-inventario-ui`, PR):** IS-11 con el sistema de diseño (D-055): tarjetas,
+- **F3-06a (Samuel, #71 mezclado):** IS-11 con el sistema de diseño (D-055): tarjetas,
   ficha con confirmación propia, formulario con chips de tipo; `app-search-field`, `app-confirm-panel`, botón `danger`.
   Postman 46/82/0 en local, app 485. Evidencias `F3-06a_0{1..8}_*`.
 - **F3-05 (Samuel, #70 mezclado):** evolucionar con caramelos (D-053). `evolution.ts`
@@ -202,7 +202,8 @@ F2-07, F2-12, F2-13, F2-15 hechas; faltan **F2-11**/**F2-14** (ARCore), F2-10 (m
 
 ## En curso
 
-- Nadie. Samuel cerró **F3-06a** (rama `feature/F3-06a-inventario-ui`, PR a `develop`; sin migración). Sigue F3-06b.
+- **F3-06b (Samuel, rama `feature/F3-06b-equipos`):** equipos con Pokémon capturados (D-054, migración `team_caught`).
+  Punto de guardado: recién reclamada, empieza por el paso 1 (servidor, e2e primero). F3-06a mezclado (#71).
 - **Ojo:** el inventario de IS-11 está ahora en `/inventario` (la Pokédex 1025 ocupa `/pokedex`).
 
 ### PRUEBAS EN EL MÓVIL PENDIENTES (con el APK de producción, `npm run apk -- --install`)
