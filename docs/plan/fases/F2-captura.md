@@ -5209,7 +5209,7 @@ fotograma. "Reducir efectos": todo al doble de rápido, sin estrellas. **Android
 
 **Files:** Create `src/app/game/encounter-scene/capture-sequence.ts`, Test `capture-sequence.spec.ts`
 
-- [ ] **1a. Test que falla:**
+- [x] **1a. Test que falla:**
 
 ```ts
 import {
@@ -5298,7 +5298,7 @@ describe('ballDropY y shakeAngle', () => {
 });
 ```
 
-- [ ] **1b.** → FALLA. **1c. Implementación:**
+- [x] **1b.** → FALLA. **1c. Implementación:**
 
 ```ts
 /**
@@ -5396,7 +5396,7 @@ export function ballDropY(k: number, fromY: number, restY: number): number {
 export const shakeAngle = (k: number): number => 0.45 * Math.sin(k * Math.PI * 4) * (1 - k);
 ```
 
-- [ ] **1d.** → PASA (8). Commit `F2-07: coreografía de la captura` + push.
+- [x] **1d.** → PASA (8). Commit `F2-07: coreografía de la captura` + push.
 
 ### Paso 2 — Naturalezas en español
 
