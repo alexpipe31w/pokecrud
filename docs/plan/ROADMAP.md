@@ -319,8 +319,14 @@
       `/pokedex/:id`: arte, categoría, tipos, descripción ES, altura/peso, generación, hábitat ES, grito, debilidades
       (`defenseProfile`) y cadena (`evolutionTree`, método en ES; ramas en 2 columnas); sin ver → solo silueta. La ficha
       del individuo enlaza a su especie. Probado en vista móvil con Nest y Postgres locales (`F3-04_0{1..4}_*`).
-- [~] **F3-05 · Evolución con caramelos** (@samuel, 2026-10-13) — regla de caramelos por cadena (D-053: 50 si la cadena tiene una
+- [x] **F3-05 · Evolución con caramelos** (@samuel, 2026-10-13) — regla de caramelos por cadena (D-053: 50 si la cadena tiene una
       evolución; 25 y 100 si tiene dos), `POST /collection/:id/evolve` transaccional, animación de evolución. Dep: F3-03.
+      **Hecho:** `shared/engine/evolution.ts` (`evolutionOptions`); servidor con gasto condicional de caramelos y cambio de
+      especie solo si sigue siendo la de origen (dos a la vez → 200 y 409, se cobra una vez; e2e 87/87). App: panel en la
+      ficha (un botón por rama con el arte del destino; "Te faltan N"; confirmación) y escena a pantalla completa
+      (`evolvePose`: silueta A↔B acelerando → destello → forma nueva con grito y vibración; espera al servidor; error →
+      vuelve a A; "Reducir movimiento" → fundido). Probado en vista móvil con Nest y Postgres locales (`F3-05_0{1..9}_*`).
+      Pendiente opcional: un vistazo en Android.
 - [ ] **F3-06a · Inventario de IS-11 con la nueva UI** — `/inventario`, detalle, agregar y editar (HU-03/04/05/14)
       con el sistema de diseño, mismos servicios, modelo, formulario y contrato; Postman sigue pasando. Dep: F3-04.
 - [ ] **F3-06b · Equipos con Pokémon capturados** — `Team.caughtIds` (≤ 6, solo tuyos; `pokemonIds` se conserva por

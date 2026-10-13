@@ -46,7 +46,7 @@ interface OptionView extends EvolutionOption {
                     <span class="candy" aria-hidden="true"></span>
                     {{ o.cost }}
                     @if (o.missing > 0) {
-                      · Te faltan {{ o.missing }}
+                      · <span class="missing">Te faltan {{ o.missing }}</span>
                     }
                   </span>
                 </span>
@@ -59,7 +59,7 @@ interface OptionView extends EvolutionOption {
   `,
   styles: `
     section {
-      margin-top: var(--s-6);
+      margin: var(--s-6) 0 var(--s-4);
     }
     h2 {
       margin: 0 0 var(--s-2);
@@ -76,27 +76,40 @@ interface OptionView extends EvolutionOption {
       width: 100%;
       min-height: 64px;
       padding: var(--s-1) var(--s-3);
-      border: 0;
+      border: 2px solid var(--tint, var(--accent));
       border-radius: var(--r-card);
-      background: linear-gradient(
-        120deg,
-        color-mix(in srgb, var(--tint, var(--accent)) 85%, white),
-        var(--tint, var(--accent))
-      );
-      color: var(--accent-ink);
+      background: color-mix(in srgb, var(--tint, var(--accent)) 22%, var(--surface-opaque));
+      color: inherit;
       text-align: left;
       box-shadow: var(--shadow-sm);
       transition:
         transform 120ms var(--ease-out),
-        filter 120ms var(--ease-out);
+        background 120ms var(--ease-out);
+    }
+    .option::after {
+      content: '›';
+      margin-left: auto;
+      font: 700 1.6rem/1 var(--font-display);
+      color: var(--tint, var(--accent));
     }
     .option:active:not(:disabled) {
       transform: scale(0.97);
+      background: color-mix(in srgb, var(--tint, var(--accent)) 34%, var(--surface-opaque));
     }
     .option:disabled {
-      filter: grayscale(0.8);
-      opacity: 0.6;
+      border-style: dashed;
+      border-color: color-mix(in srgb, currentColor 30%, transparent);
+      background: color-mix(in srgb, currentColor 6%, transparent);
       box-shadow: none;
+    }
+    .option:disabled::after {
+      content: none;
+    }
+    .option:disabled img {
+      filter: grayscale(1) opacity(0.55);
+    }
+    .missing {
+      font-weight: 700;
     }
     img {
       width: 56px;

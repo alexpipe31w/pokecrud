@@ -1302,7 +1302,7 @@ export function evolutionOptions(dex: Dex, from: number): EvolutionOption[] {
   "Reducir movimiento" → fundido A→B de 400 ms.
 - [x] **3d.** Al terminar: la ficha muestra la especie nueva (`detail` de la respuesta), `collection.patchItem`,
   `pokedex.invalidate()`. Lint, `ng test`, build. Commit + `/guardar`.
-- [ ] **3e.** Navegador 390×844 contra Nest + Postgres local: Bulbasaur con 25 caramelos (sembrados) → Ivysaur;
+- [x] **3e.** Navegador 390×844 contra Nest + Postgres local: Bulbasaur con 25 caramelos (sembrados) → Ivysaur;
   Eevee → elegir rama; sin caramelos → botón deshabilitado. Vídeo o capturas `docs/evidencias/F3-05_*`. REGLA 2.
 
 ---

@@ -1589,3 +1589,42 @@ contenido. Pasos 2-3: `shared/engine/weaknesses.ts` (`defenseProfile`) y `evolut
 **Quedó a medias:** vistazo en Android (opcional).
 **Decisiones nuevas:** ninguna (la mudanza de IS-11 ya estaba en el plan de F3-01b).
 **El siguiente debe empezar por:** F3-05 paso 1 (`shared/engine/evolution.ts`, regla D-053) en `fases/F3-coleccion.md`.
+
+## 2026-10-13 12:05 · @samuel (Claude) · F3-05 · rama `feature/F3-05-evolucion`
+
+**Qué se hizo:** paso 1: `shared/engine/evolution.ts` (`evolutionOptions`: 50 si la cadena tiene una evolución; 25 y
+100 si tiene dos; etapa por `evolvesFrom`, profundidad de la cadena una vez por mapa) y **D-053**. Paso 2:
+`POST /collection/:id/evolve { to }` (`CollectionEvolveDto`, 30/min, 200 con la ficha nueva): en UNA transacción, gasto
+condicional de caramelos (`qty >= coste`) y cambio de especie con `updateMany … speciesId = origen` (si otra petición
+ya lo evolucionó → 409 y se deshace también el gasto); recalcula PC y movimientos; Pokédex capturado sin pisar
+`firstCaughtAt`. `SpawnsService.evolutionOptions`. Contrato `EvolveRequest`. Paso 3: `evolve-timeline.ts` (`evolvePose`:
+periodo A↔B de 600 a 60 ms exponencial, brillo, destello de 400 ms; `burstAt` = ∞ mientras el servidor no responde),
+`CollectionService.evolve` (deja la fila de la lista al día), `app-evolve-panel` (un botón por rama con el arte del
+destino, coste, "Te faltan N", confirmación) y `app-evolve-scene` (pantalla completa con rayos; grito + `success` en el
+fotograma en que aparece la forma nueva; fanfarria después; error → forma A a color con el mensaje del servidor y se
+cierra sola; "Reducir efectos"/`prefers-reduced-motion` → fundido de 400 ms). Tras verlo: botones rediseñados (texto
+blanco sobre el tinte se leía mal; ahora fondo claro teñido + borde del tipo; deshabilitado con borde discontinuo).
+**Archivos clave:** `shared/engine/evolution.ts`, `server/src/collection/*`, `server/src/spawns/spawns.service.ts`,
+`server/test/collection.e2e-spec.ts` (5 nuevos), `src/app/features/collection/evolve-*.ts`,
+`collection-detail.page.ts`, `services/game/collection.service.ts`.
+**Cómo se probó (salida real):**
+
+    shared: evolution.spec rojo primero ("Cannot find module './evolution.js'") → 5 passed; todo shared 20 archivos, 167 passed
+    e2e (Postgres 17 portátil, `prisma migrate status` → 127.0.0.1:54329): 5 nuevos en rojo (404) → colección 17/17;
+      todos: Test Files 8 passed, Tests 87 passed · unitarios 22 · lint 0 errores · nest build OK
+      (concurrencia: dos evolve a la vez con 50 caramelos → [200, 409] y quedan 25)
+    app: evolve-timeline rojo ("Cannot find module") → 7 passed; collection.service rojo ("Property 'evolve' does not
+      exist") → 9 passed; evolve-panel rojo → 3 passed; todo: 84 archivos, 478 passed · lint OK · ng build OK
+    Chrome sin ventana 390×844, Nest + Postgres locales, cuenta demo+evo-…@pokecrud.test sembrada:
+      Pikachu shiny 37 caramelos → "Evolucionar a Raichu 100 · Te faltan 63", deshabilitado
+      Bulbasaur 25 → confirmar → POST 200 → silueta → destello → "¡Tu Bulbasaur evolucionó a Ivysaur!" (~3,4 s)
+      ficha: "PC 152 Ivysaur … 0 caramelos de Bulbasaur", panel "Evolucionar a Venusaur 100 · Te faltan 100"
+      Eevee 50 → 8 opciones → Jolteon ("PC 255 Jolteon … 0 caramelos de Eevee"); Pokédex "Nº 2, Ivysaur, capturado"
+      409 simulado → escena "Te faltan caramelos", vuelve a la ficha con el aviso y sigue Bulbasaur con 25
+      reducedMotion → 0 siluetas, termina en 923 ms
+      consola: solo el GET /collection que el script corta al recargar tras el login (ERR_ABORTED) y el 409 simulado
+    Evidencias docs/evidencias/F3-05_0{1..8}_*.png y F3-05_09_evolucion.webm (recorrido entero)
+
+**Quedó a medias:** nada del criterio. Opcional: vistazo en Android (grito y vibración al aparecer la forma nueva).
+**Decisiones nuevas:** D-053.
+**El siguiente debe empezar por:** F3-06a (inventario de IS-11 con la nueva UI) en `fases/F3-coleccion.md`, parte 2.
