@@ -5180,7 +5180,7 @@ Pokémon al llegar (`poseAt` en el instante del impacto, con sus saltos); aciert
 
 ### Paso 12 — Verde y Android
 
-- [ ] **12a.** `npm run lint` · `npm run build` · `npm test -- --watch=false` · `npm run test:shared` · `cd server && npm run build && npm test`.
+- [x] **12a.** `npm run lint` · `npm run build` · `npm test -- --watch=false` · `npm run test:shared` · `cd server && npm run build && npm test`.
 - [ ] **12b.** Android (con la AR y sin ella): un lanzamiento recto y firme acierta; flojo → "¡Casi!" y NO baja la
   mochila; torcido falla; con una vuelta del dedo antes, la bola hace la curva y vuelve; el aro cambia de color con
   Super/Ultra/Frambu; "¡Genial!" etc. al acertar dentro del aro; la mochila baja una bola por acierto (y la Frambu);

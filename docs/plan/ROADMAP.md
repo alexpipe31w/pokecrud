@@ -199,6 +199,9 @@
       automático) pone al Pokémon; se le puede rodear; el lanzamiento (F2-05) funciona igual. Dep: F2-11.
 - [~] **F2-05 · Lanzamiento** (@alex, 2026-10-12) — gesto 1:1, física, curva, círculo de precisión, bolas y bayas, hápticos.
       Dep: F2-04b, F2-12 (la caja del Pokémon sale del modelo 3D). (Fallar no llama al servidor ni gasta, D-046.)
+      **Hecho (pasos 1-12a, PR):** gesto, física, curva, aro, bolas y Frambu, servidor con reintentos; adaptado a F2-12
+      y F2-13. Navegador con encuentro REAL: fallos sin gastar, acierto → capturado, mochila 30→29, +110 XP.
+      App 72 archivos / 390 tests. **Falta:** 12b (Android: gesto con el dedo de verdad, curva, fps).
 - [x] **F2-06 · Captura autoritativa en servidor** (@alex, 2026-10-11) — `POST /encounters/:id/throw` con transacción,
       descuento atómico, `UNIQUE` de idempotencia, validación de distancia (ARQUITECTURA §6); test de
       concurrencia (dos lanzamientos simultáneos). Dep: F2-03, F1-06, F1-08.

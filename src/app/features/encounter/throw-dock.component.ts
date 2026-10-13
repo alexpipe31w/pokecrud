@@ -114,6 +114,9 @@ const MAX_SAMPLES = 120;
       vertical-align: -2px;
     }
     .hand {
+      /* Por encima de los botones de bolas y bayas al arrastrarla hacia arriba. */
+      position: relative;
+      z-index: 1;
       width: 72px;
       height: 72px;
       box-shadow: var(--shadow-lg);

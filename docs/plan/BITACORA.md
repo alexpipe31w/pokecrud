@@ -1247,3 +1247,28 @@ coloca al lado del Pokémon cada fotograma escribiendo el `transform` (sin signa
 **Decisiones nuevas:** D-049.
 **El siguiente debe empezar por:** con Android, F2-11 (spike ARCore). Sin Android: F2-05 (lanzamiento) siguiendo
 `docs/plan/fases/F2-captura.md` → "F2-05"; ojo, la caja del Pokémon ahora sale de `artAspect` del modelo 3D (D-048).
+
+## 2026-10-13 00:00 · @alex (Claude) · F2-05 · rama `feature/F2-05-lanzamiento`
+
+**Qué se hizo:** pasos 1-12a de F2-05 del plan. Los bloques `ts` nuevos tal cual; los `diff` con un aplicador por
+texto literal (sin números de línea) y, donde F2-12/F2-13 habían cambiado el contexto, a mano: imports, campos y
+`dispose` de la escena; imports, `inject(BagService)` y el bloque del vuelo tras `placeCard` en la página. Adaptación de
+diseño: la escena ya trae una luz hemisférica (para la bola, F2-05); el modelo 3D (F2-12) solo añade la direccional si
+falta (test ajustado). Arreglo de UX visto en el navegador: la bola agarrada pasaba POR DEBAJO de los botones de bolas →
+`z-index` en `.hand`.
+**Archivos clave:** `shared/protocol/encounters.ts`, `src/app/services/game/{bag,spawn-feed,encounter-api}.service.ts`,
+`src/app/core/auth/auth.service.ts`, `src/app/game/encounter-scene/{throw-gesture,throw-physics,precision-ring,ball-mesh,encounter-scene}.ts`,
+`src/app/features/encounter/{throw-dock.component,encounter.page}.ts`.
+**Cómo se probó (salida real):**
+
+    app: lint OK · build OK (sin avisos de presupuesto) · ng test 72 archivos, 390 passed · shared 144 passed
+    servidor: lint (solo el aviso viejo) · build OK · 22 passed
+    navegador 390×844 sin cámara, encuentro REAL (Whismur Nv. 10, PC 33; cuenta f205@pokecrud.test → "borradas 1"):
+      gestos con el ratón (salen más lentos que lo pedido): flojo → ni cuenta como lanzamiento; potencia ~0,55 → "¡Casi!"
+      SIN petición /throw; potencia 1 → acierto u=0 v=0 "¡Bien!" → servidor: capturado, la página vuelve al mapa;
+      servidor después: POKE_BALL 30→29 (solo el acierto), encounter status "caught", xp 110.
+
+**Quedó a medias / roto:** 12b (Android, con el dedo de verdad).
+**Decisiones nuevas:** ninguna (adaptaciones anotadas aquí).
+**El siguiente debe empezar por:** F2-07 (coreografía de captura) siguiendo `fases/F2-captura.md` → "F2-07"; sus diffs
+de la escena tocan `body` (absorción): aplicar lo mismo al modelo 3D (`model`), ver `fases/F2-12-pokemon-3d.md`.

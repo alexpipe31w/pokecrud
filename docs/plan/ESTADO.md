@@ -243,7 +243,7 @@ fórmula (F2-03), captura en servidor (F2-06), audio (F2-08), **spike de cámara
 - F2-04b (@alex) · pasos 1-9a mezclados en `develop`; `[~]` solo por el 9b (Android, ver PENDIENTES).
 - F2-12 (@alex) · pasos 1-5 mezclados en `develop`; `[~]` solo por el 6 (Android). Siguiente: **F2-13** (ficha con botón).
 - F2-13 hecha (ficha con botón, PC del servidor, D-049).
-- F2-05 (@alex) · rama `feature/F2-05-lanzamiento` · recién reclamada; plan en `fases/F2-captura.md` → F2-05 (adaptado a F2-12/F2-13).
+- F2-05 (@alex) · pasos 1-12a mezclados en `develop`; `[~]` solo por el 12b (Android). Siguiente sin Android: **F2-07**.
 
 ## Siguiente paso concreto
 
@@ -283,6 +283,8 @@ fórmula (F2-03), captura en servidor (F2-06), audio (F2-08), **spike de cámara
 - [ ] **F2-04a paso 12:** `npm run apk -- --install` y seguir 12a-12e de `docs/plan/fases/F2-captura.md` (cámara
       principal, ≥ 55 fps por CDP, mapa ↔ encuentro ×3 sin "context lost" y el mapa con avatar/Pokémon al volver,
       cámara suelta en segundo plano, AR apagada y permiso revocado). Si todo va, F2-04a `[x]` en ROADMAP.
+- [ ] **F2-05 paso 12b:** con el dedo: recto y firme acierta; flojo → "¡Casi!" y la mochila NO baja; torcido falla;
+      una vuelta del dedo antes → curva; el aro cambia de color con Super/Frambu; "¡Genial!" al acertar dentro del aro.
 - [ ] **F2-12 paso 6:** encuentro con un modelo 3D (Charizard o Gengar si salen; si no, el que haya) → fps ≥ 55 con
       modelo + partículas (snippet de F2-04a 12c) y que el modelo pesado no tarde demasiado con datos móviles.
 - [ ] **F2-04b paso 9b:** tocar un Pokémon en el mapa → crece → destello → cae con polvo, grito y vibración a la vez;
