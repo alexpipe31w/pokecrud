@@ -1,0 +1,121 @@
+// La arena es de noche siempre (modo Experience): el color lo ponen los Pokémon y el rojo de la Poké Ball.
+.arena {
+  --background:
+    radial-gradient(
+      120% 70% at 50% 0%,
+      color-mix(in srgb, var(--t-dragon) 35%, var(--ink)),
+      transparent 70%
+    ),
+    var(--ink);
+  color: var(--paper);
+}
+
+.page {
+  display: grid;
+  align-content: start;
+  gap: var(--s-4);
+  min-height: 100%;
+  padding: var(--s-6) var(--s-4) calc(var(--ion-safe-area-bottom, 0px) + var(--s-8));
+}
+
+.title {
+  margin: 0;
+  font: 700 2.2rem/1.05 var(--font-display);
+  letter-spacing: -0.02em;
+}
+
+.sub,
+.quiet {
+  margin: 0;
+  color: color-mix(in srgb, var(--paper), transparent 28%);
+}
+
+.team {
+  display: grid;
+  gap: var(--s-3);
+  margin-top: var(--s-4);
+
+  h2 {
+    margin: 0;
+    font: 700 1.1rem/1.2 var(--font-display);
+  }
+}
+
+.chips {
+  display: flex;
+  gap: var(--s-2);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.chip {
+  flex: none;
+  min-height: 40px;
+  padding: 0 var(--s-4);
+  border: 2px solid color-mix(in srgb, var(--paper), transparent 75%);
+  border-radius: var(--r-chip);
+  background: transparent;
+  color: var(--paper);
+  font: 600 0.95rem/1 var(--font-display);
+  transition: transform var(--dur-press) var(--ease-out);
+
+  &[aria-checked='true'] {
+    border-color: var(--gold);
+    background: var(--gold);
+    color: var(--ink);
+  }
+
+  &:active {
+    transform: scale(0.96);
+  }
+}
+
+.actions {
+  display: grid;
+  gap: var(--s-3);
+  margin-top: var(--s-6);
+}
+
+.pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--s-3);
+}
+
+.center {
+  display: grid;
+  justify-items: center;
+  gap: var(--s-3);
+  padding: var(--s-8) 0;
+  text-align: center;
+
+  h2 {
+    margin: 0;
+    font: 700 1.4rem/1.2 var(--font-display);
+  }
+
+  p {
+    margin: 0;
+  }
+}
+
+.notice {
+  margin: 0;
+  padding: var(--s-3) var(--s-4);
+  border-radius: var(--r-card);
+  background: color-mix(in srgb, var(--paper), transparent 90%);
+  text-align: center;
+}
+
+.cta {
+  display: inline-grid;
+  place-items: center;
+  min-height: 48px;
+  padding: 0 var(--s-6);
+  border-radius: var(--r-chip);
+  background: var(--accent);
+  color: var(--accent-ink);
+  font: 600 1rem/1 var(--font-display);
+  text-decoration: none;
+  box-shadow: var(--shadow-accent);
+}

@@ -71,7 +71,7 @@ describe('BallMenuComponent', () => {
     expect(ball().getAttribute('aria-expanded')).toBe('true');
   });
 
-  it('Pokédex, Inventario, Combate de prueba, Equipos, Favoritos y Personalizados navegan y cierran el menú', () => {
+  it('Pokédex, Inventario, Combate de prueba, Combate en vivo, Equipos, Favoritos y Personalizados navegan y cierran el menú', () => {
     openMenu();
     item('Pokédex').click();
     expect(router.navigateByUrl).toHaveBeenCalledWith('/pokedex');
@@ -84,6 +84,10 @@ describe('BallMenuComponent', () => {
     openMenu();
     item('Combate de prueba').click();
     expect(router.navigateByUrl).toHaveBeenCalledWith('/combate/prueba');
+    fixture.detectChanges();
+    openMenu();
+    item('Combate en vivo').click();
+    expect(router.navigateByUrl).toHaveBeenCalledWith('/pvp');
     fixture.detectChanges();
     openMenu();
     item('Equipos').click();

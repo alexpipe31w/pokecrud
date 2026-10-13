@@ -153,6 +153,25 @@ describe('PvpSocketService', () => {
     ]);
   });
 
+  it('ready espera a la conexión; si no llega o el servidor la cierra, error legible', async () => {
+    vi.useFakeTimers();
+    try {
+      const waiting = svc.ready(1000);
+      await vi.advanceTimersByTimeAsync(400);
+      sockets[0].fire('connect');
+      await vi.advanceTimersByTimeAsync(200);
+      await expect(waiting).resolves.toBeUndefined();
+
+      sockets[0].fire('disconnect', 'transport close');
+      const late = svc.ready(1000);
+      const check = expect(late).rejects.toThrow(/sin conexión/i);
+      await vi.advanceTimersByTimeAsync(1400);
+      await check;
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it('request sin respuesta → error legible', async () => {
     await svc.connect();
     sockets[0].reply = new Error('operation has timed out');
