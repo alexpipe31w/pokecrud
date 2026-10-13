@@ -176,7 +176,7 @@ script; e2e en verde; migración aplicada en Supabase **antes** de mezclar.
 
 **Files:** Create `shared/engine/candy.ts`, `shared/engine/nickname.ts`; Tests `candy.spec.ts`, `nickname.spec.ts`
 
-- [ ] **1a. Tests que fallan:**
+- [x] **1a. Tests que fallan:**
 
 ```ts
 // shared/engine/candy.spec.ts
@@ -218,8 +218,8 @@ describe('normalizeNickname', () => {
 });
 ```
 
-- [ ] **1b.** `npm run test:shared -- candy nickname` → FALLA (no existen los módulos).
-- [ ] **1c. Implementación:**
+- [x] **1b.** `npm run test:shared -- candy nickname` → FALLA (no existen los módulos).
+- [x] **1c. Implementación:**
 
 ```ts
 // shared/engine/candy.ts
@@ -246,7 +246,7 @@ export function normalizeNickname(raw: string | null | undefined): string | null
 }
 ```
 
-- [ ] **1d.** → PASA. Commit `F3-02a: reglas de caramelos y mote con tests` + `/guardar`.
+- [x] **1d.** → PASA. Commit `F3-02a: reglas de caramelos y mote con tests` + `/guardar`.
 
 ### Paso 2 — Valoración de IVs (pura; la usa la ficha de F3-03)
 
@@ -255,7 +255,7 @@ export function normalizeNickname(raw: string | null | undefined): string | null
 Escala propia sobre 6 IVs de 0-31 (186 en total), con los cortes de la valoración de Pokémon GO en porcentaje:
 0★ < 51 %, 1★ < 66,7 %, 2★ < 82,2 %, 3★ hasta 99 %, y 4 = perfecto (100 %).
 
-- [ ] **2a. Test que falla:**
+- [x] **2a. Test que falla:**
 
 ```ts
 import { ivPercent, ivStars } from './iv-appraisal.js';
@@ -278,7 +278,7 @@ describe('valoración de IVs', () => {
 });
 ```
 
-- [ ] **2b.** falla. **2c.**
+- [x] **2b.** falla. **2c.**
 
 ```ts
 import type { Stats } from './battle/stats.js';
@@ -299,18 +299,18 @@ export function ivStars(ivs: Stats): 0 | 1 | 2 | 3 | 4 {
 ```
 
   (Comprobado: 17·6 = 102 → 54,8 % → 1★; 22·6 = 132 → 71 % → 2★; 30·6 = 180 → 96,8 % → 3★.)
-- [ ] **2d.** pasa. Commit + `/guardar`.
+- [x] **2d.** pasa. Commit + `/guardar`.
 
 ### Paso 3 — Contrato
 
-- [ ] **3a.** Crear `shared/protocol/collection.ts` con el bloque de "Contrato" de arriba. `npx tsc -p
+- [x] **3a.** Crear `shared/protocol/collection.ts` con el bloque de "Contrato" de arriba. `npx tsc -p
   shared/tsconfig.json --noEmit` → sin errores. Commit `F3-02a: contrato de la colección` + `/guardar`.
 
 ### Paso 4 — Esquema y migración
 
 **Files:** Modify `server/prisma/schema.prisma`; Create `server/prisma/migrations/20261013010000_collection/migration.sql`
 
-- [ ] **4a. Esquema:** en `CaughtPokemon`, `cp Int?` (null = filas de antes del script del paso 7) y
+- [x] **4a. Esquema:** en `CaughtPokemon`, `cp Int?` (null = filas de antes del script del paso 7) y
   `@@index([playerId, cp])`, `@@index([playerId, favorite])`; en `Player`, `candies Candy[]` y `pokedex PokedexEntry[]`;
   modelos nuevos:
 
@@ -339,7 +339,7 @@ model PokedexEntry {
 }
 ```
 
-- [ ] **4b. Migración:** `cd server && npx prisma migrate dev --create-only --name collection` **contra el Postgres
+- [x] **4b. Migración:** `cd server && npx prisma migrate dev --create-only --name collection` **contra el Postgres
   portátil** (`embedded-postgres`, ver ESTADO; NUNCA `migrate dev` contra Supabase: puede pedir resetear la base). Mover
   la carpeta a `20261013010000_collection` y añadir al final del SQL:
 
@@ -357,7 +357,7 @@ GROUP BY "playerId", "speciesId"
 ON CONFLICT ("playerId", "speciesId") DO NOTHING;
 ```
 
-- [ ] **4c.** `npx prisma migrate deploy` y `npx prisma generate` contra el Postgres portátil; `npm run build`. Commit
+- [x] **4c.** `npx prisma migrate deploy` y `npx prisma generate` contra el Postgres portátil; `npm run build`. Commit
   `F3-02a: migración collection (cp, Candy, PokedexEntry)` + `/guardar`.
 
 ### Paso 5 — La captura guarda PC, caramelos y Pokédex; abrir un encuentro marca "visto"

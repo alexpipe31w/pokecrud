@@ -197,7 +197,8 @@ F2-07, F2-12, F2-13, F2-15 hechas; faltan **F2-11**/**F2-14** (ARCore), F2-10 (m
 ## En curso
 
 - **F3-02a (@samuel, 2026-10-13)** — rama `feature/F3-02a-coleccion-servidor`. **Punto de guardado:** reclamada;
-  paso siguiente: paso 1 de `fases/F3-coleccion.md` (candy.ts y nickname.ts). (F0-15 #63 y F3-01a #64 mezclados.)
+  pasos 1-4 hechos (reglas puras + contrato + migración `20261013010000_collection`, probada SOLO en un Postgres 17
+  portátil). Paso siguiente: paso 5 (la captura guarda PC, caramelos y Pokédex). (F0-15 #63 y F3-01a #64 mezclados.)
 - F1-05 y F1-07 siguen `[~]` (@alex) SOLO por su prueba en la calle (PENDIENTES).
 
 ## Siguiente paso concreto

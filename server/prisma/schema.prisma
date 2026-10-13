@@ -38,6 +38,8 @@ model Player {
   caught           CaughtPokemon[]
   encounterResults EncounterResult[]
   throws           Throw[]
+  candies          Candy[]
+  pokedex          PokedexEntry[]
 }
 
 model RefreshToken {
@@ -177,10 +179,38 @@ model CaughtPokemon {
   caughtLng   Float
   caughtAt    DateTime       @default(now())
   favorite    Boolean        @default(false)
+  /// PC (D-049) calculado al capturar, para ordenar y paginar en la base (D-052). null = capturado antes de F3-02a
+  /// (lo rellena `npm run db:backfill-collection`); se recalcula si cambia el nivel (F3-05).
+  cp          Int?
   player      Player         @relation(fields: [playerId], references: [id], onDelete: Cascade)
 
   @@index([playerId, caughtAt])
   @@index([playerId, speciesId])
+  @@index([playerId, cp])
+  @@index([playerId, favorite])
+}
+
+/// Caramelos por familia (cadena evolutiva del dataset, D-052). Capturar +3, transferir +1, evolucionar gasta (F3-05).
+model Candy {
+  playerId  String   @db.Uuid
+  familyId  Int
+  qty       Int      @default(0)
+  updatedAt DateTime @updatedAt
+  player    Player   @relation(fields: [playerId], references: [id], onDelete: Cascade)
+
+  @@id([playerId, familyId])
+}
+
+/// Pokédex del jugador (F3): una fila por especie vista; `caught` al capturarla alguna vez.
+model PokedexEntry {
+  playerId      String    @db.Uuid
+  speciesId     Int
+  caught        Boolean   @default(false)
+  firstSeenAt   DateTime  @default(now())
+  firstCaughtAt DateTime?
+  player        Player    @relation(fields: [playerId], references: [id], onDelete: Cascade)
+
+  @@id([playerId, speciesId])
 }
 
 /// Un spawn solo se resuelve una vez por jugador: capturado o huido (UNIQUE). Se puede borrar pasado 1 día: la
