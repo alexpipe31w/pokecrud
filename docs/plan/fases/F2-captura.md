@@ -5613,7 +5613,7 @@ export const natureNameEs = (nature: string): string =>
 
 **Files:** Create `src/app/features/encounter/caught-card.component.ts`, Test `caught-card.component.spec.ts`
 
-- [ ] **5a. Test que falla:**
+- [x] **5a. Test que falla:**
 
 ```ts
 import { TestBed } from '@angular/core/testing';
@@ -5702,7 +5702,7 @@ describe('CaughtCardComponent', () => {
 });
 ```
 
-- [ ] **5b.** → FALLA. **5c. Implementación:**
+- [x] **5b.** → FALLA. **5c. Implementación:**
 
 ```ts
 import { Component, OnDestroy, computed, effect, input, output, signal } from '@angular/core';
@@ -5869,7 +5869,7 @@ export class CaughtCardComponent implements OnDestroy {
 }
 ```
 
-- [ ] **5d.** → PASA (5). Commit `F2-07: tarjeta de capturado` + push.
+- [x] **5d.** → PASA (5). Commit `F2-07: tarjeta de capturado` + push.
 
 ### Paso 6 — La página: la coreografía entera
 
