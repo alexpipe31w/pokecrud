@@ -806,39 +806,39 @@ export class PendingTransfer {
 
 Componentes pequeños para no pasar el presupuesto de 2 kB de estilos por componente (como D-033).
 
-- [ ] **3a.** Ruta `coleccion/:id` (`authGuard`). La página pide `GET /collection/:id` (con el `CollectionItem` de la
+- [x] **3a.** Ruta `coleccion/:id` (`authGuard`). La página pide `GET /collection/:id` (con el `CollectionItem` de la
   lista como cabecera inmediata mientras llega el detalle: nada de pantalla en blanco). Fondo tintado por el tipo
   principal (DISENO §1: "cada pantalla de un Pokémon se tiñe con el color de su tipo principal").
-- [ ] **3b. Cabecera:** arte grande (o shiny), entrada con `scale(0.95)+opacity` → normal, **grito al abrir** (una
+- [x] **3b. Cabecera:** arte grande (o shiny), entrada con `scale(0.95)+opacity` → normal, **grito al abrir** (una
   vez; `AudioService.playCry`), PC grande en Fredoka, mote/nombre con lápiz para renombrar, ★ favorito (toque → PATCH
   optimista; si falla, vuelve atrás con aviso), nivel, sexo, chips de tipo, altura y peso × `heightScale` (XS/XL como
   en el encuentro).
-- [ ] **3c. `app-detail-stats`:** valoración (`ivStars` + `ivPercent`, con estrellas y texto "96 % · ★★★") y 6 barras
+- [x] **3c. `app-detail-stats`:** valoración (`ivStars` + `ivPercent`, con estrellas y texto "96 % · ★★★") y 6 barras
   de IVs (`app-stat-bar` con `max=31`); debajo las stats reales (`stats`) con `max` = 255; naturaleza en español
   (`shared/data/natures-es.ts`) indicando qué sube (▲) y qué baja (▼) (de la tabla de naturalezas de `stats.ts`).
-- [ ] **3d. `app-detail-moves`:** los 4 movimientos (nombre ES, `app-type-chip`, categoría física/especial/estado,
+- [x] **3d. `app-detail-moves`:** los 4 movimientos (nombre ES, `app-type-chip`, categoría física/especial/estado,
   potencia, precisión, PP) desde `DatasetService.moves`.
-- [ ] **3e. `app-detail-origin`:** "Capturado el 13 oct 2026, 11:52 · Poké Ball" (`Intl.DateTimeFormat('es-CO')`) y
+- [x] **3e. `app-detail-origin`:** "Capturado el 13 oct 2026, 11:52 · Poké Ball" (`Intl.DateTimeFormat('es-CO')`) y
   un **mapa mini** de 160 px con un pin: Google Maps JS con el mismo `loadMapsLibrary` (`disableDefaultUI`,
   `gestureHandling: 'none'`, `clickableIcons: false`, zoom 16, sin inclinación) cargado **solo al hacerse visible**
   (`IntersectionObserver`; cada mapa cuenta como una carga de Maps). Si Maps falla → texto con las coordenadas
   redondeadas a 3 decimales, nunca un hueco gris.
-- [ ] **3f. Renombrar:** hoja con un campo (máx. `NICKNAME_MAX`, contador), validación en vivo con
+- [x] **3f. Renombrar:** hoja con un campo (máx. `NICKNAME_MAX`, contador), validación en vivo con
   `normalizeNickname` (mismo mensaje que el servidor), "Guardar" → PATCH → `collection.patchItem`. "Quitar mote".
-- [ ] **3g. Transferir:** botón al final (estilo peligro, texto "Transferir · +1 caramelo"), confirmación corta
+- [x] **3g. Transferir:** botón al final (estilo peligro, texto "Transferir · +1 caramelo"), confirmación corta
   ("¿Transferir a Chispa? Recibirás 1 caramelo de Pikachu"), luego: `collection.removeItem(id)`, volver a la lista y
   aviso flotante "Chispa transferido · **Deshacer**" durante `UNDO_MS` (un `PendingTransfer` en un servicio
   `providedIn: 'root'`, para que sobreviva a cambiar de pantalla). Deshacer → `restoreItem` en su sitio. Al pausar la
   app (`document.hidden`) → `flush()`. `failed` → `restoreItem` + aviso "No se pudo transferir".
-- [ ] **3h.** Lint, `ng test`, build. Commit + `/guardar`.
+- [x] **3h.** Lint, `ng test`, build. Commit + `/guardar`.
 
 ### Paso 4 — Prueba y cierre
 
-- [ ] **4a.** Navegador 390×844: abrir 3 fichas (una shiny), renombrar (válido, 13 letras → error, con emoji → error),
+- [x] **4a.** Navegador 390×844: abrir 3 fichas (una shiny), renombrar (válido, 13 letras → error, con emoji → error),
   favorito ida y vuelta, transferir y deshacer, transferir y esperar (sale de la lista, +1 caramelo en otro de su
   familia), mapa mini. Capturas `docs/evidencias/F3-03_0{1..5}_*.png` (el mapa mini enseña DÓNDE se capturó: usar una
   captura hecha en un sitio público o en Neiva centro, no en casa; el repo es público).
-- [ ] **4b.** Android: abrir la ficha desde "¡Capturado!" → "Ver en Mis Pokémon"; grito, barras y mapa mini; fps al
+- [ ] **4b.** (pendiente: sin móvil el 2026-10-13; no usa GPS ni cámara) Android: abrir la ficha desde "¡Capturado!" → "Ver en Mis Pokémon"; grito, barras y mapa mini; fps al
   desplazar ≥ 55. REGLA 2.
 
 ---

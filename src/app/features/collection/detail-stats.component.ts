@@ -33,7 +33,10 @@ const LABEL: Record<keyof Stats, string> = {
     <section aria-labelledby="iv-title">
       <h2 id="iv-title">
         Valoración
-        <span class="stars" [attr.aria-label]="starsLabel()">{{ starsText() }}</span>
+        <span class="stars" role="img" [attr.aria-label]="starsLabel()"
+          ><span aria-hidden="true">{{ starsOn() }}</span
+          ><span class="off" aria-hidden="true">{{ starsOff() }}</span></span
+        >
         <span class="pct">{{ percent() }} %</span>
       </h2>
       @for (k of order; track k) {
@@ -44,7 +47,8 @@ const LABEL: Record<keyof Stats, string> = {
         <app-stat-bar [label]="label[k] + mark(k)" [value]="stats()[k]" [max]="255" />
       }
       <p class="nature">
-        Naturaleza <strong>{{ natureName() }}</strong>
+        Naturaleza <strong>{{ natureName() }}</strong
+        >&nbsp;
         @if (effect(); as e) {
           <span>· ▲ {{ label[e[0]] }} · ▼ {{ label[e[1]] }}</span>
         } @else {
@@ -69,6 +73,13 @@ const LABEL: Record<keyof Stats, string> = {
       color: var(--gold);
       letter-spacing: 0.08em;
     }
+    .off {
+      color: currentColor;
+      opacity: 0.25;
+    }
+    .stars .off {
+      color: var(--ink-2);
+    }
     .pct {
       margin-left: auto;
       font-variant-numeric: tabular-nums;
@@ -87,10 +98,13 @@ export class DetailStatsComponent {
   protected readonly label = LABEL;
   protected readonly percent = computed(() => ivPercent(this.ivs()));
   private readonly stars = computed(() => ivStars(this.ivs()));
-  protected readonly starsText = computed(() => {
-    const n = this.stars();
-    return n === 4 ? '★★★ ✦' : '★'.repeat(n) + '☆'.repeat(3 - n);
-  });
+  /** Llenas en dorado y vacías apagadas (con 0 estrellas, tres ☆ doradas parecían tres estrellas). */
+  protected readonly starsOn = computed(() =>
+    this.stars() === 4 ? '★★★ ✦' : '★'.repeat(this.stars()),
+  );
+  protected readonly starsOff = computed(() =>
+    this.stars() === 4 ? '' : '★'.repeat(3 - this.stars()),
+  );
   protected readonly starsLabel = computed(() =>
     this.stars() === 4 ? 'perfecto' : `${this.stars()} de 3 estrellas`,
   );

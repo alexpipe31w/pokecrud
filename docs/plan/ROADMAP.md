@@ -302,8 +302,14 @@
       (18 tipos, Shiny, Favoritos) al momento; cargando, vacía, vacía con filtros y error. "+3 caramelos de Pichu" y "Ver
       en Mis Pokémon" en "¡Capturado!"; la lista se recarga tras capturar. Probado en vista móvil 390×844 contra el Nest y
       un Postgres locales con 35 capturas (`F3-02_0{1..4}_*`). Pendiente opcional: scroll en un Android (no usa GPS/cámara).
-- [~] **F3-03 · Ficha del individuo** (@samuel, 2026-10-13) — arte, grito, PC, IVs, naturaleza, stats calculados, movimientos,
+- [x] **F3-03 · Ficha del individuo** (@samuel, 2026-10-13) — arte, grito, PC, IVs, naturaleza, stats calculados, movimientos,
       dónde/cuándo se capturó, mapa mini, renombrar, transferir (con deshacer). Dep: F3-02b.
+      **Hecho:** servidor `GET/PATCH/DELETE /collection/:id` (IVs y stats solo para su dueño, mote con la regla de
+      shared/, transferir +1 caramelo en una transacción; e2e 82/82). App `/coleccion/:id`: arte + grito, PC, mote ✎,
+      favorito ★, tipos, altura/peso × XS/XL, caramelos de la familia, valoración (★ y %), IVs, stats con ▲▼ de la
+      naturaleza, movimientos, fecha/bola y mapa mini (solo al verse; si falla, coordenadas); transferir con confirmación
+      y "Deshacer" 5 s (`PendingTransfer` + `TransferService`). "Ver en Mis Pokémon" abre la ficha del recién capturado.
+      Probado en vista móvil con Nest y Postgres locales (`F3-03_0{1..5}_*`). Pendiente opcional: un Android.
 - [ ] **F3-04 · Pokédex 1025** — vistos/capturados por generación, ficha de especie (descripción ES,
       debilidades calculadas, cadena evolutiva, altura/peso, hábitat). Dep: F3-01b, F3-02a.
 - [ ] **F3-05 · Evolución con caramelos** — regla de caramelos por cadena, endpoint transaccional,
