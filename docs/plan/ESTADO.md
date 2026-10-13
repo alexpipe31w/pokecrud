@@ -3,7 +3,7 @@
 > Se **reescribe** al cerrar cada sesión (no es histórico; el histórico es `BITACORA.md`).
 > Máximo una pantalla. Si lees esto al empezar: después lee `ROADMAP.md`.
 
-**Última actualización:** 2026-10-13 00:10 · por Kenneth (Claude) · PR #59 y #60 mezclados; rama `feature/F2-07-captura` (PR a `develop`)
+**Última actualización:** 2026-10-13 00:40 · por Kenneth (Claude) · `develop` con PR #59, #60 y #61 mezclados (CI verde)
 
 ## 👉 RELEVO DE KENNETH (2026-10-12 noche): pendientes de Android probados en el Samsung A36
 
@@ -24,7 +24,7 @@
   Santander, no donde estás; basta con desactivarlo, falta que se note), **F2-15 `[x]`** (ya hecha, D-051: los Pokémon
   anchos y largos como Slowpoke XL caben), **F2-16** (entrada al encuentro: el zoom casi no se ve, ~1,4 s de espera y la cámara llega tarde).
 
-**Siguiente, por orden:** (1) mezclar el PR de F2-07 (Kenneth confirma); (2) con luz, F1-07 7b + F1-05 3b en la calle
+**Siguiente, por orden:** (1) **F3-01 está LIBRE** (Kenneth no llegó a empezarla); (2) con luz, F1-07 7b + F1-05 3b en la calle
 (APK de producción, **joystick APAGADO** en el menú de la Poké Ball); (3) **F3-01** (plan de la colección: ya se
 puede, F2-07 hecha) o F2-11 (ARCore, Android); pulidos F2-17/F2-18 si sobra tiempo.
 - **Ver un Pokémon concreto en el APK:** `page.route` por CDP sobre `GET /encounters/:id` cambiando `speciesId` y
@@ -196,14 +196,17 @@ F2-07, F2-12, F2-13, F2-15 hechas; faltan **F2-11**/**F2-14** (ARCore), F2-10 (m
 
 ## En curso
 
-- Nadie. F2-07 (Kenneth) hecha en `feature/F2-07-captura`, en un PR a `develop`.
+- Nadie. F2-07 (Kenneth) mezclada (PR #61).
 - F1-05 y F1-07 siguen `[~]` (@alex) SOLO por su prueba en la calle (PENDIENTES).
 
 ## Siguiente paso concreto
 
-1. **Mezclar el PR de F2-07** (Kenneth confirma).
+1. **F3-01** (plan de la colección y la Pokédex con `writing-plans`). Consejo: es grande, partirla en F3-01a
+   (Mis Pokémon + ficha + lo que el servidor debe guardar ya: PC, caramelos por familia, Pokédex visto/capturado) y
+   F3-01b (Pokédex 1025, evolución, CRUD del curso). Para los e2e sin tocar Supabase: Postgres portátil con
+   `embedded-postgres` de npm (sin Docker), `DATABASE_URL`/`DIRECT_URL` a él y `npx prisma migrate deploy`.
 2. **Con luz, en la calle (Kenneth o Samuel):** F1-07 7b + F1-05 3b con el APK de producción y el **joystick apagado**.
-3. **F3-01** (plan de la colección) · **F2-11** (ARCore, Android) · F1-11 / F2-16…F2-18 (arreglos vistos en el móvil) · sin móvil: F2-10 (música), F5-01 (plan del PvP).
+3. **F2-11** (ARCore, Android) · F1-11 / F2-16…F2-18 (arreglos vistos en el móvil) · sin móvil: F2-10 (música), F5-01 (plan del PvP).
 4. APK en otro PC: JDK 21 (`winget install Microsoft.OpenJDK.21`; si da "el hash no coincide",
    `winget install EclipseAdoptium.Temurin.21.JDK`) y `npm run apk`.
 
