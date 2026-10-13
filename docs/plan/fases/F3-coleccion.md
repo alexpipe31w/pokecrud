@@ -1287,7 +1287,7 @@ export function evolutionOptions(dex: Dex, from: number): EvolutionOption[] {
 **Files:** Create `src/app/features/collection/evolve-panel.component.ts`, `evolve-scene.component.ts`,
 `evolve-timeline.ts` (+ spec); Modify `collection-detail.page.ts`, `collection.service.ts` (`evolve(id, to)`)
 
-- [ ] **3a. `evolve-timeline.ts` (puro, test primero)** — DISENO §5: "silueta blanca pulsando entre forma A y B
+- [x] **3a. `evolve-timeline.ts` (puro, test primero)** — DISENO §5: "silueta blanca pulsando entre forma A y B
   acelerando → estallido → forma nueva". `evolvePose(ms)` → `{ showB: boolean, glow: 0..1, burst: 0..1 }`: 0-3.000 ms
   alterna A/B con periodo que baja de 600 ms a 60 ms (`showB` cambia cada medio periodo), `glow` sube de 0,3 a 1;
   3.000-3.400 ms `burst` 0→1 (destello) y `showB = true`; ≥ 3.400 forma B en reposo. Tests: al principio `showB` falso;

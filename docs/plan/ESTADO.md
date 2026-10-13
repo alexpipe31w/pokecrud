@@ -198,7 +198,7 @@ F2-07, F2-12, F2-13, F2-15 hechas; faltan **F2-11**/**F2-14** (ARCore), F2-10 (m
 
 - **F3-05 (Samuel, rama `feature/F3-05-evolucion`):** evolución con caramelos (parte 2 de `fases/F3-coleccion.md`).
   Punto de guardado: pasos 1-2 hechos (regla D-053; `POST /collection/:id/evolve`, e2e 87/87 en Postgres portátil).
-  Sigue el paso 3 (app: `evolve-timeline.ts` con test primero, panel y animación).
+  Paso 3a hecho (`evolve-timeline.ts` 7 tests; `CollectionService.evolve`). Sigue 3b/3c (panel y escena).
 - **Ojo:** el inventario de IS-11 está ahora en `/inventario` (la Pokédex 1025 ocupa `/pokedex`).
 
 ### PRUEBAS EN EL MÓVIL PENDIENTES (con el APK de producción, `npm run apk -- --install`)
