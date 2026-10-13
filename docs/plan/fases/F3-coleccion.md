@@ -643,10 +643,10 @@ export class CollectionService {
 
 **Files:** Modify `src/app/features/encounter/caught-card.component.ts` (+ spec), `encounter.page.ts`
 
-- [ ] **5a.** Test: con `candy = { familyId: 10, gained: 3, total: 9 }` la tarjeta muestra "+3 caramelos de Pikachu"
+- [x] **5a.** Test: con `candy = { familyId: 10, gained: 3, total: 9 }` la tarjeta muestra "+3 caramelos de Pikachu"
   (nombre de la especie BASE de la familia: la primera de la cadena, `evolvesFrom === null` siguiendo hacia atrás en el
   dataset) y cuenta de 0 a 3 al ritmo de la XP (`XP_COUNT_MS`); sin `candy` no sale la línea.
-- [ ] **5b.** Implementar (input `candy`), pasarle `result.candy` desde la página. Botón secundario "Ver en Mis
+- [x] **5b.** Implementar (input `candy`), pasarle `result.candy` desde la página. Botón secundario "Ver en Mis
   Pokémon" → `/coleccion/<caught.id>` (la ficha llega en F3-03; hasta entonces → `/coleccion`). Commit + `/guardar`.
 
 ### Paso 6 — Prueba y cierre

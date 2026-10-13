@@ -70,6 +70,8 @@ import { OrientationService } from '../../services/ar/orientation.service';
 import { AudioService } from '../../services/game/audio.service';
 import { BagService } from '../../services/game/bag.service';
 import { DatasetService } from '../../services/game/dataset.service';
+import { CollectionService } from '../../services/game/collection.service';
+import { familyBaseId } from '../../core/utils/family';
 import { EncounterApiService } from '../../services/game/encounter-api.service';
 import { HapticsService } from '../../services/game/haptics.service';
 import { SettingsService } from '../../services/game/settings.service';
@@ -236,7 +238,10 @@ const prefersReducedMotion = (): boolean =>
                 [moveNames]="caughtMoves()"
                 [xp]="c.xp"
                 [instant]="reduce()"
+                [candy]="c.candy"
+                [candyName]="candyName()"
                 (done)="back()"
+                (collection)="openCollection()"
               />
             } @else {
               <app-throw-dock
@@ -372,6 +377,7 @@ export class EncounterPage implements OnDestroy {
   private readonly router = inject(Router);
   private readonly api = inject(EncounterApiService);
   private readonly dataset = inject(DatasetService);
+  private readonly collection = inject(CollectionService);
   private readonly audio = inject(AudioService);
   private readonly haptics = inject(HapticsService);
   private readonly settings = inject(SettingsService);
@@ -435,7 +441,15 @@ export class EncounterPage implements OnDestroy {
     return cssColor([ringToken(chance), '#3ccf8e']);
   });
   /** Lo capturado (F2-07): la tarjeta de "¡Capturado!". */
-  protected readonly caught = signal<{ view: CaughtView; xp: number } | null>(null);
+  protected readonly caught = signal<{ view: CaughtView; xp: number; candy: number } | null>(null);
+  /** Familia de caramelos con el nombre de la primera especie de la cadena (F3-02b): "de Pichu". */
+  protected readonly candyName = computed(() => {
+    const c = this.caught();
+    if (!c) return '';
+    const species = this.dataset.species();
+    const base = familyBaseId(species, c.view.speciesId);
+    return species.get(base)?.names.es ?? this.name();
+  });
   protected readonly caughtMoves = computed(() =>
     (this.caught()?.view.moves ?? []).map(
       (id) => this.dataset.moves().get(id)?.names.es ?? `#${id}`,
@@ -496,6 +510,10 @@ export class EncounterPage implements OnDestroy {
 
   protected back(): void {
     void this.router.navigateByUrl('/mapa');
+  }
+
+  protected openCollection(): void {
+    void this.router.navigateByUrl('/coleccion');
   }
 
   protected flee(): void {
@@ -849,7 +867,8 @@ export class EncounterPage implements OnDestroy {
     if (res?.captured && res.caught) {
       this.world?.removeBall();
       this.cardOpen.set(false);
-      this.caught.set({ view: res.caught, xp: res.xpGained });
+      this.caught.set({ view: res.caught, xp: res.xpGained, candy: res.candy?.gained ?? 0 });
+      this.collection.invalidate(); // que "Mis Pokémon" lo enseñe la próxima vez
       return; // la tarjeta decide (Volver al mapa)
     }
     if (res?.fled || seq.gone) {

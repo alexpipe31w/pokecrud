@@ -58,6 +58,16 @@ export class CollectionService {
     return this.inFlight;
   }
 
+  /** Hay capturas nuevas (F3-02b): la próxima visita a "Mis Pokémon" carga de cero. */
+  invalidate(): void {
+    this.generation++;
+    this.items.set([]);
+    this.total.set(null);
+    this.nextCursor.set(null);
+    this.loading.set(false);
+    this.inFlight = null;
+  }
+
   setQuery(patch: Partial<CollectionFilters>): Promise<void> {
     this.filters.update((f) => ({ ...f, ...patch }));
     return this.load();

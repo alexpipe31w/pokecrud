@@ -16,7 +16,8 @@ export function cardSpot(
   area: { minTop: number; maxBottom: number },
 ): { x: number; y: number } {
   const center = Math.round((w - cw) / 2);
-  const clampY = (y: number) => Math.min(Math.max(y, area.minTop), Math.max(area.minTop, area.maxBottom - ch));
+  const clampY = (y: number) =>
+    Math.min(Math.max(y, area.minTop), Math.max(area.minTop, area.maxBottom - ch));
   if (!box) return { x: center, y: area.minTop };
   if (w - box.right >= cw + GAP * 2) return { x: Math.round(box.right + GAP), y: clampY(box.top) };
   if (box.left >= cw + GAP * 2) return { x: Math.round(box.left - cw - GAP), y: clampY(box.top) };

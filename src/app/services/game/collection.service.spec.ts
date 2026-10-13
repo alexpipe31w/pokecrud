@@ -116,6 +116,17 @@ describe('CollectionService', () => {
     expect(svc.items().map((i) => i.id)).toEqual(['nuevo']);
   });
 
+  it('invalidate() vacía la lista (la próxima visita recarga) y descarta lo que estuviera en camino', async () => {
+    const first = svc.load();
+    const req = pending().req;
+    svc.invalidate();
+    req.flush(page(['viejo'], null));
+    await first;
+    expect(svc.items()).toEqual([]);
+    expect(svc.total()).toBeNull();
+    expect(svc.loading()).toBe(false);
+  });
+
   it('patchItem, removeItem y restoreItem cambian la lista sin pedir nada', async () => {
     const first = svc.load();
     pending().req.flush(page(['a', 'b', 'c'], null, 3));
