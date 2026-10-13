@@ -344,9 +344,15 @@
       `/equipos` (huecos con arte y PC, PC total, vacía diseñada) y editor `/equipos/nuevo` · `/equipos/:id` (elige de
       "Mis Pokémon" con `app-collection-card` en modo selección, máx. 6; borrar con confirmación); "Equipos" en el menú.
       e2e 94, app 495, Postman 46/82/0. Probado en vista móvil (`F3-06b_0{1..6}_*`).
-- [ ] **F3-06c · Favoritos y Pokémon personalizados** — `/favoritos` (desde la ficha de la Pokédex, nota y 1-5) y
+- [x] **F3-06c · Favoritos y Pokémon personalizados** (@samuel, 2026-10-13) — `/favoritos` (desde la ficha de la Pokédex, nota y 1-5) y
       `/personalizados` (crear/editar) con el sistema de diseño; contratos sin cambios. Que los personalizados salgan como
       spawns del grupo → extra de F7. Dep: F0-08, F3-04.
+      **Hecho:** favoritos: botón "♡ Favorito" en la ficha de especie con hoja de estrellas táctiles (1-5, 44 px) y nota;
+      `/favoritos` con estrellas y nota (abre la ficha); personalizados: `/personalizados` (imagen o silueta, tipos,
+      total) y editor `/personalizados/nuevo` · `/:id` (nombre, 1-2 tipos con `app-type-picker`, 4 stats con
+      deslizadores y `app-stat-bar`, URL con vista previa y silueta si no carga, descripción, borrar con confirmación).
+      "Favoritos" y "Personalizados" en el menú. Servidor sin cambios; Postman 46/82/0. App 514. Vista móvil
+      (`F3-06c_0{1..7}_*`).
 
 ## F4 · Motor de combate y combate contra IA
 
@@ -404,6 +410,8 @@
 - [ ] **F7-04 · Huevos y distancia caminada.**
 - [ ] **F7-05 · Ranking y logros/medallas.**
 - [ ] **F7-06 · Habilidades en combate** (subconjunto de las más comunes).
+- [ ] **F7-07 · Pokémon personalizados como spawns del grupo** (extra de F3-06c): que los de `/customPokemon` aparezcan
+      en el mapa para el grupo; necesita reglas de spawn propias y moderar las imágenes de terceros (URL libre).
 
 ## F8 · Pulido y entrega
 

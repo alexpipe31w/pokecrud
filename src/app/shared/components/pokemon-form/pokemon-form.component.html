@@ -26,21 +26,11 @@
 
     <div class="field" role="group" aria-labelledby="pf-types">
       <span class="field__label" id="pf-types">Tipos (máx. 2)</span>
-      <div class="types">
-        @for (key of typeKeys; track key) {
-          <button
-            type="button"
-            class="type"
-            [style.--chip]="types[key].color"
-            [style.--chip-text]="types[key].text"
-            [attr.aria-pressed]="isType(key)"
-            [disabled]="!isType(key) && typesFull()"
-            (click)="toggleType(key)"
-          >
-            {{ types[key].label }}
-          </button>
-        }
-      </div>
+      <app-type-picker
+        [value]="form.controls.types.value"
+        [max]="maxTypes"
+        (changed)="setTypes($event)"
+      />
       @if (invalid('types')) {
         <p class="field__error">Elige al menos un tipo</p>
       }

@@ -1,10 +1,11 @@
 import { Component, computed, effect, inject, input, output } from '@angular/core';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 
-import { POKEMON_TYPES, POKEMON_TYPE_KEYS } from '../../../core/constants/pokemon-types';
+import { POKEMON_TYPES } from '../../../core/constants/pokemon-types';
 import { dexNumber } from '../../../core/utils/pokemon-defaults';
 import { PokemonDraft } from '../../../models/pokemon.model';
 import { GameButtonComponent } from '../../ui/game-button.component';
+import { TypePickerComponent } from '../../ui/type-picker.component';
 
 /** Un Pokémon tiene como mucho 2 tipos. */
 const MAX_TYPES = 2;
@@ -28,7 +29,7 @@ const STAT_FIELDS = [
   selector: 'app-pokemon-form',
   templateUrl: 'pokemon-form.component.html',
   styleUrl: 'pokemon-form.component.scss',
-  imports: [ReactiveFormsModule, GameButtonComponent],
+  imports: [ReactiveFormsModule, GameButtonComponent, TypePickerComponent],
 })
 export class PokemonFormComponent {
   /** Datos con los que se rellena el formulario. */
@@ -37,8 +38,6 @@ export class PokemonFormComponent {
   readonly saving = input(false);
   readonly save = output<PokemonDraft>();
 
-  protected readonly typeKeys = POKEMON_TYPE_KEYS;
-  protected readonly types = POKEMON_TYPES;
   protected readonly statFields = STAT_FIELDS;
   protected readonly dexNumber = dexNumber;
   /** Color del tipo principal del Pokémon (fondo del arte). */
@@ -78,21 +77,11 @@ export class PokemonFormComponent {
     });
   }
 
-  protected isType(key: string): boolean {
-    return this.form.controls.types.value.includes(key);
-  }
+  protected readonly maxTypes = MAX_TYPES;
 
-  protected typesFull(): boolean {
-    return this.form.controls.types.value.length >= MAX_TYPES;
-  }
-
-  /** Pulsar un tipo lo añade (si quedan huecos) o lo quita. */
-  protected toggleType(key: string): void {
-    const control = this.form.controls.types;
-    const current = control.value;
-    if (current.includes(key)) control.setValue(current.filter((t) => t !== key));
-    else if (current.length < MAX_TYPES) control.setValue([...current, key]);
-    control.markAsTouched();
+  protected setTypes(types: string[]): void {
+    this.form.controls.types.setValue(types);
+    this.form.controls.types.markAsTouched();
   }
 
   protected invalid(path: string): boolean {

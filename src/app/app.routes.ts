@@ -11,6 +11,8 @@ import { adminGuard, authGuard, guestGuard } from './core/auth/auth.guard';
  *  /coleccion/:id     → Ficha de un Pokémon capturado (F3-03, exige sesión)
  *  /equipos           → Mis equipos (hasta 6 Pokémon capturados; F3-06b, exige sesión)
  *  /equipos/nuevo     → Crear un equipo · /equipos/:id → editarlo o borrarlo
+ *  /favoritos         → Especies favoritas con valoración y nota (F3-06c, `/favorites` del curso; exige sesión)
+ *  /personalizados    → Pokémon inventados (F3-06c, `/customPokemon` del curso) · /nuevo y /:id → editor
  *  /pokedex           → Pokédex de las 1025 especies: vistos/capturados por generación (F3-04, exige sesión)
  *  /pokedex/:id       → Ficha de una especie (F3-04, exige sesión)
  *  /inventario        → Inventario de la tienda (IS-11; pública). /tabs/pokedex → redirige aquí (enlaces viejos)
@@ -111,6 +113,29 @@ export const routes: Routes = [
     path: 'equipos/:id',
     canActivate: [authGuard],
     loadComponent: () => import('./features/teams/team-editor.page').then((m) => m.TeamEditorPage),
+  },
+  {
+    path: 'favoritos',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/favorites/favorites.page').then((m) => m.FavoritesPage),
+  },
+  {
+    path: 'personalizados',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/custom-pokemon/custom-pokemon.page').then((m) => m.CustomPokemonPage),
+  },
+  {
+    path: 'personalizados/nuevo',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/custom-pokemon/custom-editor.page').then((m) => m.CustomEditorPage),
+  },
+  {
+    path: 'personalizados/:id',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/custom-pokemon/custom-editor.page').then((m) => m.CustomEditorPage),
   },
   {
     path: 'pokedex',

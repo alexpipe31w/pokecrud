@@ -1709,3 +1709,39 @@ selector o unos ms antes de leer.
 **Quedó a medias:** nada.
 **Decisiones nuevas:** D-054.
 **El siguiente debe empezar por:** F3-06c paso 1 (favoritos desde la ficha de la Pokédex) en `fases/F3-coleccion.md`.
+
+## 2026-10-13 14:30 · @samuel (Claude) · F3-06b (mezcla) + F3-06c · rama `feature/F3-06c-favoritos-personalizados`
+
+**Qué se hizo:** #72 (F3-06b) mezclado con el CI en verde. F3-06c sin tocar el servidor (contratos `/favorites` y
+`/customPokemon` del curso tal cual; tipos en `shared/protocol/course.ts`). Favoritos: `FavoritesService` (carga de 100
+en 100, `of(pokemonId)`, `save` = POST o PATCH de valoración y nota, `remove`), `app-star-rating` (radiogroup de 5
+botones de 44 px; solo lectura con "N de 5"), `app-favorite-toggle` en la ficha de especie (botón ♡/♥ con estrellas y
+hoja con estrellas + nota; quitar) y `/favoritos` (tarjetas teñidas, estrellas, nota → ficha; vacía con la Pokédex).
+Personalizados: `CustomPokemonService`, `/personalizados` (imagen o silueta "?", tipos, total de stats; vacía) y
+`CustomEditorPage` (`/personalizados/nuevo` y `/:id`: nombre ≤ 30, `app-type-picker` 1-2, 4 deslizadores 1-255 con
+`app-stat-bar`, URL validada con vista previa y silueta si no carga, descripción ≤ 500, borrar con confirmación).
+`app-type-picker` sale de los chips del formulario del inventario (que ahora lo usa). Rutas con `authGuard`,
+"Favoritos" y "Personalizados" en el menú. F7-07 nueva en el ROADMAP (personalizados como spawns del grupo).
+**Archivos clave:** `shared/protocol/course.ts`, `src/app/services/game/{favorites,custom-pokemon}.service.ts`,
+`src/app/shared/ui/{star-rating,type-picker}.component.ts`, `features/pokedex-1025/favorite-toggle.component.*`,
+`features/favorites/*`, `features/custom-pokemon/*`, `shared/components/pokemon-form/*`, `app.routes.ts`, menú.
+**Cómo se probó (salida real):**
+
+    tests en rojo primero (módulo inexistente o aserción): favorites.service 4, star-rating 2, favorite-toggle 2,
+      favorites.page 3, custom-pokemon.service 3, type-picker 1, custom-editor 3, custom-pokemon.page 2, menú → verdes;
+      pokemon-form 5 siguen verdes con app-type-picker. App: 94 archivos, 514 passed · lint OK · ng build OK sin
+      avisos; shared 167
+    Postman (servidor local): requests 46 / 0 failed · assertions 82 / 0 failed (docs/evidencias/F3-06c_01_newman-runner.txt)
+    Chrome sin ventana 390×844 (jugador demo+eq-…):
+      "Aún no tienes favoritos" → Charizard 5 estrellas + nota → POST 201, botón "♥ Favorito" "5 de 5";
+      Pikachu 3 → "2 favoritos"; Pikachu a 4 → PATCH 200 "4 de 5"; quitar → DELETE 200 → "1 favorito"
+      "Inventa tu propio Pokémon" → Volcanito (Fuego/Roca, Ataque 150, Defensa 120, imagen de PokéAPI) → POST 201;
+      URL "no es una url" → "Escribe una URL que empiece por http:// o https://" y Guardar deshabilitado;
+      URL que no resuelve → silueta → "Sin foto" guardado; tarjetas "Sin foto AGUA Total 200", "Volcanito FUEGO
+      ROCA Total 370"; renombrar → PATCH 200 "Volcanazo"; borrar "Sin foto" → "¿Borrar a Sin foto?" → DELETE 200
+      consola: solo 3 × ERR_NAME_NOT_RESOLVED de la URL rota puesta a propósito (example.invalid)
+    Evidencias docs/evidencias/F3-06c_0{2..7}_*.png
+
+**Quedó a medias:** nada. **F3 completa en código.**
+**Decisiones nuevas:** ninguna (contratos sin cambios).
+**El siguiente debe empezar por:** F5-01 (plan del PvP) o F2-10 (música), según ESTADO.

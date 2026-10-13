@@ -17,6 +17,7 @@ import { DatasetService } from '../../services/game/dataset.service';
 import { PokedexService } from '../../services/game/pokedex.service';
 import { TypeChipsComponent } from '../../shared/components/type-chips/type-chips.component';
 import { EvolutionChainComponent } from './evolution-chain.component';
+import { FavoriteToggleComponent } from './favorite-toggle.component';
 import { SpeciesWeaknessesComponent } from './species-weaknesses.component';
 
 const HABITAT_ES: Record<string, string> = {
@@ -34,7 +35,7 @@ const ROMAN = ['', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX'];
 
 /**
  * Ficha de una especie de la Pokédex (F3-04): arte, Nº, nombre, categoría, tipos, descripción en español, altura y
- * peso de la especie, hábitat, generación, grito, debilidades calculadas y cadena evolutiva. Sin ver → solo la silueta
+ * peso de la especie, hábitat, generación, grito, favorito (F3-06c), debilidades calculadas y cadena evolutiva. Sin ver → solo la silueta
  * (se descubre jugando). Tras abrir la ficha desde otra especie de la cadena, la ruta cambia sin recrear la página.
  */
 @Component({
@@ -49,6 +50,7 @@ const ROMAN = ['', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX'];
     TypeChipsComponent,
     SpeciesWeaknessesComponent,
     EvolutionChainComponent,
+    FavoriteToggleComponent,
   ],
   template: `
     <ion-header [translucent]="true">
@@ -75,7 +77,10 @@ const ROMAN = ['', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX'];
               <h1>{{ s.names.es }}</h1>
               <p class="genus">{{ s.genus }}</p>
               <app-type-chips [types]="s.types" />
-              <button type="button" class="cry" (click)="cry(s.id)">🔊 Grito</button>
+              <div class="actions">
+                <button type="button" class="cry" (click)="cry(s.id)">🔊 Grito</button>
+                <app-favorite-toggle [speciesId]="s.id" [name]="s.name" [label]="s.names.es" />
+              </div>
               @if (status() === 'caught') {
                 <p class="caught">✓ Capturado</p>
               }
@@ -146,6 +151,12 @@ const ROMAN = ['', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX'];
     .caught {
       font-weight: 700;
       color: var(--success);
+    }
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: var(--s-2);
     }
     .cry {
       min-height: 44px;
