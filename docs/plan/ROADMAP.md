@@ -177,8 +177,23 @@
       **Hecho (pasos 1-9a, PR):** personalidad, saltos con semilla, partículas por tipo, aterrizaje con polvo + grito +
       vibración, destello shiny, zoom desde el mapa; arreglo de partículas negras (D-047). App 66 archivos / 333 tests.
       **Falta:** solo 9b (Android: fps con partículas y vídeo de la entrada).
+- [ ] **F2-12 · Pokémon en 3D (.glb) en el encuentro (D-048)** — el arte plano pasa a ser el modelo 3D de
+      `Pokemon-3D-api/assets` (cargado desde su URL, NO se sube al repo): `GLTFLoader` + `DRACOLoader` (decodificador
+      servido por la app), tamaño real por su caja (altura PokéAPI × XS/XL), animación si la trae, giro hacia la cámara,
+      sombra; los 57 sin modelo y los shiny sin modelo → el arte plano de ahora (o tinte shiny). Con la AR de orientación
+      actual; arrastrar con el dedo lo gira. Dep: F2-04b. Criterio: navegador + Android ≥ 55 fps con el modelo.
+- [ ] **F2-13 · Ficha del Pokémon junto a él en la cámara (D-048)** — tarjeta anclada al lado del Pokémon (sigue su
+      posición en pantalla): tipos (iconos), nivel, **PC** (lo calcula el servidor con los IVs y viene en
+      `GET /encounters/:id`), altura y peso reales × XS/XL, categoría ("Pokémon Ratón") y descripción de Pokédex en
+      español (`genus`/`flavor` del dataset). Plegable para que no tape el lanzamiento. Dep: F2-04a.
+- [ ] **F2-11 · Spike ARCore en Capacitor (D-048)** — plugin nativo Android propio (Kotlin): sesión ARCore, imagen de
+      la cámara, pose del móvil y matriz de proyección por fotograma hacia three.js, detección del suelo y ancla.
+      Medir en el A36 y el Redmi: Pokémon `.glb` quieto en el suelo al **rodearlo andando**, ≥ 55 fps, sin ARCore →
+      fallback de orientación. Dep: F2-12. **Necesita Android (Kenneth/Samuel).**
+- [ ] **F2-14 · Encuentro con ARCore (D-048)** — el encuentro usa el plugin de F2-11: tocar el suelo detectado (o
+      automático) pone al Pokémon; se le puede rodear; el lanzamiento (F2-05) funciona igual. Dep: F2-11.
 - [ ] **F2-05 · Lanzamiento** — gesto 1:1, física, curva, círculo de precisión, bolas y bayas, hápticos.
-      Dep: F2-04b. (Fallar no llama al servidor ni gasta, D-046.)
+      Dep: F2-04b, F2-12 (la caja del Pokémon sale del modelo 3D). (Fallar no llama al servidor ni gasta, D-046.)
 - [x] **F2-06 · Captura autoritativa en servidor** (@alex, 2026-10-11) — `POST /encounters/:id/throw` con transacción,
       descuento atómico, `UNIQUE` de idempotencia, validación de distancia (ARQUITECTURA §6); test de
       concurrencia (dos lanzamientos simultáneos). Dep: F2-03, F1-06, F1-08.
@@ -240,7 +255,8 @@
 - [ ] **F4-07 · Combate en realidad aumentada (D-034)** — la escena de combate con la cámara: los dos Pokémon anclados
       en el suelo real (three.js sobre la cámara + giroscopio, la misma base que el encuentro F2-04a), ataques con
       partículas 3D del tipo, sacudida, número de daño. Reutiliza `BattleController`, el motor, la IA y el menú de
-      F4-05 (solo cambia la capa visual). Sin cámara → fondo ilustrado. Dep: F2-01 (spike cámara), F4-05.
+      F4-05 (solo cambia la capa visual). Sin cámara → fondo ilustrado. Dep: F2-01 (spike cámara), F4-05, F2-12, F2-14
+      (D-048: modelos 3D y ARCore también en el combate).
       Criterio: combate completo contra la IA en un Android real, grabado en vídeo.
 
 ## F5 · PvP en tiempo real

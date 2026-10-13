@@ -7,9 +7,10 @@
 
 ## ⚠️ DECISIÓN DE ALEX (2026-10-12, noche): la AR tiene que ser 3D y enseñar la ficha del Pokémon
 
-Alex: "debe ser 3d la realidad aumentada… deben salir las características del pokémon". Lo de ahora (D-045) es AR
-de orientación con el arte plano: no se puede rodear al Pokémon. **No seguir con F2-05 hasta cerrar cómo** (modelos 3D
-y seguimiento del suelo con ARCore): ver la última entrada de la BITÁCORA y D-048 cuando exista.
+Alex: "todo en cámara debe ser 3D… deben salir las características del pokémon". **Decidido: D-048** — modelos
+`.glb` de `Pokemon-3D-api/assets` (968/1025, cargados desde su URL, NO al repo) + **ARCore** con plugin nativo propio
+para rodear al Pokémon + **ficha** junto a él (tipos, nivel, PC del servidor, altura/peso, descripción). Orden nuevo en
+ROADMAP: **F2-12 (modelo 3D) → F2-13 (ficha) → F2-11 (spike ARCore, Android) → F2-14 → F2-05 → F2-07**; F4-07 también.
 
 ## RELEVO DE ALEX (2026-10-12, noche): F2-04a y F2-04b en `develop` a falta del Android
 
