@@ -209,6 +209,7 @@ describe('EncounterPage', () => {
         shakes: 3,
         xpGained: 160,
         caught: { ...view, id: 'c1', nature: 'adamant', moves: [85] },
+        candy: { familyId: 10, gained: 3, total: 3 },
       }),
     );
     const f = await open(Promise.resolve(view));
@@ -220,6 +221,7 @@ describe('EncounterPage', () => {
     expect(text(f)).not.toContain('¡Capturado!'); // aún se sacude
     await finish(f);
     expect(text(f)).toContain('¡Capturado!');
+    expect(text(f)).toContain('caramelos de'); // F3-02b
     expect(text(f)).toContain('Firme');
     expect(text(f)).toContain('Rayo');
     expect(playSfx).toHaveBeenCalledWith('absorb');

@@ -196,19 +196,17 @@ F2-07, F2-12, F2-13, F2-15 hechas; faltan **F2-11**/**F2-14** (ARCore), F2-10 (m
 
 ## En curso
 
-- **F3-02a (@samuel, 2026-10-13)** — rama `feature/F3-02a-coleccion-servidor`. **Punto de guardado:** reclamada;
-  pasos 1-4 hechos (reglas puras + contrato + migración `20261013010000_collection`, probada SOLO en un Postgres 17
-  portátil); paso 5 hecho (la captura guarda PC, +3 caramelos y Pokédex; abrir encuentro = visto; e2e 14/14).
-  Paso 6 hecho (`GET /collection` y `GET /pokedex`; e2e 78/78 en local). Paso 7 hecho (`npm run db:backfill-collection`, probado 2 veces en local).
-  Paso siguiente: D-052 + PR; luego paso 8 (migración + script en Supabase ANTES de mezclar, con permiso de Samuel). (F0-15 #63 y F3-01a #64 mezclados.)
+- Nadie. **F3-02b (Samuel) hecha, PR abierto:** "Mis Pokémon" en `/coleccion`. Siguiente: **F3-03** (ficha del
+  individuo) siguiendo `fases/F3-coleccion.md`. F3-02a hecha y en producción (#65). (F0-15 #63 y F3-01a #64 mezclados.)
 - F1-05 y F1-07 siguen `[~]` (@alex) SOLO por su prueba en la calle (PENDIENTES).
 
 ## Siguiente paso concreto
 
-1. **F3-02a (URGENTE, sin móvil):** la colección en el servidor según `docs/plan/fases/F3-coleccion.md` (cada captura
-   sumará caramelos y Pokédex). **Migración + `db:backfill-collection` en Supabase ANTES de mezclar** (si no, las
-   capturas dan 500). Luego F3-02b y F3-03. En paralelo, sin móvil: **F3-01b** (plan de Pokédex, evolución y CRUD). Para los e2e sin tocar Supabase: Postgres portátil con
-   `embedded-postgres` de npm (sin Docker), `DATABASE_URL`/`DIRECT_URL` a él y `npx prisma migrate deploy`.
+1. **F3-03 (sin móvil):** ficha del individuo según `docs/plan/fases/F3-coleccion.md` (servidor: `GET/PATCH/DELETE
+   /collection/:id`; app: `/coleccion/:id`). En paralelo, sin móvil: **F3-01b** (plan de Pokédex, evolución y CRUD).
+   **Probar sin tocar Supabase:** Postgres 17 portátil (`embedded-postgres@17.10.0-beta.17` en una carpeta temporal),
+   `DATABASE_URL`/`DIRECT_URL` a él, `npx prisma migrate deploy` y `npm run db:seed`; la app en `localhost:8100` (en el
+   PC de Samuel el 4200 lo ocupa OTRO proyecto suyo). Ver la bitácora de F3-02a/F3-02b.
 2. **Con luz, en la calle (Kenneth o Samuel):** F1-07 7b + F1-05 3b con el APK de producción y el **joystick apagado**.
 3. **F2-11** (ARCore, Android) · F1-11 / F2-16…F2-18 (arreglos vistos en el móvil) · sin móvil: F2-10 (música), F5-01 (plan del PvP).
 4. APK en otro PC: JDK 21 (`winget install Microsoft.OpenJDK.21`; si da "el hash no coincide",

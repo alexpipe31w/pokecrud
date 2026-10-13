@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { IonIcon } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import {
+  albumsOutline,
   bookOutline,
   flashOutline,
   gameControllerOutline,
@@ -22,7 +23,7 @@ const DRAG_CLOSE_PX = 80;
 /**
  * Menú del juego (DISENO §1): botón Poké Ball abajo en el centro que abre una hoja con las secciones. Sustituye a las
  * pestañas de Ionic. Se cierra tocando fuera, arrastrando la hoja hacia abajo o con Escape.
- * (Mis Pokémon, Equipos y Favoritos se añaden cuando existan, F3.)
+ * (Equipos y Favoritos se añaden cuando existan, F3-06.)
  */
 @Component({
   selector: 'app-ball-menu',
@@ -55,17 +56,30 @@ const DRAG_CLOSE_PX = 80;
       (pointercancel)="dragEnd()"
     >
       <div class="grip" aria-hidden="true"></div>
-      <button #first type="button" (click)="go('/pokedex')">
+      <button #first type="button" (click)="go('/coleccion')">
+        <ion-icon name="albums-outline" aria-hidden="true" />Mis Pokémon
+      </button>
+      <button type="button" (click)="go('/pokedex')">
         <ion-icon name="book-outline" aria-hidden="true" />Pokédex
       </button>
       <button type="button" (click)="go('/combate/prueba')">
         <ion-icon name="flash-outline" aria-hidden="true" />Combate de prueba
       </button>
-      <button type="button" role="switch" [attr.aria-checked]="joystick()" (click)="toggleJoystick()">
+      <button
+        type="button"
+        role="switch"
+        [attr.aria-checked]="joystick()"
+        (click)="toggleJoystick()"
+      >
         <ion-icon name="game-controller-outline" aria-hidden="true" />Joystick
         <span class="state">{{ joystick() ? 'Sí' : 'No' }}</span>
       </button>
-      <button type="button" role="switch" [attr.aria-checked]="reduceEffects()" (click)="toggleEffects()">
+      <button
+        type="button"
+        role="switch"
+        [attr.aria-checked]="reduceEffects()"
+        (click)="toggleEffects()"
+      >
         <ion-icon name="sparkles-outline" aria-hidden="true" />Reducir efectos
         <span class="state">{{ reduceEffects() ? 'Sí' : 'No' }}</span>
       </button>
@@ -186,7 +200,14 @@ export class BallMenuComponent {
   private dragFrom: number | null = null;
 
   constructor() {
-    addIcons({ bookOutline, flashOutline, gameControllerOutline, logOutOutline, sparklesOutline });
+    addIcons({
+      albumsOutline,
+      bookOutline,
+      flashOutline,
+      gameControllerOutline,
+      logOutOutline,
+      sparklesOutline,
+    });
   }
 
   protected feedback(): void {

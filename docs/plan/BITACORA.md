@@ -1474,3 +1474,40 @@ entre la migración y el despliegue se quedaba fuera → el script también rell
 **Decisiones nuevas:** D-052.
 **El siguiente debe empezar por:** si el PR sigue sin mezclar, paso 8 de `fases/F3-coleccion.md` → F3-02a (orden
 obligatorio: `migrate deploy` + `db:backfill-collection` en Supabase y DESPUÉS mezclar). Luego F3-02b.
+
+## 2026-10-13 16:30 · @samuel (Claude) · F3-02a (cierre) + F3-02b · ramas `feature/F3-02a-coleccion-servidor` y `feature/F3-02b-mis-pokemon`
+
+**F3-02a, paso 8 (con permiso de Samuel):** `prisma migrate deploy` en Supabase → "Applying migration
+`20261013010000_collection` … All migrations have been successfully applied"; `db:backfill-collection` → "PC rellenado
+en 12 capturas · caramelos: 12 filas para 1 jugadores · Pokédex: 0 especies nuevas" (la Pokédex ya la hizo la
+migración); `migrate status` → "Database schema is up to date!". DESPUÉS #65 mezclado (CI verde); Render: `/collection`
+pasó de 404 a 401 a los ~30 s y `/health/ready` ok. La captura real en producción (8b) no se hizo: Samuel decidió
+dejarla (no hace falta móvil: se puede capturar desde el navegador con joystick); la cubren los e2e.
+**F3-02b:** `CollectionService` (cursor, filtros, `invalidate()`; descarta respuestas de una consulta anterior),
+`app-collection-card` (arte con fallback y variante shiny, tinte del tipo, ★, borde dorado shiny, entrada escalonada),
+`app-collection-filters` (hoja de vidrio: orden Recientes/PC/Nº ↑↓, 18 tipos, Shiny, Favoritos; se aplica al momento),
+`/coleccion` (rejilla 2/3 columnas, `IntersectionObserver` para la página siguiente, esqueletos, vacía, vacía con
+filtros, error) y "Mis Pokémon" en el menú de la Poké Ball. "¡Capturado!" enseña "+3 caramelos de <familia>"
+(`familyBaseId`: primera especie de la cadena) contando con la XP y "Ver en Mis Pokémon"; al capturar se invalida la
+lista. `spriteUrls` pasa a `src/app/core/utils/sprites.ts` (con shiny); el mapa la reexporta.
+**Cómo se probó (salida real):**
+
+    tests nuevos en rojo primero (TS2307 collection.service; collection 'collection' no existe en CaughtCard…)
+    collection.service 7 · collection-card 3 · family 3 · caught-card 8 · encounter.page 16 passed
+    Nest LOCAL + Postgres portátil + app en localhost:8100, cuenta col+demo…@pokecrud.test con 35 capturas sembradas:
+      30 tarjetas → al bajar 35 (35 únicas); Fuego → Charmander y Charizard ("· 2", punto en Filtros);
+      PC ↓ → 883, 856, 829, 786…; Dragón + Shiny → "Ningún Pokémon con estos filtros"; 0 errores en consola
+    Evidencias (Chrome sin ventana con playwright-core, 390×844, claro): docs/evidencias/F3-02_0{1..4}_*.png
+
+**Ojo, trucos de esta sesión:**
+- En el PC de Samuel el puerto **4200 es OTRO proyecto suyo** (un control de acceso de la universidad, abierto desde VS
+  Code): la app se sirvió en **8100** (CORS y la clave de Maps lo permiten). `.claude/launch.json` local (no se sube)
+  con "app-8100" y "server-local" (Nest contra el Postgres portátil).
+- Con el panel del navegador de Claude oculto **no se pintan fotogramas**: ni `requestAnimationFrame` ni
+  `IntersectionObserver` ni transiciones avanzan, y las capturas salen en mosaico. Para evidencias limpias:
+  `playwright-core` con el Chrome instalado, sin ventana.
+- `run_in_terminal` no aceptó líneas con `$env:` ni `-File`: se usó `preview_start` con una configuración.
+**Quedó a medias:** F3-02b 6b (mirar el scroll en un Android) opcional, sin móvil hoy.
+**Decisiones nuevas:** ninguna.
+**El siguiente debe empezar por:** F3-03 paso 1 (`GET/PATCH/DELETE /collection/:id`, e2e primero) en
+`fases/F3-coleccion.md`, con el Postgres portátil.

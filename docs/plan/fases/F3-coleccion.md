@@ -553,7 +553,7 @@ escalonada, vacía diseñada; accesible desde el menú de la Poké Ball; "+3 car
 
 **Files:** Create `src/app/services/game/collection.service.ts` + spec
 
-- [ ] **1a. Tests que fallan** (`provideHttpClient()` + `provideHttpClientTesting()`):
+- [x] **1a. Tests que fallan** (`provideHttpClient()` + `provideHttpClientTesting()`):
   1. `load()` pide `GET {serverUrl}/collection?sort=caughtAt&order=desc&limit=30` y publica `items`, `total`,
      `hasMore`.
   2. `loadMore()` manda `cursor=<nextCursor>` y AÑADE (no sustituye); con `hasMore() === false` no pide nada; dos
@@ -561,7 +561,7 @@ escalonada, vacía diseñada; accesible desde el menú de la Poké Ball; "+3 car
   3. `setQuery({ sort: 'cp' })` vacía la lista y vuelve a cargar desde el principio con el nuevo orden.
   4. Error de red → `error()` con texto en español y la lista anterior intacta.
   5. Tras `markChanged()` (lo llama la ficha al renombrar o transferir) el siguiente `load()` no usa nada en caché.
-- [ ] **1b.** → FALLA. **1c. Implementación** (forma; seguir el estilo de `BagService`: `firstValueFrom` + `timeout`
+- [x] **1b.** → FALLA. **1c. Implementación** (forma; seguir el estilo de `BagService`: `firstValueFrom` + `timeout`
   de 70 s por Render dormido):
 
 ```ts
@@ -592,13 +592,13 @@ export class CollectionService {
   Los parámetros se construyen con `HttpParams` omitiendo los `undefined`. `hasMore` depende de `next`, que no es
   signal: guardarlo también como signal privada (`nextCursor = signal<string|null>(null)`) para que `computed` repinte
   (zoneless).
-- [ ] **1d.** → PASA. Commit + `/guardar`.
+- [x] **1d.** → PASA. Commit + `/guardar`.
 
 ### Paso 2 — Tarjeta de un Pokémon
 
 **Files:** Create `src/app/features/collection/collection-card.component.ts` (+ spec corto)
 
-- [ ] **2a.** `app-collection-card` con `input.required<CollectionItem>()` y `index` (para el retardo escalonado):
+- [x] **2a.** `app-collection-card` con `input.required<CollectionItem>()` y `index` (para el retardo escalonado):
   - Arte `home` (o `home/shiny`), con el mismo fallback de siempre (CLAUDE.md: `home` → `official-artwork` →
     `front_default`). Si existe ya una función de URLs de sprites en la app, **reusarla** (buscar `official-artwork` en
     `src/app`); si no, crearla en `src/app/core/utils/sprites.ts` y usarla también aquí.
@@ -610,13 +610,13 @@ export class CollectionService {
     solo fundido.
   - Es un `<a>` a `/coleccion/:id` (accesible con teclado), área ≥ 44 px, `aria-label` "Pikachu, PC 412, nivel 12,
     shiny, favorito".
-- [ ] **2b.** Spec: el `aria-label` incluye nombre, PC y "shiny" solo si lo es. Commit + `/guardar`.
+- [x] **2b.** Spec: el `aria-label` incluye nombre, PC y "shiny" solo si lo es. Commit + `/guardar`.
 
 ### Paso 3 — Filtros y orden
 
 **Files:** Create `src/app/features/collection/collection-filters.component.ts`
 
-- [ ] **3a.** Hoja inferior (mismo patrón que `ball-menu`: `--ease-drawer`, `--dur-panel`, se cierra arrastrando o
+- [x] **3a.** Hoja inferior (mismo patrón que `ball-menu`: `--ease-drawer`, `--dur-panel`, se cierra arrastrando o
   tocando fuera): orden (Recientes · PC · Nº de Pokédex, y ascendente/descendente), tipo (los 18 `app-type-chip`
   seleccionables, uno o ninguno), interruptores Shiny y Favoritos, botón "Quitar filtros". Cada cambio llama a
   `collection.setQuery(...)` al momento (sin botón "Aplicar"). Commit + `/guardar`.
@@ -626,35 +626,35 @@ export class CollectionService {
 **Files:** Create `src/app/features/collection/collection.page.ts`; Modify `src/app/app.routes.ts`,
 `src/app/features/map/ball-menu.component.ts`
 
-- [ ] **4a.** Ruta `{ path: 'coleccion', canActivate: [authGuard], loadComponent: … }` (y comentario de rutas). En
+- [x] **4a.** Ruta `{ path: 'coleccion', canActivate: [authGuard], loadComponent: … }` (y comentario de rutas). En
   `ball-menu`, primera opción "Mis Pokémon" → `/coleccion` (icono de Ionicons ya registrado o `addIcons` nuevo).
-- [ ] **4b.** Página con `ion-header` (botón atrás `defaultHref="/mapa"`, título "Mis Pokémon" y el total "· 12"),
+- [x] **4b.** Página con `ion-header` (botón atrás `defaultHref="/mapa"`, título "Mis Pokémon" y el total "· 12"),
   botón "Filtros" con un punto si hay alguno activo, rejilla de 2 columnas (3 a partir de 600 px) de
   `app-collection-card`, y al final un centinela con `IntersectionObserver` que llama a `loadMore()` (no
   `ion-infinite-scroll`: así se controla la animación y el "cargando").
-- [ ] **4c. Estados (DISENO §6):** cargando la primera vez → 6 tarjetas esqueleto con brillo que pasa (respeta
+- [x] **4c. Estados (DISENO §6):** cargando la primera vez → 6 tarjetas esqueleto con brillo que pasa (respeta
   "reducir movimiento"); vacía sin filtros → ilustración + "Aún no has capturado ningún Pokémon" + botón "Salir a
   buscar" (→ `/mapa`); vacía CON filtros → "Ningún Pokémon con estos filtros" + "Quitar filtros"; error → texto +
   "Reintentar"; servidor despertando → lo cubre ya el interceptor de F1-09 (D-043).
-- [ ] **4d.** Al volver de la ficha (`ionViewWillEnter`) NO se recarga entera: la ficha ya llamó a `patchItem` /
+- [x] **4d.** Al volver de la ficha (`ionViewWillEnter`) NO se recarga entera: la ficha ya llamó a `patchItem` /
   `removeItem`. Commit + `/guardar`.
 
 ### Paso 5 — Caramelos en "¡Capturado!"
 
 **Files:** Modify `src/app/features/encounter/caught-card.component.ts` (+ spec), `encounter.page.ts`
 
-- [ ] **5a.** Test: con `candy = { familyId: 10, gained: 3, total: 9 }` la tarjeta muestra "+3 caramelos de Pikachu"
+- [x] **5a.** Test: con `candy = { familyId: 10, gained: 3, total: 9 }` la tarjeta muestra "+3 caramelos de Pikachu"
   (nombre de la especie BASE de la familia: la primera de la cadena, `evolvesFrom === null` siguiendo hacia atrás en el
   dataset) y cuenta de 0 a 3 al ritmo de la XP (`XP_COUNT_MS`); sin `candy` no sale la línea.
-- [ ] **5b.** Implementar (input `candy`), pasarle `result.candy` desde la página. Botón secundario "Ver en Mis
+- [x] **5b.** Implementar (input `candy`), pasarle `result.candy` desde la página. Botón secundario "Ver en Mis
   Pokémon" → `/coleccion/<caught.id>` (la ficha llega en F3-03; hasta entonces → `/coleccion`). Commit + `/guardar`.
 
 ### Paso 6 — Prueba y cierre
 
-- [ ] **6a.** Navegador 390×844 con el servidor local y una cuenta `@pokecrud.test` con ~35 capturas (sembradas con el
+- [x] **6a.** Navegador 390×844 con el servidor local y una cuenta `@pokecrud.test` con ~35 capturas (sembradas con el
   helper del e2e o capturando): scroll hasta el final (2 páginas, sin repetidos), cada orden y filtro, vacía, sin
   conexión (DevTools → Offline → error + Reintentar). Capturas `docs/evidencias/F3-02_0{1..4}_*.png`. Borrar la cuenta.
-- [ ] **6b.** Android: abrirla en el APK y comprobar el scroll fluido con 30+ tarjetas (fps por CDP ≥ 55). REGLA 2.
+- [ ] **6b.** (pendiente: Samuel sin móvil el 2026-10-13; la pantalla no usa GPS ni cámara) Android: abrirla en el APK y comprobar el scroll fluido con 30+ tarjetas (fps por CDP ≥ 55). REGLA 2.
 
 ---
 

@@ -74,6 +74,33 @@ describe('CaughtCardComponent', () => {
     expect(img.getAttribute('src')).toContain('/official-artwork/shiny/25.png');
   });
 
+  it('caramelos: "+3 caramelos de Pichu" contando a la vez que la XP (F3-02b)', () => {
+    const f = TestBed.createComponent(CaughtCardComponent);
+    f.componentRef.setInput('caught', CAUGHT);
+    f.componentRef.setInput('name', 'Pikachu');
+    f.componentRef.setInput('xp', 160);
+    f.componentRef.setInput('candy', 3);
+    f.componentRef.setInput('candyName', 'Pichu');
+    f.detectChanges();
+    expect(text(f)).toContain('+0 caramelos de Pichu');
+    vi.advanceTimersByTime(XP_COUNT_MS);
+    f.detectChanges();
+    expect(text(f)).toContain('+3 caramelos de Pichu');
+  });
+
+  it('sin caramelos (respuesta antigua del servidor) no sale la línea', () => {
+    expect(text(setup())).not.toContain('caramelo');
+  });
+
+  it('"Ver en Mis Pokémon" avisa a la página', () => {
+    const f = setup();
+    const open = vi.fn();
+    f.componentInstance.collection.subscribe(open);
+    const buttons = (f.nativeElement as HTMLElement).querySelectorAll('button');
+    [...buttons].find((b) => b.textContent?.includes('Mis Pokémon'))!.click();
+    expect(open).toHaveBeenCalled();
+  });
+
   it('"Volver al mapa" avisa a la página', () => {
     const f = setup();
     const done = vi.fn();

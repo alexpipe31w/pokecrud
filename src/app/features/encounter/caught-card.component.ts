@@ -53,7 +53,11 @@ const XP_STEPS = 20;
         <p class="moves">{{ moveNames().join(' · ') }}</p>
       }
       <p class="xp">+{{ xpShown() }} XP</p>
+      @if (candy() > 0) {
+        <p class="candy">+{{ candyShown() }} caramelos de {{ candyName() }}</p>
+      }
       <app-game-button label="Volver al mapa" [block]="true" (pressed)="done.emit()" />
+      <button type="button" class="link" (click)="collection.emit()">Ver en Mis Pokémon</button>
     </app-glass-panel>
   `,
   styles: `
@@ -101,6 +105,19 @@ const XP_STEPS = 20;
       margin: 0;
       font-size: 0.85rem;
     }
+    .candy {
+      margin: 0;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+    }
+    .link {
+      min-height: 44px;
+      border: 0;
+      background: none;
+      color: inherit;
+      font: 600 0.95rem/1 system-ui;
+      text-decoration: underline;
+    }
     .xp {
       margin: 0;
       font: 700 1.2rem/1 var(--font-display);
@@ -117,7 +134,12 @@ export class CaughtCardComponent implements OnDestroy {
   readonly xp = input(0);
   /** Sin animación ("reducir efectos"). */
   readonly instant = input(false);
+  /** Caramelos ganados (F3-02b, D-052) y nombre de su familia (la primera especie de la cadena). */
+  readonly candy = input(0);
+  readonly candyName = input('');
   readonly done = output<void>();
+  /** "Ver en Mis Pokémon" (F3-02b). */
+  readonly collection = output<void>();
 
   private readonly artIndex = signal(0);
   protected readonly art = computed(
@@ -130,6 +152,10 @@ export class CaughtCardComponent implements OnDestroy {
   });
   protected readonly size = computed(() => sizeClass(this.caught().heightScale));
   protected readonly xpShown = signal(0);
+  /** Los caramelos cuentan al ritmo de la XP (misma animación, mismo final). */
+  protected readonly candyShown = computed(() =>
+    this.xp() > 0 ? Math.round((this.candy() * this.xpShown()) / this.xp()) : this.candy(),
+  );
   private timer?: ReturnType<typeof setInterval>;
 
   constructor() {
