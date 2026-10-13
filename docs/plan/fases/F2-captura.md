@@ -3022,7 +3022,7 @@ mientras se manda la posición (a la vez: no añade espera). Con "reducir efecto
 
 **Files:** Modify `src/app/game/map-scene/pokemon-dom.ts`, `pokemon-dom.spec.ts`, `src/app/features/map/map.page.ts`
 
-- [ ] **8a.** Test de `elementOf` y código:
+- [x] **8a.** Test de `elementOf` y código:
 
 ```diff
 diff --git a/src/app/features/map/map.page.ts b/src/app/features/map/map.page.ts
@@ -3143,7 +3143,7 @@ index a35e8a7..bf29e9a 100644
      for (const { img } of this.items.values()) img.style.visibility = 'hidden';
 ```
 
-- [ ] **8b.** `npx ng test --include=src/app/game/map-scene/pokemon-dom.spec.ts --watch=false` → PASA. Commit + push.
+- [x] **8b.** `npx ng test --include=src/app/game/map-scene/pokemon-dom.spec.ts --watch=false` → PASA. Commit + push.
 
 ### Paso 9 — Verde y Android
 

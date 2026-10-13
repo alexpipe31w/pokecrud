@@ -76,6 +76,11 @@ export class PokemonDom {
     }
   }
 
+  /** El `<img>` de un Pokémon (la transición al encuentro lo hace crecer, F2-04b). */
+  elementOf(id: string): HTMLImageElement | undefined {
+    return this.items.get(id)?.img;
+  }
+
   /** Sin la capa 3D (fuera del mapa, segundo plano): que no se queden flotando. */
   hideAll(): void {
     for (const { img } of this.items.values()) img.style.visibility = 'hidden';

@@ -48,6 +48,13 @@ describe('PokemonDom', () => {
 
   const imgs = () => [...box.querySelectorAll('img')];
 
+  it('elementOf: el <img> de ese Pokémon (o nada si no está)', () => {
+    const dom = new PokemonDom(box, () => undefined);
+    dom.render([vis()], mvp(), 400, 800);
+    expect(dom.elementOf('a')).toBe(imgs()[0]);
+    expect(dom.elementOf('zz')).toBeUndefined();
+  });
+
   it('un <img> por Pokémon, colocado con transform y su opacidad; se quita cuando se va', () => {
     const dom = new PokemonDom(box, () => undefined);
     dom.render([vis(), vis({ id: 'b', x: 5, opacity: 0.5 })], mvp(), 400, 800);
