@@ -3,7 +3,24 @@
 > Se **reescribe** al cerrar cada sesión (no es histórico; el histórico es `BITACORA.md`).
 > Máximo una pantalla. Si lees esto al empezar: después lee `ROADMAP.md`.
 
-**Última actualización:** 2026-10-12 noche · por Kenneth (Claude) · `develop` (F2-01 y F2-02 mezclados, PR #48 y #49)
+**Última actualización:** 2026-10-12 noche · por Alex (Claude) · `develop` (F2-04a pasos 1-11 mezclados)
+
+## 👉 RELEVO DE ALEX (2026-10-12, noche): F2-04a en `develop` a falta del Android
+
+- **F2-04a pasos 1-11 hechos** copiando el plan de Kenneth tal cual con TDD (cada spec falló antes y pasó después):
+  lint OK, build OK sin avisos de presupuesto, **app 63 archivos / 307 tests** (el plan decía 62/306: estaba mal
+  contado por uno; `develop` tenía 57/278, −3 del spec provisional + 32 nuevos = 307), shared 140.
+- **Navegador 390×844** (Nest local + `ng serve`): Gulpin y Chansey reales a su tamaño con sombra, fondo ilustrado,
+  "Sin permiso de cámara: modo sin AR.", AR apagada → "Sin giroscopio…", "Huir" vuelve a `/mapa` y destruye la página;
+  mapa ↔ encuentro ×3 sin ningún error de consola. Evidencias `F2-04a_00/02/04_navegador-*`.
+- **Ojo al probar:** entrar con `history.pushState` + `popstate` deja VIVO el encuentro anterior (Ionic no lo destruye)
+  y el segundo `WebGLRenderer` falla ("reading 'precision'"). En la app real no pasa: se entra con
+  `router.navigateByUrl` (en consola: `ng.getComponent(document.querySelector('app-map')).router.navigateByUrl('/encuentro/<id>')`).
+  Antes, mandar la posición (`GET /spawns?lat&lng` a ≤ 80 m) o da 403.
+- **Visto en el navegador, también en `develop` (no es de F2-04a):** al volver de CUALQUIER encuentro, el avatar y los
+  Pokémon del mapa no se repintan en Chromium headless hasta recargar. Mirarlo en Android en el paso 12d.
+- **Siguiente:** paso 12 de F2-04a con el A36 o el Redmi (está en PENDIENTES). Sin móvil se puede seguir con
+  **F2-04b** (plan, sección F2-04b), que se apoya en este código.
 
 ## 👉 RELEVO DE KENNETH A ALEX (2026-10-12, noche)
 
@@ -204,7 +221,7 @@ fórmula (F2-03), captura en servidor (F2-06), audio (F2-08), **spike de cámara
 
 ## En curso
 
-- F2-04a (@alex) · rama `feature/F2-04a-escena-encuentro-ar` · **Punto de guardado 2026-10-12 20:56**: hechos pasos 1-11 (lint OK, build OK, app 63 archivos / 307 tests, shared 140); ahora en el paso 12 (Android); siguiente: prueba en navegador 390×844 y paso 12 con el A36/Redmi; estado: compila ✅. F1-05 (3b) y F1-07 (7b) solo esperan la prueba en Android.
+- F2-04a (@alex) · pasos 1-11 mezclados en `develop`; tarea `[~]` solo por el paso 12 (Android, ver PENDIENTES). F1-05 (3b) y F1-07 (7b) solo esperan la prueba en Android.
 
 ## Siguiente paso concreto
 
@@ -241,6 +258,9 @@ fórmula (F2-03), captura en servidor (F2-06), audio (F2-08), **spike de cámara
 - [ ] **F2-01 (D-045) en otro móvil (Samuel, Redmi Note 10):** abrir `/dev/ar` por CDP (`history.pushState` + `popstate`;
       no hay botón), apuntar a un Pokémon sobre una mesa y girar despacio: con qué **campo de visión** se queda quieto
       (en el A36, 64°), qué cámara elige ("Cám. 0"?) y los fps de "Medir batería". Anotarlo en D-045.
+- [ ] **F2-04a paso 12:** `npm run apk -- --install` y seguir 12a-12e de `docs/plan/fases/F2-captura.md` (cámara
+      principal, ≥ 55 fps por CDP, mapa ↔ encuentro ×3 sin "context lost" y el mapa con avatar/Pokémon al volver,
+      cámara suelta en segundo plano, AR apagada y permiso revocado). Si todo va, F2-04a `[x]` en ROADMAP.
 
 **Kenneth:**
 

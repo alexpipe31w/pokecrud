@@ -1141,3 +1141,33 @@ el criterio de cada tarea.
 **Decisiones nuevas:** D-046.
 **El siguiente debe empezar por:** `/inicio` → F2-04a: abrir `docs/plan/fases/F2-captura.md` → "F2-04a" y seguir los
 pasos 1-12 (código copiado tal cual del plan; necesita un Android para el paso 12).
+
+## 2026-10-12 22:10 · @alex (Claude) · F2-04a · rama `feature/F2-04a-escena-encuentro-ar`
+
+**Qué se hizo:** pasos 1-11 de F2-04a copiando el código del plan de Kenneth tal cual (script que extrae cada bloque
+del plan) con TDD: cada spec se ejecutó antes de su implementación (falla por módulo inexistente) y después (pasa).
+Tamaño/distancia/arte (`encounter-layout`), arte con alternativas (`art-texture`), escena three.js sin renderer
+(`encounter-scene`), escenario con un solo contexto WebGL (`encounter-stage`), `CameraService` (cámara principal,
+D-045), `OrientationService` (sensor → evento, 80 ms), `EncounterApiService.view`, ajuste `arEnabled`, cabecera
+`app-encounter-hud` y la pantalla `/encuentro/:id` definitiva. Un commit por paso.
+**Archivos clave:** `src/app/game/encounter-scene/{encounter-layout,art-texture,encounter-scene,encounter-stage}.ts`,
+`src/app/services/ar/{camera,orientation}.service.ts`, `src/app/services/game/encounter-api.service.ts`,
+`src/app/features/encounter/{encounter.page,encounter-hud.component}.ts`.
+**Cómo se probó (salida real):**
+
+    lint: All files pass linting. · build: Application bundle generation complete (sin avisos de presupuesto)
+    ng test: 63 archivos, 307 passed · test:shared: 12 archivos, 140 passed
+      (el plan decía 62/306: develop tenía 57 archivos / 278 tests; −3 del spec provisional + 32 nuevos = 307)
+    navegador 390×844 (Playwright, Nest local + ng serve, cuenta f204a@pokecrud.test → "borradas 1"):
+      Gulpin (Nv. 1) y Chansey (Nv. 14) a su tamaño con sombra y fondo ilustrado; "Sin permiso de cámara: modo sin
+      AR."; AR apagada → aria-pressed=false y "Sin giroscopio: el Pokémon se queda delante."; "Huir" → /mapa y la
+      página se destruye; mapa ↔ encuentro ×3 con router.navigateByUrl: 0 errores de consola. 403 si no se mandó la
+      posición antes (D-041), "Este Pokémon ya no está." con un id falso.
+
+**Quedó a medias / roto:** solo el paso 12 (Android). Visto en el navegador: (1) con `pushState`+`popstate` el
+encuentro anterior queda vivo y el segundo WebGLRenderer falla — artefacto del truco, en la app se entra con el
+router; (2) al volver de cualquier encuentro el avatar y los Pokémon del mapa no se repintan en Chromium headless
+hasta recargar — **pasa igual en `develop`** con la página provisional, así que no es de F2-04a; comprobar en Android.
+**Decisiones nuevas:** ninguna.
+**El siguiente debe empezar por:** con Android, paso 12 de F2-04a (PENDIENTES de ESTADO). Sin Android: F2-04b siguiendo
+`docs/plan/fases/F2-captura.md` → "F2-04b" (rama nueva desde `develop`).
