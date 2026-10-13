@@ -111,6 +111,30 @@ export const SFX_RECIPES = {
     { wave: 'square', from: 900, to: 300, start: 0, duration: 0.07, gain: 0.2, attack: 0.002 },
     { wave: 'noise', from: 3000, to: 800, start: 0, duration: 0.06, gain: 0.3, attack: 0.001 },
   ],
+  /** El Pokémon se convierte en luz y entra en la bola (F2-07). */
+  absorb: [
+    { wave: 'saw', from: 200, to: 1200, start: 0, duration: 0.55, gain: 0.12, attack: 0.05 },
+    { wave: 'sine', from: 400, to: 1600, start: 0, duration: 0.55, gain: 0.15, attack: 0.05 },
+  ],
+  /** Cada sacudida de la bola (F2-07): clac seco. */
+  shake: [
+    { wave: 'noise', from: 1500, to: 400, start: 0, duration: 0.06, gain: 0.35, attack: 0.001 },
+    { wave: 'sine', from: 200, to: 120, start: 0, duration: 0.12, gain: 0.4, attack: 0.002 },
+  ],
+  /** ¡Capturado! (F2-07): clic y fanfarria corta Sol-Do-Mi-Sol. */
+  capture: [
+    { wave: 'square', from: 1500, to: 1500, start: 0, duration: 0.04, gain: 0.2, attack: 0.001 },
+    { wave: 'square', from: 784, to: 784, start: 0.15, duration: 0.1, gain: 0.13 },
+    { wave: 'square', from: 1047, to: 1047, start: 0.25, duration: 0.1, gain: 0.13 },
+    { wave: 'square', from: 1319, to: 1319, start: 0.35, duration: 0.1, gain: 0.13 },
+    { wave: 'square', from: 1568, to: 1568, start: 0.45, duration: 0.3, gain: 0.15 },
+    { wave: 'triangle', from: 784, to: 784, start: 0.45, duration: 0.3, gain: 0.2 },
+  ],
+  /** Se escapa de la bola (F2-07): la bola se abre de golpe. */
+  escape: [
+    { wave: 'square', from: 600, to: 1400, start: 0, duration: 0.08, gain: 0.18, attack: 0.002 },
+    { wave: 'noise', from: 2000, to: 600, start: 0.05, duration: 0.3, gain: 0.3, attack: 0.01 },
+  ],
 } satisfies Record<string, Voice[]>;
 
 export type SfxName = keyof typeof SFX_RECIPES;

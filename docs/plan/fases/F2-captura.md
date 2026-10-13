@@ -5577,7 +5577,7 @@ export const natureNameEs = (nature: string): string =>
 
 ### Paso 4 — Sonidos de la captura
 
-- [ ] **4a.** En `SFX_RECIPES` (`sfx-synth.ts`):
+- [x] **4a.** En `SFX_RECIPES` (`sfx-synth.ts`):
 
 ```ts
   /** El Pokémon se convierte en luz y entra en la bola (F2-07). */
@@ -5606,7 +5606,7 @@ export const natureNameEs = (nature: string): string =>
   ],
 ```
 
-- [ ] **4b.** `npx ng test --include=src/app/services/game/sfx-synth.spec.ts --watch=false` → PASA (24). Regenerar los
+- [x] **4b.** `npx ng test --include=src/app/services/game/sfx-synth.spec.ts --watch=false` → PASA (24). Regenerar los
   `.wav` para escucharlos como en F2-08 (`docs/evidencias/F2-08_sfx/`) y añadir los nuevos. Commit + push.
 
 ### Paso 5 — La tarjeta "¡Capturado!"
