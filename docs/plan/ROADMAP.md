@@ -324,6 +324,7 @@
 - [ ] **F3-06c · Favoritos y Pokémon personalizados** — `/favoritos` (desde la ficha de la Pokédex, nota y 1-5) y
       `/personalizados` (crear/editar) con el sistema de diseño; contratos sin cambios. Que los personalizados salgan como
       spawns del grupo → extra de F7. Dep: F0-08, F3-04.
+
 ## F4 · Motor de combate y combate contra IA
 
 - [x] **F4-01 · Plan detallado de F4.** (@alex, 2026-10-11) Dep: F0-03.
