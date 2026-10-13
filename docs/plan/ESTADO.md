@@ -3,7 +3,19 @@
 > Se **reescribe** al cerrar cada sesión (no es histórico; el histórico es `BITACORA.md`).
 > Máximo una pantalla. Si lees esto al empezar: después lee `ROADMAP.md`.
 
-**Última actualización:** 2026-10-13 · por Samuel (Claude) · `develop` con #63…#73 (F3 completa)
+**Última actualización:** 2026-10-13 · por Alex (Claude) · F5-01 (plan del PvP) en PR · `develop` con #63…#74 (F3 completa)
+
+## 👉 F5 EMPIEZA AQUÍ (Alex, 2026-10-13)
+
+- **F5-01 `[x]`:** plan en `docs/plan/fases/F5-pvp.md`, contrato en `shared/protocol/pvp.ts`, reglas en **D-056** (tú
+  eres siempre el lado 0, información oculta del rival, `decision` idempotente en vez de `seq`, equipos `caughtIds` a
+  nivel 50, 30 s / 3 tiempos agotados / 60 s de abandono, tabla `Battle`).
+- **Lo primero de F5-02 (verificado en un spike):** el `JwtAuthGuard` global REVIENTA con los mensajes del socket y el
+  `ThrottlerGuard` global mete todos los sockets en un cubo y PIERDE mensajes en silencio. Los dos arreglos (2 líneas
+  y una clase) están en el plan, paso 1. Versiones exactas: `@nestjs/websockets`/`platform-socket.io` 12.1.2,
+  `socket.io-client` 4.8.3.
+- Si en tu PC el servidor no compila con errores de `candy`/`pokedexEntry`/`cp`: `cd server && npx prisma generate`
+  (cliente Prisma viejo; `src/generated` no está en Git).
 
 ## 👉 RELEVO DE KENNETH (2026-10-12 noche): pendientes de Android probados en el Samsung A36
 
@@ -56,7 +68,7 @@ puede, F2-07 hecha) o F2-11 (ARCore, Android); pulidos F2-17/F2-18 si sobra tiem
 
 **F0 completa.** **F1:** todo hecho salvo la calle (F1-05 3b, F1-07 7b) y F1-11 (nueva). **F2:** F2-01…F2-06, F2-08,
 F2-07, F2-12, F2-13, F2-15 hechas; faltan **F2-11**/**F2-14** (ARCore), F2-10 (música) y los pulidos F2-16…F2-18.
-**F3:** completa en código (F3-01…F3-06c); quedan los vistazos opcionales en Android. **F4:** completa en código salvo F4-07 (combate en AR 3D, D-048).
+**F3:** completa en código (F3-01…F3-06c); quedan los vistazos opcionales en Android. **F4:** completa en código salvo F4-07 (combate en AR 3D, D-048). **F5:** F5-01 (plan) hecha; sigue F5-02.
 
 ## Hecho
 
@@ -208,7 +220,7 @@ F2-07, F2-12, F2-13, F2-15 hechas; faltan **F2-11**/**F2-14** (ARCore), F2-10 (m
 
 ## En curso
 
-- **F5-01 (Alex, rama `feature/F5-01-plan-pvp`):** plan del PvP en `docs/plan/fases/F5-pvp.md`.
+- Nadie. **F5-01** (Alex) hecha, PR abierto/mezclado; **siguiente: F5-02** (gateway Socket.IO), sin móvil.
 - Samuel cerró **F3-06c** (#73 mezclado; sin migración). **Con esto la F3 está completa en código.**
 - **Ojo:** el inventario de IS-11 está ahora en `/inventario` (la Pokédex 1025 ocupa `/pokedex`).
 
@@ -225,7 +237,7 @@ F2-07, F2-12, F2-13, F2-15 hechas; faltan **F2-11**/**F2-14** (ARCore), F2-10 (m
 
 ## Siguiente paso concreto
 
-1. **Sin móvil:** F5-01 (plan del PvP) o F2-10 (música). F7-07 nueva (personalizados como spawns, extra).
+1. **Sin móvil:** **F5-02** (gateway Socket.IO, `fases/F5-pvp.md`), luego F5-03. Alternativas: F2-10 (música), F7-07 (extra).
    **Probar sin tocar Supabase:** Postgres 17 portátil (`embedded-postgres@17.10.0-beta.17` en una carpeta temporal),
    `DATABASE_URL`/`DIRECT_URL` a él, `npx prisma migrate deploy` y `npm run db:seed`; comprobar con `prisma migrate
    status` que apunta a 127.0.0.1. La app en `localhost:8100` (en el PC de Samuel el 4200 lo ocupa OTRO proyecto suyo).

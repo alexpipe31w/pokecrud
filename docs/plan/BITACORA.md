@@ -1745,3 +1745,34 @@ Personalizados: `CustomPokemonService`, `/personalizados` (imagen o silueta "?",
 **Quedó a medias:** nada. **F3 completa en código.**
 **Decisiones nuevas:** ninguna (contratos sin cambios).
 **El siguiente debe empezar por:** F5-01 (plan del PvP) o F2-10 (música), según ESTADO.
+
+## 2026-10-13 15:00 · @alex (Claude) · F5-01 · rama `feature/F5-01-plan-pvp`
+
+**Qué se hizo:** REGLA 1 (el pendiente "mezclar #73" ya estaba hecho: develop `0fefc15`). Plan de F5 en
+`docs/plan/fases/F5-pvp.md`: arquitectura (`server/src/pvp/`: gateway solo transporte, sala `BattleRoom` sin Nest con
+reloj inyectado, sala de espera, equipos a nivel 50, repositorio de resultados; `pvp-view.ts` puro en `shared/`),
+reglas (D-056), seguridad (auth en el handshake, límite por socket, validación en el borde, CORS), y F5-02…F5-05
+paso a paso con sus tests (incluidos los de concurrencia: dos "unirse" al mismo código, dos acciones a la vez).
+Contrato real `shared/protocol/pvp.ts` (mensajes con ack, códigos de error, vistas con información oculta, constantes).
+**Spike (borrado tras medir):** gateway `/pvp` mínimo con `@nestjs/websockets`/`platform-socket.io` 12.1.2 y
+`socket.io-client` 4.8.3 en un test de Vitest del servidor, instalados con `--no-save` y quitados con `npm prune`.
+**Hallazgos:** (1) el `JwtAuthGuard` global se ejecuta en los mensajes del socket y revienta (`reading
+'authorization'`): el cliente se queda sin respuesta; (2) el `ThrottlerGuard` global mete todos los sockets en un solo
+cubo: con 2 jugadores × 70 mensajes, 22 se perdieron en silencio. Con los arreglos del plan (paso 1 de F5-02): 140/140.
+(3) Render Free admite WebSockets y los mensajes cuentan como tráfico. (4) En mi PC el servidor no compilaba por un
+cliente Prisma anterior a F3 → `npx prisma generate` (anotado en ESTADO).
+**Archivos clave:** `docs/plan/fases/F5-pvp.md`, `shared/protocol/pvp.ts`, `docs/plan/DECISIONES.md` (D-056),
+`docs/plan/ARQUITECTURA.md` §8 (nota).
+**Cómo se probó (salida real):**
+
+    spike: sin token / basura / otro secreto → pvp:error unauthorized + desconexión; ack + seq repetido → 1 eco ✔
+    con APP_GUARD JwtAuthGuard: "TypeError: Cannot read properties of undefined (reading 'authorization')" + timeout
+    con APP_GUARD ThrottlerGuard: "ok 118 fail 22"  → con HttpThrottlerGuard + guard solo HTTP: "ok 140 fail 0"
+    socket.io.min.js 4.8.3 gzip: 14680 bytes
+    npm run lint: All files pass linting · test:shared 20 archivos / 167 passed · ng build OK
+    app: 94 archivos / 514 passed · server: nest build OK (tras prisma generate) · vitest 4 archivos / 22 passed
+
+**Quedó a medias:** nada de F5-01. No se instaló nada de verdad (lo hace F5-02 paso 1).
+**Decisiones nuevas:** D-056.
+**El siguiente debe empezar por:** F5-02 paso 1 de `fases/F5-pvp.md` (instalar versiones exactas tras `/guardar`,
+los dos arreglos de guards con su e2e que falla primero).
