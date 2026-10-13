@@ -191,6 +191,10 @@ F2-15/F2-16. **F4:** completa en código salvo F4-07 (combate en AR 3D, D-048).
 
 - **Kenneth (2026-10-12 noche, rama `feature/F2-07-captura`): F2-07** — coreografía de captura/escape/huida y shiny
   (`fases/F2-captura.md` → "F2-07", aplicando a mano sobre el modelo 3D). PR #59 y #60 (F2-15) ya mezclados.
+  **Punto de guardado (23:55):** pasos 1-7a hechos y subidos (coreografía, naturalezas comprobadas con PokéAPI,
+  absorción también del modelo 3D con luz roja, sonidos + `.wav`, tarjeta "¡Capturado!", página). Verde: app 75
+  archivos / 435 tests, shared 147, servidor 22, lint y build. **Falta 7b (Android):** `npm run apk -- --install` y
+  grabar una captura completa y un escape en el A36; luego REGLA 2 y PR.
 - F1-05 y F1-07 siguen `[~]` (@alex) SOLO por su prueba en la calle (PENDIENTES).
 
 ## Siguiente paso concreto
