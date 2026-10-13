@@ -71,12 +71,16 @@ describe('BallMenuComponent', () => {
     expect(ball().getAttribute('aria-expanded')).toBe('true');
   });
 
-  it('Pokédex y Combate de prueba navegan y cierran el menú', () => {
+  it('Pokédex, Inventario y Combate de prueba navegan y cierran el menú', () => {
     openMenu();
     item('Pokédex').click();
     expect(router.navigateByUrl).toHaveBeenCalledWith('/pokedex');
     fixture.detectChanges();
     expect(sheet().classList).not.toContain('is-open');
+    openMenu();
+    item('Inventario').click();
+    expect(router.navigateByUrl).toHaveBeenCalledWith('/inventario');
+    fixture.detectChanges();
     openMenu();
     item('Combate de prueba').click();
     expect(router.navigateByUrl).toHaveBeenCalledWith('/combate/prueba');

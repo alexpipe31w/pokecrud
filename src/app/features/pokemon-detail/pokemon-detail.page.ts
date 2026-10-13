@@ -111,7 +111,7 @@ export class PokemonDetailPage implements ViewWillEnter {
   }
 
   protected goToList(): void {
-    this.navCtrl.navigateBack('/pokedex');
+    this.navCtrl.navigateBack('/inventario');
   }
 
   protected edit(): void {
@@ -129,7 +129,7 @@ export class PokemonDetailPage implements ViewWillEnter {
     this.pokemonService.delete(p.id).subscribe({
       next: () => {
         this.ui.toast(`${displayName(p.name)} eliminado`);
-        this.navCtrl.navigateBack('/pokedex');
+        this.navCtrl.navigateBack('/inventario');
       },
       error: () => this.ui.toast('No se pudo eliminar', 'danger'),
     });

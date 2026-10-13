@@ -3,7 +3,7 @@
 > Se **reescribe** al cerrar cada sesión (no es histórico; el histórico es `BITACORA.md`).
 > Máximo una pantalla. Si lees esto al empezar: después lee `ROADMAP.md`.
 
-**Última actualización:** 2026-10-13 00:40 · por Kenneth (Claude) · `develop` con PR #59, #60 y #61 mezclados (CI verde)
+**Última actualización:** 2026-10-13 · por Samuel (Claude) · `develop` con #63…#69 mezclados (CI verde)
 
 ## 👉 RELEVO DE KENNETH (2026-10-12 noche): pendientes de Android probados en el Samsung A36
 
@@ -196,14 +196,23 @@ F2-07, F2-12, F2-13, F2-15 hechas; faltan **F2-11**/**F2-14** (ARCore), F2-10 (m
 
 ## En curso
 
-- Nadie. **F3-01b (Samuel) hecha, PR abierto:** parte 2 del plan de F3 (`fases/F3-coleccion.md`). F3-02a hecha y en producción (#65). (F0-15 #63 y F3-01a #64 mezclados.)
+- Nadie. Samuel cerró el 2026-10-13: F0-15, F3-01a, F3-02a (+ migración en Supabase), F3-02b, F3-03, F3-01b y
+  F3-04 (#63…#69). **Ojo:** el inventario de IS-11 está ahora en `/inventario` (la Pokédex 1025 ocupa `/pokedex`).
+
+### PRUEBAS EN EL MÓVIL PENDIENTES (con el APK de producción, `npm run apk -- --install`)
+- **F1-07 7b + F1-05 3b (en la calle, con luz, joystick APAGADO):** andar y trotar; fps ≥ 55 con Pokémon; grito
+  bajito al acercarse; tocar lejos → "Acércate más"; cerca → encuentro.
+- **F2-01 en el Redmi (D-045):** `/dev/ar`, campo de visión con el que el Pokémon se queda quieto y cámara elegida.
+- **F3-02a 8b:** capturar un Pokémon y ver "+3 caramelos de …" en "¡Capturado!" (también vale desde el PC con joystick
+  contra Render).
+- **F3-02b 6b / F3-03 4b / F3-04:** abrir Mis Pokémon (scroll con 30+), una ficha (grito, barras, mapa mini, mote,
+  favorito, transferir y deshacer) y la Pokédex (generaciones, ficha de especie); fps ≥ 55 al desplazar. F3-02a hecha y en producción (#65). (F0-15 #63 y F3-01a #64 mezclados.)
 - F1-05 y F1-07 siguen `[~]` (@alex) SOLO por su prueba en la calle (PENDIENTES).
 
 ## Siguiente paso concreto
 
-1. **F3-04 (sin móvil):** Pokédex 1025 según la parte 2 de `docs/plan/fases/F3-coleccion.md` (empieza moviendo el
-   inventario de IS-11 a `/inventario`). Independientes y también sin móvil: **F3-05** (evolución con caramelos),
-   **F3-06a/b/c** (CRUD del curso con la nueva UI).
+1. **F3-05 (sin móvil):** evolución con caramelos según la parte 2 de `docs/plan/fases/F3-coleccion.md` (regla D-053,
+   `POST /collection/:id/evolve`, animación). Independientes y también sin móvil: **F3-06a/b/c** (CRUD del curso).
    **Probar sin tocar Supabase:** Postgres 17 portátil (`embedded-postgres@17.10.0-beta.17` en una carpeta temporal),
    `DATABASE_URL`/`DIRECT_URL` a él, `npx prisma migrate deploy` y `npm run db:seed`; la app en `localhost:8100` (en el
    PC de Samuel el 4200 lo ocupa OTRO proyecto suyo). Ver la bitácora de F3-02a/F3-02b.

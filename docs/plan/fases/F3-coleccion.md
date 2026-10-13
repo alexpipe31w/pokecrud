@@ -925,21 +925,21 @@ selector `app-inventory`); Modify `app.routes.ts`, `core/auth/auth.guard.ts` (fa
 `features/pokemon-add/pokemon-add.page.ts`, `features/pokemon-detail/pokemon-detail.page.ts`,
 `features/map/ball-menu.component.ts`, `README.md` (tabla de rutas)
 
-- [ ] **1a.** `git mv` de la carpeta y renombrar clase/selector/título ("Inventario de la tienda"). En `app.routes.ts`:
+- [x] **1a.** `git mv` de la carpeta y renombrar clase/selector/título ("Inventario de la tienda"). En `app.routes.ts`:
   `{ path: 'inventario', loadComponent: … InventoryPage }` (pública, como hoy) y `{ path: 'tabs/pokedex', redirectTo:
   '/inventario' }`. Quitar la ruta `pokedex` vieja (la nueva llega en el paso 4).
-- [ ] **1b.** Cambiar `'/pokedex'` → `'/inventario'` en el fallback de `adminGuard`, en `navigateBack` de
+- [x] **1b.** Cambiar `'/pokedex'` → `'/inventario'` en el fallback de `adminGuard`, en `navigateBack` de
   `pokemon-add` y `pokemon-detail`, y en el `defaultHref` del botón atrás de esas páginas.
   `grep -rn "'/pokedex'" src/app` → solo lo que ahora es la Pokédex nueva.
-- [ ] **1c.** Menú de la Poké Ball: "Pokédex" (→ `/pokedex`, la nueva) y "Inventario" (→ `/inventario`, icono
+- [x] **1c.** Menú de la Poké Ball: "Pokédex" (→ `/pokedex`, la nueva) y "Inventario" (→ `/inventario`, icono
   `storefront-outline`). README: tabla de rutas al día.
-- [ ] **1d.** `ng test` (el spec de la página movida se renombra con ella), lint, build. Commit + `/guardar`.
+- [x] **1d.** `ng test` (el spec de la página movida se renombra con ella), lint, build. Commit + `/guardar`.
 
 ### Paso 2 — Debilidades (puro)
 
 **Files:** Create `shared/engine/weaknesses.ts` + spec
 
-- [ ] **2a. Test que falla** (con la tabla real de `types.json`, como `type-chart.spec.ts`):
+- [x] **2a. Test que falla** (con la tabla real de `types.json`, como `type-chart.spec.ts`):
 
 ```ts
 import { readFileSync } from 'node:fs';
@@ -968,7 +968,7 @@ describe('defenseProfile', () => {
 });
 ```
 
-- [ ] **2b.** falla. **2c.**
+- [x] **2b.** falla. **2c.**
 
 ```ts
 import type { TypeName } from '../data/dataset.types.js';
@@ -998,13 +998,13 @@ export function defenseProfile(types: readonly TypeName[], chart: TypeChart): De
 ```
 
   (`effectiveness(chart, ataque, tiposDefensor)` es la firma real de `type-chart.ts`.)
-- [ ] **2d.** pasa. Commit + `/guardar`.
+- [x] **2d.** pasa. Commit + `/guardar`.
 
 ### Paso 3 — Cadena evolutiva (pura)
 
 **Files:** Create `shared/engine/evolution-chain.ts` + spec
 
-- [ ] **3a. Test que falla** (con `pokedex.json` real):
+- [x] **3a. Test que falla** (con `pokedex.json` real):
 
 ```ts
 import { readFileSync } from 'node:fs';
@@ -1037,7 +1037,7 @@ describe('evolutionTree', () => {
 });
 ```
 
-- [ ] **3b.** falla. **3c.**
+- [x] **3b.** falla. **3c.**
 
 ```ts
 import type { EvolutionLink, Species } from '../data/dataset.types.js';
@@ -1092,18 +1092,18 @@ export function methodText(link: EvolutionLink): string {
 }
 ```
 
-- [ ] **3d.** pasa. Commit + `/guardar`.
+- [x] **3d.** pasa. Commit + `/guardar`.
 
 ### Paso 4 — `PokedexService` y la pantalla `/pokedex`
 
 **Files:** Create `src/app/services/game/pokedex.service.ts` (+ spec), `src/app/features/pokedex-1025/pokedex.page.ts`;
 Modify `app.routes.ts`, `features/encounter/encounter.page.ts` (invalidar al capturar, como la colección)
 
-- [ ] **4a. `PokedexService`** (test primero, patrón de `CollectionService`): `load()` → `GET /pokedex` una vez y
+- [x] **4a. `PokedexService`** (test primero, patrón de `CollectionService`): `load()` → `GET /pokedex` una vez y
   publica `entries` como `Map<speciesId, 'seen' | 'caught'>`; `seenCount`, `caughtCount` (`computed`); `invalidate()`
   (lo llama el encuentro al capturar y también al ABRIR un encuentro: el servidor marca "visto" en ese momento).
   Tests: carga y cuenta; un segundo `load()` sin invalidar no pide nada; tras `invalidate()` sí.
-- [ ] **4b. Página `/pokedex`** (`authGuard`): cabecera "Pokédex · vistos 120 · capturados 34 / 1025"; fila de 9 chips
+- [x] **4b. Página `/pokedex`** (`authGuard`): cabecera "Pokédex · vistos 120 · capturados 34 / 1025"; fila de 9 chips
   de generación (I…IX, con "x/y capturados" de cada una); rejilla de 3-4 columnas de la generación elegida (máx. 156
   celdas: no hace falta virtualizar). Celda: Nº en `tabular-nums` y:
   - **no visto** → silueta (el arte con `filter: brightness(0) opacity(.25)`) y "???"; no se puede abrir;
@@ -1111,27 +1111,27 @@ Modify `app.routes.ts`, `features/encounter/encounter.page.ts` (invalidar al cap
   - **capturado** → arte + icono de Poké Ball; se abre.
   Imágenes con `loading="lazy"` y el fallback de `spriteUrls`. La generación elegida se recuerda en `localStorage`
   (conveniencia; con try/catch). Estados: cargando (esqueletos), error con "Reintentar".
-- [ ] **4c.** Commit + `/guardar`.
+- [x] **4c.** Commit + `/guardar`.
 
 ### Paso 5 — Ficha de la especie `/pokedex/:id`
 
 **Files:** Create `src/app/features/pokedex-1025/species.page.ts`, `species-weaknesses.component.ts`,
 `evolution-chain.component.ts`
 
-- [ ] **5a.** Si la especie no está vista → pantalla "Aún no has visto este Pokémon" con su silueta (nada de datos: se
+- [x] **5a.** Si la especie no está vista → pantalla "Aún no has visto este Pokémon" con su silueta (nada de datos: se
   descubre jugando). Si está vista: arte grande teñido por su tipo, Nº, nombre, `genus` ("Pokémon Ratón"), tipos,
   `flavor` (descripción ES), altura y peso **de la especie** (sin XS/XL), hábitat en español (`grassland` Pradera,
   `forest` Bosque, `waters-edge` Orilla, `mountain` Montaña, `cave` Cueva, `sea` Mar, `urban` Ciudad,
   `rough-terrain` Terreno agreste, `rare` Raro; `null` → no se muestra), generación y botón de grito.
-- [ ] **5b. `app-species-weaknesses`:** `defenseProfile(types, chart)` con el `chart` construido de
+- [x] **5b. `app-species-weaknesses`:** `defenseProfile(types, chart)` con el `chart` construido de
   `DatasetService.types()`; grupos "Muy débil ×4", "Débil ×2", "Resiste ×½", "Resiste mucho ×¼", "Inmune ×0" con
   `app-type-chips`; los grupos vacíos no salen. **Siempre texto + color** (DISENO §7).
-- [ ] **5c. `app-evolution-chain`:** el árbol de `evolutionTree` en horizontal (ramas en columnas, como Eevee), cada
+- [x] **5c. `app-evolution-chain`:** el árbol de `evolutionTree` en horizontal (ramas en columnas, como Eevee), cada
   nodo con su arte pequeño (silueta si no está visto), nombre y bajo la flecha `methodText` + **el coste en caramelos de
   F3-05** cuando exista (`evolutionCost`, paso 1 de F3-05; hasta entonces, solo el método). Tocar un nodo visto → su
   ficha.
-- [ ] **5d.** Desde la ficha del individuo (`/coleccion/:id`), el nombre de la especie enlaza a `/pokedex/:speciesId`.
-- [ ] **5e.** Navegador 390×844 (Chrome sin ventana con `playwright-core`, ver bitácora de F3-02b/F3-03): Pokédex
+- [x] **5d.** Desde la ficha del individuo (`/coleccion/:id`), el nombre de la especie enlaza a `/pokedex/:speciesId`.
+- [x] **5e.** Navegador 390×844 (Chrome sin ventana con `playwright-core`, ver bitácora de F3-02b/F3-03): Pokédex
   con una cuenta con vistos y capturados; ficha de Charizard (debilidades del test), Eevee (8 ramas), un no visto.
   Evidencias `docs/evidencias/F3-04_0{1..4}_*.png`. REGLA 2.
 

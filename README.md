@@ -88,12 +88,12 @@ pokecrud/
 
 ## Rutas de la app
 
-| Ruta                  | Pantalla                                                               | Historia            |
-| --------------------- | ---------------------------------------------------------------------- | ------------------- |
-| `/tabs/pokedex`       | Pokédex (lista, buscar, editar, eliminar)                              | HU-03, HU-05, HU-14 |
-| `/pokemon/nuevo`      | Agregar: buscar en PokéAPI por número o nombre y formulario prellenado | HU-03               |
-| `/pokemon/:id`        | Detalle de un Pokémon (tipo, stats, precio, stock)                     | HU-04               |
-| `/pokemon/:id/editar` | Editar un Pokémon                                                      | HU-03               |
+| Ruta                  | Pantalla                                                                                 | Historia            |
+| --------------------- | ---------------------------------------------------------------------------------------- | ------------------- |
+| `/inventario`         | Inventario de la tienda (lista, buscar, editar, eliminar); `/tabs/pokedex` redirige aquí | HU-03, HU-05, HU-14 |
+| `/pokemon/nuevo`      | Agregar: buscar en PokéAPI por número o nombre y formulario prellenado                   | HU-03               |
+| `/pokemon/:id`        | Detalle de un Pokémon (tipo, stats, precio, stock)                                       | HU-04               |
+| `/pokemon/:id/editar` | Editar un Pokémon                                                                        | HU-03               |
 
 > Las secciones **Equipos**, **Favoritos** y **Mis Pokémon** están ocultas en esta entrega: no aparecen en la app ni tienen ruta. Su código sigue en `src/app/features/` y sus endpoints en el backend, por si se activan más adelante.
 

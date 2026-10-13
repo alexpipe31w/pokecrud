@@ -61,7 +61,7 @@ describe('authGuard / guestGuard', () => {
 
     loggedIn.set(true);
     const player = (await run(adminGuard, '/pokemon/nuevo')) as UrlTree;
-    expect(router().serializeUrl(player)).toBe('/pokedex');
+    expect(router().serializeUrl(player)).toBe('/inventario');
 
     admin.set(true);
     expect(await run(adminGuard, '/pokemon/nuevo')).toBe(true);

@@ -9,6 +9,7 @@ import {
   gameControllerOutline,
   logOutOutline,
   sparklesOutline,
+  storefrontOutline,
 } from 'ionicons/icons';
 
 import { AuthService } from '../../core/auth/auth.service';
@@ -61,6 +62,9 @@ const DRAG_CLOSE_PX = 80;
       </button>
       <button type="button" (click)="go('/pokedex')">
         <ion-icon name="book-outline" aria-hidden="true" />Pokédex
+      </button>
+      <button type="button" (click)="go('/inventario')">
+        <ion-icon name="storefront-outline" aria-hidden="true" />Inventario
       </button>
       <button type="button" (click)="go('/combate/prueba')">
         <ion-icon name="flash-outline" aria-hidden="true" />Combate de prueba
@@ -207,6 +211,7 @@ export class BallMenuComponent {
       gameControllerOutline,
       logOutOutline,
       sparklesOutline,
+      storefrontOutline,
     });
   }
 
