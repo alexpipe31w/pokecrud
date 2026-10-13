@@ -1231,7 +1231,7 @@ export class EncounterApiService {
 
 **Files:** Create `src/app/features/encounter/encounter-hud.component.ts`
 
-- [ ] **9a.** Crear (la prueba la hace el spec de la página, paso 10):
+- [x] **9a.** Crear (la prueba la hace el spec de la página, paso 10):
 
 ```ts
 import { Component, input, output } from '@angular/core';
@@ -1351,7 +1351,7 @@ el horizonte de la escena. Al pasar de un modo al otro el Pokémon se vuelve a p
 
 **Files:** Modify (reescribir) `src/app/features/encounter/encounter.page.ts`, `encounter.page.spec.ts`
 
-- [ ] **10a. Test que falla** (reescribir el spec entero; los dobles evitan WebGL, cámara y sensores):
+- [x] **10a. Test que falla** (reescribir el spec entero; los dobles evitan WebGL, cámara y sensores):
 
 ```ts
 import { HttpErrorResponse } from '@angular/common/http';
@@ -1508,8 +1508,8 @@ describe('EncounterPage', () => {
 });
 ```
 
-- [ ] **10b.** `npx ng test --include=src/app/features/encounter/encounter.page.spec.ts --watch=false` → FALLA.
-- [ ] **10c. Implementación** (reescribir el archivo entero):
+- [x] **10b.** `npx ng test --include=src/app/features/encounter/encounter.page.spec.ts --watch=false` → FALLA.
+- [x] **10c. Implementación** (reescribir el archivo entero):
 
 ```ts
 import { HttpErrorResponse } from '@angular/common/http';
@@ -1951,7 +1951,7 @@ function firstFrame(video: HTMLVideoElement): Promise<void> {
 }
 ```
 
-- [ ] **10d.** → PASA (7 tests). Commit `F2-04a: pantalla del encuentro en AR` + push.
+- [x] **10d.** → PASA (7 tests). Commit `F2-04a: pantalla del encuentro en AR` + push.
 
 ### Paso 11 — Todo en verde
 
