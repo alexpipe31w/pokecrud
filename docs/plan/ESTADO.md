@@ -3,7 +3,7 @@
 > Se **reescribe** al cerrar cada sesión (no es histórico; el histórico es `BITACORA.md`).
 > Máximo una pantalla. Si lees esto al empezar: después lee `ROADMAP.md`.
 
-**Última actualización:** 2026-10-12 noche · por Kenneth (Claude) · rama `feature/F2-01-spike-camara-giroscopio`
+**Última actualización:** 2026-10-12 noche · por Kenneth (Claude) · F2-01 mezclado (PR #48); F2-02 en curso
 
 **Kenneth (2026-10-12, noche), en paralelo al relevo de abajo:** hecho **F2-01** (spike de cámara + giroscopio en
 el Samsung A36, D-045) y comprobado que el APK ya **no** saca el refresh token en logcat. Con eso **F2-02 (plan de F2)
@@ -164,7 +164,9 @@ siguiente es el plan de la fase (F2-02) y luego la escena del encuentro (F2-04).
 
 ## En curso
 
-- Nadie (Kenneth cerró F2-01; PR abierto a `develop`). F1-05 (3b) y F1-07 (7b) solo esperan la prueba en Android.
+- **F2-02 (Kenneth, rama `feature/F2-02-plan-captura`):** plan de F2 en `docs/plan/fases/F2-captura.md`. **Punto de
+  guardado:** recién reclamada. (F2-01 ya mezclado, PR #48.)
+- F1-05 (3b) y F1-07 (7b) solo esperan la prueba en Android.
 
 ## Siguiente paso concreto
 

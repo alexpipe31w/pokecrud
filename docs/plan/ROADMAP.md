@@ -156,7 +156,7 @@
       en 20 s; calibrado FOV 64° y retraso 80 ms. Sin WebXR (AR solo de orientación). Cámara y sensores se sueltan al
       salir y en segundo plano; 3 idas y vueltas al mapa sin perder el contexto WebGL. Evidencias `F2-01_0{1..6}_*`. D-045.
       Código para F2-04: `game/encounter-scene/device-pose.ts` y `pose-delay.ts` (17 tests).
-- [ ] **F2-02 · Plan detallado de F2** (`docs/plan/fases/F2-captura.md`). Dep: F2-01.
+- [~] **F2-02 · Plan detallado de F2** (@kenneth, 2026-10-12) (`docs/plan/fases/F2-captura.md`). Dep: F2-01.
 - [x] **F2-03 · Fórmula de captura** (@alex, 2026-10-11) — `shared/engine/capture.ts` (+ huida) con tests de casos conocidos.
       Dep: F0-03.
       **Hecho:** fórmula Gen III+ de ARQUITECTURA §6, huida por rareza/velocidad, `resolveThrow` con RNG inyectado;
