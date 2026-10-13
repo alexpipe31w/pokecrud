@@ -1152,7 +1152,7 @@ Pikachu→Raichu 100; Wurmple→Silcoon 25). Sin nivel mínimo, sin piedras ni i
 método de los juegos se enseña como información (F3-04). El nivel, IVs, naturaleza, shiny, tamaño y mote se
 **conservan**; cambian especie, stats, PC y movimientos (los 4 por defecto de la especie nueva a su nivel, D-030).
 
-- [ ] **1a. Test que falla** (dataset real):
+- [x] **1a. Test que falla** (dataset real):
 
 ```ts
 import { readFileSync } from 'node:fs';
@@ -1189,7 +1189,7 @@ describe('evolutionOptions', () => {
 });
 ```
 
-- [ ] **1b.** falla. **1c.**
+- [x] **1b.** falla. **1c.**
 
 ```ts
 import type { Species } from '../data/dataset.types.js';
@@ -1229,7 +1229,7 @@ export function evolutionOptions(dex: Dex, from: number): EvolutionOption[] {
 }
 ```
 
-- [ ] **1d.** pasa. Anotar **D-053** (la regla de arriba y por qué: como Pokémon GO, sin objetos ni intercambios que el
+- [x] **1d.** pasa. Anotar **D-053** (la regla de arriba y por qué: como Pokémon GO, sin objetos ni intercambios que el
   juego no tiene). Commit + `/guardar`.
 
 ### Paso 2 — Servidor: `POST /collection/:id/evolve`
@@ -1238,14 +1238,14 @@ export function evolutionOptions(dex: Dex, from: number): EvolutionOption[] {
 `speciesMap()` para `evolutionOptions`), `server/src/collection/*`, `shared/protocol/collection.ts`
 (`EvolveRequest { to: number }`, respuesta `CollectionDetail`); Test `server/test/collection.e2e-spec.ts`
 
-- [ ] **2a. e2e que fallan:**
+- [x] **2a. e2e que fallan:**
   1. Bulbasaur nv 10 con 25 caramelos de su familia → `POST …/evolve { to: 2 }` → 200, `speciesId: 2`, mismo nivel,
      IVs, naturaleza, shiny y mote; `cp` y `stats` recalculados (= `combatPower(calcStats(base de Ivysaur, …))`);
      caramelos 25 → 0; Pokédex de 2 = capturado.
   2. Con 24 caramelos → 409 "Te faltan caramelos" y nada cambia.
   3. `to` que no es una evolución suya (Bulbasaur → 3) → 400; especie sin evolución → 400; de otro jugador → 404.
   4. Dos `evolve` a la vez del mismo con 50 caramelos → uno 200 y otro 409; caramelos 50 → 25 (no 0).
-- [ ] **2b. Servicio** (una transacción, como `transfer`):
+- [x] **2b. Servicio** (una transacción, como `transfer`):
 
 ```ts
   async evolve(playerId: string, id: string, to: number): Promise<CollectionDetail> {
@@ -1280,29 +1280,29 @@ export function evolutionOptions(dex: Dex, from: number): EvolutionOption[] {
 ```
 
   Controlador `@Post(':id/evolve')` con `ParseUUIDPipe` y DTO `{ to: @IsInt() @Min(1) }`, límite 30/min.
-- [ ] **2c.** e2e → PASA; todos los e2e, lint, unitarios, build. Commit + `/guardar`.
+- [x] **2c.** e2e → PASA; todos los e2e, lint, unitarios, build. Commit + `/guardar`.
 
 ### Paso 3 — App: evolucionar desde la ficha + animación
 
 **Files:** Create `src/app/features/collection/evolve-panel.component.ts`, `evolve-scene.component.ts`,
 `evolve-timeline.ts` (+ spec); Modify `collection-detail.page.ts`, `collection.service.ts` (`evolve(id, to)`)
 
-- [ ] **3a. `evolve-timeline.ts` (puro, test primero)** — DISENO §5: "silueta blanca pulsando entre forma A y B
+- [x] **3a. `evolve-timeline.ts` (puro, test primero)** — DISENO §5: "silueta blanca pulsando entre forma A y B
   acelerando → estallido → forma nueva". `evolvePose(ms)` → `{ showB: boolean, glow: 0..1, burst: 0..1 }`: 0-3.000 ms
   alterna A/B con periodo que baja de 600 ms a 60 ms (`showB` cambia cada medio periodo), `glow` sube de 0,3 a 1;
   3.000-3.400 ms `burst` 0→1 (destello) y `showB = true`; ≥ 3.400 forma B en reposo. Tests: al principio `showB` falso;
   los cambios A↔B en el último segundo son ≥ 4 veces más que en el primero; al final `showB` verdadero y `burst` 0.
-- [ ] **3b. `app-evolve-panel`** en la ficha (debajo de los caramelos): un botón por opción "Evolucionar a Raichu ·
+- [x] **3b. `app-evolve-panel`** en la ficha (debajo de los caramelos): un botón por opción "Evolucionar a Raichu ·
   100 🍬" (arte pequeño del destino); deshabilitado con "Te faltan 37" si no llegan. Confirmación corta.
-- [ ] **3c. `app-evolve-scene`** (capa a pantalla completa): fondo oscuro, las dos siluetas blancas
+- [x] **3c. `app-evolve-scene`** (capa a pantalla completa): fondo oscuro, las dos siluetas blancas
   (`filter: brightness(0) invert(1)`) alternando según `evolvePose` en `requestAnimationFrame`, brillo creciente,
   destello, forma nueva a color + su grito + háptico `success` en el MISMO fotograma (DISENO §4.10), texto
   "¡Tu Pikachu evolucionó a Raichu!". La petición `POST …/evolve` sale al empezar y la animación espera su respuesta antes
   del destello (como la captura, D-046); si falla → vuelve a A con el error ("Te faltan caramelos" / "Ya evolucionó").
   "Reducir movimiento" → fundido A→B de 400 ms.
-- [ ] **3d.** Al terminar: la ficha muestra la especie nueva (`detail` de la respuesta), `collection.patchItem`,
+- [x] **3d.** Al terminar: la ficha muestra la especie nueva (`detail` de la respuesta), `collection.patchItem`,
   `pokedex.invalidate()`. Lint, `ng test`, build. Commit + `/guardar`.
-- [ ] **3e.** Navegador 390×844 contra Nest + Postgres local: Bulbasaur con 25 caramelos (sembrados) → Ivysaur;
+- [x] **3e.** Navegador 390×844 contra Nest + Postgres local: Bulbasaur con 25 caramelos (sembrados) → Ivysaur;
   Eevee → elegir rama; sin caramelos → botón deshabilitado. Vídeo o capturas `docs/evidencias/F3-05_*`. REGLA 2.
 
 ---

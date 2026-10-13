@@ -3,7 +3,7 @@
 > Se **reescribe** al cerrar cada sesión (no es histórico; el histórico es `BITACORA.md`).
 > Máximo una pantalla. Si lees esto al empezar: después lee `ROADMAP.md`.
 
-**Última actualización:** 2026-10-13 · por Samuel (Claude) · `develop` con #63…#69 mezclados (CI verde)
+**Última actualización:** 2026-10-13 · por Samuel (Claude) · `develop` con #63…#69; F3-05 en PR
 
 ## 👉 RELEVO DE KENNETH (2026-10-12 noche): pendientes de Android probados en el Samsung A36
 
@@ -56,10 +56,13 @@ puede, F2-07 hecha) o F2-11 (ARCore, Android); pulidos F2-17/F2-18 si sobra tiem
 
 **F0 completa.** **F1:** todo hecho salvo la calle (F1-05 3b, F1-07 7b) y F1-11 (nueva). **F2:** F2-01…F2-06, F2-08,
 F2-07, F2-12, F2-13, F2-15 hechas; faltan **F2-11**/**F2-14** (ARCore), F2-10 (música) y los pulidos F2-16…F2-18.
-**F3:** se puede empezar (F3-01, plan). **F4:** completa en código salvo F4-07 (combate en AR 3D, D-048).
+**F3:** F3-01…F3-05 hechas; faltan F3-06a/b/c (CRUD del curso). **F4:** completa en código salvo F4-07 (combate en AR 3D, D-048).
 
 ## Hecho
 
+- **F3-05 (Samuel, rama `feature/F3-05-evolucion`, PR):** evolucionar con caramelos (D-053). `evolution.ts`
+  (shared), `POST /collection/:id/evolve` (una transacción; dos a la vez → una gana y se cobra una vez), panel en la
+  ficha y animación de evolución. e2e 87, app 478, shared 167. Evidencias `F3-05_0{1..9}_*` (vídeo `.webm`).
 - **F2-07 (Kenneth, rama `feature/F2-07-captura`, PR):** `capture-sequence.ts`, `shared/data/natures-es.ts`,
   `EncounterScene.setCaptureLook`/`poseBall` (plano y modelo 3D), sonidos absorb/shake/capture/escape (+ `.wav` en
   `F2-08_sfx/`), `app-caught-card` y la coreografía en la página. App 75 archivos / 435 tests, shared 147, servidor 22.
@@ -196,8 +199,8 @@ F2-07, F2-12, F2-13, F2-15 hechas; faltan **F2-11**/**F2-14** (ARCore), F2-10 (m
 
 ## En curso
 
-- Nadie. Samuel cerró el 2026-10-13: F0-15, F3-01a, F3-02a (+ migración en Supabase), F3-02b, F3-03, F3-01b y
-  F3-04 (#63…#69). **Ojo:** el inventario de IS-11 está ahora en `/inventario` (la Pokédex 1025 ocupa `/pokedex`).
+- Nadie. Samuel cerró **F3-05** (rama `feature/F3-05-evolucion`, PR a `develop`; sin migración). Sigue F3-06a.
+- **Ojo:** el inventario de IS-11 está ahora en `/inventario` (la Pokédex 1025 ocupa `/pokedex`).
 
 ### PRUEBAS EN EL MÓVIL PENDIENTES (con el APK de producción, `npm run apk -- --install`)
 - **F1-07 7b + F1-05 3b (en la calle, con luz, joystick APAGADO):** andar y trotar; fps ≥ 55 con Pokémon; grito
@@ -205,17 +208,19 @@ F2-07, F2-12, F2-13, F2-15 hechas; faltan **F2-11**/**F2-14** (ARCore), F2-10 (m
 - **F2-01 en el Redmi (D-045):** `/dev/ar`, campo de visión con el que el Pokémon se queda quieto y cámara elegida.
 - **F3-02a 8b:** capturar un Pokémon y ver "+3 caramelos de …" en "¡Capturado!" (también vale desde el PC con joystick
   contra Render).
-- **F3-02b 6b / F3-03 4b / F3-04:** abrir Mis Pokémon (scroll con 30+), una ficha (grito, barras, mapa mini, mote,
-  favorito, transferir y deshacer) y la Pokédex (generaciones, ficha de especie); fps ≥ 55 al desplazar. F3-02a hecha y en producción (#65). (F0-15 #63 y F3-01a #64 mezclados.)
+- **F3-02b 6b / F3-03 4b / F3-04 / F3-05:** abrir Mis Pokémon (scroll con 30+), una ficha (grito, barras, mapa mini, mote,
+  favorito, transferir y deshacer), la Pokédex (generaciones, ficha de especie) y evolucionar (grito y vibración al
+  aparecer la forma nueva, fluidez de la animación); fps ≥ 55 al desplazar. F3-02a hecha y en producción (#65). (F0-15 #63 y F3-01a #64 mezclados.)
 - F1-05 y F1-07 siguen `[~]` (@alex) SOLO por su prueba en la calle (PENDIENTES).
 
 ## Siguiente paso concreto
 
-1. **F3-05 (sin móvil):** evolución con caramelos según la parte 2 de `docs/plan/fases/F3-coleccion.md` (regla D-053,
-   `POST /collection/:id/evolve`, animación). Independientes y también sin móvil: **F3-06a/b/c** (CRUD del curso).
+1. **F3-06a → F3-06b → F3-06c (sin móvil)**, en ese orden, según `fases/F3-coleccion.md` (parte 2). F3-06b lleva
+   migración (`team_caught`, D-054): se aplica en Supabase ANTES de mezclar, con permiso de Samuel.
    **Probar sin tocar Supabase:** Postgres 17 portátil (`embedded-postgres@17.10.0-beta.17` en una carpeta temporal),
-   `DATABASE_URL`/`DIRECT_URL` a él, `npx prisma migrate deploy` y `npm run db:seed`; la app en `localhost:8100` (en el
-   PC de Samuel el 4200 lo ocupa OTRO proyecto suyo). Ver la bitácora de F3-02a/F3-02b.
+   `DATABASE_URL`/`DIRECT_URL` a él, `npx prisma migrate deploy` y `npm run db:seed`; comprobar con `prisma migrate
+   status` que apunta a 127.0.0.1. La app en `localhost:8100` (en el PC de Samuel el 4200 lo ocupa OTRO proyecto suyo).
+   Ojo: cada `npm run test:e2e` borra las cuentas `@pokecrud.test` de más de 1 h (también las `demo+…`).
 2. **Con luz, en la calle (Kenneth o Samuel):** F1-07 7b + F1-05 3b con el APK de producción y el **joystick apagado**.
 3. **F2-11** (ARCore, Android) · F1-11 / F2-16…F2-18 (arreglos vistos en el móvil) · sin móvil: F2-10 (música), F5-01 (plan del PvP).
 4. APK en otro PC: JDK 21 (`winget install Microsoft.OpenJDK.21`; si da "el hash no coincide",

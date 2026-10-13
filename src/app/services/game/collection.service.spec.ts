@@ -169,4 +169,22 @@ describe('CollectionService', () => {
     delReq.flush({ candy: { familyId: 10, qty: 4, gained: 1 } });
     expect((await t).candy.gained).toBe(1);
   });
+  it('F3-05: evolve() hace POST /collection/:id/evolve y deja la fila de la lista con la especie y el PC nuevos', async () => {
+    const first = svc.load();
+    pending().req.flush(page(['a', 'b'], null));
+    await first;
+
+    const e = svc.evolve('a', 26);
+    const req = http.expectOne(`${URL}/a/evolve`);
+    expect(req.request.method).toBe('POST');
+    expect(req.request.body).toEqual({ to: 26 });
+    req.flush({
+      ...item('a', { speciesId: 26, cp: 250 }),
+      stats: {},
+      candy: { familyId: 10, qty: 0 },
+    });
+    expect((await e).speciesId).toBe(26);
+    expect(svc.items()[0]).toMatchObject({ id: 'a', speciesId: 26, cp: 250 });
+    expect(svc.items()[1].speciesId).toBe(25);
+  });
 });

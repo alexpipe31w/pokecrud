@@ -6,6 +6,7 @@ import type {
   CollectionPage,
   CollectionPatch,
   CollectionQuery,
+  EvolveRequest,
   TransferResult,
 } from '@shared/protocol/collection';
 import { firstValueFrom, timeout } from 'rxjs';
@@ -116,6 +117,19 @@ export class CollectionService {
     );
     this.patchItem(id, item);
     return item;
+  }
+
+  /**
+   * `POST /collection/:id/evolve` (F3-05, D-053): evoluciona gastando caramelos; devuelve la ficha nueva y deja la fila
+   * de la lista con la especie y el PC nuevos. Lanza el error HTTP (409 sin caramelos o ya evolucionado).
+   */
+  async evolve(id: string, to: number): Promise<CollectionDetail> {
+    const body: EvolveRequest = { to };
+    const detail = await firstValueFrom(
+      this.http.post<CollectionDetail>(`${this.url(id)}/evolve`, body).pipe(timeout(TIMEOUT_MS)),
+    );
+    this.patchItem(id, { speciesId: detail.speciesId, cp: detail.cp });
+    return detail;
   }
 
   /** `DELETE /collection/:id` (F3-03): transferir (+1 caramelo). Lo llama `TransferService` tras el "deshacer". */

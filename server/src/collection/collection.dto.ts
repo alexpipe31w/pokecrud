@@ -36,6 +36,13 @@ export class CollectionPatchDto {
   favorite?: boolean;
 }
 
+/** `POST /collection/:id/evolve` (F3-05): la especie a la que evoluciona (las ramas de Eevee se eligen). */
+export class CollectionEvolveDto {
+  @IsInt()
+  @Min(1)
+  to!: number;
+}
+
 export const COLLECTION_DEFAULT_LIMIT = 30;
 export const COLLECTION_MAX_LIMIT = 50;
 

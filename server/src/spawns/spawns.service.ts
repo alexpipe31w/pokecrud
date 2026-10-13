@@ -14,6 +14,10 @@ import type {
 } from '../../../shared/data/dataset.types.js';
 import { familyOf } from '../../../shared/engine/candy.js';
 import {
+  type EvolutionOption,
+  evolutionOptions,
+} from '../../../shared/engine/evolution.js';
+import {
   defaultMoves,
   isSupportedMove,
 } from '../../../shared/engine/battle/moves.js';
@@ -72,6 +76,11 @@ export class SpawnsService {
   private readonly byType = new Map<TypeName, number[]>();
   /** Movimientos que el motor de combate v1 sabe ejecutar (F4-03): solo esos se asignan al capturar. */
   private readonly supportedMoves = new Set<number>();
+  /** Cadenas evolutivas, para el coste de evolucionar (F3-05, D-053). */
+  private readonly evolution = new Map<
+    number,
+    Pick<Species, 'id' | 'evolvesFrom' | 'evolvesTo' | 'evolutionChainId'>
+  >();
   private readonly tables = new Map<string, SpawnTable>();
 
   constructor(
@@ -112,6 +121,12 @@ export class SpawnsService {
           learnset: s.learnset,
           familyId: familyOf(s),
           types: s.types,
+        });
+        this.evolution.set(s.id, {
+          id: s.id,
+          evolvesFrom: s.evolvesFrom,
+          evolvesTo: s.evolvesTo,
+          evolutionChainId: s.evolutionChainId,
         });
         for (const t of s.types) {
           const ids = this.byType.get(t) ?? [];
@@ -215,6 +230,11 @@ export class SpawnsService {
       level,
       (id) => this.supportedMoves.has(id),
     );
+  }
+
+  /** Evoluciones posibles de una especie y su coste en caramelos (F3-05, D-053). */
+  evolutionOptions(speciesId: number): EvolutionOption[] {
+    return evolutionOptions(this.evolution, speciesId);
   }
 
   speciesDetails(speciesId: number): SpeciesDetails | undefined {

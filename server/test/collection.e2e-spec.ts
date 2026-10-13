@@ -6,9 +6,11 @@ import { Test } from '@nestjs/testing';
 import request from 'supertest';
 import type { Species } from '../../shared/data/dataset.types.js';
 import { type Stats, calcStats } from '../../shared/engine/battle/stats.js';
+import { combatPower } from '../../shared/engine/combat-power.js';
 import type { Nature } from '../../shared/engine/spawns.js';
 import { AppModule } from '../src/app.module.js';
 import { PrismaService } from '../src/prisma/prisma.service.js';
+import { SpawnsService } from '../src/spawns/spawns.service.js';
 import { TEST_DOMAIN, cleanupTestPlayers } from './support/cleanup.js';
 
 // e2e de la colección (F3-02a, D-052). Las capturas se insertan directamente en la base (la captura en sí se prueba
@@ -68,6 +70,7 @@ describe('Colección (e2e)', { timeout: 60_000 }, () => {
     n: number,
     over: (i: number) => Partial<{
       speciesId: number;
+      nickname: string | null;
       cp: number | null;
       shiny: boolean;
       favorite: boolean;
@@ -397,5 +400,134 @@ describe('Colección (e2e)', { timeout: 60_000 }, () => {
       .sort();
     expect(codes).toEqual([200, 404]);
     expect(await candyQty(p)).toBe(1);
+  });
+  // --- F3-05: evolucionar con caramelos (D-053) ---
+  const familyOfSpecies = (speciesId: number) =>
+    dataset.get(speciesId)!.evolutionChainId;
+  const seedOne = async (
+    p: Player,
+    speciesId: number,
+    candy: number,
+    extra: { nickname?: string; shiny?: boolean } = {},
+  ) => {
+    await seedCaught(p, 1, () => ({ speciesId, cp: 50, ...extra }));
+    if (candy > 0) {
+      await prisma.candy.create({
+        data: {
+          playerId: p.id,
+          familyId: familyOfSpecies(speciesId),
+          qty: candy,
+        },
+      });
+    }
+    return prisma.caughtPokemon.findFirstOrThrow({
+      where: { playerId: p.id },
+    });
+  };
+  const qtyOf = async (p: Player, speciesId: number) =>
+    (
+      await prisma.candy.findUnique({
+        where: {
+          playerId_familyId: {
+            playerId: p.id,
+            familyId: familyOfSpecies(speciesId),
+          },
+        },
+      })
+    )?.qty ?? 0;
+  const evolve = (p: Player | undefined, id: string, body: object) =>
+    as(p, http().post(`/collection/${id}/evolve`).send(body));
+
+  it('POST /collection/:id/evolve: Bulbasaur con 25 caramelos → Ivysaur; conserva lo suyo y recalcula stats y PC', async () => {
+    const p = await register();
+    const row = await seedOne(p, 1, 25, { nickname: 'Bulby', shiny: true });
+    const res = await evolve(p, row.id, { to: 2 }).expect(200);
+    const stats = calcStats(
+      dataset.get(2)!.baseStats,
+      row.ivs as unknown as Stats,
+      row.level,
+      row.nature as Nature,
+    );
+    expect(res.body).toMatchObject({
+      id: row.id,
+      speciesId: 2,
+      level: 10,
+      nickname: 'Bulby',
+      shiny: true,
+      nature: 'hardy',
+      ivs: row.ivs,
+      stats,
+      cp: combatPower(stats),
+      candy: { familyId: familyOfSpecies(1), qty: 0 },
+    });
+    const stored = await prisma.caughtPokemon.findUniqueOrThrow({
+      where: { id: row.id },
+    });
+    expect(stored.moves).toEqual(app.get(SpawnsService).defaultMoves(2, 10));
+    expect(stored.caughtAt).toEqual(row.caughtAt);
+    expect(await qtyOf(p, 1)).toBe(0);
+    const dex = await prisma.pokedexEntry.findUniqueOrThrow({
+      where: { playerId_speciesId: { playerId: p.id, speciesId: 2 } },
+    });
+    expect(dex.caught).toBe(true);
+    expect(dex.firstCaughtAt).not.toBeNull();
+  });
+
+  it('evolve: Eevee elige rama (Jolteon, 50 caramelos)', async () => {
+    const p = await register();
+    const row = await seedOne(p, 133, 50);
+    const res = await evolve(p, row.id, { to: 135 }).expect(200);
+    expect(res.body).toMatchObject({ speciesId: 135, candy: { qty: 0 } });
+  });
+
+  it('evolve: con un caramelo de menos → 409 y no cambia nada', async () => {
+    const p = await register();
+    const row = await seedOne(p, 1, 24);
+    const res = await evolve(p, row.id, { to: 2 }).expect(409);
+    expect(res.body.message).toBe('Te faltan caramelos');
+    expect(await qtyOf(p, 1)).toBe(24);
+    expect(
+      (await prisma.caughtPokemon.findUniqueOrThrow({ where: { id: row.id } }))
+        .speciesId,
+    ).toBe(1);
+  });
+
+  it('evolve: destino que no le toca o sin evolución → 400; de otro → 404; validación', async () => {
+    const p = await register();
+    const row = await seedOne(p, 1, 500);
+    await evolve(p, row.id, { to: 3 }).expect(400);
+    const tauros = await register();
+    const t = await seedOne(tauros, 128, 500);
+    await evolve(tauros, t.id, { to: 129 }).expect(400);
+    await evolve(await register(), row.id, { to: 2 }).expect(404);
+    await evolve(p, randomUUID(), { to: 2 }).expect(404);
+    for (const bad of [
+      {},
+      { to: 'dos' },
+      { to: 0 },
+      { to: 2.5 },
+      { to: 2, extra: 1 },
+    ]) {
+      await evolve(p, row.id, bad).expect(400);
+    }
+    await evolve(p, 'no-es-uuid', { to: 2 }).expect(400);
+    await evolve(undefined, row.id, { to: 2 }).expect(401);
+    expect(await qtyOf(p, 1)).toBe(500);
+  });
+
+  it('dos evoluciones a la vez del mismo Pokémon con 50 caramelos → una 200 y otra 409; gasta 25, no 50', async () => {
+    const p = await register();
+    const row = await seedOne(p, 1, 50);
+    const codes = (
+      await Promise.all([1, 2].map(() => evolve(p, row.id, { to: 2 })))
+    )
+      .map((r) => r.status)
+      .sort();
+    expect(codes).toEqual([200, 409]);
+    expect(await qtyOf(p, 1)).toBe(25);
+    expect(
+      (await prisma.caughtPokemon.findUniqueOrThrow({ where: { id: row.id } }))
+        .speciesId,
+    ).toBe(2);
   });
 });
