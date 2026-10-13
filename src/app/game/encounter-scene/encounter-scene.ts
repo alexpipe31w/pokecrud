@@ -24,6 +24,11 @@ export const ENCOUNTER_FOV_DEG = 64;
 /** Puntos de una ráfaga (polvo al aterrizar, destello shiny; estrellas de la captura en F2-07). */
 export const BURST_COUNT = 28;
 export const BURST_S = 0.8;
+/**
+ * La bola en vuelo no se dibuja hasta estar a esta distancia por delante: sale del plano de la cámara y, pegada a
+ * ella, tapaba la pantalla entera. Así entra desde abajo, desde la mano (como en Pokémon GO). Solo visual.
+ */
+export const BALL_SHOW_FWD = 0.35;
 
 const horizon = new THREE.Vector3();
 const boxTmp = new THREE.Box3();
@@ -69,6 +74,8 @@ export class EncounterScene {
   private mixer: THREE.AnimationMixer | null = null;
   private lastAnimT = Number.NaN;
   private spinY = 0;
+  /** Caja del modelo EN REPOSO en el sistema de los pies (sin saltos ni respiración): la de la ficha (F2-13). */
+  private readonly restBox = new THREE.Box3();
   private readonly shadowTex: THREE.Texture;
   private readonly glowTex: THREE.Texture;
   private aspect = 1;
@@ -147,7 +154,16 @@ export class EncounterScene {
    * reproduce en bucle su primera animación (si trae) y enciende la luz que necesitan sus materiales.
    */
   setModel({ scene: gltf, clips }: PokemonModel): void {
-    const box = new THREE.Box3().setFromObject(gltf);
+    if (clips.length) {
+      this.mixer = new THREE.AnimationMixer(gltf);
+      this.mixer.clipAction(clips[0]).play();
+      this.mixer.update(0); // se mide en la pose de su animación, que es la que se ve
+    }
+    // Se mide lo que SE DIBUJA: en los modelos con huesos la geometría en reposo no dice dónde está (Pikachu salía
+    // flotando 14 cm). `precise` aplica los huesos, que necesitan sus matrices al día.
+    gltf.updateMatrixWorld(true);
+    gltf.traverse((o) => (o as THREE.SkinnedMesh).skeleton?.update());
+    const box = new THREE.Box3().setFromObject(gltf, true);
     const size = box.getSize(new THREE.Vector3());
     if (size.y <= 0) return; // modelo vacío: se queda el plano
     const k = this.heightM / size.y;
@@ -164,11 +180,11 @@ export class EncounterScene {
     this.anchor.add(pivot);
     this.model = pivot;
     this.aspect = size.x / size.y;
+    this.restBox.set(
+      new THREE.Vector3((-size.x * k) / 2, 0, (-size.z * k) / 2),
+      new THREE.Vector3((size.x * k) / 2, this.heightM, (size.z * k) / 2),
+    );
     this.body.visible = false;
-    if (clips.length) {
-      this.mixer = new THREE.AnimationMixer(gltf);
-      this.mixer.clipAction(clips[0]).play();
-    }
     // La hemisférica ya está (F2-05, para la bola); el modelo necesita además una direccional que marque volumen.
     if (!this.scene.getObjectsByProperty('isDirectionalLight', true).length) {
       const sun = new THREE.DirectionalLight(0xffffff, 1.8);
@@ -228,8 +244,14 @@ export class EncounterScene {
     if (!this.placed) return null;
     this.anchor.updateMatrixWorld(true);
     this.camera.updateMatrixWorld();
-    boxTmp.setFromObject(this.model ?? this.body);
-    if (boxTmp.isEmpty()) return null;
+    // En reposo (sin saltos ni respiración): si no, la ficha subiría y bajaría con él (Alex lo vio).
+    if (this.model) boxTmp.copy(this.restBox);
+    else {
+      const half = (this.heightM * this.aspect) / 2;
+      boxTmp.min.set(-half, 0, 0);
+      boxTmp.max.set(half, this.heightM, 0);
+    }
+    boxTmp.applyMatrix4(this.anchor.matrixWorld);
     let left = Infinity;
     let top = Infinity;
     let right = -Infinity;
@@ -400,6 +422,7 @@ export class EncounterScene {
       fz * p.fwd - Math.sin(yaw) * p.lat,
     );
     this.ball.rotation.set(-spin, 0, 0);
+    this.ball.visible = p.fwd >= BALL_SHOW_FWD;
   }
 
   dispose(): void {

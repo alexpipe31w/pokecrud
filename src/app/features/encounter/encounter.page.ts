@@ -59,6 +59,7 @@ import { HapticsService } from '../../services/game/haptics.service';
 import { SettingsService } from '../../services/game/settings.service';
 import { GameButtonComponent } from '../../shared/ui/game-button.component';
 import { GlassPanelComponent } from '../../shared/ui/glass-panel.component';
+import { cardSpot } from './card-spot';
 import { EncounterCardComponent } from './encounter-card.component';
 import { EncounterHudComponent } from './encounter-hud.component';
 import { ThrowDockComponent, type ThrowIntent } from './throw-dock.component';
@@ -194,6 +195,7 @@ const prefersReducedMotion = (): boolean =>
               <p class="note toast" role="status">{{ t }}</p>
             }
             <app-throw-dock
+              #dock
               class="dock"
               [ball]="ball()"
               [berry]="berry()"
@@ -291,7 +293,7 @@ const prefersReducedMotion = (): boolean =>
       position: absolute;
       top: 0;
       left: 0;
-      width: min(220px, 58vw);
+      width: min(300px, calc(100vw - 32px));
     }
     .note {
       align-self: center;
@@ -333,6 +335,7 @@ export class EncounterPage implements OnDestroy {
   private readonly canvasEl = viewChild.required<ElementRef<HTMLCanvasElement>>('canvas');
   private readonly flashEl = viewChild.required<ElementRef<HTMLElement>>('flash');
   private readonly cardEl = viewChild('card', { read: ElementRef<HTMLElement> });
+  private readonly dockEl = viewChild('dock', { read: ElementRef<HTMLElement> });
 
   protected readonly phase = signal<Phase>('loading');
   protected readonly view = signal<EncounterView | null>(null);
@@ -719,9 +722,8 @@ export class EncounterPage implements OnDestroy {
   }
 
   /**
-   * Pone la ficha al lado del Pokémon (a su derecha, si no cabe a su izquierda) a la altura de su cabeza; si no cabe a
-   * ningún lado o no se le ve (en AR mirando a otra parte), bajo la cabecera. Escribe el estilo directamente: cada
-   * fotograma por signals repintaría Angular 60 veces por segundo.
+   * Pone la ficha donde no tape al Pokémon (`cardSpot`: a un lado, encima o debajo). Escribe el estilo directamente:
+   * cada fotograma por signals repintaría Angular 60 veces por segundo.
    */
   private placeCard(world: EncounterScene): void {
     const el = this.cardEl()?.nativeElement;
@@ -729,19 +731,14 @@ export class EncounterPage implements OnDestroy {
     const stage = this.stageEl().nativeElement;
     const w = stage.clientWidth;
     const h = stage.clientHeight;
-    const cw = el.offsetWidth;
-    const ch = el.offsetHeight;
-    const gap = 8;
-    const minTop = 120; // bajo la cabecera (huir, placa, AR y ficha)
-    const box = world.screenBox(w, h);
-    let x = (w - cw) / 2;
-    let y = minTop;
-    if (box && w - box.right >= cw + gap * 2) x = box.right + gap;
-    else if (box && box.left >= cw + gap * 2) x = box.left - cw - gap;
-    if (box && x !== (w - cw) / 2) y = box.top;
-    y = Math.min(Math.max(y, minTop), Math.max(minTop, h - ch - 72));
-    el.style.transform = `translate(${Math.round(x)}px, ${Math.round(y)}px)`;
+    const dockTop = this.dockEl()?.nativeElement.getBoundingClientRect().top;
+    const spot = cardSpot(world.screenBox(w, h), w, h, el.offsetWidth, el.offsetHeight, {
+      minTop: 156, // bajo la cabecera y el aviso de cámara/giroscopio
+      maxBottom: (dockTop ?? h) - 8, // sin meterse en la zona de la mano
+    });
+    el.style.transform = `translate(${spot.x}px, ${spot.y}px)`;
   }
+
 
   private async openCamera(): Promise<void> {
     const stream = await this.camera.open();
