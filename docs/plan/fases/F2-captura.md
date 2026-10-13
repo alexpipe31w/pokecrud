@@ -2087,7 +2087,7 @@ encuentro, sin acumular.
 
 **Files:** Create `src/app/game/encounter-scene/pokemon-motion.ts`, Test `pokemon-motion.spec.ts`
 
-- [ ] **2a. Test que falla:**
+- [x] **2a. Test que falla:**
 
 ```ts
 import {
@@ -2163,7 +2163,7 @@ describe('landingAt', () => {
 });
 ```
 
-- [ ] **2b.** → FALLA. **2c. Implementación:**
+- [x] **2b.** → FALLA. **2c. Implementación:**
 
 ```ts
 import { createRng } from '@shared/engine/rng';
@@ -2259,7 +2259,7 @@ function activeJump(tMs: number, jumps: readonly number[]): number | null {
 }
 ```
 
-- [ ] **2d.** → PASA (8 tests). Commit `F2-04b: aterrizaje, respiración y saltos del Pokémon` + push.
+- [x] **2d.** → PASA (8 tests). Commit `F2-04b: aterrizaje, respiración y saltos del Pokémon` + push.
 
 ### Paso 3 — Partículas por tipo
 
