@@ -287,7 +287,7 @@
       **Hecho:** plan de F3-02a, F3-02b y F3-03 con contrato, código y tests (TDD). F3-02 partida en a/b.
 - [ ] **F3-01b · Plan de F3 (parte 2): Pokédex, evolución y CRUD del curso** — mismo archivo: F3-04, F3-05, F3-06.
       Dep: F3-01a.
-- [ ] **F3-02a · Colección en el servidor (URGENTE)** — al capturar se guarda el PC, +3 caramelos por familia y la
+- [~] **F3-02a · Colección en el servidor (URGENTE)** (@samuel, 2026-10-13) — al capturar se guarda el PC, +3 caramelos por familia y la
       Pokédex; abrir un encuentro marca "visto"; `GET /collection` (cursor, orden, filtros) y `GET /pokedex`; script que
       recupera lo capturado antes. **Migración + script en Supabase ANTES de mezclar.** Plan: `fases/F3-coleccion.md`.
       Dep: F3-01a.
