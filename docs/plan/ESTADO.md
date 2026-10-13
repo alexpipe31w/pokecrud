@@ -204,7 +204,8 @@ F2-07, F2-12, F2-13, F2-15 hechas; faltan **F2-11**/**F2-14** (ARCore), F2-10 (m
 
 - **F3-06b (Samuel, rama `feature/F3-06b-equipos`):** equipos con Pokémon capturados (D-054, migración `team_caught`).
   Punto de guardado: paso 1 hecho (migración `20261013020000_team_caught` aplicada SOLO en el Postgres local; e2e 93).
-  Sigue el paso 2 (app `/equipos`). La migración va a Supabase ANTES de mezclar (Samuel dio permiso).
+  Paso 2 hecho (`/equipos` + editor, app 495). Sigue el paso 3: navegador, Postman y migración en Supabase ANTES de
+  mezclar (Samuel dio permiso).
 - **Ojo:** el inventario de IS-11 está ahora en `/inventario` (la Pokédex 1025 ocupa `/pokedex`).
 
 ### PRUEBAS EN EL MÓVIL PENDIENTES (con el APK de producción, `npm run apk -- --install`)

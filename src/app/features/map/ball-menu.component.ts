@@ -8,6 +8,7 @@ import {
   flashOutline,
   gameControllerOutline,
   logOutOutline,
+  peopleOutline,
   sparklesOutline,
   storefrontOutline,
 } from 'ionicons/icons';
@@ -59,6 +60,9 @@ const DRAG_CLOSE_PX = 80;
       <div class="grip" aria-hidden="true"></div>
       <button #first type="button" (click)="go('/coleccion')">
         <ion-icon name="albums-outline" aria-hidden="true" />Mis Pokémon
+      </button>
+      <button type="button" (click)="go('/equipos')">
+        <ion-icon name="people-outline" aria-hidden="true" />Equipos
       </button>
       <button type="button" (click)="go('/pokedex')">
         <ion-icon name="book-outline" aria-hidden="true" />Pokédex
@@ -210,6 +214,7 @@ export class BallMenuComponent {
       flashOutline,
       gameControllerOutline,
       logOutOutline,
+      peopleOutline,
       sparklesOutline,
       storefrontOutline,
     });

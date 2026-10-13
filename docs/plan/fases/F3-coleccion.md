@@ -1334,7 +1334,7 @@ juego (DISENO §1-§4) sin cambiar su contrato ni sus servicios (`PokemonService
   jugador (`count where id in … and playerId` = longitud) → si no, 400 "Hay Pokémon que no son tuyos"; al transferir un
   Pokémon (F3-03) se quita de los equipos que lo tengan (misma transacción del `DELETE /collection/:id`). e2e: crear con
   3 propios; con uno ajeno → 400; con 7 → 400; transferir uno → desaparece del equipo; Postman sin cambios sigue pasando.
-- [ ] **2. App:** `/equipos` (menú de la Poké Ball): lista de equipos con los 6 huecos (arte de cada capturado, PC);
+- [x] **2. App:** `/equipos` (menú de la Poké Ball): lista de equipos con los 6 huecos (arte de cada capturado, PC);
   crear/renombrar/borrar; editor que elige de "Mis Pokémon" (reutilizar `app-collection-card` en modo selección, máx. 6,
   sin repetir). Vacía diseñada ("Arma tu primer equipo").
 - [ ] **3.** Tests, lint, build, capturas `F3-06b_*`. REGLA 2.

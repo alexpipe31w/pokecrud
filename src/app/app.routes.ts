@@ -9,6 +9,8 @@ import { adminGuard, authGuard, guestGuard } from './core/auth/auth.guard';
  *  /mapa              → Mapa: pantalla principal del juego (F1-04, exige sesión). "" y rutas desconocidas → aquí
  *  /coleccion         → Mis Pokémon: lo capturado, con orden y filtros (F3-02b, exige sesión)
  *  /coleccion/:id     → Ficha de un Pokémon capturado (F3-03, exige sesión)
+ *  /equipos           → Mis equipos (hasta 6 Pokémon capturados; F3-06b, exige sesión)
+ *  /equipos/nuevo     → Crear un equipo · /equipos/:id → editarlo o borrarlo
  *  /pokedex           → Pokédex de las 1025 especies: vistos/capturados por generación (F3-04, exige sesión)
  *  /pokedex/:id       → Ficha de una especie (F3-04, exige sesión)
  *  /inventario        → Inventario de la tienda (IS-11; pública). /tabs/pokedex → redirige aquí (enlaces viejos)
@@ -94,6 +96,21 @@ export const routes: Routes = [
     canActivate: [authGuard],
     loadComponent: () =>
       import('./features/collection/collection-detail.page').then((m) => m.CollectionDetailPage),
+  },
+  {
+    path: 'equipos',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/teams/teams.page').then((m) => m.TeamsPage),
+  },
+  {
+    path: 'equipos/nuevo',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/teams/team-editor.page').then((m) => m.TeamEditorPage),
+  },
+  {
+    path: 'equipos/:id',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/teams/team-editor.page').then((m) => m.TeamEditorPage),
   },
   {
     path: 'pokedex',

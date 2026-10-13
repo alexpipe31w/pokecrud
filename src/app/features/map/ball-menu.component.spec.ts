@@ -71,7 +71,7 @@ describe('BallMenuComponent', () => {
     expect(ball().getAttribute('aria-expanded')).toBe('true');
   });
 
-  it('Pokédex, Inventario y Combate de prueba navegan y cierran el menú', () => {
+  it('Pokédex, Inventario, Combate de prueba y Equipos navegan y cierran el menú', () => {
     openMenu();
     item('Pokédex').click();
     expect(router.navigateByUrl).toHaveBeenCalledWith('/pokedex');
@@ -84,6 +84,10 @@ describe('BallMenuComponent', () => {
     openMenu();
     item('Combate de prueba').click();
     expect(router.navigateByUrl).toHaveBeenCalledWith('/combate/prueba');
+    fixture.detectChanges();
+    openMenu();
+    item('Equipos').click();
+    expect(router.navigateByUrl).toHaveBeenCalledWith('/equipos');
   });
 
   it('Joystick: con GPS lo activa en la posición actual; en joystick vuelve al GPS', () => {

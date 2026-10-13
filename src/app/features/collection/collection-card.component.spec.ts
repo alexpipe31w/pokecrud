@@ -68,4 +68,23 @@ describe('CollectionCardComponent', () => {
     f.detectChanges();
     expect(img.getAttribute('src')).toBe(spriteUrls(25)[1]);
   });
+  it('modo selección (F3-06b): es un botón con aria-pressed que emite al pulsarlo, sin enlace', () => {
+    const { el, f } = render(item());
+    f.componentRef.setInput('selectable', true);
+    f.componentRef.setInput('selected', true);
+    f.detectChanges();
+    const toggled: string[] = [];
+    f.componentInstance.toggled.subscribe((id: string) => toggled.push(id));
+    expect(el.querySelector('a')).toBeNull();
+    const btn = el.querySelector('button')!;
+    expect(btn.getAttribute('aria-pressed')).toBe('true');
+    expect(btn.getAttribute('aria-label')).toContain('Pikachu');
+    btn.click();
+    expect(toggled).toEqual(['c1']);
+    f.componentRef.setInput('selected', false);
+    f.componentRef.setInput('disabled', true);
+    f.detectChanges();
+    expect(btn.getAttribute('aria-pressed')).toBe('false');
+    expect(btn.disabled).toBe(true);
+  });
 });
