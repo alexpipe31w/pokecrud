@@ -1192,7 +1192,7 @@ export class EncounterApiService {
 
 **Files:** Modify `src/app/services/game/settings.service.ts`, `settings.service.spec.ts`
 
-- [ ] **8a.** Test (añadir `arEnabled: true` a lo esperado en "arranca con los valores por defecto") y código:
+- [x] **8a.** Test (añadir `arEnabled: true` a lo esperado en "arranca con los valores por defecto") y código:
 
 ```diff
 --- a/src/app/services/game/settings.service.spec.ts
@@ -1225,7 +1225,7 @@ export class EncounterApiService {
  /** Preferencias del jugador (no sensibles) persistidas en localStorage. */
 ```
 
-- [ ] **8b.** `npx ng test --include=src/app/services/game/settings.service.spec.ts --watch=false` → PASA (4). Commit + push.
+- [x] **8b.** `npx ng test --include=src/app/services/game/settings.service.spec.ts --watch=false` → PASA (4). Commit + push.
 
 ### Paso 9 — Cabecera del encuentro
 
