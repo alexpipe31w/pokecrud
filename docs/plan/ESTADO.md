@@ -3,15 +3,49 @@
 > Se **reescribe** al cerrar cada sesión (no es histórico; el histórico es `BITACORA.md`).
 > Máximo una pantalla. Si lees esto al empezar: después lee `ROADMAP.md`.
 
-**Última actualización:** 2026-10-12 noche · por Kenneth (Claude) · F2-01 mezclado (PR #48); F2-02 en PR
+**Última actualización:** 2026-10-12 noche · por Kenneth (Claude) · `develop` (F2-01 y F2-02 mezclados, PR #48 y #49)
 
-**Kenneth (2026-10-12, noche), en paralelo al relevo de abajo:** hechos **F2-01** (spike de cámara + giroscopio en
-el Samsung A36, D-045) y **F2-02** (plan de F2 en `docs/plan/fases/F2-captura.md`, D-046), y comprobado que el APK ya
-**no** saca el refresh token en logcat. **Siguiente de la AR: F2-04a** (necesita Android). El plan trae TODO el código
-y sus tests ya verificados: ejecutarlo es seguir los pasos y probar en el móvil. Samuel: lo tuyo sigue igual (7b y
-3b), y si puedes, abre `/dev/ar` en tu Redmi para comprobar el campo de visión (ver "PENDIENTES DE HUMANOS").
+## 👉 RELEVO DE KENNETH A ALEX (2026-10-12, noche)
 
-## 👉 RELEVO DE ALEX A SAMUEL (2026-10-12, noche)
+Todo mezclado en `develop` con el CI en verde (PR #48 y #49):
+
+1. **F2-01 · spike de cámara + giroscopio (PR #48, D-045)**, medido en el Samsung A36 con `/dev/ar`:
+   - `getUserMedia` funciona en el WebView → sin plugin nativo (camera-preview descartado).
+   - 60 fps con Pokémon + 400 partículas, 0 % tirones. El vídeo va a ~24 fps en interior (autoexposición): aceptado.
+   - **`facingMode: 'environment'` abre el GRAN ANGULAR en el A36**: hay que elegir "camera 0" por `deviceId`.
+   - Orientación con `RelativeOrientationSensor` (56 Hz, más suave); `deviceorientation` deja de llegar con el móvil
+     quieto. Calibrado a ojo: campo de visión vertical **64°** y retraso de la orientación **80 ms**.
+   - Sin WebXR en el WebView → AR solo de orientación (como el AR clásico de Pokémon GO).
+   - Cámara y sensores se sueltan al salir y en segundo plano; mapa ↔ AR ×3 sin perder el contexto WebGL (D-038).
+   - Sin permiso → fondo ilustrado. Un `<video>` vacío pinta un póster gris con "play": ocultarlo hasta su 1.er fotograma.
+   - Código reutilizable: `src/app/game/encounter-scene/device-pose.ts` y `pose-delay.ts`.
+2. **Seguridad del APK (#47):** comprobado en el A36 → logcat ya NO saca el refresh token (ver PENDIENTES).
+3. **F2-02 · plan de F2 (PR #49, D-046):** `docs/plan/fases/F2-captura.md` con F2-04a, F2-04b, F2-05 y F2-07 (F2-04
+   partida en a/b). **Todo su código se escribió y se probó capa a capa antes de subir el plan** y luego se borró:
+   estado final app 393 tests, shared 143, servidor 22, lint y build OK; los diffs del plan aplicados en orden dan ese
+   código byte a byte. Ejecutarlo = seguir los pasos con TDD copiando el código; lo único sin probar es el móvil.
+   D-046: la app solo decide si la bola TOCA; el servidor todo lo demás; **fallar no llama al servidor ni gasta**; el
+   mismo gesto vale a 2 m o a 12 m; curva = girar el dedo ~1 vuelta alrededor de la bola; el aro es la zona real que
+   cuenta; la animación de captura empieza al golpear y tapa lo que tarda Render.
+
+**Cómo empezar:** `/inicio` (y `npm install` en la raíz y en `server/`; no cambiaron dependencias). Leer D-045 y D-046.
+Del plan, solo la cabecera ("Antes de empezar") y la sección de tu tarea (~6.400 líneas porque trae todo el código).
+
+**Siguiente tarea: F2-04a · escena del encuentro en AR (base).** Pasos 1-11: código y tests copiados del plan (al
+acabar: lint OK, build OK, 62 archivos / 306 tests). El paso 12 necesita un Android (el A36 de Kenneth o el Redmi de
+Samuel): ≥ 55 fps, cámara principal, mapa ↔ encuentro ×3, AR apagada y sin permiso; si no hay móvil, el 12 a
+PENDIENTES y la tarea en `[~]`. Después: F2-04b → F2-05 → F2-07 (cada una su rama y su PR).
+
+**Trucos:** a `/dev/ar` (el spike, sigue para medir otros móviles) no hay botón: por CDP,
+`adb forward tcp:9222 localabstract:webview_devtools_remote_<pid>` y en la consola
+`history.pushState({}, '', '/dev/ar'); dispatchEvent(new PopStateEvent('popstate', { state: {} }))`. Capturas del
+móvil con `adb exec-out screencap -p > captura.png` (por CDP no salen ni WebGL ni la cámara). Para abrir un encuentro
+sin salir a la calle: joystick (menú de la Poké Ball) hasta ≤ 40 m de un Pokémon y tocarlo.
+
+**Samuel, lo tuyo sigue igual:** 7b de F1-07 y 3b de F1-05 con tu Redmi, y si puedes, abre `/dev/ar` en el Redmi para
+comprobar el campo de visión (en el A36 fue 64°; ver PENDIENTES).
+
+## RELEVO DE ALEX A SAMUEL (2026-10-12, noche)
 
 Hoy (Alex) quedó todo mezclado en `develop` con el CI en verde (PR #38-#46):
 F1-05 avatar 3D · F1-07 Pokémon en el mapa (hierba, grito por cercanía, toque → `/encuentro/:id` provisional) ·
@@ -170,7 +204,7 @@ fórmula (F2-03), captura en servidor (F2-06), audio (F2-08), **spike de cámara
 
 ## En curso
 
-- Nadie (Kenneth cerró F2-02; PR abierto a `develop`). F1-05 (3b) y F1-07 (7b) solo esperan la prueba en Android.
+- Nadie (F2-02 mezclado, PR #49). F1-05 (3b) y F1-07 (7b) solo esperan la prueba en Android.
 
 ## Siguiente paso concreto
 
