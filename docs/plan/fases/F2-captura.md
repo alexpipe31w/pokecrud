@@ -2441,7 +2441,7 @@ Puntos redondos con una `DataTexture` (sin canvas, D-038) en mezcla aditiva: el 
 
 **Files:** Modify `src/app/game/encounter-scene/encounter-scene.ts`, `encounter-scene.spec.ts`
 
-- [ ] **5a. Tests** (añadir al spec):
+- [x] **5a. Tests** (añadir al spec):
 
 ```diff
 --- a/src/app/game/encounter-scene/encounter-scene.spec.ts
@@ -2515,7 +2515,7 @@ Puntos redondos con una `DataTexture` (sin canvas, D-038) en mezcla aditiva: el 
  });
 ```
 
-- [ ] **5b.** → FALLAN (no existen `setFx`, `startBurst`, `animate`, `BURST_*`). **5c. Implementación:**
+- [x] **5b.** → FALLAN (no existen `setFx`, `startBurst`, `animate`, `BURST_*`). **5c. Implementación:**
 
 ```diff
 --- a/src/app/game/encounter-scene/encounter-scene.ts
@@ -2709,7 +2709,7 @@ Puntos redondos con una `DataTexture` (sin canvas, D-038) en mezcla aditiva: el 
 +  p.geometry.getAttribute(name) as THREE.BufferAttribute;
 ```
 
-- [ ] **5d.** `npx ng test --include=src/app/game/encounter-scene/encounter-scene.spec.ts --watch=false` → PASA (12). Commit + push.
+- [x] **5d.** `npx ng test --include=src/app/game/encounter-scene/encounter-scene.spec.ts --watch=false` → PASA (12). Commit + push.
 
 ### Paso 6 — Sonidos de la entrada
 

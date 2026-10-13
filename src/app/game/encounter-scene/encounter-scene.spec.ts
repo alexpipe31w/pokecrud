@@ -1,6 +1,17 @@
 import * as THREE from 'three';
 import { EYE_HEIGHT_M, encounterDistance } from './encounter-layout';
-import { EncounterScene, blobTexture } from './encounter-scene';
+import { BURST_COUNT, BURST_S, EncounterScene, blobTexture } from './encounter-scene';
+import { FX_COUNT } from './type-fx';
+
+const ys = (p: THREE.Points, n: number) =>
+  Array.from({ length: n }, (_, i) => p.geometry.getAttribute('position').getY(i));
+const radii = (p: THREE.Points, n: number) =>
+  Array.from({ length: n }, (_, i) =>
+    Math.hypot(
+      p.geometry.getAttribute('position').getX(i),
+      p.geometry.getAttribute('position').getZ(i),
+    ),
+  );
 
 describe('EncounterScene', () => {
   it('no se ve hasta colocarlo; colocado está en el suelo, delante, a su distancia', () => {
@@ -88,5 +99,48 @@ describe('EncounterScene', () => {
     s.setTexture(new THREE.Texture({ width: 512, height: 256 } as unknown as HTMLImageElement));
     expect(s.artAspect).toBe(2);
     s.dispose();
+  });
+
+  it('partículas del tipo: ocultas hasta setFx, se mueven con animate y se apagan con null', () => {
+    const s = new EncounterScene(1);
+    expect(s.fx.visible).toBe(false);
+    s.setFx('rise', '#ee8130');
+    expect(s.fx.visible).toBe(true);
+    s.animate(0.2);
+    const before = ys(s.fx, FX_COUNT);
+    s.animate(0.9);
+    expect(ys(s.fx, FX_COUNT)).not.toEqual(before);
+    s.setFx(null);
+    expect(s.fx.visible).toBe(false);
+    s.dispose();
+  });
+
+  it('ráfaga de polvo: por el suelo, se abre y desaparece a los BURST_S', () => {
+    const s = new EncounterScene(1);
+    s.startBurst(1, '#ffffff', false);
+    s.animate(1.1);
+    expect(Math.max(...ys(s.burst, BURST_COUNT))).toBeLessThan(0.15);
+    const early = Math.max(...radii(s.burst, BURST_COUNT));
+    s.animate(1.6);
+    expect(Math.max(...radii(s.burst, BURST_COUNT))).toBeGreaterThan(early);
+    s.animate(1 + BURST_S + 0.01);
+    expect(s.burst.visible).toBe(false);
+    s.dispose();
+  });
+
+  it('destello shiny: las chispas suben por encima de medio cuerpo', () => {
+    const s = new EncounterScene(1);
+    s.startBurst(0, '#ffcb3d', true);
+    s.animate(0.6);
+    expect(Math.max(...ys(s.burst, BURST_COUNT))).toBeGreaterThan(0.5);
+    s.dispose();
+  });
+
+  it('el punto de luz de las partículas es blanco y opaco en el centro', () => {
+    const tex = blobTexture(9, 255, 255);
+    const at = (x: number, y: number, c: number) => tex.image.data![(y * 9 + x) * 4 + c];
+    expect([at(4, 4, 0), at(4, 4, 3)]).toEqual([255, 255]);
+    expect(at(0, 4, 3)).toBe(0);
+    tex.dispose();
   });
 });
