@@ -221,8 +221,8 @@ F2-07, F2-12, F2-13, F2-15 hechas; faltan **F2-11**/**F2-14** (ARCore), F2-10 (m
 ## En curso
 
 - **F5-04 (Samuel, rama `feature/F5-04-combate-pvp`, `[~]`):** combate PvP completo EN CÓDIGO (pasos 1-5) y probado con
-  dos cuentas en el navegador. **Falta:** (1) migración `20261013030000_battle` en Supabase ANTES de mezclar (permiso del
-  humano); (2) mezclar → Render; (3) el criterio: combate entre DOS MÓVILES con el APK de producción, en vídeo
+  dos cuentas en el navegador. Migración `battle` **ya aplicada en Supabase**. **Falta:** (1) mezclar el PR → Render;
+  (2) el criterio: combate entre DOS MÓVILES con el APK de producción, en vídeo
   (`docs/evidencias/F5-04_*`). Punto de guardado: todo subido; nada a medias en el código.
 - Cuentas de prueba locales: `demo+alex@pokecrud.test` y `demo+rival@pokecrud.test` (contraseña: pídesela a Alex; no va en el repo), con equipo "Arena" de 3. `test:e2e` las borra pasada 1 h: se recrean registrándolas y con el script de la bitácora de F5-03.
 - Samuel cerró **F3-06c** (#73 mezclado; sin migración). **Con esto la F3 está completa en código.**
@@ -269,6 +269,12 @@ F2-07, F2-12, F2-13, F2-15 hechas; faltan **F2-11**/**F2-14** (ARCore), F2-10 (m
 - [x] Añadir **`SPAWN_SALT`** en Render (≥ 32 caracteres aleatorios, propia de Render). (2026-10-12)
 - [x] ~~Manual Deploy tras cada mezcla~~: no hace falta, Render despliega solo al cambiar `develop` (comprobado).
 - [x] Su `server/.env`: puerto 6543, `JWT_SECRET` y `SPAWN_SALT` propios. (2026-10-12)
+
+**Quien haga F5-04:**
+
+- [x] (Samuel, 2026-10-13) Migración `20261013030000_battle` en Supabase ANTES de mezclar (tabla vacía, CHECKs e índices).
+- [ ] **Dos móviles con el APK de producción:** combate entero grabado en vídeo (criterio de F5-04), también desconectar
+      uno y volver, y dejar correr el tiempo. Marcar F5-04 `[x]`.
 
 **Quien haga F3-06b:**
 

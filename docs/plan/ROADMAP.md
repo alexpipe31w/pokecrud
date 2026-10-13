@@ -409,7 +409,8 @@
       remoto de `BattleController`, `PvpBattleSession`, `/pvp/combate` y "¡A combatir!" en el cara a cara. D-058.
       Servidor e2e 114, unitarios 64; app 558; shared 178. Dos cuentas en el navegador: combate entero, cambio forzado,
       tiempo agotado, desconexión y vuelta, rendirse (`F5-04_0{1..9}_*`).
-      **Falta:** (1) migración `20261013030000_battle` en Supabase ANTES de mezclar (con permiso); (2) el criterio:
+      **Migración `battle` YA aplicada en Supabase** (2026-10-13, permiso de Samuel; tabla vacía, CHECKs e índices).
+      **Falta** el criterio:
       combate entre DOS MÓVILES REALES (APK de producción contra Render) grabado en vídeo.
 - [ ] **F5-05 · Espectadores.** Dep: F5-04.
 

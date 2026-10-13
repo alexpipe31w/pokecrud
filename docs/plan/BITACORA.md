@@ -1890,7 +1890,9 @@ battle-dock.component}.ts`, `src/app/features/pvp/{pvp.page,pvp-versus.component
       inactive y abandon (una sin ganador); errores de consola: 0 y 0
     Evidencias docs/evidencias/F5-04_0{1..9}_*.png
 
-**Quedó a medias:** (1) migración `battle` en Supabase (pedir permiso); (2) vídeo con dos móviles (criterio).
+**Quedó a medias:** vídeo con dos móviles (criterio). La migración `battle` se aplicó en Supabase después (permiso de
+Samuel): `migrate status` → solo faltaba `battle`; `deploy` → applied; `migrate diff` → vacía; tabla vacía con
+`battle_reason`, `winner_is_player` y los índices `(p1Id, endedAt)` y `(p2Id, endedAt)`.
 **Decisiones nuevas:** D-058.
 **El siguiente debe empezar por:** con permiso, `cd server && npx prisma migrate deploy` contra Supabase (comprobar antes
 con `prisma migrate status` que apunta a Supabase y que solo falta `battle`), PR de la rama, mezclar, `npm run apk` y
