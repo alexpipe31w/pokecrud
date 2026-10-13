@@ -196,7 +196,7 @@ F2-07, F2-12, F2-13, F2-15 hechas; faltan **F2-11**/**F2-14** (ARCore), F2-10 (m
 
 ## En curso
 
-- Nadie. F2-07 (Kenneth) mezclada (PR #61).
+- **F0-15 (Samuel, PR abierto):** hecha. Samuel sigue con **F3-01**.
 - F1-05 y F1-07 siguen `[~]` (@alex) SOLO por su prueba en la calle (PENDIENTES).
 
 ## Siguiente paso concreto

@@ -81,6 +81,14 @@
       **Hecho:** causa reproducida (compilar con la config previa a D-024 emite en `shared/`) y comprobado que Vitest usa
       el `.js` viejo en vez del `.ts`. `scripts/clean-shared-artifacts.mjs` en los ganchos pre* de raíz, `server/` y APK,
       y `.gitignore`. D-036.
+- [x] **F0-15 · Tests pesados de `shared/` sin tiempo propio** (@samuel, 2026-10-13) — en el PC de Samuel
+      `npm run test:shared` falla a veces por "Test timed out in 5000ms": las simulaciones de captura (40.000
+      lanzamientos), spawns y RNG tardan 3,6-7,3 s (en el CI van más rápido). Los de combate e IA ya llevan `120_000`.
+      Criterio: los tests de simulación llevan su tiempo propio (no el global, que escondería cuelgues de verdad) y
+      `test:shared` pasa 3 veces seguidas en el PC de Samuel.
+      **Hecho:** la lentitud eran los `expect` dentro de los bucles (hasta ~100.000 por test): ahora se apuntan los casos
+      malos y hay un solo `expect` con la lista (el fallo sigue diciendo cuáles; comprobado saboteando los IVs). Los 5
+      tests pasan de 1,3-7,3 s a 3-251 ms y llevan `SIMULATION_TIMEOUT_MS` (30 s) por si acaso. 147/147 ×3.
 
 ## F1 · Mapa con GPS
 
