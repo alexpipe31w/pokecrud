@@ -3,7 +3,7 @@
 > Se **reescribe** al cerrar cada sesión (no es histórico; el histórico es `BITACORA.md`).
 > Máximo una pantalla. Si lees esto al empezar: después lee `ROADMAP.md`.
 
-**Última actualización:** 2026-10-13 · por Samuel (Claude) · `develop` con #63…#71
+**Última actualización:** 2026-10-13 · por Samuel (Claude) · `develop` con #63…#72
 
 ## 👉 RELEVO DE KENNETH (2026-10-12 noche): pendientes de Android probados en el Samsung A36
 
@@ -60,7 +60,7 @@ F2-07, F2-12, F2-13, F2-15 hechas; faltan **F2-11**/**F2-14** (ARCore), F2-10 (m
 
 ## Hecho
 
-- **F3-06b (Samuel, rama `feature/F3-06b-equipos`, PR):** equipos con Pokémon capturados (D-054): `caughtIds`,
+- **F3-06b (Samuel, #72 mezclado):** equipos con Pokémon capturados (D-054): `caughtIds`,
   migración `team_caught` **aplicada en Supabase**, transferir los quita, `GET /collection?ids`; `/equipos` y editor.
   e2e 94, app 495, Postman 46/82/0. Evidencias `F3-06b_0{1..6}_*`.
 - **F3-06a (Samuel, #71 mezclado):** IS-11 con el sistema de diseño (D-055): tarjetas,
@@ -205,7 +205,8 @@ F2-07, F2-12, F2-13, F2-15 hechas; faltan **F2-11**/**F2-14** (ARCore), F2-10 (m
 
 ## En curso
 
-- Nadie. Samuel cerró **F3-06b** (PR a `develop`; migración `team_caught` YA aplicada en Supabase). Sigue F3-06c.
+- **F3-06c (Samuel, rama `feature/F3-06c-favoritos-personalizados`):** `/favoritos` y `/personalizados` con el sistema
+  de diseño. Punto de guardado: recién reclamada, empieza por el paso 1 (favoritos). F3-06b mezclado (#72).
 - **Ojo:** el inventario de IS-11 está ahora en `/inventario` (la Pokédex 1025 ocupa `/pokedex`).
 
 ### PRUEBAS EN EL MÓVIL PENDIENTES (con el APK de producción, `npm run apk -- --install`)
