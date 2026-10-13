@@ -1,6 +1,13 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, computed, inject, signal } from '@angular/core';
-import type { CollectionItem, CollectionPage, CollectionQuery } from '@shared/protocol/collection';
+import type {
+  CollectionDetail,
+  CollectionItem,
+  CollectionPage,
+  CollectionPatch,
+  CollectionQuery,
+  TransferResult,
+} from '@shared/protocol/collection';
 import { firstValueFrom, timeout } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
@@ -95,6 +102,29 @@ export class CollectionService {
   restoreItem(item: CollectionItem, index: number): void {
     this.items.update((list) => [...list.slice(0, index), item, ...list.slice(index)]);
     this.total.update((t) => (t === null ? t : t + 1));
+  }
+
+  /** `GET /collection/:id` (F3-03): la ficha completa. Lanza el error HTTP (la página lo enseña). */
+  detail(id: string): Promise<CollectionDetail> {
+    return firstValueFrom(this.http.get<CollectionDetail>(this.url(id)).pipe(timeout(TIMEOUT_MS)));
+  }
+
+  /** `PATCH /collection/:id` (F3-03): mote y favorito; la fila de la lista queda al día. */
+  async patch(id: string, body: CollectionPatch): Promise<CollectionItem> {
+    const item = await firstValueFrom(
+      this.http.patch<CollectionItem>(this.url(id), body).pipe(timeout(TIMEOUT_MS)),
+    );
+    this.patchItem(id, item);
+    return item;
+  }
+
+  /** `DELETE /collection/:id` (F3-03): transferir (+1 caramelo). Lo llama `TransferService` tras el "deshacer". */
+  transfer(id: string): Promise<TransferResult> {
+    return firstValueFrom(this.http.delete<TransferResult>(this.url(id)).pipe(timeout(TIMEOUT_MS)));
+  }
+
+  private url(id: string): string {
+    return `${environment.serverUrl}/collection/${encodeURIComponent(id)}`;
   }
 
   private async fetch(cursor: string | null, generation: number): Promise<void> {
