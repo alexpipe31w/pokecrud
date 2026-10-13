@@ -2421,7 +2421,7 @@ three.js no lee variables CSS: se lee el token al crear el material (lo usan la 
 
 **Files:** Create `src/app/game/encounter-scene/css-color.ts`
 
-- [ ] **4a.** Crear (se prueba a través de `ball-mesh.spec.ts` en F2-05: en jsdom devuelve el valor escrito):
+- [x] **4a.** Crear (se prueba a través de `ball-mesh.spec.ts` en F2-05: en jsdom devuelve el valor escrito):
 
 ```ts
 /**
