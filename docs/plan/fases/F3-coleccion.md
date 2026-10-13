@@ -1329,7 +1329,7 @@ juego (DISENO §1-§4) sin cambiar su contrato ni sus servicios (`PokemonService
 **conserva**; se añade `Team.caughtIds uuid[]` (≤ 6, ids de **tus** `CaughtPokemon`), que es lo que usará el combate
 (F4/F5). Así no se rompe el contrato del curso (D-019) y ARQUITECTURA §9 ("equipos con Pokémon capturados") se cumple.
 
-- [ ] **1. Servidor:** migración `team_caught` (`caughtIds UUID[] NOT NULL DEFAULT '{}'`, CHECK de cardinalidad ≤ 6);
+- [x] **1. Servidor:** migración `team_caught` (`caughtIds UUID[] NOT NULL DEFAULT '{}'`, CHECK de cardinalidad ≤ 6);
   DTO de `/teams` acepta `caughtIds` opcional (array de UUID únicos, ≤ 6) y el servicio comprueba que TODOS son del
   jugador (`count where id in … and playerId` = longitud) → si no, 400 "Hay Pokémon que no son tuyos"; al transferir un
   Pokémon (F3-03) se quita de los equipos que lo tengan (misma transacción del `DELETE /collection/:id`). e2e: crear con

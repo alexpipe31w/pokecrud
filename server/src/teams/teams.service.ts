@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { assertSameId, orderBy, pageArgs } from '../common/list-query.js';
 import { isNotFound } from '../common/prisma-errors.js';
 import { Prisma } from '../generated/prisma/client.js';
@@ -12,6 +16,10 @@ import {
 
 const DEFAULT_LIMIT = 50;
 const NOT_FOUND = 'Equipo no encontrado';
+const NOT_YOURS = 'Hay Pokémon que no son tuyos';
+/** Como la colección: esperar el bloqueo de una transferencia simultánea. */
+const TX_OPTIONS = { maxWait: 5_000, timeout: 10_000 };
+type Tx = Prisma.TransactionClient;
 /** El dueño nunca sale en la respuesta: mismo contrato que JSON Server. */
 const OMIT = { playerId: true } as const;
 export type TeamView = Prisma.TeamGetPayload<{ omit: typeof OMIT }>;
@@ -53,15 +61,19 @@ export class TeamsService {
   }
 
   create(playerId: string, dto: CreateTeamDto): Promise<TeamView> {
-    return this.prisma.team.create({
-      data: {
-        playerId,
-        name: dto.name,
-        description: dto.description ?? '',
-        pokemonIds: dto.pokemonIds,
-      },
-      omit: OMIT,
-    });
+    return this.prisma.$transaction(async (tx) => {
+      await this.assertOwned(tx, playerId, dto.caughtIds);
+      return tx.team.create({
+        data: {
+          playerId,
+          name: dto.name,
+          description: dto.description ?? '',
+          pokemonIds: dto.pokemonIds,
+          caughtIds: dto.caughtIds ?? [],
+        },
+        omit: OMIT,
+      });
+    }, TX_OPTIONS);
   }
 
   replace(
@@ -74,6 +86,7 @@ export class TeamsService {
       name: dto.name,
       description: dto.description ?? '',
       pokemonIds: dto.pokemonIds,
+      caughtIds: dto.caughtIds,
     });
   }
 
@@ -83,6 +96,7 @@ export class TeamsService {
       name: dto.name,
       description: dto.description,
       pokemonIds: dto.pokemonIds,
+      caughtIds: dto.caughtIds,
     });
   }
 
@@ -95,17 +109,40 @@ export class TeamsService {
     }
   }
 
+  /**
+   * Todos los `caughtIds` son capturas del jugador. Las filas quedan bloqueadas (FOR SHARE) hasta el final de la
+   * transacción: una transferencia simultánea espera y después quita el Pokémon de este equipo (D-054); si la
+   * transferencia llegó antes, aquí ya no está y se responde 400.
+   */
+  private async assertOwned(
+    tx: Tx,
+    playerId: string,
+    caughtIds: string[] | undefined,
+  ): Promise<void> {
+    if (!caughtIds?.length) return;
+    const rows = await tx.$queryRaw<{ id: string }[]>`
+      SELECT id FROM "CaughtPokemon"
+      WHERE id = ANY(${caughtIds}::uuid[]) AND "playerId" = ${playerId}::uuid
+      FOR SHARE`;
+    if (rows.length !== caughtIds.length) {
+      throw new BadRequestException(NOT_YOURS);
+    }
+  }
+
   private async update(
     playerId: string,
     id: number,
-    data: Prisma.TeamUpdateInput,
+    data: Prisma.TeamUpdateInput & { caughtIds?: string[] },
   ): Promise<TeamView> {
     try {
-      return await this.prisma.team.update({
-        where: { id, playerId },
-        data,
-        omit: OMIT,
-      });
+      return await this.prisma.$transaction(async (tx) => {
+        await this.assertOwned(tx, playerId, data.caughtIds);
+        return tx.team.update({
+          where: { id, playerId },
+          data,
+          omit: OMIT,
+        });
+      }, TX_OPTIONS);
     } catch (err) {
       if (isNotFound(err)) throw new NotFoundException(NOT_FOUND);
       throw err;
