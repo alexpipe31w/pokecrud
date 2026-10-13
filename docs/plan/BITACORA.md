@@ -1272,3 +1272,21 @@ falta (test ajustado). Arreglo de UX visto en el navegador: la bola agarrada pas
 **Decisiones nuevas:** ninguna (adaptaciones anotadas aquí).
 **El siguiente debe empezar por:** F2-07 (coreografía de captura) siguiendo `fases/F2-captura.md` → "F2-07"; sus diffs
 de la escena tocan `body` (absorción): aplicar lo mismo al modelo 3D (`model`), ver `fases/F2-12-pokemon-3d.md`.
+
+## 2026-10-13 00:20 · @alex (Claude) · arreglos vistos por Alex (F2-12/F2-13/F2-05) · rama `feature/F2-13-ficha-no-tapa`
+
+**Qué se hizo (Alex miraba la ventana del Chromium de pruebas):**
+1. **La ficha tapaba a Pikachu** → `card-spot.ts` (función pura con tests): a un lado, si no encima, si no debajo, sin
+   meterse en la cabecera ni en la mano; ficha más compacta (cuatro datos en una fila).
+2. **La ficha subía y bajaba al saltar** → `screenBox` usa la caja del Pokémon EN REPOSO (sin saltos ni respiración).
+3. **Los modelos con huesos flotaban** (Pikachu 14 cm, el aro y la sombra quedaban debajo) → se normaliza con lo que
+   se dibuja: `Box3.setFromObject(gltf, true)` con las matrices de los huesos al día y en la pose de su animación.
+4. **La bola 3D, al salir, tapaba la pantalla** (sale del plano de la cámara) → no se dibuja hasta 0,35 m por delante
+   (`BALL_SHOW_FWD`): entra desde abajo. Solo visual; la física no cambia.
+**Cómo se probó (salida real):** lint OK · build OK · ng test 73 archivos, 398 passed. Navegador 390×844 (cuenta
+f213b@pokecrud.test → "borradas 1"): Pikachu de pie en el suelo (pies a −0,005 m), aro centrado sobre él, ficha fija
+(top 215 px durante 6 s con saltos de 0,45 m) y debajo/encima sin taparlo; la bola entra desde abajo. Evidencia
+`F2-13_03_ficha-no-tapa.png`.
+**Ojo:** la ventana del Chromium de Playwright es más pequeña que la pantalla simulada (390×844) y corta la parte de
+abajo (la mano y las bolas): Alex creyó que no salían. Mirar las capturas, no la ventana.
+**El siguiente debe empezar por:** F2-07 (coreografía de captura), igual que decía la entrada anterior.

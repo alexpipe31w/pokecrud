@@ -1,6 +1,12 @@
 import * as THREE from 'three';
 import { EYE_HEIGHT_M, encounterDistance } from './encounter-layout';
-import { BURST_COUNT, BURST_S, EncounterScene, blobTexture } from './encounter-scene';
+import {
+  BALL_SHOW_FWD,
+  BURST_COUNT,
+  BURST_S,
+  EncounterScene,
+  blobTexture,
+} from './encounter-scene';
 import { FX_COUNT } from './type-fx';
 
 const ys = (p: THREE.Points, n: number) =>
@@ -334,6 +340,70 @@ describe('EncounterScene.screenBox (F2-13)', () => {
     s.placeAt(Math.PI); // detrás
     s.update(null);
     expect(s.screenBox(390, 844)).toBeNull();
+    s.dispose();
+  });
+});
+
+describe('EncounterScene: modelos con huesos y caja en reposo (arreglos F2-12/F2-13)', () => {
+  /** Malla con un hueso que la sube 5 m DESPUÉS de enlazarla: la geometría en reposo no dice dónde se dibuja. */
+  const skinnedModel = () => {
+    const geo = new THREE.BoxGeometry(1, 2, 1);
+    const n = geo.getAttribute('position').count;
+    geo.setAttribute('skinIndex', new THREE.Uint16BufferAttribute(new Array(n * 4).fill(0), 4));
+    geo.setAttribute(
+      'skinWeight',
+      new THREE.Float32BufferAttribute(Array.from({ length: n * 4 }, (_, i) => (i % 4 ? 0 : 1)), 4),
+    );
+    const mesh = new THREE.SkinnedMesh(geo, new THREE.MeshStandardMaterial());
+    const bone = new THREE.Bone();
+    mesh.add(bone);
+    mesh.bind(new THREE.Skeleton([bone]));
+    bone.position.y = 5;
+    return { scene: new THREE.Group().add(mesh) as THREE.Group, clips: [] };
+  };
+  /** Caja de lo que SE DIBUJA (con los huesos) en el sistema de los pies. */
+  const drawn = (s: EncounterScene) => {
+    s.anchor.updateMatrixWorld(true);
+    s.model!.traverse((o) => (o as THREE.SkinnedMesh).skeleton?.update());
+    const inv = s.anchor.matrixWorld.clone().invert();
+    return new THREE.Box3().setFromObject(s.model!, true).applyMatrix4(inv);
+  };
+
+  it('normaliza con lo que se dibuja: pies en el suelo y su altura real aunque los huesos la muevan', () => {
+    const s = new EncounterScene(0.4);
+    s.placeAt(0);
+    s.setModel(skinnedModel());
+    s.update(null);
+    const b = drawn(s);
+    expect(b.min.y).toBeCloseTo(0, 3);
+    expect(b.max.y - b.min.y).toBeCloseTo(0.4, 3);
+    s.dispose();
+  });
+
+  it('screenBox usa la caja en reposo: no se mueve cuando salta o respira', () => {
+    for (const withModel of [false, true]) {
+      const s = new EncounterScene(1);
+      s.setViewport(390, 844);
+      s.placeAt(0);
+      s.aimAtPokemon();
+      if (withModel) s.setModel(skinnedModel());
+      s.update(null);
+      const still = s.screenBox(390, 844)!;
+      s.update(null, { lift: 0.8, squash: 0.85, lean: 0.1 });
+      expect(s.screenBox(390, 844)).toEqual(still);
+      s.dispose();
+    }
+  });
+});
+
+describe('EncounterScene: la bola al salir de la mano', () => {
+  it('no se dibuja pegada a la cámara (taparía la pantalla): aparece a partir de BALL_SHOW_FWD', () => {
+    const s = new EncounterScene(0.4);
+    const ball = s.spawnBall('POKE_BALL');
+    s.setBallInThrowFrame(0, { fwd: 0.05, lat: 0, up: -0.35 }, 0);
+    expect(ball.visible).toBe(false);
+    s.setBallInThrowFrame(0, { fwd: BALL_SHOW_FWD + 0.01, lat: 0, up: -0.3 }, 0);
+    expect(ball.visible).toBe(true);
     s.dispose();
   });
 });

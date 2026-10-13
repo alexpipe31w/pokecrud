@@ -16,8 +16,10 @@ const num = (n: number, decimals: number): string =>
   imports: [GlassPanelComponent, TypeChipsComponent],
   template: `
     <app-glass-panel class="card">
-      <p class="genus">{{ genus() }}</p>
-      <app-type-chips [types]="types()" />
+      <div class="head">
+        <p class="genus">{{ genus() }}</p>
+        <app-type-chips [types]="types()" />
+      </div>
       <dl class="facts">
         <div>
           <dt>Nivel</dt>
@@ -43,7 +45,14 @@ const num = (n: number, decimals: number): string =>
     .card {
       display: grid;
       gap: var(--s-2);
-      padding: var(--s-3);
+      padding: var(--s-2) var(--s-3);
+    }
+    .head {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--s-1) var(--s-2);
     }
     .genus {
       margin: 0;
@@ -51,8 +60,9 @@ const num = (n: number, decimals: number): string =>
     }
     .facts {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: var(--s-1) var(--s-3);
+      grid-template-columns: repeat(4, auto);
+      justify-content: space-between;
+      gap: var(--s-2);
       margin: 0;
     }
     dt {
@@ -67,10 +77,14 @@ const num = (n: number, decimals: number): string =>
     .cp {
       color: var(--accent);
     }
+    dd {
+      font-size: 0.85rem;
+      white-space: nowrap;
+    }
     .flavor {
       margin: 0;
-      font-size: 0.78rem;
-      line-height: 1.35;
+      font-size: 0.74rem;
+      line-height: 1.3;
     }
   `,
 })
