@@ -25,5 +25,7 @@ import { LoginAttemptsService } from './login-attempts.service.js';
     // Guard global: toda ruta exige access token salvo las marcadas con @Public().
     { provide: APP_GUARD, useClass: JwtAuthGuard },
   ],
+  // El socket /pvp (F5) verifica el access token con el mismo JwtService.
+  exports: [JwtModule],
 })
 export class AuthModule {}

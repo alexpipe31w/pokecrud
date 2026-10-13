@@ -220,7 +220,7 @@ F2-07, F2-12, F2-13, F2-15 hechas; faltan **F2-11**/**F2-14** (ARCore), F2-10 (m
 
 ## En curso
 
-- **F5-02 (Alex, rama `feature/F5-02-gateway-socketio`):** gateway Socket.IO según `fases/F5-pvp.md`. Punto de guardado: paso 0.
+- **F5-02 (Alex, rama `feature/F5-02-gateway-socketio`):** gateway Socket.IO según `fases/F5-pvp.md`. Punto de guardado: pasos 1-4 hechos (servidor, e2e 100/100); sigue el paso 5 (`PvpSocketService` en la app).
 - Samuel cerró **F3-06c** (#73 mezclado; sin migración). **Con esto la F3 está completa en código.**
 - **Ojo:** el inventario de IS-11 está ahora en `/inventario` (la Pokédex 1025 ocupa `/pokedex`).
 
