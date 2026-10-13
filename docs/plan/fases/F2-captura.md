@@ -286,7 +286,7 @@ horizonte para que el fondo ilustrado coincida. La sombra es una `DataTexture` (
 
 **Files:** Create `src/app/game/encounter-scene/encounter-scene.ts`, Test `encounter-scene.spec.ts`
 
-- [ ] **3a. Test que falla:**
+- [x] **3a. Test que falla:**
 
 ```ts
 import * as THREE from 'three';
@@ -383,8 +383,8 @@ describe('EncounterScene', () => {
 });
 ```
 
-- [ ] **3b.** `npx ng test --include=src/app/game/encounter-scene/encounter-scene.spec.ts --watch=false` → FALLA.
-- [ ] **3c. Implementación** (ojo: `project()` usa la matriz de la cámara y `lookAt()` no la actualiza: por eso los
+- [x] **3b.** `npx ng test --include=src/app/game/encounter-scene/encounter-scene.spec.ts --watch=false` → FALLA.
+- [x] **3c. Implementación** (ojo: `project()` usa la matriz de la cámara y `lookAt()` no la actualiza: por eso los
   `updateMatrixWorld()`):
 
 ```ts
@@ -543,7 +543,7 @@ export function blobTexture(size = 64): THREE.DataTexture {
 }
 ```
 
-- [ ] **3d.** → PASA (8 tests). Commit `F2-04a: escena del encuentro (Pokémon a tamaño real, sombra, sin AR)` + push.
+- [x] **3d.** → PASA (8 tests). Commit `F2-04a: escena del encuentro (Pokémon a tamaño real, sombra, sin AR)` + push.
 
 ### Paso 4 — El escenario (renderer y bucle)
 
