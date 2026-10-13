@@ -21,10 +21,7 @@ describe('LocationGateComponent', () => {
   };
   const text = (): string => fixture.nativeElement.textContent;
   const buttons = (): HTMLButtonElement[] => [...fixture.nativeElement.querySelectorAll('button')];
-  const press = (label: string) =>
-    buttons()
-      .find((b) => b.textContent?.includes(label))!
-      .click();
+  const press = (label: string) => buttons().find((b) => b.textContent?.includes(label))!.click();
 
   function show(status: LocationStatus) {
     location.status.set(status);
