@@ -939,7 +939,7 @@ selector `app-inventory`); Modify `app.routes.ts`, `core/auth/auth.guard.ts` (fa
 
 **Files:** Create `shared/engine/weaknesses.ts` + spec
 
-- [ ] **2a. Test que falla** (con la tabla real de `types.json`, como `type-chart.spec.ts`):
+- [x] **2a. Test que falla** (con la tabla real de `types.json`, como `type-chart.spec.ts`):
 
 ```ts
 import { readFileSync } from 'node:fs';
@@ -968,7 +968,7 @@ describe('defenseProfile', () => {
 });
 ```
 
-- [ ] **2b.** falla. **2c.**
+- [x] **2b.** falla. **2c.**
 
 ```ts
 import type { TypeName } from '../data/dataset.types.js';
@@ -998,13 +998,13 @@ export function defenseProfile(types: readonly TypeName[], chart: TypeChart): De
 ```
 
   (`effectiveness(chart, ataque, tiposDefensor)` es la firma real de `type-chart.ts`.)
-- [ ] **2d.** pasa. Commit + `/guardar`.
+- [x] **2d.** pasa. Commit + `/guardar`.
 
 ### Paso 3 — Cadena evolutiva (pura)
 
 **Files:** Create `shared/engine/evolution-chain.ts` + spec
 
-- [ ] **3a. Test que falla** (con `pokedex.json` real):
+- [x] **3a. Test que falla** (con `pokedex.json` real):
 
 ```ts
 import { readFileSync } from 'node:fs';
@@ -1037,7 +1037,7 @@ describe('evolutionTree', () => {
 });
 ```
 
-- [ ] **3b.** falla. **3c.**
+- [x] **3b.** falla. **3c.**
 
 ```ts
 import type { EvolutionLink, Species } from '../data/dataset.types.js';
@@ -1092,7 +1092,7 @@ export function methodText(link: EvolutionLink): string {
 }
 ```
 
-- [ ] **3d.** pasa. Commit + `/guardar`.
+- [x] **3d.** pasa. Commit + `/guardar`.
 
 ### Paso 4 — `PokedexService` y la pantalla `/pokedex`
 
