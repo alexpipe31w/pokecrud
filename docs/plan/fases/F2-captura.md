@@ -6333,7 +6333,7 @@ final, los pasos intermedios no "empiezan" y no suenan.
 
 ### Paso 7 — Verde y Android
 
-- [ ] **7a.** `npm run lint` · `npm run build` · `npm test -- --watch=false` (referencia: **73 archivos / 393 tests**) ·
+- [x] **7a.** `npm run lint` · `npm run build` · `npm test -- --watch=false` (referencia: **73 archivos / 393 tests**) ·
   `npm run test:shared` (**143**) · `cd server && npm run build && npm test` (**22**).
 - [ ] **7b.** Android: grabar (`adb shell screenrecord`) una captura completa (golpe → luz roja → cae → 3 sacudidas con
   vibración → clic con estrellas y fanfarria → tarjeta con la XP contando) y un escape (sale con su grito y se puede
