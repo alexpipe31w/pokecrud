@@ -204,7 +204,7 @@ para el criterio (vídeo); hasta entonces, dos ventanas del navegador a 390×844
 
 ## F5-04 · Combate PvP completo
 
-- [ ] **Paso 1 — `pvp-view.ts`** (puro, + spec): `viewFor(state, me, decision, mustDo, remainingMs, revealed)` (tu lado
+- [x] **Paso 1 — `pvp-view.ts`** (puro, + spec): `viewFor(state, me, decision, mustDo, remainingMs, revealed)` (tu lado
   completo; el rival solo con lo revelado); `eventsFor(events, stateBefore, me)` (gira los lados: `side === me ? 0 : 1`;
   y el `switch` lleva `pokemon: PublicPokemon` sacado de `stateBefore`); `defaultAction(state, side)`. Tests: la vista
   del rival NO contiene `moves`, `stats` ni `ivs` (comprobar con `JSON.stringify`); girar dos veces = original; el combate

@@ -1,5 +1,5 @@
-import type { PublicPokemon, PublicSide, PvpBattleView } from '../../protocol/pvp.js';
-import type { BattleState, SideIndex } from './types.js';
+import type { PublicPokemon, PublicSide, PvpBattleView, PvpEvent } from '../../protocol/pvp.js';
+import type { BattleAction, BattleEvent, BattleState, SideIndex } from './types.js';
 
 /**
  * Lo que ve cada jugador de un combate PvP (D-056). Puro: lo usan el servidor (para mandarlo) y sus tests.
@@ -63,4 +63,37 @@ export function publicPokemon(
     maxHp: p.stats.hp,
     status: p.status,
   };
+}
+
+/**
+ * Los eventos de un turno vistos por `viewer`: cada `side` girado (tú = 0) y cada `switch` con el Pokémon que sale
+ * (el cliente no conoce el equipo del rival). `before` = el estado ANTES del turno: los del banquillo no cambian
+ * durante el turno, así que sus PS y estado son los de entonces.
+ */
+export function eventsFor(
+  events: readonly BattleEvent[],
+  before: BattleState,
+  viewer: SideIndex,
+): PvpEvent[] {
+  return events.map((e): PvpEvent => {
+    const side = mirrorSide(e.side, viewer);
+    if (e.kind === 'switch') {
+      return { ...e, side, pokemon: publicPokemon(before, e.side, e.teamIndex) };
+    }
+    return { ...e, side };
+  });
+}
+
+/**
+ * Lo que se juega por `side` si se le acaba el tiempo (D-056, regla 4): en un cambio forzado, el primer Pokémon en pie
+ * que no está en combate; si no, el primer movimiento con PP (sin PP en ninguno, el 0: el motor hace Forcejeo).
+ */
+export function defaultAction(state: BattleState, side: SideIndex): BattleAction {
+  const s = state.sides[side];
+  if (state.pendingSwitch[side]) {
+    const teamIndex = s.team.findIndex((p, i) => i !== s.active && p.hp > 0);
+    return { kind: 'switch', teamIndex };
+  }
+  const moveIndex = s.team[s.active].moves.findIndex((m) => m.pp > 0);
+  return { kind: 'move', moveIndex: Math.max(0, moveIndex) };
 }
