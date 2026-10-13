@@ -235,6 +235,34 @@ describe('Colección (e2e)', { timeout: 60_000 }, () => {
     await as(b, http().get(`/collection?cursor=${someoneElse.id}`)).expect(400);
   });
 
+  it('F3-06b: ?ids=a,b trae solo esos (los ajenos o inexistentes no salen); más de 50 o no UUID → 400', async () => {
+    const p = await register();
+    await seedCaught(p, 4);
+    const mine = (
+      await prisma.caughtPokemon.findMany({
+        where: { playerId: p.id },
+        orderBy: { caughtAt: 'asc' },
+      })
+    ).map((r) => r.id);
+    const other = await register();
+    await seedCaught(other, 1);
+    const theirs = (
+      await prisma.caughtPokemon.findFirstOrThrow({
+        where: { playerId: other.id },
+      })
+    ).id;
+    const ids = [mine[0], mine[2], theirs, randomUUID()].join(',');
+    const res = await as(p, http().get(`/collection?ids=${ids}`)).expect(200);
+    const page = res.body as Page;
+    expect(page.items.map((i) => i.id).sort()).toEqual(
+      [mine[0], mine[2]].sort(),
+    );
+    expect(page.total).toBe(2);
+    const many = Array.from({ length: 51 }, () => randomUUID()).join(',');
+    await as(p, http().get(`/collection?ids=${many}`)).expect(400);
+    await as(p, http().get('/collection?ids=no-es-uuid')).expect(400);
+  });
+
   it('validación: limit fuera de 1-50, orden o tipo desconocido, cursor no UUID, campo extra → 400', async () => {
     const p = await register();
     for (const q of [

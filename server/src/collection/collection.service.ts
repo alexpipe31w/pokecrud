@@ -70,6 +70,7 @@ export class CollectionService {
       playerId,
       ...(q.shiny === undefined ? {} : { shiny: q.shiny }),
       ...(q.favorite === undefined ? {} : { favorite: q.favorite }),
+      ...(q.ids ? { id: { in: q.ids } } : {}),
       ...(q.type
         ? { speciesId: { in: this.spawns.speciesIdsOfType(q.type) } }
         : {}),

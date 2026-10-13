@@ -9,6 +9,8 @@ export type SortOrder = 'asc' | 'desc';
 
 /** `GET /collection?…` (todo opcional). Por defecto: lo último capturado primero, 30 por página. */
 export interface CollectionQuery {
+  /** F3-06b: solo estos ids (≤ 50), p. ej. los de tus equipos. */
+  ids?: string[];
   sort?: CollectionSort;
   order?: SortOrder;
   type?: TypeName;
