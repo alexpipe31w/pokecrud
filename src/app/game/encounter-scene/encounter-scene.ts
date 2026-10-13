@@ -161,11 +161,12 @@ export class EncounterScene {
 
   /**
    * Sin AR (sin imagen de la cámara o sin giroscopio): cámara quieta mirando al centro del Pokémon, como Pokémon GO
-   * con la AR apagada. Si no, un Pikachu a 2 m quedaría por debajo de la pantalla.
+   * con la AR apagada. Si no, un Pikachu a 2 m quedaría por debajo de la pantalla. `hover`: metros que flota (los
+   * alados), para que no se salga por arriba.
    */
-  aimAtPokemon(): void {
+  aimAtPokemon(hover = 0): void {
     const a = this.anchor.position;
-    this.camera.lookAt(a.x, a.y + this.heightM / 2, a.z);
+    this.camera.lookAt(a.x, a.y + hover + this.heightM / 2, a.z);
     this.camera.updateMatrixWorld();
   }
 

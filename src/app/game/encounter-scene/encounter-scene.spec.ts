@@ -77,6 +77,16 @@ describe('EncounterScene', () => {
     snorlax.dispose();
   });
 
+  it('sin AR apunta también a lo que flota (los que vuelan no se salen por arriba)', () => {
+    const s = new EncounterScene(1.7);
+    s.setViewport(390, 844);
+    s.placeAt(0);
+    s.aimAtPokemon(0.6);
+    const c = s.anchor.position.clone().setY(s.anchor.position.y + 0.6 + 0.85).project(s.camera);
+    expect(c.y).toBeCloseTo(0, 6);
+    s.dispose();
+  });
+
   it('la cámara copia la orientación del móvil', () => {
     const s = new EncounterScene(0.4);
     const q = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), 1);

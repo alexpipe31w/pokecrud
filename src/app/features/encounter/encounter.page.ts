@@ -449,7 +449,7 @@ export class EncounterPage implements OnDestroy {
       world.placeAt(ar ? cameraYaw(this.q) : 0);
       this.arMode = ar;
       if (!ar) {
-        world.aimAtPokemon();
+        world.aimAtPokemon(this.personality.hover);
         this.horizon.set(`${Math.round(world.horizonY() * 100)}%`);
       }
     }
@@ -459,7 +459,7 @@ export class EncounterPage implements OnDestroy {
     if (ar) {
       world.update(this.q, pose);
     } else {
-      world.aimAtPokemon();
+      world.aimAtPokemon(this.personality.hover);
       world.update(null, pose);
     }
     world.animate(t / 1000);
