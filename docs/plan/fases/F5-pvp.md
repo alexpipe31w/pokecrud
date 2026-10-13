@@ -222,7 +222,7 @@ para el criterio (vídeo); hasta entonces, dos ventanas del navegador a 390×844
   `handleDisconnect` → sala; `battle-data.service.ts` carga movimientos soportados y tabla de tipos una vez (de
   `src/assets/data`, como `SpawnsService`). e2e con dos clientes: combate entero hasta `battle:end` y fila en `Battle`;
   reconexión a mitad (cerrar un socket y abrir otro con el mismo token → `hello` trae la vista y se sigue).
-- [ ] **Paso 5 — app, modo remoto de `BattleController`:** `startRemote(view, opponent)` y aplicar cada `battle:turn`
+- [x] **Paso 5 — app, modo remoto de `BattleController`:** `startRemote(view, opponent)` y aplicar cada `battle:turn`
   con la MISMA reproducción (`play`): el `switch` usa `e.pokemon` si viene (en local sigue leyendo `before`). `moves` y
   `bench` leen solo tu lado (`view.me`), que es un `BattleSide` igual que en local. `act()` manda `battle:act` y espera
   el ack (si la red falla, reintenta la MISMA decisión: es idempotente). Mientras el rival elige: "Esperando a <rival>…"

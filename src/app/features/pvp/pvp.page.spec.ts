@@ -1,6 +1,6 @@
 import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { provideRouter } from '@angular/router';
+import { Router, provideRouter } from '@angular/router';
 import { provideIonicAngular } from '@ionic/angular';
 import type { Team } from '@shared/protocol/teams';
 
@@ -149,5 +149,14 @@ describe('PvpPage', () => {
     expect(store.forfeit).not.toHaveBeenCalled();
     button('Rendirme').click();
     expect(store.forfeit).toHaveBeenCalled();
+  });
+
+  it('en el cara a cara, «¡A combatir!» abre la escena del combate', () => {
+    const nav = vi.spyOn(TestBed.inject(Router), 'navigateByUrl').mockResolvedValue(true);
+    store.match.set({ battleId: 'b', opponent: 'ash', myLead: 25, foeLead: 6, foeTeamSize: 3 });
+    store.phase.set('matched');
+    fixture.detectChanges();
+    button('¡A combatir!').click();
+    expect(nav).toHaveBeenCalledWith('/pvp/combate');
   });
 });

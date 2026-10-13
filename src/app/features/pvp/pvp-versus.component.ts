@@ -13,8 +13,8 @@ interface Corner {
 
 /**
  * Cara a cara al emparejar (F5-03, el momento de la pantalla): cada mitad de la arena se tiñe con el tipo del Pokémon
- * con el que sale cada uno, los dos entran desde su lado y el "VS" cae en medio. El combate por turnos en directo es
- * F5-04: hasta entonces, desde aquí solo se puede rendirse (con confirmación: cuenta como derrota).
+ * con el que sale cada uno, los dos entran desde su lado y el "VS" cae en medio. "¡A combatir!" lleva a la escena del
+ * combate (F5-04); también se puede rendirse (con confirmación: cuenta como derrota).
  */
 @Component({
   selector: 'app-pvp-versus',
@@ -40,7 +40,7 @@ interface Corner {
       </div>
       <span class="vs" aria-hidden="true">VS</span>
     </div>
-    <p class="soon">El combate por turnos en directo llega en la próxima versión.</p>
+    <button type="button" class="fight" (click)="fight.emit()">¡A combatir!</button>
     @if (confirming()) {
       <app-confirm-panel
         message="Si te rindes, gana tu rival."
@@ -136,10 +136,15 @@ interface Corner {
         0 10px 22px rgb(0 0 0 / 0.6);
       animation: stamp 380ms var(--ease-out) 460ms both;
     }
-    .soon {
-      margin: 0;
-      text-align: center;
-      color: color-mix(in srgb, var(--paper), transparent 25%);
+    .fight {
+      justify-self: center;
+      min-height: 52px;
+      padding: 0 var(--s-8);
+      border: 0;
+      border-radius: var(--r-chip);
+      background: var(--gold);
+      color: var(--ink);
+      font: 700 1.1rem/1 var(--font-display);
     }
     .quit {
       min-height: 44px;
@@ -191,6 +196,7 @@ export class PvpVersusComponent {
   readonly foeLead = input<number | null>(null);
   readonly busy = input(false);
   readonly forfeit = output<void>();
+  readonly fight = output<void>();
 
   protected readonly confirming = signal(false);
   protected readonly me = computed(() => this.corner(this.myName(), this.myLead()));

@@ -1,5 +1,5 @@
 import { Component, computed, effect, inject } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import {
   IonBackButton,
   IonButtons,
@@ -103,6 +103,7 @@ import { PvpVersusComponent } from './pvp-versus.component';
                 [foeLead]="m.foeLead"
                 [busy]="lobby.busy()"
                 (forfeit)="lobby.forfeit()"
+                (fight)="fight()"
               />
             }
           }
@@ -164,6 +165,7 @@ export class PvpPage implements ViewWillEnter, ViewWillLeave {
   protected readonly lobby = inject(PvpLobbyStore);
   protected readonly teams = inject(TeamsService);
   private readonly auth = inject(AuthService);
+  private readonly router = inject(Router);
 
   protected readonly myName = computed(() => this.auth.player()?.nickname ?? 'Tú');
   /** Solo los equipos con algún Pokémon capturado sirven para combatir. */
@@ -182,6 +184,11 @@ export class PvpPage implements ViewWillEnter, ViewWillLeave {
       const current = this.lobby.teamId();
       if (list.length && !list.some((t) => t.id === current)) this.lobby.teamId.set(list[0].id);
     });
+  }
+
+  /** Del cara a cara a la escena del combate (F5-04): el socket sigue abierto. */
+  protected fight(): void {
+    void this.router.navigateByUrl('/pvp/combate');
   }
 
   ionViewWillEnter(): void {

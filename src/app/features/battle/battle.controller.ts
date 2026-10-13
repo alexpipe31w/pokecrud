@@ -309,12 +309,23 @@ export class BattleController {
     this.awayUntil.set(msg.connected ? null : Date.now() + msg.graceMs);
   }
 
-  /** El servidor ya no conoce el combate (se reinició al desplegar, D-005): sin resultado. */
-  interrupted(): void {
+  /** El servidor ya no conoce el combate (se reinició al desplegar, D-005) o no se pudo recuperar: sin resultado. */
+  interrupted(message = 'El combate se interrumpió (el servidor se reinició). No cuenta.'): void {
     this.stopTicker();
     this.winner.set(null);
-    this.message.set('El combate se interrumpió (el servidor se reinició). No cuenta.');
+    this.message.set(message);
     this.phase.set('ended');
+  }
+
+  /** Tras un corte de red: la vista que manda el servidor (los turnos perdidos no se animan). */
+  resync(view: PvpBattleView): void {
+    if (!this.remote()) return;
+    this.queue = this.queue.then(() => {
+      if (this.phase() === 'ended') return;
+      this.setView(view);
+      this.shown.set([this.viewSnapshot(view, PLAYER), this.viewSnapshot(view, RIVAL)]);
+      this.applyView();
+    });
   }
 
   /** Rendirse en PvP (en local se rinde con `act({ kind: 'forfeit' })`). */

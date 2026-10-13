@@ -18,7 +18,7 @@ const DARK_TYPES = new Set<TypeName>([
   selector: 'app-battle-dock',
   template: `
     <p class="message" aria-live="polite">{{ ctrl.message() }}</p>
-    @switch (ctrl.phase() === 'animating' ? 'choose' : ctrl.phase()) {
+    @switch (ctrl.phase() === 'animating' || ctrl.phase() === 'waiting' ? 'choose' : ctrl.phase()) {
       @case ('choose') {
         <div class="moves">
           @for (m of ctrl.moves(); track m.index) {
@@ -62,11 +62,17 @@ const DARK_TYPES = new Set<TypeName>([
       @case ('ended') {
         <div class="end">
           <h2 class="end__title" [class.end__title--win]="ctrl.winner() === 0">
-            {{ ctrl.winner() === 0 ? '¡Victoria!' : 'Derrota' }}
+            {{
+              ctrl.winner() === 0 ? '¡Victoria!' : ctrl.winner() === 1 ? 'Derrota' : 'Sin resultado'
+            }}
           </h2>
           <div class="actions">
-            <button class="primary" (click)="rematch()">Revancha</button>
-            <button class="ghost" (click)="ctrl.backToPicker()">Otro rival</button>
+            @if (ctrl.remote()) {
+              <button class="primary" (click)="exit.emit()">Volver a la arena</button>
+            } @else {
+              <button class="primary" (click)="rematch()">Revancha</button>
+              <button class="ghost" (click)="ctrl.backToPicker()">Otro rival</button>
+            }
           </div>
         </div>
       }
@@ -186,12 +192,14 @@ const DARK_TYPES = new Set<TypeName>([
 export class BattleDockComponent {
   protected readonly ctrl = inject(BattleController);
   readonly openSheet = output<void>();
+  /** PvP terminado: volver a la arena (`/pvp`). */
+  readonly exit = output<void>();
   protected readonly confirm = signal(false);
   private confirmTimer: ReturnType<typeof setTimeout> | undefined;
 
   /** Mientras se anima el turno el menú se queda (el diseño no salta) pero no se puede tocar. */
   protected busy(): boolean {
-    return this.ctrl.phase() === 'animating';
+    return this.ctrl.phase() === 'animating' || this.ctrl.phase() === 'waiting';
   }
 
   protected anyPp(): boolean {

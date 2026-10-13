@@ -224,7 +224,8 @@ F2-07, F2-12, F2-13, F2-15 hechas; faltan **F2-11**/**F2-14** (ARCore), F2-10 (m
   pasos 1-3 hechos (`pvp-view`, `BattleRoom`, tabla `Battle` + `BattlesRepository`). Migración `20261013030000_battle`
   SOLO en el Postgres local: va a Supabase ANTES de mezclar (con permiso). Paso 4 hecho (servidor completo: `battle:act`,
   reconexión, abandono, resultado guardado; e2e 114). Paso 5 a medias: modo remoto de `BattleController` hecho (9 tests,
-  app 549); falta la pantalla `/pvp/combate` (BattlePage en modo PvP) y el paso del cara a cara al combate.
+  app 549) y pantalla `/pvp/combate` (BattlePage en modo PvP + `PvpBattleSession`, barra de tiempo, "¡A combatir!" en el
+  cara a cara; app 558). Falta: probar en el navegador con dos cuentas (paso 6) y el criterio con dos móviles.
 - Cuentas de prueba locales: `demo+alex@pokecrud.test` y `demo+rival@pokecrud.test` (contraseña: pídesela a Alex; no va en el repo), con equipo "Arena" de 3. `test:e2e` las borra pasada 1 h: se recrean registrándolas y con el script de la bitácora de F5-03.
 - Samuel cerró **F3-06c** (#73 mezclado; sin migración). **Con esto la F3 está completa en código.**
 - **Ojo:** el inventario de IS-11 está ahora en `/inventario` (la Pokédex 1025 ocupa `/pokedex`).
