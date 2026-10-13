@@ -390,7 +390,11 @@
       **Hecho:** `docs/plan/fases/F5-pvp.md` (F5-02…F5-05 paso a paso) y contrato `shared/protocol/pvp.ts` (compila en
       app y servidor). Spike de Socket.IO en Nest 12 verificado y borrado: los guards globales rompen el socket
       (JwtAuthGuard revienta; ThrottlerGuard pierde mensajes) → arreglos medidos en el plan. D-056.
-- [ ] **F5-02 · Gateway Socket.IO** — auth en handshake, salas, `seq` idempotente, reconexión. Dep: F5-01, F0-07.
+- [x] **F5-02 · Gateway Socket.IO** (@alex, 2026-10-13) — auth en handshake, salas, `seq` idempotente, reconexión. Dep: F5-01, F0-07.
+      **Hecho:** `server/src/pvp/` (gateway `/pvp` con JWT en el handshake, sala `player:<id>`, máx. 3 sockets por
+      jugador, 20 mensajes / 10 s por socket, validación en el borde, `pvp:hello`), guards globales solo HTTP (D-056) y
+      `PvpSocketService` en la app (token vigente en cada reconexión, un reintento tras `unauthorized`). Las salas de
+      combate y la idempotencia por `decision` (el `seq` de antes) son de F5-04, según el plan.
 - [ ] **F5-03 · Invitar / código / buscar rival** — emparejamiento y selección de equipo (nivel 50). Dep: F5-02.
 - [ ] **F5-04 · Combate PvP completo** — servidor aplica el engine, temporizador 30 s, abandono 60 s,
       resultado persistido; la escena de F4-05 reutilizada. Dep: F5-03, F4-05. Criterio: combate entre dos

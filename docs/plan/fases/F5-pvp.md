@@ -152,25 +152,28 @@ para el criterio (vídeo); hasta entonces, dos ventanas del navegador a 390×844
 
 ## F5-02 · Gateway Socket.IO
 
-- [ ] **Paso 1 — dependencias y arreglos del spike:** instalar las versiones exactas de la tabla (en `server/` y
+- [x] **Paso 1 — dependencias y arreglos del spike:** instalar las versiones exactas de la tabla (en `server/` y
   `socket.io-client` en la raíz; **antes** hacer `/guardar`, REGLA 2b). Aplicar los dos arreglos de arriba. Test e2e
   que falla sin ellos: un mensaje del socket con ack recibe respuesta (sin el arreglo del guard → timeout); 2 sockets ×
   70 mensajes → 140 respuestas. Los e2e HTTP existentes siguen verdes (`throttle.e2e-spec.ts` incluido).
-- [ ] **Paso 2 — `pvp.gateway.ts`:** `@WebSocketGateway({ namespace: PVP_NAMESPACE, cors, maxHttpBufferSize })`;
+- [x] **Paso 2 — `pvp.gateway.ts`:** `@WebSocketGateway({ namespace: PVP_NAMESPACE, cors, maxHttpBufferSize })`;
   `handleConnection` verifica el token (como el spike: `client.data.playerId = sub`, `client.join('player:' + sub)`) o
   emite `pvp:error {code:'unauthorized'}` y desconecta; tope de 3 sockets por jugador; `handleDisconnect` avisa a
   `BattleRoomsService` (en F5-02 aún no existe: deja el gancho con un `TODO(F5-04)` y un test que lo llame).
-- [ ] **Paso 3 — límite por socket** (`socket-rate-limit.ts`, puro con reloj inyectado, + spec) y validación
+- [x] **Paso 3 — límite por socket** (`socket-rate-limit.ts`, puro con reloj inyectado, + spec) y validación
   (`pvp.validation.ts` + spec: cada carga del contrato, válida e inválida).
-- [ ] **Paso 4 — `pvp:hello`** devuelve `{ok:true, battle:null, lobby:null}` (se rellena en F5-03/F5-04).
-- [ ] **Paso 5 — app:** `PvpSocketService` (`providedIn: 'root'`, se conecta solo cuando se entra en `/pvp` o hay un
+- [x] **Paso 4 — `pvp:hello`** devuelve `{ok:true, battle:null, lobby:null}` (se rellena en F5-03/F5-04).
+- [x] **Paso 5 — app:** `PvpSocketService` (`providedIn: 'root'`, se conecta solo cuando se entra en `/pvp` o hay un
   combate PvP; `auth: (cb) => cb({ token: <access actual o refrescado> })`, `transports: ['websocket']`,
   reconexión con espera creciente que trae Socket.IO), signal `status` (`offline | connecting | online`), `request<K>`
   tipado con `PvpClientEvents` y `timeout(8000)` → error "Sin conexión con el servidor". Al recibir `unauthorized`:
   `auth.refresh()` y reintentar UNA vez; si vuelve a fallar, sesión perdida (como el interceptor HTTP). Tests del
   servicio con un socket falso.
-- [ ] **Paso 6:** e2e del gateway (sin token / token falso / caducado; con token → hello OK; 21 mensajes en 10 s → el
+- [x] **Paso 6:** e2e del gateway (sin token / token falso / caducado; con token → hello OK; 21 mensajes en 10 s → el
   21.º `rate-limited`; 4.º socket rechazado), lint, build de app y servidor, REGLA 2.
+  **Hecho (2026-10-13, Alex):** e2e 6/6 (+ 140 respuestas con 7 sockets; con el `ThrottlerGuard` de antes, 120).
+  Ojo para F5-03: el chunk perezoso de `socket.io-client` no se ha podido ver aún porque ninguna pantalla usa el
+  servicio (el build lo elimina); comprobarlo cuando `/pvp` lo importe.
 
 ## F5-03 · Invitar / código / buscar rival
 

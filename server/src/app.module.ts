@@ -3,7 +3,8 @@ import type { IncomingMessage, ServerResponse } from 'node:http';
 import { Module, ValidationPipe } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_GUARD, APP_PIPE } from '@nestjs/core';
-import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { ThrottlerModule } from '@nestjs/throttler';
+import { HttpThrottlerGuard } from './common/http-throttler.guard.js';
 import { LoggerModule } from 'nestjs-pino';
 import { AuthModule } from './auth/auth.module.js';
 import { CustomPokemonModule } from './custom-pokemon/custom-pokemon.module.js';
@@ -18,6 +19,7 @@ import { ProgressionModule } from './progression/progression.module.js';
 import { EncountersModule } from './encounters/encounters.module.js';
 import { CollectionModule } from './collection/collection.module.js';
 import { TeamsModule } from './teams/teams.module.js';
+import { PvpModule } from './pvp/pvp.module.js';
 
 const isProd = process.env['NODE_ENV'] === 'production';
 const isTest = Boolean(process.env['VITEST']);
@@ -76,9 +78,12 @@ function requestId(req: IncomingMessage, res: ServerResponse): string {
     // F2-06: encuentro y captura autoritativos.
     EncountersModule,
     CollectionModule,
+    // F5: PvP en tiempo real (socket /pvp, D-056).
+    PvpModule,
   ],
   providers: [
-    { provide: APP_GUARD, useClass: ThrottlerGuard },
+    // Solo HTTP: el socket /pvp tiene su propio límite por socket (D-056).
+    { provide: APP_GUARD, useClass: HttpThrottlerGuard },
     // Validación global de DTOs. Aquí (y no en main.ts) para que también aplique en los tests e2e.
     {
       provide: APP_PIPE,

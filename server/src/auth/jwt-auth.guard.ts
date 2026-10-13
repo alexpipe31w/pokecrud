@@ -23,6 +23,8 @@ export class JwtAuthGuard implements CanActivate {
   ) {}
 
   async canActivate(ctx: ExecutionContext): Promise<boolean> {
+    // El socket /pvp se autentica UNA vez en el handshake (pvp.gateway.ts); este guard es solo para HTTP (D-056).
+    if (ctx.getType() !== 'http') return true;
     const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
       ctx.getHandler(),
       ctx.getClass(),
