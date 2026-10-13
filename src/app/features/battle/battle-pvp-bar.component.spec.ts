@@ -26,11 +26,11 @@ describe('BattlePvpBarComponent (F5-04)', () => {
     expect(el.querySelector('.timer')?.classList).toContain('urgent');
   });
 
-  it('esperando al rival: lo dice; rival desconectado: aviso con sus segundos', () => {
+  it('esperando al rival: el "Esperando a…" va solo en el mensaje del panel (no repetido); desconectado: aviso', () => {
     ctrl.phase.set('waiting');
     ctrl.opponentAwayS.set(42);
     const { el } = render();
-    expect(el.textContent).toContain('Esperando a rivaldemo');
+    expect(el.textContent).not.toContain('Esperando');
     expect(el.querySelector('[role="status"].away')?.textContent).toContain(
       'rivaldemo se desconectó · 42 s para volver',
     );

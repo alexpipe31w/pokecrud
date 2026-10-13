@@ -3,7 +3,8 @@ import { BattleController } from './battle.controller';
 
 /**
  * Barra del combate PvP (F5-04) encima del panel: la cuenta atrás de la decisión (el servidor juega por ti al llegar a
- * 0; roja en los últimos 10 s), "Esperando a <rival>…" y el aviso si el rival se desconectó con lo que le queda.
+ * 0; roja en los últimos 10 s) y el aviso si el rival se desconectó con lo que le queda. "Esperando a <rival>…" va en
+ * el mensaje del panel.
  */
 @Component({
   selector: 'app-battle-pvp-bar',
@@ -12,9 +13,6 @@ import { BattleController } from './battle.controller';
       <span class="timer" [class.urgent]="ctrl.remainingS() <= 10" aria-hidden="true">
         ⏱ {{ ctrl.remainingS() }} s
       </span>
-      @if (ctrl.phase() === 'waiting') {
-        <span class="wait">Esperando a {{ ctrl.opponent() }}…</span>
-      }
     }
     @if (ctrl.opponentAwayS(); as s) {
       <span class="away" role="status">
@@ -42,9 +40,6 @@ import { BattleController } from './battle.controller';
     .urgent {
       background: var(--danger);
       animation: pulse 1s ease-in-out infinite;
-    }
-    .wait {
-      opacity: 0.8;
     }
     .away {
       flex-basis: 100%;
