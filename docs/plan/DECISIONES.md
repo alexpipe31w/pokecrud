@@ -754,3 +754,17 @@ usa para pintar los botones. Si F8-05 quiere evolucionar en la demo sin farmear,
 no cambian; Postman pasa igual.
 **Consecuencia:** quien necesite confirmar algo en otra pantalla, que use `app-confirm-panel`; `app-game-button`
 tiene variante `danger`; `app-search-field` es el buscador común.
+
+## D-054 · Equipos con Pokémon capturados: `caughtIds` junto a `pokemonIds` (F3-06b) (2026-10-13, Samuel)
+
+**Contexto:** `Team.pokemonIds` son números de Pokédex: es el contrato de JSON Server del curso (D-019) y lo usa la
+colección de Postman. El juego (combate F4/F5) necesita equipos de Pokémon CAPTURADOS (ARQUITECTURA §9).
+**Decisión:** se **conserva** `pokemonIds` y se añade `Team.caughtIds UUID[]` (migración `team_caught`, por defecto
+`{}`, CHECK `max_six_caught` ≤ 6). En `/teams`: `caughtIds` opcional, ≤ 6, UUID sin repetir; todos deben ser del jugador
+(400 "Hay Pokémon que no son tuyos"), comprobado en la MISMA transacción que la escritura con `SELECT … FOR SHARE`, así
+una transferencia simultánea espera y luego lo quita (o, si llegó antes, la escritura da 400). `PUT` sin `caughtIds`
+(Postman) **los conserva**; `PATCH` igual. Transferir (`DELETE /collection/:id`) hace `array_remove` en los equipos del
+jugador dentro de su transacción. Para pintar los equipos sin una petición por Pokémon: `GET /collection?ids=a,b`
+(≤ 50, solo lo tuyo).
+**Consecuencia:** el combate debe leer `caughtIds`, no `pokemonIds`. La migración se aplicó en Supabase el 2026-10-13
+ANTES de mezclar (2 equipos existentes → `caughtIds` vacío).

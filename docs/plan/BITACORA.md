@@ -1667,3 +1667,45 @@ confirmación a `app-confirm-panel` (build sin avisos). (3) Una salida llamada `
 **Quedó a medias:** nada. Pikachu quedó con stock 30 en la base local (se restauró al final).
 **Decisiones nuevas:** D-055.
 **El siguiente debe empezar por:** F3-06b paso 1 (migración `team_caught`, D-054) en `fases/F3-coleccion.md`.
+
+## 2026-10-13 13:30 · @samuel (Claude) · F3-06a (mezcla) + F3-06b · rama `feature/F3-06b-equipos`
+
+**Qué se hizo:** #71 (F3-06a) mezclado con el CI en verde. F3-06b (D-054). Servidor: migración `team_caught`
+(`caughtIds UUID[] DEFAULT '{}'` + CHECK `max_six_caught`), DTO con `caughtIds` opcional (≤ 6, `ArrayUnique`, UUID);
+create/replace/patch en una transacción con `SELECT … FOR SHARE` de los capturados (si falta alguno → 400 "Hay Pokémon
+que no son tuyos"); `PUT` sin `caughtIds` los conserva; transferir hace `array_remove` en los equipos en su transacción;
+`GET /collection?ids=a,b` (≤ 50). Contrato `shared/protocol/teams.ts`. App: `TeamsService` (equipos + sus Pokémon en
+UNA petición `?ids`), `app-team-slots` (6 huecos: arte, PC; en el editor tocar uno lo quita), `/equipos` (tarjetas con
+nº/6 y PC total; vacía con Poké Ball de CSS) y `TeamEditorPage` (`/equipos/nuevo` y `/equipos/:id`: nombre, huecos
+fijos arriba, "Mis Pokémon" con `app-collection-card` en modo selección —nuevo: `selectable`/`selected`/`disabled`/
+`toggled`—, máx. 6, borrar con `app-confirm-panel`); rutas con `authGuard` y "Equipos" en el menú de la Poké Ball.
+**Supabase (permiso de Samuel):** `prisma migrate status` → falta solo `team_caught` (aws-1-sa-east-1 pooler);
+`migrate deploy` → applied; `migrate diff` contra el esquema → vacío; lectura: 2 equipos, 0 `caughtIds` nulos,
+restricciones `max_six` y `max_six_caught`.
+**Archivos clave:** `server/prisma/migrations/20261013020000_team_caught/`, `server/src/teams/*`,
+`server/src/collection/*`, `server/test/teams.e2e-spec.ts` (6), `shared/protocol/teams.ts`,
+`src/app/services/game/teams.service.ts`, `src/app/features/teams/*`, `features/collection/collection-card.component.ts`.
+**Cómo se probó (salida real):**
+
+    e2e equipos: 5 de 6 en rojo primero → 6/6; ?ids en rojo (400) → colección 18/18; todos: Test Files 9 passed,
+      Tests 94 passed (Postgres portátil) · unitarios 22 · lint OK · nest build OK
+      (concurrencia: PATCH con [a, b] y transferir b a la vez → el equipo nunca queda con b)
+    migración local: migrate diff (base local → schema.prisma) → "-- This is an empty migration."
+    app: teams.service 4, teams.page 3, team-editor 3, collection-card +1, menú +Equipos (todos en rojo primero);
+      todo: 87 archivos, 495 passed · lint OK · ng build OK sin avisos; shared 167
+    Postman contra el Nest local con el código nuevo: requests 46 / 0 failed · assertions 82 / 0 failed
+      (docs/evidencias/F3-06b_01_newman-runner.txt)
+    Chrome sin ventana 390×844 (jugador demo+eq-… con 8 capturas):
+      vacía "Arma tu primer equipo" → crear: Guardar deshabilitado sin nombre; 6 elegidos → 6/6, Gyarados y Eevee
+      deshabilitados; POST 201 → "Equipo Kanto, 6 de 6: Charizard, Gengar, Pikachu, Lapras, Snorlax, Dragonite",
+      "PC 8570"; segundo equipo "Agua" (Gyarados, Lapras); quitar a Pikachu tocando su hueco → PATCH 200 → 5 de 6;
+      transferir a Lapras (pasado el Deshacer) → "Equipo Kanto, 4 de 6…" y "Agua, 1 de 6: Gyarados";
+      borrar "Agua" → "¿Borrar el equipo «Agua»?" → DELETE 200 → 1 equipo; 0 errores de consola
+    Evidencias docs/evidencias/F3-06b_0{2..6}_*.png
+
+**Ojo (pruebas con Playwright):** en la app sin zone.js el repintado llega un instante después del clic: leer el
+DOM justo tras `click()` puede dar el valor anterior (vi "5/6" tras el 6º toque; la captura enseña 6/6). Esperar a un
+selector o unos ms antes de leer.
+**Quedó a medias:** nada.
+**Decisiones nuevas:** D-054.
+**El siguiente debe empezar por:** F3-06c paso 1 (favoritos desde la ficha de la Pokédex) en `fases/F3-coleccion.md`.

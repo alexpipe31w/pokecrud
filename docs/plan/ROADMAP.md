@@ -335,9 +335,15 @@
       chips (máx. 2); agregar desde PokéAPI con tarjetas de resultado. Servicios, modelo y contrato sin cambios.
       Postman 46 peticiones / 82 comprobaciones / 0 fallos contra el servidor local (`F3-06a_01`). App 485 tests.
       Probado en vista móvil como admin y como jugador (`F3-06a_0{2..8}_*`).
-- [~] **F3-06b · Equipos con Pokémon capturados** (@samuel, 2026-10-13) — `Team.caughtIds` (≤ 6, solo tuyos; `pokemonIds` se conserva por
+- [x] **F3-06b · Equipos con Pokémon capturados** (@samuel, 2026-10-13) — `Team.caughtIds` (≤ 6, solo tuyos; `pokemonIds` se conserva por
       el contrato del curso, D-054), quitar del equipo al transferir; pantalla `/equipos` que elige de "Mis Pokémon".
       Dep: F0-08, F3-02b.
+      **Hecho:** migración `team_caught` (UUID[] + CHECK ≤ 6) **aplicada en Supabase antes de mezclar**; `/teams` acepta
+      `caughtIds` (solo tuyos, sin repetir; comprobados con `FOR SHARE` en la misma transacción) y `PUT` sin ellos los
+      conserva; transferir los quita de los equipos en su transacción; `GET /collection?ids=` para pintarlos. App:
+      `/equipos` (huecos con arte y PC, PC total, vacía diseñada) y editor `/equipos/nuevo` · `/equipos/:id` (elige de
+      "Mis Pokémon" con `app-collection-card` en modo selección, máx. 6; borrar con confirmación); "Equipos" en el menú.
+      e2e 94, app 495, Postman 46/82/0. Probado en vista móvil (`F3-06b_0{1..6}_*`).
 - [ ] **F3-06c · Favoritos y Pokémon personalizados** — `/favoritos` (desde la ficha de la Pokédex, nota y 1-5) y
       `/personalizados` (crear/editar) con el sistema de diseño; contratos sin cambios. Que los personalizados salgan como
       spawns del grupo → extra de F7. Dep: F0-08, F3-04.
