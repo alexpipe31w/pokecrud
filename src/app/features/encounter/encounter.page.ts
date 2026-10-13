@@ -43,6 +43,7 @@ import { HapticsService } from '../../services/game/haptics.service';
 import { SettingsService } from '../../services/game/settings.service';
 import { GameButtonComponent } from '../../shared/ui/game-button.component';
 import { GlassPanelComponent } from '../../shared/ui/glass-panel.component';
+import { EncounterCardComponent } from './encounter-card.component';
 import { EncounterHudComponent } from './encounter-hud.component';
 
 /** Crea el escenario (renderer + bucle). Token para que los tests pongan un doble: jsdom no tiene WebGL. */
@@ -98,7 +99,13 @@ const prefersReducedMotion = (): boolean =>
  */
 @Component({
   selector: 'app-encounter',
-  imports: [IonContent, GameButtonComponent, GlassPanelComponent, EncounterHudComponent],
+  imports: [
+    IonContent,
+    GameButtonComponent,
+    GlassPanelComponent,
+    EncounterHudComponent,
+    EncounterCardComponent,
+  ],
   template: `
     <ion-content [scrollY]="false" class="full">
       <div
@@ -129,9 +136,25 @@ const prefersReducedMotion = (): boolean =>
                 [shiny]="v.shiny"
                 [size]="size()"
                 [ar]="arOn()"
+                [cardOpen]="cardOpen()"
                 (flee)="flee()"
                 (toggleAr)="toggleAr()"
+                (toggleCard)="toggleCard()"
               />
+              @if (cardOpen()) {
+                <app-encounter-card
+                  #card
+                  class="card-slot"
+                  [genus]="species()?.genus ?? ''"
+                  [flavor]="species()?.flavor ?? ''"
+                  [types]="species()?.types ?? []"
+                  [level]="v.level"
+                  [cp]="v.cp"
+                  [heightDm]="species()?.height ?? 0"
+                  [weightHg]="species()?.weight ?? 0"
+                  [heightScale]="v.heightScale"
+                />
+              }
             }
             @if (note(); as n) {
               <p class="note" role="status">{{ n }}</p>
@@ -214,6 +237,12 @@ const prefersReducedMotion = (): boolean =>
       color: var(--paper);
       text-shadow: 0 1px 3px rgb(0 0 0 / 0.5);
     }
+    .card-slot {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: min(220px, 58vw);
+    }
     .note {
       align-self: center;
       margin: 0;
@@ -252,6 +281,7 @@ export class EncounterPage implements OnDestroy {
   private readonly videoEl = viewChild.required<ElementRef<HTMLVideoElement>>('video');
   private readonly canvasEl = viewChild.required<ElementRef<HTMLCanvasElement>>('canvas');
   private readonly flashEl = viewChild.required<ElementRef<HTMLElement>>('flash');
+  private readonly cardEl = viewChild('card', { read: ElementRef<HTMLElement> });
 
   protected readonly phase = signal<Phase>('loading');
   protected readonly view = signal<EncounterView | null>(null);
@@ -266,7 +296,7 @@ export class EncounterPage implements OnDestroy {
   private readonly reduce = computed(
     () => this.settings.settings().reduceEffects || prefersReducedMotion(),
   );
-  private readonly species = computed(() => {
+  protected readonly species = computed(() => {
     const v = this.view();
     return v ? (this.dataset.species().get(v.speciesId) ?? null) : null;
   });
@@ -335,6 +365,14 @@ export class EncounterPage implements OnDestroy {
   protected flee(): void {
     this.haptics.tap();
     this.back();
+  }
+
+  /** Ficha del Pokémon (F2-13): cerrada por defecto; el botón la abre y, otra vez, la cierra (Alex). */
+  protected readonly cardOpen = signal(false);
+
+  protected toggleCard(): void {
+    this.haptics.tap();
+    this.cardOpen.update((open) => !open);
   }
 
   protected toggleAr(): void {
@@ -463,6 +501,7 @@ export class EncounterPage implements OnDestroy {
       world.update(null, pose);
     }
     world.animate(t / 1000);
+    this.placeCard(world);
   }
 
   /** Postura en `t` ms del encuentro: cae al entrar y después se mueve según su ficha (F2-04b). */
@@ -497,6 +536,31 @@ export class EncounterPage implements OnDestroy {
       duration: 350,
       easing: 'cubic-bezier(0.23, 1, 0.32, 1)',
     });
+  }
+
+  /**
+   * Pone la ficha al lado del Pokémon (a su derecha, si no cabe a su izquierda) a la altura de su cabeza; si no cabe a
+   * ningún lado o no se le ve (en AR mirando a otra parte), bajo la cabecera. Escribe el estilo directamente: cada
+   * fotograma por signals repintaría Angular 60 veces por segundo.
+   */
+  private placeCard(world: EncounterScene): void {
+    const el = this.cardEl()?.nativeElement;
+    if (!el) return;
+    const stage = this.stageEl().nativeElement;
+    const w = stage.clientWidth;
+    const h = stage.clientHeight;
+    const cw = el.offsetWidth;
+    const ch = el.offsetHeight;
+    const gap = 8;
+    const minTop = 120; // bajo la cabecera (huir, placa, AR y ficha)
+    const box = world.screenBox(w, h);
+    let x = (w - cw) / 2;
+    let y = minTop;
+    if (box && w - box.right >= cw + gap * 2) x = box.right + gap;
+    else if (box && box.left >= cw + gap * 2) x = box.left - cw - gap;
+    if (box && x !== (w - cw) / 2) y = box.top;
+    y = Math.min(Math.max(y, minTop), Math.max(minTop, h - ch - 72));
+    el.style.transform = `translate(${Math.round(x)}px, ${Math.round(y)}px)`;
   }
 
   private async openCamera(): Promise<void> {

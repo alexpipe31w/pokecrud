@@ -1,13 +1,14 @@
 import { Component, input, output } from '@angular/core';
 import { IonIcon } from '@ionic/angular';
 import { addIcons } from 'ionicons';
-import { arrowBack } from 'ionicons/icons';
+import { arrowBack, informationCircleOutline } from 'ionicons/icons';
 
 import { GlassPanelComponent } from '../../shared/ui/glass-panel.component';
 
 /**
  * Cabecera del encuentro (F2-04a): huir (arriba a la izquierda), la placa del Pokémon (nombre, ✦ si es shiny, nivel,
- * XS/XL) y el interruptor de la AR. Solo pinta: la página decide.
+ * XS/XL), el interruptor de la AR y el botón de la ficha (F2-13: la abre y, otra vez, la cierra). Solo pinta: la
+ * página decide.
  */
 @Component({
   selector: 'app-encounter-hud',
@@ -30,16 +31,28 @@ import { GlassPanelComponent } from '../../shared/ui/glass-panel.component';
         }
       </span>
     </app-glass-panel>
-    <button
-      type="button"
-      class="btn btn--ar"
-      [class.is-on]="ar()"
-      [attr.aria-pressed]="ar()"
-      aria-label="Realidad aumentada"
-      (click)="toggleAr.emit()"
-    >
-      AR
-    </button>
+    <div class="side">
+      <button
+        type="button"
+        class="btn btn--ar"
+        [class.is-on]="ar()"
+        [attr.aria-pressed]="ar()"
+        aria-label="Realidad aumentada"
+        (click)="toggleAr.emit()"
+      >
+        AR
+      </button>
+      <button
+        type="button"
+        class="btn"
+        [class.is-on]="cardOpen()"
+        [attr.aria-expanded]="cardOpen()"
+        aria-label="Ficha del Pokémon"
+        (click)="toggleCard.emit()"
+      >
+        <ion-icon name="information-circle-outline" aria-hidden="true" />
+      </button>
+    </div>
   `,
   styles: `
     :host {
@@ -62,7 +75,14 @@ import { GlassPanelComponent } from '../../shared/ui/glass-panel.component';
     .btn:active {
       transform: scale(0.94);
     }
-    .btn--ar.is-on {
+    .side {
+      display: grid;
+      gap: var(--s-2);
+    }
+    ion-icon {
+      font-size: 1.4rem;
+    }
+    .btn.is-on {
       background: var(--accent);
       color: var(--accent-ink);
     }
@@ -100,8 +120,10 @@ export class EncounterHudComponent {
   readonly ar = input(true);
   readonly flee = output<void>();
   readonly toggleAr = output<void>();
+  readonly cardOpen = input(false);
+  readonly toggleCard = output<void>();
 
   constructor() {
-    addIcons({ arrowBack });
+    addIcons({ arrowBack, informationCircleOutline });
   }
 }
