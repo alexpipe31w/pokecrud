@@ -5476,7 +5476,7 @@ export const natureNameEs = (nature: string): string =>
 
 **Files:** Modify `src/app/game/encounter-scene/encounter-scene.ts`, `encounter-scene.spec.ts`
 
-- [ ] **3a. Tests:**
+- [x] **3a. Tests:**
 
 ```diff
 --- a/src/app/game/encounter-scene/encounter-scene.spec.ts
@@ -5516,7 +5516,7 @@ export const natureNameEs = (nature: string): string =>
  });
 ```
 
-- [ ] **3b.** → FALLAN. **3c. Implementación:**
+- [x] **3b.** → FALLAN. **3c. Implementación:**
 
 ```diff
 --- a/src/app/game/encounter-scene/encounter-scene.ts
@@ -5573,7 +5573,7 @@ export const natureNameEs = (nature: string): string =>
      this.removeBall();
 ```
 
-- [ ] **3d.** → PASA (17). Commit + push.
+- [x] **3d.** → PASA (17). Commit + push.
 
 ### Paso 4 — Sonidos de la captura
 
