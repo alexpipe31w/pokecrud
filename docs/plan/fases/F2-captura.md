@@ -5405,7 +5405,7 @@ inventa nada (REGLA 3).
 
 **Files:** Create `shared/data/natures-es.ts`, Test `shared/data/natures-es.spec.ts`
 
-- [ ] **2a. Test que falla:**
+- [x] **2a. Test que falla:**
 
 ```ts
 import { NATURES } from '../engine/spawns.js';
@@ -5428,7 +5428,7 @@ describe('NATURE_NAMES_ES', () => {
 });
 ```
 
-- [ ] **2b.** `npm run test:shared -- natures` → FALLA. **2c. Implementación:**
+- [x] **2b.** `npm run test:shared -- natures` → FALLA. **2c. Implementación:**
 
 ```ts
 import type { Nature } from '../engine/spawns.js';
@@ -5470,7 +5470,7 @@ export const natureNameEs = (nature: string): string =>
   (NATURE_NAMES_ES as Record<string, string>)[nature] ?? nature;
 ```
 
-- [ ] **2d.** → PASA (3). Commit `F2-07: naturalezas en español (PokéAPI)` + push.
+- [x] **2d.** → PASA (3). Commit `F2-07: naturalezas en español (PokéAPI)` + push.
 
 ### Paso 3 — Absorción y bola quieta en la escena
 
