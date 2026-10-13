@@ -508,11 +508,12 @@ ON CONFLICT ("playerId", "speciesId") DO NOTHING;
 
 **Files:** Create `server/prisma/backfill-collection.ts`; Modify `server/package.json`
 
-- [ ] **7a.** Script `npm run db:backfill-collection` (`tsx prisma/backfill-collection.ts`, como `admin`): carga
+- [x] **7a.** Script `npm run db:backfill-collection` (`tsx prisma/backfill-collection.ts`, como `admin`): carga
   `pokedex.json`; (1) `cp` de las filas con `cp IS NULL` (por lotes de 200); (2) caramelos: **solo para jugadores sin
   ninguna fila `Candy`** (así se puede ejecutar dos veces sin duplicar), `CANDY_PER_CATCH × capturados` por familia;
-  imprime cuántas filas tocó. La Pokédex ya la rellenó la migración.
-- [ ] **7b.** Probarlo en el Postgres portátil: sembrar 3 capturas de antes (sin `cp`, sin `Candy`) → ejecutar →
+  (3) Pokédex "capturado" de todo lo capturado (`createMany skipDuplicates`): la migración solo cubre lo capturado
+  ANTES de aplicarla, y entre la migración y el despliegue el código viejo sigue capturando. Imprime cuántas filas tocó.
+- [x] **7b.** Probarlo en el Postgres portátil: sembrar 3 capturas de antes (sin `cp`, sin `Candy`) → ejecutar →
   `cp` relleno y 9 caramelos repartidos por familia → ejecutarlo otra vez → "0 filas". Commit + `/guardar`.
 
 ### Paso 8 — Aplicar en Supabase (ANTES de mezclar el PR)
