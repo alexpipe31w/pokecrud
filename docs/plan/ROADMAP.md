@@ -319,7 +319,7 @@
       `/pokedex/:id`: arte, categoría, tipos, descripción ES, altura/peso, generación, hábitat ES, grito, debilidades
       (`defenseProfile`) y cadena (`evolutionTree`, método en ES; ramas en 2 columnas); sin ver → solo silueta. La ficha
       del individuo enlaza a su especie. Probado en vista móvil con Nest y Postgres locales (`F3-04_0{1..4}_*`).
-- [ ] **F3-05 · Evolución con caramelos** — regla de caramelos por cadena (D-053: 50 si la cadena tiene una
+- [~] **F3-05 · Evolución con caramelos** (@samuel, 2026-10-13) — regla de caramelos por cadena (D-053: 50 si la cadena tiene una
       evolución; 25 y 100 si tiene dos), `POST /collection/:id/evolve` transaccional, animación de evolución. Dep: F3-03.
 - [ ] **F3-06a · Inventario de IS-11 con la nueva UI** — `/inventario`, detalle, agregar y editar (HU-03/04/05/14)
       con el sistema de diseño, mismos servicios, modelo, formulario y contrato; Postman sigue pasando. Dep: F3-04.

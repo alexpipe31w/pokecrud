@@ -196,8 +196,9 @@ F2-07, F2-12, F2-13, F2-15 hechas; faltan **F2-11**/**F2-14** (ARCore), F2-10 (m
 
 ## En curso
 
-- Nadie. Samuel cerró el 2026-10-13: F0-15, F3-01a, F3-02a (+ migración en Supabase), F3-02b, F3-03, F3-01b y
-  F3-04 (#63…#69). **Ojo:** el inventario de IS-11 está ahora en `/inventario` (la Pokédex 1025 ocupa `/pokedex`).
+- **F3-05 (Samuel, rama `feature/F3-05-evolucion`):** evolución con caramelos (parte 2 de `fases/F3-coleccion.md`).
+  Punto de guardado: recién reclamada, empieza por el paso 1 (`shared/engine/evolution.ts`).
+- **Ojo:** el inventario de IS-11 está ahora en `/inventario` (la Pokédex 1025 ocupa `/pokedex`).
 
 ### PRUEBAS EN EL MÓVIL PENDIENTES (con el APK de producción, `npm run apk -- --install`)
 - **F1-07 7b + F1-05 3b (en la calle, con luz, joystick APAGADO):** andar y trotar; fps ≥ 55 con Pokémon; grito
