@@ -218,7 +218,7 @@ para el criterio (vídeo); hasta entonces, dos ventanas del navegador a 390×844
 - [x] **Paso 3 — persistencia:** modelo `Battle` + migración `battle` (índices `(p1Id, endedAt)`, `(p2Id, endedAt)`),
   `BattlesRepository.save` idempotente (regla 10). e2e: guardar dos veces el mismo id → una fila. **Aplicar en Supabase
   ANTES de mezclar** (con `DIRECT_URL` y permiso del humano), como F3-02a y F3-06b.
-- [ ] **Paso 4 — `BattleRoomsService` + gateway:** `battle:act`, `battle:forfeit`, `pvp:hello` con el combate en curso,
+- [x] **Paso 4 — `BattleRoomsService` + gateway:** `battle:act`, `battle:forfeit`, `pvp:hello` con el combate en curso,
   `handleDisconnect` → sala; `battle-data.service.ts` carga movimientos soportados y tabla de tipos una vez (de
   `src/assets/data`, como `SpawnsService`). e2e con dos clientes: combate entero hasta `battle:end` y fila en `Battle`;
   reconexión a mitad (cerrar un socket y abrir otro con el mismo token → `hello` trae la vista y se sigue).

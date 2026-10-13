@@ -222,7 +222,8 @@ F2-07, F2-12, F2-13, F2-15 hechas; faltan **F2-11**/**F2-14** (ARCore), F2-10 (m
 
 - **F5-04 (Samuel, rama `feature/F5-04-combate-pvp`):** combate PvP completo. Punto de guardado: recién reclamada;
   pasos 1-3 hechos (`pvp-view`, `BattleRoom`, tabla `Battle` + `BattlesRepository`). Migración `20261013030000_battle`
-  SOLO en el Postgres local: va a Supabase ANTES de mezclar (con permiso). Sigue el paso 4 (rooms service + gateway).
+  SOLO en el Postgres local: va a Supabase ANTES de mezclar (con permiso). Paso 4 hecho (servidor completo: `battle:act`,
+  reconexión, abandono, resultado guardado; e2e 114). Sigue el paso 5 (app: modo remoto de `BattleController`).
 - Cuentas de prueba locales: `demo+alex@pokecrud.test` y `demo+rival@pokecrud.test` (contraseña: pídesela a Alex; no va en el repo), con equipo "Arena" de 3. `test:e2e` las borra pasada 1 h: se recrean registrándolas y con el script de la bitácora de F5-03.
 - Samuel cerró **F3-06c** (#73 mezclado; sin migración). **Con esto la F3 está completa en código.**
 - **Ojo:** el inventario de IS-11 está ahora en `/inventario` (la Pokédex 1025 ocupa `/pokedex`).
