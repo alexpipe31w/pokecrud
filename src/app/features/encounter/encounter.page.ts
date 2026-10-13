@@ -512,8 +512,10 @@ export class EncounterPage implements OnDestroy {
     void this.router.navigateByUrl('/mapa');
   }
 
+  /** "Ver en Mis Pokémon" (F3-02b): la ficha del recién capturado (F3-03). */
   protected openCollection(): void {
-    void this.router.navigateByUrl('/coleccion');
+    const id = this.caught()?.view.id;
+    void this.router.navigateByUrl(id ? `/coleccion/${id}` : '/coleccion');
   }
 
   protected flee(): void {

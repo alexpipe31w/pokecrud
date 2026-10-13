@@ -19,6 +19,7 @@ import {
 import { CollectionService } from '../../services/game/collection.service';
 import { CollectionCardComponent } from './collection-card.component';
 import { CollectionFiltersComponent } from './collection-filters.component';
+import { TransferToastComponent } from './transfer-toast.component';
 
 /** Esqueletos que se enseñan mientras llega la primera página. */
 const SKELETONS = Array.from({ length: 6 }, (_, i) => i);
@@ -40,6 +41,7 @@ const SKELETONS = Array.from({ length: 6 }, (_, i) => i);
     RouterLink,
     CollectionCardComponent,
     CollectionFiltersComponent,
+    TransferToastComponent,
   ],
   template: `
     <ion-header [translucent]="true">
@@ -115,6 +117,7 @@ const SKELETONS = Array.from({ length: 6 }, (_, i) => i);
     </ion-content>
 
     <app-collection-filters [open]="filtersOpen()" (closed)="filtersOpen.set(false)" />
+    <app-transfer-toast />
   `,
   styles: `
     .count {
