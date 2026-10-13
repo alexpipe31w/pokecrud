@@ -1238,14 +1238,14 @@ export function evolutionOptions(dex: Dex, from: number): EvolutionOption[] {
 `speciesMap()` para `evolutionOptions`), `server/src/collection/*`, `shared/protocol/collection.ts`
 (`EvolveRequest { to: number }`, respuesta `CollectionDetail`); Test `server/test/collection.e2e-spec.ts`
 
-- [ ] **2a. e2e que fallan:**
+- [x] **2a. e2e que fallan:**
   1. Bulbasaur nv 10 con 25 caramelos de su familia → `POST …/evolve { to: 2 }` → 200, `speciesId: 2`, mismo nivel,
      IVs, naturaleza, shiny y mote; `cp` y `stats` recalculados (= `combatPower(calcStats(base de Ivysaur, …))`);
      caramelos 25 → 0; Pokédex de 2 = capturado.
   2. Con 24 caramelos → 409 "Te faltan caramelos" y nada cambia.
   3. `to` que no es una evolución suya (Bulbasaur → 3) → 400; especie sin evolución → 400; de otro jugador → 404.
   4. Dos `evolve` a la vez del mismo con 50 caramelos → uno 200 y otro 409; caramelos 50 → 25 (no 0).
-- [ ] **2b. Servicio** (una transacción, como `transfer`):
+- [x] **2b. Servicio** (una transacción, como `transfer`):
 
 ```ts
   async evolve(playerId: string, id: string, to: number): Promise<CollectionDetail> {
@@ -1280,7 +1280,7 @@ export function evolutionOptions(dex: Dex, from: number): EvolutionOption[] {
 ```
 
   Controlador `@Post(':id/evolve')` con `ParseUUIDPipe` y DTO `{ to: @IsInt() @Min(1) }`, límite 30/min.
-- [ ] **2c.** e2e → PASA; todos los e2e, lint, unitarios, build. Commit + `/guardar`.
+- [x] **2c.** e2e → PASA; todos los e2e, lint, unitarios, build. Commit + `/guardar`.
 
 ### Paso 3 — App: evolucionar desde la ficha + animación
 

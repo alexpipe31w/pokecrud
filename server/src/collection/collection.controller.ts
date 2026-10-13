@@ -3,9 +3,11 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
   Param,
   ParseUUIDPipe,
   Patch,
+  Post,
   Query,
 } from '@nestjs/common';
 import { Throttle } from '@nestjs/throttler';
@@ -18,7 +20,11 @@ import type {
   PokedexView,
   TransferResult,
 } from '../../../shared/protocol/collection.js';
-import { CollectionPatchDto, CollectionQueryDto } from './collection.dto.js';
+import {
+  CollectionEvolveDto,
+  CollectionPatchDto,
+  CollectionQueryDto,
+} from './collection.dto.js';
 import { CollectionService } from './collection.service.js';
 
 /** `GET /collection` (F3-02a): los Pokémon capturados del jugador del token. Exige sesión (guard global). */
@@ -54,6 +60,18 @@ export class CollectionController {
     @Body() dto: CollectionPatchDto,
   ): Promise<CollectionItem> {
     return this.collection.patch(player.id, id, dto);
+  }
+
+  /** Evolucionar con caramelos (F3-05, D-053): devuelve la ficha ya evolucionada. */
+  @Throttle({ default: { limit: 30, ttl: 60_000 } })
+  @Post(':id/evolve')
+  @HttpCode(200)
+  evolve(
+    @CurrentPlayer() player: AuthPlayer,
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() dto: CollectionEvolveDto,
+  ): Promise<CollectionDetail> {
+    return this.collection.evolve(player.id, id, dto.to);
   }
 
   /** Transferir (F3-03): +1 caramelo de su familia. */

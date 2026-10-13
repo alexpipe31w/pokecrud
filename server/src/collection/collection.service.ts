@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ConflictException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -206,6 +207,70 @@ export class CollectionService {
         candy: { familyId, qty: candy.qty, gained: CANDY_PER_TRANSFER },
       };
     }, TX_OPTIONS);
+  }
+
+  /**
+   * `POST /collection/:id/evolve` (F3-05, D-053): gasta los caramelos de su familia y cambia la especie, en UNA
+   * transacción. Se conservan nivel, IVs, naturaleza, shiny, tamaño y mote; cambian especie, PC y movimientos. Dos a la
+   * vez: el gasto es condicional (`qty >= coste`) y el cambio solo vale si sigue siendo la especie de origen; si no,
+   * se lanza y la transacción deshace también el gasto.
+   */
+  async evolve(
+    playerId: string,
+    id: string,
+    to: number,
+  ): Promise<CollectionDetail> {
+    await this.prisma.$transaction(async (tx) => {
+      const row = await tx.caughtPokemon.findFirst({
+        where: { id, playerId },
+        select: { speciesId: true, ivs: true, level: true, nature: true },
+      });
+      if (!row) throw new NotFoundException(NOT_YOURS);
+      const option = this.spawns
+        .evolutionOptions(row.speciesId)
+        .find((o) => o.to === to);
+      const from = this.spawns.speciesDetails(row.speciesId);
+      const target = this.spawns.speciesDetails(to);
+      if (!option || !from || !target) {
+        throw new BadRequestException(
+          'Ese Pokémon no evoluciona en esa especie',
+        );
+      }
+      const paid = await tx.candy.updateMany({
+        where: { playerId, familyId: from.familyId, qty: { gte: option.cost } },
+        data: { qty: { decrement: option.cost } },
+      });
+      if (paid.count !== 1) throw new ConflictException('Te faltan caramelos');
+      const stats = calcStats(
+        target.baseStats,
+        row.ivs as unknown as Stats,
+        row.level,
+        row.nature as Nature,
+      );
+      const changed = await tx.caughtPokemon.updateMany({
+        where: { id, playerId, speciesId: row.speciesId },
+        data: {
+          speciesId: to,
+          cp: combatPower(stats),
+          moves: this.spawns.defaultMoves(to, row.level),
+        },
+      });
+      if (changed.count !== 1) {
+        throw new ConflictException('Ese Pokémon ya evolucionó');
+      }
+      const now = new Date();
+      await tx.pokedexEntry.upsert({
+        where: { playerId_speciesId: { playerId, speciesId: to } },
+        create: { playerId, speciesId: to, caught: true, firstCaughtAt: now },
+        update: { caught: true },
+      });
+      // La primera fecha de captura nunca se pisa (la fila pudo existir solo como "vista"), como en la captura.
+      await tx.pokedexEntry.updateMany({
+        where: { playerId, speciesId: to, firstCaughtAt: null },
+        data: { firstCaughtAt: now },
+      });
+    }, TX_OPTIONS);
+    return this.detail(playerId, id);
   }
 
   /** PC de una fila: el guardado o, si es de antes de F3-02a, calculado al vuelo (D-049). */

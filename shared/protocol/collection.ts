@@ -62,6 +62,14 @@ export interface CollectionPatch {
   favorite?: boolean;
 }
 
+/**
+ * `POST /collection/:id/evolve` (F3-05, D-053). Responde la ficha (`CollectionDetail`) ya evolucionada.
+ * 409 "Te faltan caramelos" / "Ese Pokémon ya evolucionó"; 400 si no evoluciona en esa especie.
+ */
+export interface EvolveRequest {
+  to: number;
+}
+
 /** `DELETE /collection/:id` (transferir). */
 export interface TransferResult {
   candy: { familyId: number; qty: number; gained: number };
