@@ -551,7 +551,7 @@ Sin test unitario (WebGL no existe en jsdom): la página lo recibe por un token 
 
 **Files:** Create `src/app/game/encounter-scene/encounter-stage.ts`
 
-- [ ] **4a.** Crear:
+- [x] **4a.** Crear:
 
 ```ts
 import * as THREE from 'three';
@@ -621,7 +621,7 @@ export class EncounterStage implements EncounterStageLike {
 }
 ```
 
-- [ ] **4b.** `npm run build` → compila. Commit `F2-04a: escenario del encuentro (un contexto WebGL que se suelta)` + push.
+- [x] **4b.** `npm run build` → compila. Commit `F2-04a: escenario del encuentro (un contexto WebGL que se suelta)` + push.
 
 ### Paso 5 — Cámara principal
 
