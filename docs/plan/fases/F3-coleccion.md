@@ -1313,14 +1313,14 @@ export function evolutionOptions(dex: Dex, from: number): EvolutionOption[] {
 juego (DISENO §1-§4) sin cambiar su contrato ni sus servicios (`PokemonService`, `PokeApiService`, modelo
 `pokemon.model.ts`, `PokemonFormComponent`), y sus tests siguen en verde.
 
-- [ ] **1.** `/inventario`: rejilla de tarjetas como "Mis Pokémon" (arte, nombre, tipos, **precio** y **stock** con
+- [x] **1.** `/inventario`: rejilla de tarjetas como "Mis Pokémon" (arte, nombre, tipos, **precio** y **stock** con
   "Agotado" si 0), buscador con el estilo del juego, scroll infinito actual conservado, botón "Agregar" solo para ADMIN
   (D-023).
-- [ ] **2.** `/pokemon/:id`: ficha con el tinte del tipo, stats con `app-stat-bar`, precio/stock destacados, editar y
+- [x] **2.** `/pokemon/:id`: ficha con el tinte del tipo, stats con `app-stat-bar`, precio/stock destacados, editar y
   eliminar (solo ADMIN) con confirmación diseñada (nada de `alert` del sistema).
-- [ ] **3.** `/pokemon/nuevo` y `/pokemon/:id/editar`: `PokemonFormComponent` con los estilos de `src/theme/forms.scss`
+- [x] **3.** `/pokemon/nuevo` y `/pokemon/:id/editar`: `PokemonFormComponent` con los estilos de `src/theme/forms.scss`
   (`.form`, `.field__*`, D-018) y `app-game-button`.
-- [ ] **4.** Postman (colección del repo) sigue pasando entera contra el servidor local; `ng test`, lint, build;
+- [x] **4.** Postman (colección del repo) sigue pasando entera contra el servidor local; `ng test`, lint, build;
   capturas `F3-06a_*`. REGLA 2.
 
 ## F3-06b · Equipos con Pokémon capturados

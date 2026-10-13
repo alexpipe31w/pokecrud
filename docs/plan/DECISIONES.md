@@ -741,3 +741,16 @@ la especie nueva a su nivel, D-030). La Pokédex marca la especie nueva como cap
 **Consecuencia:** el servidor decide (REGLA 3): `POST /collection/:id/evolve { to }` usa la MISMA función; la app solo la
 usa para pintar los botones. Si F8-05 quiere evolucionar en la demo sin farmear, que regale caramelos en el modo demo
 (nunca un endpoint público).
+
+## D-055 · IS-11 con la nueva UI: editar y eliminar desde la ficha, confirmaciones propias (F3-06a) (2026-10-13, Samuel)
+
+(D-054 queda reservada para F3-06b, como dice el plan.)
+**Contexto:** la lista del inventario usaba `ion-item-sliding` (deslizar para editar/eliminar) y `UiService.confirm`
+(el `alert` de Ionic); con tarjetas en rejilla no hay fila que deslizar, y el plan pide "nada de alert del sistema".
+**Decisión:** la lista solo abre la ficha y tiene "Agregar" (ADMIN). **Editar y Eliminar están en la ficha
+`/pokemon/:id`** (solo ADMIN, D-023), y eliminar pide confirmación con `app-confirm-panel` (`shared/ui/`, rol
+`alertdialog`, botón rojo). `UiService` se queda solo con `toast`. Los tipos del formulario se eligen con chips
+(máx. 2) en vez de `ion-select`. Servicios, modelo, `PokemonFormComponent` (lo que emite) y el contrato `/pokemon`
+no cambian; Postman pasa igual.
+**Consecuencia:** quien necesite confirmar algo en otra pantalla, que use `app-confirm-panel`; `app-game-button`
+tiene variante `danger`; `app-search-field` es el buscador común.

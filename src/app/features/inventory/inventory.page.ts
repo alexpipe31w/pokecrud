@@ -1,85 +1,57 @@
-import { CurrencyPipe, TitleCasePipe } from '@angular/common';
 import { Component, computed, effect, inject, signal, untracked } from '@angular/core';
 import { Router } from '@angular/router';
 import {
   IonBackButton,
-  IonButton,
   IonButtons,
   IonContent,
-  IonFab,
-  IonFabButton,
   IonHeader,
-  IonIcon,
   IonInfiniteScroll,
   IonInfiniteScrollContent,
   InfiniteScrollCustomEvent,
-  IonItem,
-  IonItemOption,
-  IonItemOptions,
-  IonItemSliding,
-  IonLabel,
-  IonList,
-  IonNote,
   IonRefresher,
   IonRefresherContent,
-  IonSearchbar,
-  IonSpinner,
-  IonText,
-  IonThumbnail,
+  IonTitle,
   IonToolbar,
   RefresherCustomEvent,
 } from '@ionic/angular';
-import { addIcons } from 'ionicons';
-import { add, createOutline, trashOutline } from 'ionicons/icons';
 import { finalize } from 'rxjs';
 
 import { POKEDEX_PAGE_SIZE } from '../../core/constants/app.constants';
-import { dexNumber, displayName, spriteUrl } from '../../core/utils/pokemon-defaults';
 import { Pokemon } from '../../models/pokemon.model';
 import { filterRefs } from '../../services/poke-api.service';
 import { PokemonService } from '../../services/pokemon.service';
 import { AuthService } from '../../core/auth/auth.service';
-import { UiService } from '../../services/ui.service';
-import { TypeChipsComponent } from '../../shared/components/type-chips/type-chips.component';
+import { GameButtonComponent } from '../../shared/ui/game-button.component';
+import { SearchFieldComponent } from '../../shared/ui/search-field.component';
+import { InventoryCardComponent } from './inventory-card.component';
 
-/** Listado de los Pokémon guardados en la base de datos (IS-11 · HU-03). */
+/**
+ * Inventario de la tienda (IS-11 · HU-03), con el sistema de diseño del juego (F3-06a): rejilla de tarjetas teñidas
+ * con el tipo, precio y stock destacados ("Agotado" si 0), buscador y scroll infinito de 20 en 20. Editar y eliminar
+ * están en la ficha (`/pokemon/:id`); "Agregar" solo para ADMIN (D-023), que el servidor exige igualmente.
+ */
 @Component({
   selector: 'app-inventory',
   templateUrl: 'inventory.page.html',
   styleUrl: 'inventory.page.scss',
   imports: [
-    CurrencyPipe,
-    TitleCasePipe,
     IonHeader,
     IonToolbar,
     IonButtons,
     IonBackButton,
+    IonTitle,
     IonContent,
-    IonSearchbar,
-    IonList,
-    IonItemSliding,
-    IonItem,
-    IonItemOptions,
-    IonItemOption,
-    IonThumbnail,
-    IonLabel,
-    IonNote,
-    IonIcon,
-    IonFab,
-    IonFabButton,
     IonInfiniteScroll,
     IonInfiniteScrollContent,
     IonRefresher,
     IonRefresherContent,
-    IonSpinner,
-    IonText,
-    IonButton,
-    TypeChipsComponent,
+    GameButtonComponent,
+    SearchFieldComponent,
+    InventoryCardComponent,
   ],
 })
 export class InventoryPage {
   private readonly pokemonService = inject(PokemonService);
-  private readonly ui = inject(UiService);
   /** Solo un ADMIN ve agregar/editar/eliminar (F0-12); el servidor lo exige igualmente. */
   protected readonly isAdmin = inject(AuthService).isAdmin;
   private readonly router = inject(Router);
@@ -96,11 +68,7 @@ export class InventoryPage {
   protected readonly visible = computed(() => this.filtered().slice(0, this.shown()));
   protected readonly hasMore = computed(() => this.shown() < this.filtered().length);
 
-  protected readonly dexNumber = dexNumber;
-  protected readonly spriteUrl = spriteUrl;
-
   constructor() {
-    addIcons({ add, createOutline, trashOutline });
     // Carga inicial y recarga automática cuando se agrega, edita o elimina un Pokémon.
     effect(() => {
       this.pokemonService.version();
@@ -121,10 +89,7 @@ export class InventoryPage {
       )
       .subscribe({
         next: (list) => this.pokemon.set(list),
-        error: () =>
-          this.error.set(
-            'No se pudo conectar con la base de datos. ¿Está corriendo `npm run api`?',
-          ),
+        error: () => this.error.set('No se pudo cargar el inventario.'),
       });
   }
 
@@ -133,31 +98,9 @@ export class InventoryPage {
     event.target.complete();
   }
 
-  protected onSearch(event: Event): void {
+  protected onSearch(value: string): void {
     this.shown.set(POKEDEX_PAGE_SIZE);
-    this.term.set((event as CustomEvent<{ value?: string | null }>).detail.value ?? '');
-  }
-
-  protected open(p: Pokemon): void {
-    this.router.navigate(['/pokemon', p.id]);
-  }
-
-  protected edit(p: Pokemon, sliding: IonItemSliding): void {
-    sliding.close();
-    this.router.navigate(['/pokemon', p.id, 'editar']);
-  }
-
-  protected async remove(p: Pokemon, sliding: IonItemSliding): Promise<void> {
-    await sliding.close();
-    const ok = await this.ui.confirm(
-      'Eliminar Pokémon',
-      `¿Seguro que quieres eliminar a ${displayName(p.name)} (${dexNumber(p.id)})?`,
-    );
-    if (!ok) return;
-    this.pokemonService.delete(p.id).subscribe({
-      next: () => this.ui.toast(`${displayName(p.name)} eliminado`),
-      error: () => this.ui.toast('No se pudo eliminar', 'danger'),
-    });
+    this.term.set(value);
   }
 
   protected add(): void {

@@ -327,8 +327,14 @@
       (`evolvePose`: silueta A↔B acelerando → destello → forma nueva con grito y vibración; espera al servidor; error →
       vuelve a A; "Reducir movimiento" → fundido). Probado en vista móvil con Nest y Postgres locales (`F3-05_0{1..9}_*`).
       Pendiente opcional: un vistazo en Android.
-- [ ] **F3-06a · Inventario de IS-11 con la nueva UI** — `/inventario`, detalle, agregar y editar (HU-03/04/05/14)
+- [x] **F3-06a · Inventario de IS-11 con la nueva UI** (@samuel, 2026-10-13) — `/inventario`, detalle, agregar y editar (HU-03/04/05/14)
       con el sistema de diseño, mismos servicios, modelo, formulario y contrato; Postman sigue pasando. Dep: F3-04.
+      **Hecho:** `/inventario` en tarjetas (`app-inventory-card`: tinte del tipo, precio dorado, stock y "Agotado"),
+      buscador del juego (`app-search-field`), "Agregar" solo ADMIN; ficha `/pokemon/:id` con barras `app-stat-bar`,
+      editar y eliminar con `app-confirm-panel` (sin `alert` de Ionic, D-055); formulario con `forms.scss` y tipos en
+      chips (máx. 2); agregar desde PokéAPI con tarjetas de resultado. Servicios, modelo y contrato sin cambios.
+      Postman 46 peticiones / 82 comprobaciones / 0 fallos contra el servidor local (`F3-06a_01`). App 485 tests.
+      Probado en vista móvil como admin y como jugador (`F3-06a_0{2..8}_*`).
 - [ ] **F3-06b · Equipos con Pokémon capturados** — `Team.caughtIds` (≤ 6, solo tuyos; `pokemonIds` se conserva por
       el contrato del curso, D-054), quitar del equipo al transferir; pantalla `/equipos` que elige de "Mis Pokémon".
       Dep: F0-08, F3-02b.

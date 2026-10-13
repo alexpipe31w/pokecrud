@@ -1628,3 +1628,42 @@ blanco sobre el tinte se leía mal; ahora fondo claro teñido + borde del tipo; 
 **Quedó a medias:** nada del criterio. Opcional: vistazo en Android (grito y vibración al aparecer la forma nueva).
 **Decisiones nuevas:** D-053.
 **El siguiente debe empezar por:** F3-06a (inventario de IS-11 con la nueva UI) en `fases/F3-coleccion.md`, parte 2.
+
+## 2026-10-13 12:40 · @samuel (Claude) · F3-05 (mezcla) + F3-06a · rama `feature/F3-06a-inventario-ui`
+
+**Qué se hizo:** #70 (F3-05) mezclado con el CI en verde (permiso de Samuel). F3-06a (D-055): paso 1 `/inventario`
+en rejilla de `app-inventory-card` (tinte del tipo, arte `home` con respaldo, nº, stock / "Agotado" con el arte en
+gris, precio en dorado, enlace a la ficha, entrada escalonada), `app-search-field` y "Agregar" (`app-game-button`) solo
+ADMIN; editar/eliminar ya no se deslizan en la lista. Paso 2 `/pokemon/:id`: teñida con el tipo, precio y stock en
+tarjetas, altura/peso/exp., habilidades en chips, `app-stat-bar`, Editar y Eliminar (variante nueva `danger` de
+`app-game-button`) con `app-confirm-panel`. Paso 3: `PokemonFormComponent` con `forms.scss` y tipos en chips (máx. 2;
+un tercero se ignora y se deshabilita), agregar con resultados en tarjetas y aviso "ya está en el inventario",
+editar sin `ion-spinner`. `UiService.confirm` (alert de Ionic) se quitó porque quedó sin uso.
+**Tropiezos:** (1) `prettier --write src/app/features` reformateó dos archivos del mapa y entraron en un commit → el
+siguiente commit los devolvió a su estado (no eran de la tarea). Pasar Prettier solo sobre los archivos tocados.
+(2) Los estilos de la lista y la ficha pasaban del presupuesto de 2 kB → la tarjeta pasó a componente propio y la
+confirmación a `app-confirm-panel` (build sin avisos). (3) Una salida llamada `search` choca con la regla
+`no-output-native` → `query`.
+**Archivos clave:** `src/app/features/inventory/*`, `features/pokemon-detail/*`, `features/pokemon-add/*`,
+`features/pokemon-edit/*`, `shared/components/pokemon-form/*`, `shared/ui/{search-field,confirm-panel,game-button}`,
+`services/ui.service.ts`.
+**Cómo se probó (salida real):**
+
+    tests en rojo primero: inventario 4 (sin tarjetas), ficha 2 (sin "Agotado" ni confirmación), formulario 2
+      (sin chips / con ion-input), search-field (no existe) → verdes; app: 85 archivos, 485 passed · lint OK ·
+      ng build OK sin avisos de presupuesto
+    Postman (newman 6.2.1, servidor local + cuenta ADMIN demo+admin-… en el Postgres portátil):
+      requests 46 / 0 failed · assertions 82 / 0 failed (docs/evidencias/F3-06a_01_newman-runner.txt)
+    Chrome sin ventana 390×844, Nest + Postgres locales:
+      admin: "151 de 151 Pokémon", 20 tarjetas, "Bulbasaur, #001, $ 6.400, 12 en stock", botón Agregar
+      buscar "char" → "3 de 151"; ficha Pikachu con 6 barras; editar stock 0 → "Stock Agotado" y tarjeta
+        "Pikachu, #025, $ 11.200, agotado"
+      agregar lucario desde PokéAPI → formulario con tipos [Lucha, Acero] → "152 de 152"
+      eliminar Lucario → "¿Eliminar a Lucario (#448) del inventario?", 0 ion-alert → "151 de 151"
+      jugador normal: 0 botones Agregar / Editar / Eliminar; 0 errores de consola
+      (admin: 1 × 404 de GET /pokemon/448, que es cómo IS-11 comprueba que Lucario aún no está guardado)
+    Evidencias docs/evidencias/F3-06a_0{2..8}_*.png
+
+**Quedó a medias:** nada. Pikachu quedó con stock 30 en la base local (se restauró al final).
+**Decisiones nuevas:** D-055.
+**El siguiente debe empezar por:** F3-06b paso 1 (migración `team_caught`, D-054) en `fases/F3-coleccion.md`.

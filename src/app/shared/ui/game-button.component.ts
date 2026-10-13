@@ -88,11 +88,15 @@ import { HapticsService } from '../../services/game/haptics.service';
       background: var(--gold);
       color: var(--ink);
     }
+    .gb--danger {
+      background: var(--danger);
+      color: var(--accent-ink);
+    }
   `,
 })
 export class GameButtonComponent {
   readonly label = input.required<string>();
-  readonly variant = input<'primary' | 'glass' | 'gold'>('primary');
+  readonly variant = input<'primary' | 'glass' | 'gold' | 'danger'>('primary');
   readonly type = input<'button' | 'submit'>('button');
   readonly disabled = input(false);
   readonly loading = input(false);

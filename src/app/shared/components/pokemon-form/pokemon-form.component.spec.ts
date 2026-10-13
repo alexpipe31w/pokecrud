@@ -1,6 +1,9 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideIonicAngular } from '@ionic/angular';
 
+import { AudioService } from '../../../services/game/audio.service';
+import { HapticsService } from '../../../services/game/haptics.service';
+
 import { PokemonDraft } from '../../../models/pokemon.model';
 import { PokemonFormComponent } from './pokemon-form.component';
 
@@ -25,7 +28,11 @@ describe('PokemonFormComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [PokemonFormComponent],
-      providers: [provideIonicAngular()],
+      providers: [
+        provideIonicAngular(),
+        { provide: HapticsService, useValue: { tap: vi.fn() } },
+        { provide: AudioService, useValue: { playSfx: vi.fn() } },
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(PokemonFormComponent);
@@ -64,5 +71,36 @@ describe('PokemonFormComponent', () => {
     (component as unknown as { submit(): void }).submit();
 
     expect(emitted).toHaveLength(0);
+  });
+  it('types are chosen with chips: at most 2, a third one is ignored, tapping again removes it', () => {
+    const el = fixture.nativeElement as HTMLElement;
+    const chip = (label: string) =>
+      [...el.querySelectorAll<HTMLButtonElement>('button.type')].find(
+        (b) => b.textContent?.trim() === label,
+      )!;
+    const value = () =>
+      (component as unknown as { form: { controls: { types: { value: string[] } } } }).form.controls
+        .types.value;
+
+    expect(el.querySelectorAll('button.type')).toHaveLength(18);
+    expect(chip('Eléctrico').getAttribute('aria-pressed')).toBe('true');
+    chip('Acero').click();
+    fixture.detectChanges();
+    expect(value()).toEqual(['electric', 'steel']);
+    chip('Fuego').click();
+    fixture.detectChanges();
+    expect(value()).toEqual(['electric', 'steel']);
+    expect(chip('Fuego').disabled).toBe(true);
+    chip('Eléctrico').click();
+    fixture.detectChanges();
+    expect(value()).toEqual(['steel']);
+    expect(chip('Fuego').disabled).toBe(false);
+  });
+
+  it('uses the game form fields (no Ionic inputs) and a game submit button', () => {
+    const el = fixture.nativeElement as HTMLElement;
+    expect(el.querySelector('ion-input, ion-select, ion-item')).toBeNull();
+    expect(el.querySelectorAll('input.field__input').length).toBeGreaterThanOrEqual(13);
+    expect(el.querySelector('app-game-button button[type="submit"]')).not.toBeNull();
   });
 });

@@ -2,79 +2,72 @@
   <ion-toolbar>
     <ion-buttons slot="start">
       @if (selected()) {
-        <ion-button (click)="backToSearch()">Buscar otro</ion-button>
+        <ion-button (click)="backToSearch()">‹ Buscar otro</ion-button>
       } @else {
         <ion-back-button defaultHref="/inventario" text="Inventario"></ion-back-button>
       }
     </ion-buttons>
     <ion-title>Agregar Pokémon</ion-title>
   </ion-toolbar>
-  @if (!selected()) {
-    <ion-toolbar>
-      <ion-searchbar
-        placeholder="Número o nombre"
-        [debounce]="400"
-        (ionInput)="onSearch($event)"
-      ></ion-searchbar>
-    </ion-toolbar>
-  }
 </ion-header>
 
 <ion-content [fullscreen]="true">
   @if (loadingDetail()) {
-    <div class="state"><ion-spinner name="crescent"></ion-spinner></div>
+    <p class="state" role="status">Trayendo sus datos de PokéAPI…</p>
   } @else if (selected(); as draft) {
     @if (alreadySaved()) {
-      <div class="warning">
-        <ion-text color="warning">
-          <p>{{ dexNumber(draft.id) }} {{ draft.name | titlecase }} ya está en la base de datos.</p>
-        </ion-text>
-        <ion-button size="small" fill="outline" (click)="goToEdit()">Editarlo</ion-button>
+      <div class="warning" role="alert">
+        <p>{{ dexNumber(draft.id) }} {{ draft.name | titlecase }} ya está en el inventario.</p>
+        <app-game-button label="Editarlo" variant="gold" (pressed)="goToEdit()" />
       </div>
     }
     <p class="hint">Datos traídos de PokéAPI. Puedes cambiar cualquier campo antes de guardar.</p>
     <app-pokemon-form
       [initial]="draft"
-      submitLabel="Agregar a la Pokédex"
+      submitLabel="Agregar al inventario"
       [saving]="saving()"
       (save)="save($event)"
     ></app-pokemon-form>
-  } @else if (refs() === null) {
-    <div class="state"><ion-spinner name="crescent"></ion-spinner></div>
-  } @else if (refs()!.length === 0) {
-    <div class="state">
-      <ion-text color="danger"><p>No se pudo conectar con PokéAPI.</p></ion-text>
-    </div>
-  } @else if (!term().trim()) {
-    <div class="state">
-      <p>
-        Escribe el número (por ejemplo <b>150</b> o <b>448</b>) o el nombre (por ejemplo
-        <b>lucario</b>).
-      </p>
-    </div>
   } @else {
-    <ion-list lines="full">
-      @for (r of results(); track r.id) {
-        <ion-item button detail="true" (click)="pick(r)">
-          <ion-thumbnail slot="start">
-            <img [src]="spriteUrl(r.id)" [alt]="r.name" loading="lazy" />
-          </ion-thumbnail>
-          <ion-label>
-            <p class="dex">{{ dexNumber(r.id) }}</p>
-            <h2>{{ r.name | titlecase }}</h2>
-          </ion-label>
-        </ion-item>
-      } @empty {
-        <div class="state">
-          <p>No se encontró ningún Pokémon.</p>
-        </div>
+    <div class="page">
+      <app-search-field
+        class="search"
+        label="Buscar en PokéAPI"
+        placeholder="Número o nombre"
+        (query)="term.set($event)"
+      />
+
+      @if (refs() === null) {
+        <p class="state" role="status">Cargando la lista de PokéAPI…</p>
+      } @else if (refs()!.length === 0) {
+        <p class="state error">No se pudo conectar con PokéAPI.</p>
+      } @else if (!term().trim()) {
+        <p class="state">
+          Escribe el número (por ejemplo <b>150</b> o <b>448</b>) o el nombre (por ejemplo
+          <b>lucario</b>).
+        </p>
+      } @else {
+        <ul class="results">
+          @for (r of results(); track r.id) {
+            <li>
+              <button type="button" class="result" (click)="pick(r)">
+                <img [src]="spriteUrl(r.id)" alt="" width="56" height="56" loading="lazy" />
+                <span class="dex">{{ dexNumber(r.id) }}</span>
+                <span class="name">{{ r.name | titlecase }}</span>
+                <span class="go" aria-hidden="true">›</span>
+              </button>
+            </li>
+          } @empty {
+            <li class="state">No se encontró ningún Pokémon.</li>
+          }
+        </ul>
+        @if (totalMatches() > results().length) {
+          <p class="hint">
+            Mostrando {{ results().length }} de {{ totalMatches() }} coincidencias. Escribe más para
+            afinar la búsqueda.
+          </p>
+        }
       }
-    </ion-list>
-    @if (totalMatches() > results().length) {
-      <p class="hint">
-        Mostrando {{ results().length }} de {{ totalMatches() }} coincidencias. Escribe más para
-        afinar la búsqueda.
-      </p>
-    }
+    </div>
   }
 </ion-content>
