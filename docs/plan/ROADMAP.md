@@ -273,7 +273,11 @@
 
 ## F3 · Colección y Pokédex
 
-- [ ] **F3-01 · Plan detallado de F3.** Dep: F2-07.
+- [~] **F3-01a · Plan de F3 (parte 1): colección** (@samuel, 2026-10-13) — `docs/plan/fases/F3-coleccion.md`: Mis
+      Pokémon (F3-02), ficha del individuo (F3-03) y lo que el servidor debe empezar a guardar YA al capturar (caramelos
+      por familia, Pokédex visto/capturado), para que nada capturado desde hoy se pierda. Dep: F2-07.
+- [ ] **F3-01b · Plan de F3 (parte 2): Pokédex, evolución y CRUD del curso** — mismo archivo: F3-04, F3-05, F3-06.
+      Dep: F3-01a.
 - [ ] **F3-02 · Mis Pokémon** — lista paginada con filtros (tipo, shiny, favorito), orden (PC, fecha, Nº),
       escalonado, vacía diseñada. Dep: F3-01.
 - [ ] **F3-03 · Ficha del individuo** — arte, grito, PC, IVs, naturaleza, stats calculados, movimientos,

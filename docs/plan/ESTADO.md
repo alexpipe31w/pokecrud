@@ -196,7 +196,9 @@ F2-07, F2-12, F2-13, F2-15 hechas; faltan **F2-11**/**F2-14** (ARCore), F2-10 (m
 
 ## En curso
 
-- Nadie. F2-07 (Kenneth) mezclada (PR #61).
+- **F3-01a (@samuel, 2026-10-13)** — rama `feature/F3-01a-plan-coleccion`. F3-01 partida en a/b (consejo de
+  Kenneth). **Punto de guardado:** reclamada; paso siguiente: leer el modelo `CaughtPokemon` y la captura del servidor
+  y escribir `docs/plan/fases/F3-coleccion.md` con `writing-plans`.
 - F1-05 y F1-07 siguen `[~]` (@alex) SOLO por su prueba en la calle (PENDIENTES).
 
 ## Siguiente paso concreto
