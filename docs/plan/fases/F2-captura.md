@@ -1126,7 +1126,7 @@ En F2-04a el servicio solo tiene `view()`; F2-05 lo amplía con `throw()` (paso 
 
 **Files:** Create `src/app/services/game/encounter-api.service.ts`, Test `encounter-api.service.spec.ts`
 
-- [ ] **7a. Test que falla:**
+- [x] **7a. Test que falla:**
 
 ```ts
 import { provideHttpClient } from '@angular/common/http';
@@ -1156,7 +1156,7 @@ describe('EncounterApiService', () => {
 });
 ```
 
-- [ ] **7b.** → FALLA. **7c. Implementación:**
+- [x] **7b.** → FALLA. **7c. Implementación:**
 
 ```ts
 import { HttpClient } from '@angular/common/http';
@@ -1186,7 +1186,7 @@ export class EncounterApiService {
 }
 ```
 
-- [ ] **7d.** → PASA (1 test). Commit `F2-04a: EncounterApiService.view` + push.
+- [x] **7d.** → PASA (1 test). Commit `F2-04a: EncounterApiService.view` + push.
 
 ### Paso 8 — Ajuste "AR activada"
 
