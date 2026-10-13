@@ -3,7 +3,7 @@
 > Se **reescribe** al cerrar cada sesión (no es histórico; el histórico es `BITACORA.md`).
 > Máximo una pantalla. Si lees esto al empezar: después lee `ROADMAP.md`.
 
-**Última actualización:** 2026-10-13 · por Alex (Claude) · F5-01 (plan del PvP) en PR · `develop` con #63…#74 (F3 completa)
+**Última actualización:** 2026-10-13 · por Alex (Claude) · F5-02 (gateway) en PR · `develop` con #75 (plan F5)
 
 ## 👉 F5 EMPIEZA AQUÍ (Alex, 2026-10-13)
 
@@ -68,7 +68,7 @@ puede, F2-07 hecha) o F2-11 (ARCore, Android); pulidos F2-17/F2-18 si sobra tiem
 
 **F0 completa.** **F1:** todo hecho salvo la calle (F1-05 3b, F1-07 7b) y F1-11 (nueva). **F2:** F2-01…F2-06, F2-08,
 F2-07, F2-12, F2-13, F2-15 hechas; faltan **F2-11**/**F2-14** (ARCore), F2-10 (música) y los pulidos F2-16…F2-18.
-**F3:** completa en código (F3-01…F3-06c); quedan los vistazos opcionales en Android. **F4:** completa en código salvo F4-07 (combate en AR 3D, D-048). **F5:** F5-01 (plan) hecha; sigue F5-02.
+**F3:** completa en código (F3-01…F3-06c); quedan los vistazos opcionales en Android. **F4:** completa en código salvo F4-07 (combate en AR 3D, D-048). **F5:** F5-01 (plan) y F5-02 (gateway) hechas; sigue F5-03.
 
 ## Hecho
 
@@ -220,7 +220,7 @@ F2-07, F2-12, F2-13, F2-15 hechas; faltan **F2-11**/**F2-14** (ARCore), F2-10 (m
 
 ## En curso
 
-- **F5-02 (Alex, rama `feature/F5-02-gateway-socketio`):** gateway Socket.IO según `fases/F5-pvp.md`. Punto de guardado: pasos 1-4 hechos (servidor, e2e 100/100); sigue el paso 5 (`PvpSocketService` en la app).
+- Nadie. **F5-02** (Alex) hecha: socket `/pvp` + `PvpSocketService`. **Siguiente: F5-03** (invitar / código / buscar rival).
 - Samuel cerró **F3-06c** (#73 mezclado; sin migración). **Con esto la F3 está completa en código.**
 - **Ojo:** el inventario de IS-11 está ahora en `/inventario` (la Pokédex 1025 ocupa `/pokedex`).
 
@@ -237,7 +237,7 @@ F2-07, F2-12, F2-13, F2-15 hechas; faltan **F2-11**/**F2-14** (ARCore), F2-10 (m
 
 ## Siguiente paso concreto
 
-1. **Sin móvil:** **F5-02** (gateway Socket.IO, `fases/F5-pvp.md`), luego F5-03. Alternativas: F2-10 (música), F7-07 (extra).
+1. **Sin móvil:** **F5-03** (sala de espera: invitar, código, cola, equipos a nivel 50, pantalla `/pvp`; `fases/F5-pvp.md`). Alternativas: F2-10 (música), F7-07 (extra).
    **Probar sin tocar Supabase:** Postgres 17 portátil (`embedded-postgres@17.10.0-beta.17` en una carpeta temporal),
    `DATABASE_URL`/`DIRECT_URL` a él, `npx prisma migrate deploy` y `npm run db:seed`; comprobar con `prisma migrate
    status` que apunta a 127.0.0.1. La app en `localhost:8100` (en el PC de Samuel el 4200 lo ocupa OTRO proyecto suyo).

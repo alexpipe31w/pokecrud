@@ -171,6 +171,9 @@ para el criterio (vídeo); hasta entonces, dos ventanas del navegador a 390×844
   servicio con un socket falso.
 - [x] **Paso 6:** e2e del gateway (sin token / token falso / caducado; con token → hello OK; 21 mensajes en 10 s → el
   21.º `rate-limited`; 4.º socket rechazado), lint, build de app y servidor, REGLA 2.
+  **Hecho (2026-10-13, Alex):** e2e 6/6 (+ 140 respuestas con 7 sockets; con el `ThrottlerGuard` de antes, 120).
+  Ojo para F5-03: el chunk perezoso de `socket.io-client` no se ha podido ver aún porque ninguna pantalla usa el
+  servicio (el build lo elimina); comprobarlo cuando `/pvp` lo importe.
 
 ## F5-03 · Invitar / código / buscar rival
 
