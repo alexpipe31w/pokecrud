@@ -149,6 +149,7 @@
       pantalla dice que va en joystick ni cómo volver al GPS (está en el menú de la Poké Ball). Propuesta: con permiso
       de ubicación, el joystick arranca en la primera posición del GPS (o la última guardada); aviso pequeño "Modo
       joystick" con acceso a "Usar GPS". Dep: F1-03.
+      (Kenneth: desactivarlo en el menú de la Poké Ball lo lleva a su ubicación; lo que falta es que se note. Baja prioridad.)
 - [x] **F1-08 · Inventario y XP básicos** (@alex, 2026-10-11) — modelo `Inventory`, bolas iniciales, nivel/XP del jugador en
       el HUD. Dep: F0-07.
       **Hecho:** modelo `Inventory` + `GET /bag` (kit 30/5/0/5 al registrarse y a los existentes), curva de nivel y
@@ -213,7 +214,7 @@
       fallback de orientación. Dep: F2-12. **Necesita Android (Kenneth/Samuel).**
 - [ ] **F2-14 · Encuentro con ARCore (D-048)** — el encuentro usa el plugin de F2-11: tocar el suelo detectado (o
       automático) pone al Pokémon; se le puede rodear; el lanzamiento (F2-05) funciona igual. Dep: F2-11.
-- [ ] **F2-15 · Los Pokémon anchos caben en la pantalla** — `encounterDistance` solo mira la ALTURA (máx(2 m, 1,8 ×
+- [~] **F2-15 · Los Pokémon anchos caben en la pantalla** (@kenneth, 2026-10-12) — `encounterDistance` solo mira la ALTURA (máx(2 m, 1,8 ×
       altura), D-045), pero en vertical la pantalla abarca ~32° de ancho frente a 64° de alto: un Slowpoke XL (1,75 m,
       largo) "ocupaba prácticamente toda la pantalla" (Kenneth, A36) y Diggersby a 2 m se salía por los lados. Que la
       distancia tenga en cuenta también el ancho (`aspect` del modelo/arte y el de la pantalla) y que, si el modelo

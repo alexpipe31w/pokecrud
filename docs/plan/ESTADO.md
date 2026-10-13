@@ -184,16 +184,16 @@ F2-15/F2-16. **F4:** completa en código salvo F4-07 (combate en AR 3D, D-048).
 
 ## En curso
 
-- Nadie. La rama `feature/pendientes-android-a36` (Kenneth) está en un PR a `develop`: pruebas del A36 + arreglo del
-  lanzamiento (D-050). F1-05 y F1-07 siguen `[~]` (@alex) SOLO por su prueba en la calle (PENDIENTES).
+- **Kenneth (2026-10-12 noche, rama `feature/F2-15-anchos-caben`): F2-15** — la distancia del encuentro tendrá en cuenta
+  el ancho del Pokémon (Slowpoke XL no cabía). PR #59 (pendientes de Android + D-050) ya mezclado.
+- F1-05 y F1-07 siguen `[~]` (@alex) SOLO por su prueba en la calle (PENDIENTES).
 
 ## Siguiente paso concreto
 
-1. **Mezclar el PR de `feature/pendientes-android-a36`** (Kenneth confirma la mezcla).
-2. **Con luz, en la calle (Kenneth o Samuel):** F1-07 7b + F1-05 3b con el APK de producción y el **joystick apagado**.
-3. **F2-15** (Pokémon anchos que no caben; pequeña, TDD) · **F2-07** (coreografía de captura) · **F2-11** (ARCore,
+1. **Con luz, en la calle (Kenneth o Samuel):** F1-07 7b + F1-05 3b con el APK de producción y el **joystick apagado**.
+2. **F2-07** (coreografía de captura) · **F2-11** (ARCore,
    Android) · F1-11 / F2-16 (arreglos vistos en el móvil) · sin móvil: F2-10 (música), F5-01 (plan del PvP).
-4. APK en otro PC: JDK 21 (`winget install Microsoft.OpenJDK.21`; si da "el hash no coincide",
+3. APK en otro PC: JDK 21 (`winget install Microsoft.OpenJDK.21`; si da "el hash no coincide",
    `winget install EclipseAdoptium.Temurin.21.JDK`) y `npm run apk`.
 
 ## Bloqueos / roto / pendiente de humanos
