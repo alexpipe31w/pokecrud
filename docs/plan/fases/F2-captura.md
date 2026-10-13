@@ -4512,7 +4512,7 @@ HTML (un círculo con los colores de los tokens); la que vuela, 3D.
 
 **Files:** Create `src/app/features/encounter/throw-dock.component.ts`, Test `throw-dock.component.spec.ts`
 
-- [ ] **10a. Test que falla** (jsdom no tiene `PointerEvent`: `MouseEvent` con el nombre del evento y el `timeStamp` fijado):
+- [x] **10a. Test que falla** (jsdom no tiene `PointerEvent`: `MouseEvent` con el nombre del evento y el `timeStamp` fijado):
 
 ```ts
 import { TestBed } from '@angular/core/testing';
@@ -4575,7 +4575,7 @@ describe('ThrowDockComponent', () => {
 });
 ```
 
-- [ ] **10b.** → FALLA. **10c. Implementación:**
+- [x] **10b.** → FALLA. **10c. Implementación:**
 
 ```ts
 import { Component, ElementRef, input, output, signal, viewChild } from '@angular/core';
@@ -4776,7 +4776,7 @@ export class ThrowDockComponent {
 }
 ```
 
-- [ ] **10d.** → PASA (4). Commit `F2-05: la mano (bola, baya y gesto)` + push.
+- [x] **10d.** → PASA (4). Commit `F2-05: la mano (bola, baya y gesto)` + push.
 
 ### Paso 11 — La página: aro, lanzamiento y respuesta del servidor
 
