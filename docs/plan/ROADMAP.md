@@ -327,7 +327,7 @@
       (`evolvePose`: silueta A↔B acelerando → destello → forma nueva con grito y vibración; espera al servidor; error →
       vuelve a A; "Reducir movimiento" → fundido). Probado en vista móvil con Nest y Postgres locales (`F3-05_0{1..9}_*`).
       Pendiente opcional: un vistazo en Android.
-- [ ] **F3-06a · Inventario de IS-11 con la nueva UI** — `/inventario`, detalle, agregar y editar (HU-03/04/05/14)
+- [~] **F3-06a · Inventario de IS-11 con la nueva UI** (@samuel, 2026-10-13) — `/inventario`, detalle, agregar y editar (HU-03/04/05/14)
       con el sistema de diseño, mismos servicios, modelo, formulario y contrato; Postman sigue pasando. Dep: F3-04.
 - [ ] **F3-06b · Equipos con Pokémon capturados** — `Team.caughtIds` (≤ 6, solo tuyos; `pokemonIds` se conserva por
       el contrato del curso, D-054), quitar del equipo al transferir; pantalla `/equipos` que elige de "Mis Pokémon".
