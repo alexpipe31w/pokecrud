@@ -3765,7 +3765,7 @@ export class EncounterApiService {
 
 **Files:** Create `src/app/game/encounter-scene/throw-gesture.ts`, Test `throw-gesture.spec.ts`
 
-- [ ] **4a. Test que falla:**
+- [x] **4a. Test que falla:**
 
 ```ts
 import {
@@ -3839,7 +3839,7 @@ describe('swipeToThrow', () => {
 });
 ```
 
-- [ ] **4b.** → FALLA. **4c. Implementación:**
+- [x] **4b.** → FALLA. **4c. Implementación:**
 
 ```ts
 /**
@@ -3916,7 +3916,7 @@ export function swipeToThrow(r: Release): { power: number; aim: number } | null 
 }
 ```
 
-- [ ] **4d.** → PASA (7). Commit `F2-05: gesto de lanzar (velocidad al soltar, curva)` + push.
+- [x] **4d.** → PASA (7). Commit `F2-05: gesto de lanzar (velocidad al soltar, curva)` + push.
 
 ### Paso 5 — La física del vuelo
 
