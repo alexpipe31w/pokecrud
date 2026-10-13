@@ -706,7 +706,7 @@ mini, renombrar, transferir (con deshacer).
 
 **Files:** Create `src/app/features/collection/pending-transfer.ts` + spec
 
-- [ ] **2a. Test que falla** (reloj falso de Vitest):
+- [x] **2a. Test que falla** (reloj falso de Vitest):
 
 ```ts
 import { PendingTransfer, UNDO_MS } from './pending-transfer';
@@ -750,7 +750,7 @@ describe('PendingTransfer', () => {
 });
 ```
 
-- [ ] **2b.** → FALLA. **2c.**
+- [x] **2b.** → FALLA. **2c.**
 
 ```ts
 import { signal } from '@angular/core';
@@ -796,7 +796,7 @@ export class PendingTransfer {
 }
 ```
 
-- [ ] **2d.** → PASA. Commit + `/guardar`.
+- [x] **2d.** → PASA. Commit + `/guardar`.
 
 ### Paso 3 — Página de la ficha
 
