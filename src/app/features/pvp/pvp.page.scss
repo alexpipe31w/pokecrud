@@ -7,7 +7,12 @@
       transparent 70%
     ),
     var(--ink);
-  color: var(--paper);
+  --color: var(--paper);
+}
+
+ion-toolbar {
+  --background: var(--ink);
+  --color: var(--paper);
 }
 
 .page {
@@ -32,6 +37,7 @@
 
 .team {
   display: grid;
+  color: var(--paper); // los huecos libres usan currentColor
   gap: var(--s-3);
   margin-top: var(--s-4);
 
@@ -70,18 +76,6 @@
   }
 }
 
-.actions {
-  display: grid;
-  gap: var(--s-3);
-  margin-top: var(--s-6);
-}
-
-.pair {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--s-3);
-}
-
 .center {
   display: grid;
   justify-items: center;
@@ -118,4 +112,8 @@
   font: 600 1rem/1 var(--font-display);
   text-decoration: none;
   box-shadow: var(--shadow-accent);
+}
+
+app-pvp-actions {
+  margin-top: var(--s-4);
 }

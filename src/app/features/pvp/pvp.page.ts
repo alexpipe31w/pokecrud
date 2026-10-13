@@ -15,6 +15,7 @@ import { AuthService } from '../../core/auth/auth.service';
 import { TeamsService } from '../../services/game/teams.service';
 import { GameButtonComponent } from '../../shared/ui/game-button.component';
 import { TeamSlotsComponent } from '../teams/team-slots.component';
+import { PvpActionsComponent } from './pvp-actions.component';
 import { PvpBallComponent } from './pvp-ball.component';
 import { PvpCodeInputComponent } from './pvp-code-input.component';
 import { PvpCodeComponent } from './pvp-code.component';
@@ -39,6 +40,7 @@ import { PvpVersusComponent } from './pvp-versus.component';
     IonContent,
     GameButtonComponent,
     TeamSlotsComponent,
+    PvpActionsComponent,
     PvpBallComponent,
     PvpCodeComponent,
     PvpCodeInputComponent,
@@ -141,28 +143,12 @@ import { PvpVersusComponent } from './pvp-versus.component';
                 <app-team-slots [members]="members()" />
               </section>
 
-              <div class="actions">
-                <app-game-button
-                  label="Buscar rival"
-                  [block]="true"
-                  [loading]="lobby.busy()"
-                  (pressed)="lobby.searchRival()"
-                />
-                <div class="pair">
-                  <app-game-button
-                    label="Invitar"
-                    variant="glass"
-                    [block]="true"
-                    (pressed)="lobby.invite()"
-                  />
-                  <app-game-button
-                    label="Tengo un código"
-                    variant="glass"
-                    [block]="true"
-                    (pressed)="lobby.openJoin()"
-                  />
-                </div>
-              </div>
+              <app-pvp-actions
+                [busy]="lobby.busy()"
+                (searchRival)="lobby.searchRival()"
+                (invite)="lobby.invite()"
+                (join)="lobby.openJoin()"
+              />
             }
             @if (lobby.notice(); as n) {
               <p class="notice" role="status">{{ n }}</p>

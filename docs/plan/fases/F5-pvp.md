@@ -192,12 +192,15 @@ para el criterio (vídeo); hasta entonces, dos ventanas del navegador a 390×844
   (`createBattle` + `BattleDataService`) y manda la vista con `viewFor` (adelantado del paso 1 de F5-04, en
   `shared/engine/battle/pvp-view.ts`), y ya sabe **rendirse** (`battle:forfeit`): sin eso, dos jugadores emparejados se
   quedaban atascados en `already-in-battle` hasta reiniciar el servidor. La clase es `PvpLobby` (pura), no un servicio.
-- [ ] **Paso 4 — pantalla `/pvp`** (DISENO, `impeccable`, nada de Ionic por defecto): elegir equipo (de `/equipos`;
+- [x] **Paso 4 — pantalla `/pvp`** (DISENO, `impeccable`, nada de Ionic por defecto): elegir equipo (de `/equipos`;
   sin equipos → enlace a crear uno), "Invitar" (código grande con letras separadas, botón copiar, cuenta atrás de 5 min,
   cancelar), "Unirme" (6 casillas, mayúsculas solas, pegar), "Buscar rival" (animación de espera, cancelar), estados
   sin conexión / servidor despertando (D-043). Entrada en el menú de la Poké Ball.
-- [ ] **Paso 5:** e2e con dos clientes (invitación y cola), vista móvil 390×844 con dos cuentas en dos pestañas,
+- [x] **Paso 5:** e2e con dos clientes (invitación y cola), vista móvil 390×844 con dos cuentas en dos pestañas,
   evidencias `F5-03_*`, REGLA 2.
+  **Hecho (2026-10-13, Alex):** e2e `pvp-lobby` 5/5 y `pvp-teams` 3/3; navegador con `demo+alex` y `demo+rival` (equipo
+  "Arena"): menú, código, código malo, cara a cara en las dos ventanas, rendición, buscar rival → emparejados, 0
+  errores de consola. Socket.IO va en un chunk perezoso de 42 KB (no en `main`).
 
 ## F5-04 · Combate PvP completo
 
