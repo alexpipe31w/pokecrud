@@ -4190,7 +4190,7 @@ export const QUALITY_TEXT: Readonly<Record<ThrowQuality, string>> = {
 
 **Files:** Create `src/app/game/encounter-scene/ball-mesh.ts`, Test `ball-mesh.spec.ts`
 
-- [ ] **7a. Test que falla:**
+- [x] **7a. Test que falla:**
 
 ```ts
 import * as THREE from 'three';
@@ -4224,7 +4224,7 @@ describe('createBall', () => {
 });
 ```
 
-- [ ] **7b.** → FALLA. **7c. Implementación:**
+- [x] **7b.** → FALLA. **7c. Implementación:**
 
 ```ts
 import type { BallId } from '@shared/engine/capture';
@@ -4287,7 +4287,7 @@ export function disposeBall(g: THREE.Object3D): void {
 }
 ```
 
-- [ ] **7d.** → PASA (3). Commit `F2-05: Poké/Super/Ultra Ball` + push.
+- [x] **7d.** → PASA (3). Commit `F2-05: Poké/Super/Ultra Ball` + push.
 
 ### Paso 8 — Aro, bola y caja en la escena
 
