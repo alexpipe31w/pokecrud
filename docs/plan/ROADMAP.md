@@ -285,7 +285,7 @@
       Pokémon (F3-02), ficha del individuo (F3-03) y lo que el servidor debe empezar a guardar YA al capturar (caramelos
       por familia, Pokédex visto/capturado), para que nada capturado desde hoy se pierda. Dep: F2-07.
       **Hecho:** plan de F3-02a, F3-02b y F3-03 con contrato, código y tests (TDD). F3-02 partida en a/b.
-- [ ] **F3-01b · Plan de F3 (parte 2): Pokédex, evolución y CRUD del curso** — mismo archivo: F3-04, F3-05, F3-06.
+- [~] **F3-01b · Plan de F3 (parte 2): Pokédex, evolución y CRUD del curso** (@samuel, 2026-10-13) — mismo archivo: F3-04, F3-05, F3-06.
       Dep: F3-01a.
 - [x] **F3-02a · Colección en el servidor (URGENTE)** (@samuel, 2026-10-13) — al capturar se guarda el PC, +3 caramelos por familia y la
       Pokédex; abrir un encuentro marca "visto"; `GET /collection` (cursor, orden, filtros) y `GET /pokedex`; script que

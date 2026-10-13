@@ -196,8 +196,8 @@ F2-07, F2-12, F2-13, F2-15 hechas; faltan **F2-11**/**F2-14** (ARCore), F2-10 (m
 
 ## En curso
 
-- Nadie. **F3-03 (Samuel) hecha, PR abierto:** la ficha `/coleccion/:id`. Siguiente: **F3-01b** (plan de la
-  Pokédex 1025, la evolución con caramelos y el CRUD del curso con la nueva UI). F3-02a hecha y en producción (#65). (F0-15 #63 y F3-01a #64 mezclados.)
+- **F3-01b (@samuel, 2026-10-13)** — rama `feature/F3-01b-plan-pokedex`. **Punto de guardado:** reclamada; paso
+  siguiente: escribir la parte 2 de `fases/F3-coleccion.md` (F3-04, F3-05, F3-06). F3-03 mezclada (#67). F3-02a hecha y en producción (#65). (F0-15 #63 y F3-01a #64 mezclados.)
 - F1-05 y F1-07 siguen `[~]` (@alex) SOLO por su prueba en la calle (PENDIENTES).
 
 ## Siguiente paso concreto
