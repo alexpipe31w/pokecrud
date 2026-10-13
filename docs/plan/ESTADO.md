@@ -21,7 +21,7 @@
   Santander, no donde estás; basta con desactivarlo, falta que se note), **F2-15 `[x]`** (ya hecha, D-051: los Pokémon
   anchos y largos como Slowpoke XL caben), **F2-16** (entrada al encuentro: el zoom casi no se ve, ~1,4 s de espera y la cámara llega tarde).
 
-**Siguiente, por orden:** (1) mezclar el PR de F2-15 (Kenneth confirma); (2) con luz, F1-07 7b + F1-05 3b en la calle
+**Siguiente, por orden:** (1) F2-07 (Kenneth, en curso); (2) con luz, F1-07 7b + F1-05 3b en la calle
 (APK de producción, **joystick APAGADO** en el menú de la Poké Ball); (3) F2-07 (coreografía de captura; ver la entrada
 de F2-05 en la BITÁCORA para aplicar los diffs a mano) o F2-11 (ARCore, Android).
 - **Ver un Pokémon concreto en el APK:** `page.route` por CDP sobre `GET /encounters/:id` cambiando `speciesId` y
@@ -189,17 +189,16 @@ F2-15/F2-16. **F4:** completa en código salvo F4-07 (combate en AR 3D, D-048).
 
 ## En curso
 
-- Nadie. F2-15 (Kenneth) hecha en `feature/F2-15-anchos-caben`, en un PR a `develop`. PR #59 (pendientes de Android +
-  D-050) ya mezclado.
+- **Kenneth (2026-10-12 noche, rama `feature/F2-07-captura`): F2-07** — coreografía de captura/escape/huida y shiny
+  (`fases/F2-captura.md` → "F2-07", aplicando a mano sobre el modelo 3D). PR #59 y #60 (F2-15) ya mezclados.
 - F1-05 y F1-07 siguen `[~]` (@alex) SOLO por su prueba en la calle (PENDIENTES).
 
 ## Siguiente paso concreto
 
-1. **Mezclar el PR de F2-15** (Kenneth confirma).
-2. **Con luz, en la calle (Kenneth o Samuel):** F1-07 7b + F1-05 3b con el APK de producción y el **joystick apagado**.
-3. **F2-07** (coreografía de captura) · **F2-11** (ARCore,
+1. **Con luz, en la calle (Kenneth o Samuel):** F1-07 7b + F1-05 3b con el APK de producción y el **joystick apagado**.
+2. **F2-11** (ARCore,
    Android) · F1-11 / F2-16 (arreglos vistos en el móvil) · sin móvil: F2-10 (música), F5-01 (plan del PvP).
-4. APK en otro PC: JDK 21 (`winget install Microsoft.OpenJDK.21`; si da "el hash no coincide",
+3. APK en otro PC: JDK 21 (`winget install Microsoft.OpenJDK.21`; si da "el hash no coincide",
    `winget install EclipseAdoptium.Temurin.21.JDK`) y `npm run apk`.
 
 ## Bloqueos / roto / pendiente de humanos

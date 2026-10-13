@@ -246,7 +246,7 @@
       **Hecho:** `GET /encounters/:id` y `POST /encounters/:id/throw`; migración `capture` aplicada. e2e 11/11 (franja,
       distancia, gasto atómico, reintento ×5 a la vez = 1 bola, 3 capturas simultáneas = 1 gana, huida, sin bolas,
       antitrampa de precisión, validación). D-028.
-- [ ] **F2-07 · Secuencia de captura/escape y shiny** — absorción, sacudidas, fanfarria, recompensas,
+- [~] **F2-07 · Secuencia de captura/escape y shiny** (@kenneth, 2026-10-12) — absorción, sacudidas, fanfarria, recompensas,
       pantalla de "¡Capturado!" con datos del individuo. Dep: F2-05, F2-06.
 - [x] **F2-08 · Audio del juego** (@alex, 2026-10-12) — buscar/crear SFX y música libres, `CREDITOS.md`, mezcla y volúmenes.
       Dep: F0-05.
