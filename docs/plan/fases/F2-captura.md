@@ -3541,7 +3541,7 @@ gasta otra bola, D-028); 403 → manda la última posición (D-041) y lo intenta
 
 **Files:** Modify (reescribir) `src/app/services/game/encounter-api.service.ts`, `encounter-api.service.spec.ts`
 
-- [ ] **3a. Test que falla** (reescribir el spec):
+- [x] **3a. Test que falla** (reescribir el spec):
 
 ```ts
 import { HttpErrorResponse, provideHttpClient } from '@angular/common/http';
@@ -3671,7 +3671,7 @@ describe('EncounterApiService', () => {
 });
 ```
 
-- [ ] **3b.** → FALLA. **3c. Implementación** (reescribir el archivo):
+- [x] **3b.** → FALLA. **3c. Implementación** (reescribir el archivo):
 
 ```ts
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
@@ -3759,7 +3759,7 @@ export class EncounterApiService {
 }
 ```
 
-- [ ] **3d.** → PASA (7). Commit `F2-05: EncounterApiService.throw (reintentos sin gastar de más)` + push.
+- [x] **3d.** → PASA (7). Commit `F2-05: EncounterApiService.throw (reintentos sin gastar de más)` + push.
 
 ### Paso 4 — El gesto
 
