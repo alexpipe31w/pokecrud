@@ -221,7 +221,7 @@ F2-07, F2-12, F2-13, F2-15 hechas; faltan **F2-11**/**F2-14** (ARCore), F2-10 (m
 ## En curso
 
 - **F5-04 (Samuel, rama `feature/F5-04-combate-pvp`):** combate PvP completo. Punto de guardado: recién reclamada;
-  paso 1 hecho (`eventsFor`, `defaultAction`, 10 tests). Sigue el paso 2 (`BattleRoom` con reloj falso).
+  pasos 1-2 hechos (`pvp-view`; `BattleRoom` 10 tests; `validateAction` en el motor). Sigue el paso 3 (tabla `Battle`).
 - Cuentas de prueba locales: `demo+alex@pokecrud.test` y `demo+rival@pokecrud.test` (contraseña: pídesela a Alex; no va en el repo), con equipo "Arena" de 3. `test:e2e` las borra pasada 1 h: se recrean registrándolas y con el script de la bitácora de F5-03.
 - Samuel cerró **F3-06c** (#73 mezclado; sin migración). **Con esto la F3 está completa en código.**
 - **Ojo:** el inventario de IS-11 está ahora en `/inventario` (la Pokédex 1025 ocupa `/pokedex`).

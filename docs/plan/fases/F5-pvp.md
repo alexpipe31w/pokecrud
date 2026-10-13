@@ -209,7 +209,7 @@ para el criterio (vídeo); hasta entonces, dos ventanas del navegador a 390×844
   y el `switch` lleva `pokemon: PublicPokemon` sacado de `stateBefore`); `defaultAction(state, side)`. Tests: la vista
   del rival NO contiene `moves`, `stats` ni `ivs` (comprobar con `JSON.stringify`); girar dos veces = original; el combate
   de snapshot de F4-04 visto desde el lado 1 tiene los mismos eventos con los lados cambiados.
-- [ ] **Paso 2 — `BattleRoom`** (+ spec con reloj falso, `vi.useFakeTimers`): `start`, `act(player, decision, action)`
+- [x] **Paso 2 — `BattleRoom`** (+ spec con reloj falso, `vi.useFakeTimers`): `start`, `act(player, decision, action)`
   (regla 3), temporizador (regla 4), `disconnect`/`reconnect` (regla 5), `forfeit`, fin. Emite por un callback
   `send(playerId, evento, msg)` (la sala no conoce Socket.IO). Tests: acción duplicada; decisión vieja; acción inválida
   no gasta la decisión; solo el que debe cambiar puede actuar; 3 tiempos agotados → `inactive`; desconexión 60 s →

@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import type { Move, Species, TypeInfo } from '../../data/dataset.types.js';
 import { createRng } from '../rng.js';
 import { NATURES } from '../spawns.js';
-import { type PokemonInit, createBattle, resolveTurn } from './battle-engine.js';
+import { type PokemonInit, createBattle, resolveTurn, validateAction } from './battle-engine.js';
 import { damageRolls } from './damage.js';
 import { defaultMoves, isSupportedMove } from './moves.js';
 import { calcStats } from './stats.js';
@@ -453,6 +453,19 @@ describe('debilitados, cambios y final', () => {
     twoMoves.sides[0].team[0].moves[0].pp = 0;
     expect(() => resolveTurn(ctx, twoMoves, [M(0), M()], createRng(0))).toThrow(BattleError);
     expect(() => resolveTurn(ctx, s, [null, M()], createRng(0))).toThrow(BattleError);
+  });
+
+  it('validateAction (PvP): rechaza lo imposible sin resolver nada; en un cambio forzado solo vale cambiar', () => {
+    const s = ko();
+    expect(() => validateAction(s, 0, M(3))).toThrow(BattleError);
+    expect(() => validateAction(s, 0, { kind: 'switch', teamIndex: 0 })).toThrow(BattleError);
+    expect(() => validateAction(s, 0, M(0))).not.toThrow();
+    expect(() => validateAction(s, 0, { kind: 'forfeit' })).not.toThrow();
+    const forced = structuredClone(s);
+    forced.pendingSwitch[0] = true;
+    expect(() => validateAction(forced, 0, M(0))).toThrow(BattleError);
+    expect(() => validateAction(forced, 0, { kind: 'switch', teamIndex: 1 })).not.toThrow();
+    expect(() => validateAction(forced, 1, M(0))).toThrow(BattleError);
   });
 
   it('al cambiar se pierden las etapas y la confusión (el estado principal se queda)', () => {
