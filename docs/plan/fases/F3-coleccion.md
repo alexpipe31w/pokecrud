@@ -651,10 +651,10 @@ export class CollectionService {
 
 ### Paso 6 — Prueba y cierre
 
-- [ ] **6a.** Navegador 390×844 con el servidor local y una cuenta `@pokecrud.test` con ~35 capturas (sembradas con el
+- [x] **6a.** Navegador 390×844 con el servidor local y una cuenta `@pokecrud.test` con ~35 capturas (sembradas con el
   helper del e2e o capturando): scroll hasta el final (2 páginas, sin repetidos), cada orden y filtro, vacía, sin
   conexión (DevTools → Offline → error + Reintentar). Capturas `docs/evidencias/F3-02_0{1..4}_*.png`. Borrar la cuenta.
-- [ ] **6b.** Android: abrirla en el APK y comprobar el scroll fluido con 30+ tarjetas (fps por CDP ≥ 55). REGLA 2.
+- [ ] **6b.** (pendiente: Samuel sin móvil el 2026-10-13; la pantalla no usa GPS ni cámara) Android: abrirla en el APK y comprobar el scroll fluido con 30+ tarjetas (fps por CDP ≥ 55). REGLA 2.
 
 ---
 

@@ -131,8 +131,11 @@ const SORTS: { key: CollectionSort; label: string }[] = [
       gap: var(--s-2);
       padding: var(--s-2) var(--s-4) calc(var(--ion-safe-area-bottom, 0px) + var(--s-4));
       border-radius: var(--r-sheet) var(--r-sheet) 0 0;
-      background: var(--surface-opaque);
+      background: var(--surface);
       color: var(--surface-text);
+      backdrop-filter: var(--glass-filter);
+      -webkit-backdrop-filter: var(--glass-filter);
+      border-top: 1px solid var(--glass-edge);
       box-shadow: var(--shadow-lg);
       transform: translateY(100%);
       transition: transform var(--dur-panel) var(--ease-drawer);

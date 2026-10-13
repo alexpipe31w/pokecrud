@@ -118,7 +118,7 @@ const SKELETONS = Array.from({ length: 6 }, (_, i) => i);
   `,
   styles: `
     .count {
-      color: var(--ink-2);
+      opacity: 0.65; /* sigue al color de la cabecera: legible de día y de noche */
       font-weight: 500;
     }
     .filters-btn {

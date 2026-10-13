@@ -295,8 +295,13 @@
       script probado dos veces (idempotente). D-052. **Paso 8 hecho:** migración + script en Supabase (12 capturas con
       PC, 12 filas de caramelos) y DESPUÉS #65 mezclado; Render lo sirve (`/collection` → 401 sin sesión). La captura
       real en producción (8b) no se hizo (Samuel decidió dejarla; lo cubren los e2e).
-- [~] **F3-02b · Mis Pokémon (pantalla)** (@samuel, 2026-10-13) — lista paginada con filtros (tipo, shiny, favorito), orden (PC, fecha, Nº),
+- [x] **F3-02b · Mis Pokémon (pantalla)** (@samuel, 2026-10-13) — lista paginada con filtros (tipo, shiny, favorito), orden (PC, fecha, Nº),
       escalonado, vacía diseñada; "+3 caramelos" en "¡Capturado!". Dep: F3-02a.
+      **Hecho:** `/coleccion` (menú de la Poké Ball → "Mis Pokémon"): rejilla con PC, nivel, tinte del tipo, ★ y borde
+      dorado si es shiny, entrada escalonada; carga por cursor al bajar; hoja de orden (Recientes/PC/Nº, ↑↓) y filtros
+      (18 tipos, Shiny, Favoritos) al momento; cargando, vacía, vacía con filtros y error. "+3 caramelos de Pichu" y "Ver
+      en Mis Pokémon" en "¡Capturado!"; la lista se recarga tras capturar. Probado en vista móvil 390×844 contra el Nest y
+      un Postgres locales con 35 capturas (`F3-02_0{1..4}_*`). Pendiente opcional: scroll en un Android (no usa GPS/cámara).
 - [ ] **F3-03 · Ficha del individuo** — arte, grito, PC, IVs, naturaleza, stats calculados, movimientos,
       dónde/cuándo se capturó, mapa mini, renombrar, transferir (con deshacer). Dep: F3-02b.
 - [ ] **F3-04 · Pokédex 1025** — vistos/capturados por generación, ficha de especie (descripción ES,
