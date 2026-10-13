@@ -22,14 +22,18 @@ import {
   slotEndsAt,
   slotFor,
 } from '../../../shared/engine/spawns.js';
-import { BagService, type BagView } from '../bag/bag.service.js';
+import { BagService } from '../bag/bag.service.js';
 import { isUniqueViolation } from '../common/prisma-errors.js';
 import { Prisma } from '../generated/prisma/client.js';
 import { LocationService, distanceM } from '../location/location.service.js';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { ProgressionService } from '../progression/progression.service.js';
 import { SpawnsService } from '../spawns/spawns.service.js';
-import type { EncounterView } from '../../../shared/protocol/encounters.js';
+import type {
+  CaughtView,
+  EncounterView,
+  ThrowResult,
+} from '../../../shared/protocol/encounters.js';
 import type { ThrowDto } from './encounters.dto.js';
 
 /**
@@ -64,31 +68,8 @@ const TX_OPTIONS = { maxWait: 5_000, timeout: 10_000 };
 const THROW_RETENTION_MS = 7 * 24 * 3600_000;
 const RESULT_RETENTION_MS = 24 * 3600_000;
 
-// El contrato vive en shared/protocol (lo usa también la app, F1-07); se reexporta para no cambiar los imports.
-export type { EncounterView };
-
-export interface CaughtView {
-  id: string;
-  speciesId: number;
-  level: number;
-  gender: 'M' | 'F' | null;
-  shiny: boolean;
-  nature: string;
-  heightScale: number;
-  moves: number[];
-}
-
-export interface ThrowResult {
-  clientThrowId: string;
-  captured: boolean;
-  shakes: number;
-  fled: boolean;
-  /** Calidad con la que contó el servidor (puede ser menor que la pedida). */
-  throwQuality: ThrowQuality;
-  xpGained: number;
-  caught: CaughtView | null;
-  bag: BagView;
-}
+// El contrato vive en shared/protocol (lo usa también la app, F1-07 y F2-05); se reexporta para no cambiar los imports.
+export type { CaughtView, EncounterView, ThrowResult };
 
 const caughtView = (c: {
   id: string;

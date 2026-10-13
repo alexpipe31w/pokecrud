@@ -3179,7 +3179,7 @@ El servidor los tenía en `encounters.service.ts`/`bag.service.ts`; pasan a `sha
 **Files:** Modify `shared/protocol/encounters.ts`, `server/src/encounters/encounters.service.ts`,
 `server/src/encounters/encounters.dto.ts`, `server/src/bag/bag.service.ts`
 
-- [ ] **1a.** Aplicar:
+- [x] **1a.** Aplicar:
 
 ```diff
 --- a/shared/protocol/encounters.ts
@@ -3331,7 +3331,7 @@ El servidor los tenía en `encounters.service.ts`/`bag.service.ts`; pasan a `sha
  export const starterRows = (): { item: ItemId; qty: number }[] =>
 ```
 
-- [ ] **1b.** `cd server && npm run lint && npm run build && npm test` → compila, 22 tests (el único aviso de lint,
+- [x] **1b.** `cd server && npm run lint && npm run build && npm test` → compila, 22 tests (el único aviso de lint,
   `require-array-sort-compare` en `test/auth.e2e-spec.ts`, ya estaba). Commit `F2-05: tipos del lanzamiento en shared/protocol` + push.
 
 ### Paso 2 — Lo que se actualiza con la respuesta
@@ -3343,7 +3343,7 @@ los spawns no se guardan, D-025, y el servidor lo seguiría dando).
 **Files:** Modify `src/app/services/game/bag.service.ts` (+ spec), `src/app/core/auth/auth.service.ts` (+ spec),
 `src/app/services/game/spawn-feed.service.ts` (+ spec)
 
-- [ ] **2a. Tests:**
+- [x] **2a. Tests:**
 
 ```diff
 --- a/src/app/services/game/bag.service.spec.ts
@@ -3413,7 +3413,7 @@ los spawns no se guardan, D-025, y el servidor lo seguiría dando).
      player.set({ id: 'p2' });
 ```
 
-- [ ] **2b.** → FALLAN. **2c. Implementación:**
+- [x] **2b.** → FALLAN. **2c. Implementación:**
 
 ```diff
 --- a/src/app/services/game/bag.service.ts
@@ -3531,7 +3531,7 @@ los spawns no se guardan, D-025, y el servidor lo seguiría dando).
      this._night.set(null);
 ```
 
-- [ ] **2d.** `npx ng test --include=src/app/services/game/bag.service.spec.ts --include=src/app/core/auth/auth.service.spec.ts --include=src/app/services/game/spawn-feed.service.spec.ts --watch=false`
+- [x] **2d.** `npx ng test --include=src/app/services/game/bag.service.spec.ts --include=src/app/core/auth/auth.service.spec.ts --include=src/app/services/game/spawn-feed.service.spec.ts --watch=false`
   → PASA (4 + 14 + 9). Commit `F2-05: mochila, XP y mapa se actualizan tras lanzar` + push.
 
 ### Paso 3 — `EncounterApiService.throw`
@@ -3541,7 +3541,7 @@ gasta otra bola, D-028); 403 → manda la última posición (D-041) y lo intenta
 
 **Files:** Modify (reescribir) `src/app/services/game/encounter-api.service.ts`, `encounter-api.service.spec.ts`
 
-- [ ] **3a. Test que falla** (reescribir el spec):
+- [x] **3a. Test que falla** (reescribir el spec):
 
 ```ts
 import { HttpErrorResponse, provideHttpClient } from '@angular/common/http';
@@ -3671,7 +3671,7 @@ describe('EncounterApiService', () => {
 });
 ```
 
-- [ ] **3b.** → FALLA. **3c. Implementación** (reescribir el archivo):
+- [x] **3b.** → FALLA. **3c. Implementación** (reescribir el archivo):
 
 ```ts
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
@@ -3759,13 +3759,13 @@ export class EncounterApiService {
 }
 ```
 
-- [ ] **3d.** → PASA (7). Commit `F2-05: EncounterApiService.throw (reintentos sin gastar de más)` + push.
+- [x] **3d.** → PASA (7). Commit `F2-05: EncounterApiService.throw (reintentos sin gastar de más)` + push.
 
 ### Paso 4 — El gesto
 
 **Files:** Create `src/app/game/encounter-scene/throw-gesture.ts`, Test `throw-gesture.spec.ts`
 
-- [ ] **4a. Test que falla:**
+- [x] **4a. Test que falla:**
 
 ```ts
 import {
@@ -3839,7 +3839,7 @@ describe('swipeToThrow', () => {
 });
 ```
 
-- [ ] **4b.** → FALLA. **4c. Implementación:**
+- [x] **4b.** → FALLA. **4c. Implementación:**
 
 ```ts
 /**
@@ -3916,13 +3916,13 @@ export function swipeToThrow(r: Release): { power: number; aim: number } | null 
 }
 ```
 
-- [ ] **4d.** → PASA (7). Commit `F2-05: gesto de lanzar (velocidad al soltar, curva)` + push.
+- [x] **4d.** → PASA (7). Commit `F2-05: gesto de lanzar (velocidad al soltar, curva)` + push.
 
 ### Paso 5 — La física del vuelo
 
 **Files:** Create `src/app/game/encounter-scene/throw-physics.ts`, Test `throw-physics.spec.ts`
 
-- [ ] **5a. Test que falla:**
+- [x] **5a. Test que falla:**
 
 ```ts
 import { EYE_HEIGHT_M } from './encounter-layout';
@@ -3994,7 +3994,7 @@ describe('throw-physics', () => {
 });
 ```
 
-- [ ] **5b.** → FALLA. **5c. Implementación:**
+- [x] **5b.** → FALLA. **5c. Implementación:**
 
 ```ts
 /**
@@ -4106,13 +4106,13 @@ export function resolveFlight(f: Flight, box: TargetBox): ThrowHit {
 }
 ```
 
-- [ ] **5d.** → PASA (7). Commit `F2-05: física del vuelo y acierto` + push.
+- [x] **5d.** → PASA (7). Commit `F2-05: física del vuelo y acierto` + push.
 
 ### Paso 6 — El aro de precisión
 
 **Files:** Create `src/app/game/encounter-scene/precision-ring.ts`, Test `precision-ring.spec.ts`
 
-- [ ] **6a. Test que falla:**
+- [x] **6a. Test que falla:**
 
 ```ts
 import { RING_MIN, RING_PERIOD_MS, ringRadius, ringToken, throwQuality } from './precision-ring';
@@ -4141,7 +4141,7 @@ describe('precision-ring', () => {
 });
 ```
 
-- [ ] **6b.** → FALLA. **6c. Implementación:**
+- [x] **6b.** → FALLA. **6c. Implementación:**
 
 ```ts
 import type { ThrowQuality } from '@shared/engine/capture';
@@ -4184,13 +4184,13 @@ export const QUALITY_TEXT: Readonly<Record<ThrowQuality, string>> = {
 };
 ```
 
-- [ ] **6d.** → PASA (3). Commit `F2-05: aro de precisión` + push.
+- [x] **6d.** → PASA (3). Commit `F2-05: aro de precisión` + push.
 
 ### Paso 7 — La bola en 3D
 
 **Files:** Create `src/app/game/encounter-scene/ball-mesh.ts`, Test `ball-mesh.spec.ts`
 
-- [ ] **7a. Test que falla:**
+- [x] **7a. Test que falla:**
 
 ```ts
 import * as THREE from 'three';
@@ -4224,7 +4224,7 @@ describe('createBall', () => {
 });
 ```
 
-- [ ] **7b.** → FALLA. **7c. Implementación:**
+- [x] **7b.** → FALLA. **7c. Implementación:**
 
 ```ts
 import type { BallId } from '@shared/engine/capture';
@@ -4287,7 +4287,7 @@ export function disposeBall(g: THREE.Object3D): void {
 }
 ```
 
-- [ ] **7d.** → PASA (3). Commit `F2-05: Poké/Super/Ultra Ball` + push.
+- [x] **7d.** → PASA (3). Commit `F2-05: Poké/Super/Ultra Ball` + push.
 
 ### Paso 8 — Aro, bola y caja en la escena
 
@@ -4297,7 +4297,7 @@ Pokémon y los aros son `MeshBasic`).
 
 **Files:** Modify `src/app/game/encounter-scene/encounter-scene.ts`, `encounter-scene.spec.ts`
 
-- [ ] **8a. Tests:**
+- [x] **8a. Tests:**
 
 ```diff
 --- a/src/app/game/encounter-scene/encounter-scene.spec.ts
@@ -4347,7 +4347,7 @@ Pokémon y los aros son `MeshBasic`).
  });
 ```
 
-- [ ] **8b.** → FALLAN. **8c. Implementación:**
+- [x] **8b.** → FALLAN. **8c. Implementación:**
 
 ```diff
 --- a/src/app/game/encounter-scene/encounter-scene.ts
@@ -4485,11 +4485,11 @@ Pokémon y los aros son `MeshBasic`).
        p.material.dispose();
 ```
 
-- [ ] **8d.** → PASA (15). Commit + push.
+- [x] **8d.** → PASA (15). Commit + push.
 
 ### Paso 9 — Sonidos del lanzamiento
 
-- [ ] **9a.** En `SFX_RECIPES` (`sfx-synth.ts`):
+- [x] **9a.** En `SFX_RECIPES` (`sfx-synth.ts`):
 
 ```ts
   /** Lanzar la bola (F2-05): soplido de aire. ("throw" NO: es un sonido de archivo en el spec de AudioService.) */
@@ -4503,7 +4503,7 @@ Pokémon y los aros son `MeshBasic`).
   ],
 ```
 
-- [ ] **9b.** `npx ng test --include=src/app/services/game/sfx-synth.spec.ts --watch=false` → PASA. Commit + push.
+- [x] **9b.** `npx ng test --include=src/app/services/game/sfx-synth.spec.ts --watch=false` → PASA. Commit + push.
 
 ### Paso 10 — La mano: bola y baya
 
@@ -4512,7 +4512,7 @@ HTML (un círculo con los colores de los tokens); la que vuela, 3D.
 
 **Files:** Create `src/app/features/encounter/throw-dock.component.ts`, Test `throw-dock.component.spec.ts`
 
-- [ ] **10a. Test que falla** (jsdom no tiene `PointerEvent`: `MouseEvent` con el nombre del evento y el `timeStamp` fijado):
+- [x] **10a. Test que falla** (jsdom no tiene `PointerEvent`: `MouseEvent` con el nombre del evento y el `timeStamp` fijado):
 
 ```ts
 import { TestBed } from '@angular/core/testing';
@@ -4575,7 +4575,7 @@ describe('ThrowDockComponent', () => {
 });
 ```
 
-- [ ] **10b.** → FALLA. **10c. Implementación:**
+- [x] **10b.** → FALLA. **10c. Implementación:**
 
 ```ts
 import { Component, ElementRef, input, output, signal, viewChild } from '@angular/core';
@@ -4776,7 +4776,7 @@ export class ThrowDockComponent {
 }
 ```
 
-- [ ] **10d.** → PASA (4). Commit `F2-05: la mano (bola, baya y gesto)` + push.
+- [x] **10d.** → PASA (4). Commit `F2-05: la mano (bola, baya y gesto)` + push.
 
 ### Paso 11 — La página: aro, lanzamiento y respuesta del servidor
 
@@ -4787,7 +4787,7 @@ Pokémon al llegar (`poseAt` en el instante del impacto, con sus saltos); aciert
 
 **Files:** Modify `src/app/features/encounter/encounter.page.ts`, `encounter.page.spec.ts`
 
-- [ ] **11a. Tests:**
+- [x] **11a. Tests:**
 
 ```diff
 --- a/src/app/features/encounter/encounter.page.spec.ts
@@ -4875,7 +4875,7 @@ Pokémon al llegar (`poseAt` en el instante del impacto, con sus saltos); aciert
      expect(text(f)).toContain('Estás demasiado lejos.');
 ```
 
-- [ ] **11b.** → FALLAN. **11c. Implementación:**
+- [x] **11b.** → FALLAN. **11c. Implementación:**
 
 ```diff
 --- a/src/app/features/encounter/encounter.page.ts
@@ -5176,11 +5176,11 @@ Pokémon al llegar (`poseAt` en el instante del impacto, con sus saltos); aciert
      this.stage = null;
 ```
 
-- [ ] **11d.** `npx ng test --include=src/app/features/encounter/encounter.page.spec.ts --watch=false` → PASA (11). Commit + push.
+- [x] **11d.** `npx ng test --include=src/app/features/encounter/encounter.page.spec.ts --watch=false` → PASA (11). Commit + push.
 
 ### Paso 12 — Verde y Android
 
-- [ ] **12a.** `npm run lint` · `npm run build` · `npm test -- --watch=false` · `npm run test:shared` · `cd server && npm run build && npm test`.
+- [x] **12a.** `npm run lint` · `npm run build` · `npm test -- --watch=false` · `npm run test:shared` · `cd server && npm run build && npm test`.
 - [ ] **12b.** Android (con la AR y sin ella): un lanzamiento recto y firme acierta; flojo → "¡Casi!" y NO baja la
   mochila; torcido falla; con una vuelta del dedo antes, la bola hace la curva y vuelve; el aro cambia de color con
   Super/Ultra/Frambu; "¡Genial!" etc. al acertar dentro del aro; la mochila baja una bola por acierto (y la Frambu);

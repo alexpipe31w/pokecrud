@@ -1,8 +1,11 @@
+import type { BallId } from '@shared/engine/capture';
 import * as THREE from 'three';
 
+import { createBall, disposeBall } from './ball-mesh';
 import { spotInFront } from './device-pose';
 import { EYE_HEIGHT_M, encounterDistance } from './encounter-layout';
 import type { PokemonModel } from './pokemon-model';
+import { hitBox, type FlightPos, type TargetBox } from './throw-physics';
 import { FX_COUNT, particleAt, type FxKind, type FxPoint } from './type-fx';
 
 /** Postura del Pokémon en un fotograma (la da `motionAt` en F2-04b; quieto hasta entonces). */
@@ -52,6 +55,12 @@ export class EncounterScene {
   readonly fx: THREE.Points<THREE.BufferGeometry, THREE.PointsMaterial>;
   /** Ráfaga: polvo por el suelo o chispas que suben (F2-04b; estrellas en F2-07). */
   readonly burst: THREE.Points<THREE.BufferGeometry, THREE.PointsMaterial>;
+  /** Aro de precisión sobre el Pokémon (F2-05): blanco fijo por fuera, de color y encogiendo por dentro. */
+  readonly ring = new THREE.Group();
+  /** La Poké Ball que vuela (F2-05); null mientras está en la mano (que es HTML). */
+  ball: THREE.Group | null = null;
+  private readonly ringOuter: THREE.Mesh<THREE.RingGeometry, THREE.MeshBasicMaterial>;
+  private readonly ringInner: THREE.Mesh<THREE.RingGeometry, THREE.MeshBasicMaterial>;
   /**
    * Modelo 3D (F2-12): un grupo con los pies en su origen al que se aplica la postura; dentro, el `.glb` normalizado a
    * su altura real. Va AL LADO del plano `body` (no dentro: su escala no uniforme deformaría el giro). null = plano.
@@ -88,9 +97,23 @@ export class EncounterScene {
     this.burst = glowPoints(BURST_COUNT, 0.12, this.glowTex);
     this.fx.visible = false;
     this.burst.visible = false;
-    this.anchor.add(this.shadow, this.body, this.fx, this.burst);
+    const ringMat = (color: number, opacity: number) =>
+      new THREE.MeshBasicMaterial({
+        color,
+        transparent: true,
+        opacity,
+        depthWrite: false,
+        depthTest: false,
+      });
+    this.ringOuter = new THREE.Mesh(new THREE.RingGeometry(0.94, 1, 48), ringMat(0xffffff, 0.85));
+    this.ringInner = new THREE.Mesh(new THREE.RingGeometry(0.86, 1, 48), ringMat(0x3ccf8e, 0.95));
+    this.ring.add(this.ringOuter, this.ringInner);
+    this.ring.renderOrder = 3;
+    this.ring.visible = false;
+    this.anchor.add(this.shadow, this.body, this.fx, this.burst, this.ring);
     this.anchor.visible = false;
-    this.scene.add(this.anchor);
+    // Luz solo para la bola (el Pokémon y los aros son MeshBasic: no les afecta).
+    this.scene.add(this.anchor, new THREE.HemisphereLight(0xffffff, 0x445566, 2.5));
   }
 
   get isPlaced(): boolean {
@@ -100,6 +123,11 @@ export class EncounterScene {
   /** Proporción ancho/alto del arte (para la caja del lanzamiento, F2-05). */
   get artAspect(): number {
     return this.aspect;
+  }
+
+  /** Caja del Pokémon para el lanzamiento (la misma que dibuja el aro). */
+  get box(): { height: number; halfWidth: number } {
+    return hitBox(this.heightM, this.aspect);
   }
 
   /** Distancia a la que está (D-045: máx(2 m, 1,8 × altura), tope 12 m). */
@@ -141,10 +169,11 @@ export class EncounterScene {
       this.mixer = new THREE.AnimationMixer(gltf);
       this.mixer.clipAction(clips[0]).play();
     }
-    if (!this.scene.getObjectsByProperty('isLight', true).length) {
+    // La hemisférica ya está (F2-05, para la bola); el modelo necesita además una direccional que marque volumen.
+    if (!this.scene.getObjectsByProperty('isDirectionalLight', true).length) {
       const sun = new THREE.DirectionalLight(0xffffff, 1.8);
       sun.position.set(1, 4, 2);
-      this.scene.add(new THREE.HemisphereLight(0xffffff, 0x8d7b68, 2.2), sun);
+      this.scene.add(sun);
     }
   }
 
@@ -317,7 +346,68 @@ export class EncounterScene {
     col.needsUpdate = true;
   }
 
+  setRing(visible: boolean, color = '#3ccf8e'): void {
+    this.ring.visible = visible;
+    this.ringInner.material.color.set(color);
+  }
+
+  /**
+   * Aro centrado en la caja del Pokémon con los pies a `lift`; `inner` = radio del de color (`ringRadius`, 0..1).
+   * Es una elipse del tamaño de la caja: así lo que se ve es justo la zona que cuenta (`throwQuality`).
+   */
+  updateRing(lift: number, inner: number): void {
+    const { height, halfWidth } = this.box;
+    this.ring.position.set(0, lift + height / 2, 0.02);
+    this.ringOuter.scale.set(halfWidth, height / 2, 1);
+    this.ringInner.scale.set(halfWidth * inner, (height / 2) * inner, 1);
+  }
+
+  /** Caja del Pokémon en el marco de un lanzamiento hecho mirando a `yaw`, con los pies a `lift` (throw-physics). */
+  throwTarget(yaw: number, lift: number): TargetBox {
+    const p = this.anchor.position;
+    return {
+      fwd: -Math.sin(yaw) * p.x - Math.cos(yaw) * p.z,
+      lat: Math.cos(yaw) * p.x - Math.sin(yaw) * p.z,
+      baseY: p.y + lift,
+      groundY: -EYE_HEIGHT_M,
+      ...this.box,
+    };
+  }
+
+  /** Saca a la escena una bola nueva (la de la mano es HTML); si había otra, se tira. */
+  spawnBall(id: BallId): THREE.Group {
+    this.removeBall();
+    this.ball = createBall(id);
+    this.scene.add(this.ball);
+    return this.ball;
+  }
+
+  removeBall(): void {
+    if (!this.ball) return;
+    this.scene.remove(this.ball);
+    disposeBall(this.ball);
+    this.ball = null;
+  }
+
+  /** Bola en un punto del vuelo (marco del lanzamiento hecho mirando a `yaw`), girando `spin` rad hacia delante. */
+  setBallInThrowFrame(yaw: number, p: FlightPos, spin: number): void {
+    if (!this.ball) return;
+    const fx = -Math.sin(yaw);
+    const fz = -Math.cos(yaw);
+    this.ball.position.set(
+      fx * p.fwd + Math.cos(yaw) * p.lat,
+      p.up,
+      fz * p.fwd - Math.sin(yaw) * p.lat,
+    );
+    this.ball.rotation.set(-spin, 0, 0);
+  }
+
   dispose(): void {
+    this.removeBall();
+    for (const m of [this.ringOuter, this.ringInner]) {
+      m.geometry.dispose();
+      m.material.dispose();
+    }
     this.mixer?.stopAllAction();
     this.model?.traverse((o) => (o as THREE.Mesh).geometry?.dispose());
     eachMaterial(this.model, (m) => {

@@ -102,6 +102,15 @@ export const SFX_RECIPES = {
     { wave: 'triangle', from: 2400, to: 3200, start: 0.1, duration: 0.15, gain: 0.22 },
     { wave: 'sine', from: 3200, to: 3600, start: 0.22, duration: 0.3, gain: 0.18, attack: 0.01 },
   ],
+  /** Lanzar la bola (F2-05): soplido de aire. ("throw" NO: es un sonido de archivo en el spec de AudioService.) */
+  'ball-throw': [
+    { wave: 'noise', from: 800, to: 4000, start: 0, duration: 0.25, gain: 0.3, attack: 0.05 },
+  ],
+  /** La bola golpea al Pokémon (F2-05): "pop". */
+  'ball-hit': [
+    { wave: 'square', from: 900, to: 300, start: 0, duration: 0.07, gain: 0.2, attack: 0.002 },
+    { wave: 'noise', from: 3000, to: 800, start: 0, duration: 0.06, gain: 0.3, attack: 0.001 },
+  ],
 } satisfies Record<string, Voice[]>;
 
 export type SfxName = keyof typeof SFX_RECIPES;

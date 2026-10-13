@@ -57,6 +57,13 @@ describe('BagService', () => {
     expect(bag.error()).toBe('No se pudo cargar la mochila.');
   });
 
+  it('apply: la mochila que manda el servidor tras lanzar (lo que falta, a 0) y borra el error', () => {
+    bag.apply({ items: [{ item: 'POKE_BALL', qty: 29 }] });
+    expect(bag.qty()).toEqual({ POKE_BALL: 29, GREAT_BALL: 0, ULTRA_BALL: 0, RAZZ_BERRY: 0 });
+    expect(bag.balls()).toBe(29);
+    expect(bag.error()).toBeNull();
+  });
+
   it('al cambiar de jugador o cerrar sesión se vacía', async () => {
     await flushBag();
     player.set(null);

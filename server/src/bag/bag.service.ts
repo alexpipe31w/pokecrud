@@ -4,11 +4,11 @@ import {
   type ItemId,
   STARTER_KIT,
 } from '../../../shared/engine/items.js';
+import type { BagView } from '../../../shared/protocol/encounters.js';
 import { PrismaService } from '../prisma/prisma.service.js';
 
-export interface BagView {
-  items: { item: ItemId; qty: number }[];
-}
+// El contrato vive en shared/protocol (lo usa también la app, F2-05).
+export type { BagView };
 
 /** Filas del kit inicial para `createMany` (registro y garantía de `get`). */
 export const starterRows = (): { item: ItemId; qty: number }[] =>

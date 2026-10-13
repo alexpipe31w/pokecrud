@@ -165,6 +165,44 @@ describe('EncounterScene', () => {
     expect(at(0, 4, 3)).toBe(0);
     tex.dispose();
   });
+
+  it('throwTarget: el Pokémon en el marco del lanzamiento (delante / a la izquierda)', () => {
+    const s = new EncounterScene(0.4);
+    s.placeAt(Math.PI / 2); // a la izquierda, a 2 m
+    const ahead = s.throwTarget(Math.PI / 2, 0.3);
+    expect(ahead.fwd).toBeCloseTo(2, 6);
+    expect(ahead.lat).toBeCloseTo(0, 6);
+    expect(ahead.baseY).toBeCloseTo(-1.4 + 0.3, 6);
+    expect(ahead.height).toBe(0.4);
+    const side = s.throwTarget(0, 0); // lanzando hacia −Z, el Pokémon queda a la izquierda
+    expect(side.fwd).toBeCloseTo(0, 6);
+    expect(side.lat).toBeCloseTo(-2, 6);
+    s.dispose();
+  });
+
+  it('la bola vuela en el marco del lanzamiento', () => {
+    const s = new EncounterScene(0.4);
+    const ball = s.spawnBall('POKE_BALL');
+    s.setBallInThrowFrame(Math.PI / 2, { fwd: 1, lat: 0.5, up: -0.3 }, 0);
+    expect(ball.position.x).toBeCloseTo(-1, 6); // adelante = −X
+    expect(ball.position.z).toBeCloseTo(-0.5, 6); // derecha = −Z mirando a −X
+    expect(ball.position.y).toBeCloseTo(-0.3, 6);
+    s.removeBall();
+    expect(s.ball).toBeNull();
+    s.dispose();
+  });
+
+  it('el aro es la caja del Pokémon y el de color encoge con inner', () => {
+    const s = new EncounterScene(0.4);
+    s.setRing(true, '#ff0000');
+    s.updateRing(0.5, 0.5);
+    expect(s.ring.visible).toBe(true);
+    expect(s.ring.position.y).toBeCloseTo(0.5 + 0.2, 6);
+    const [outer, inner] = s.ring.children as THREE.Mesh[];
+    expect(outer.scale.y).toBeCloseTo(0.2, 6);
+    expect(inner.scale.x).toBeCloseTo(outer.scale.x / 2, 6);
+    s.dispose();
+  });
 });
 
 describe('EncounterScene con modelo 3D (F2-12)', () => {
@@ -234,12 +272,12 @@ describe('EncounterScene con modelo 3D (F2-12)', () => {
     s.dispose();
   });
 
-  it('con modelo hay luz; el fantasma también lo vuelve semitransparente', () => {
+  it('con modelo hay luz direccional; el fantasma también lo vuelve semitransparente', () => {
     const s = new EncounterScene(1);
-    expect(s.scene.getObjectsByProperty('isLight', true)).toHaveLength(0);
+    expect(s.scene.getObjectsByProperty('isDirectionalLight', true)).toHaveLength(0);
     const m = fakeModel();
     s.setModel(m);
-    expect(s.scene.getObjectsByProperty('isLight', true).length).toBeGreaterThan(0);
+    expect(s.scene.getObjectsByProperty('isDirectionalLight', true)).toHaveLength(1);
     s.setOpacity(0.7);
     const mat = (m.scene.children[0] as THREE.Mesh).material as THREE.MeshStandardMaterial;
     expect(mat.transparent).toBe(true);

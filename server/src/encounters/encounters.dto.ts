@@ -10,13 +10,14 @@ import type {
   BerryId,
   ThrowQuality,
 } from '../../../shared/engine/capture.js';
+import type { ThrowRequest } from '../../../shared/protocol/encounters.js';
 
 export const BALLS: BallId[] = ['POKE_BALL', 'GREAT_BALL', 'ULTRA_BALL'];
 export const BERRIES: BerryId[] = ['RAZZ_BERRY'];
 export const QUALITIES: ThrowQuality[] = ['none', 'nice', 'great', 'excellent'];
 
 /** `POST /encounters/:id/throw`. Cualquier otro campo → 400 (forbidNonWhitelisted). */
-export class ThrowDto {
+export class ThrowDto implements ThrowRequest {
   @IsIn(BALLS)
   ball: BallId;
 

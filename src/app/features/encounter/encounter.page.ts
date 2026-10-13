@@ -12,6 +12,7 @@ import {
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { IonContent } from '@ionic/angular';
+import { captureChance, type BallId, type ThrowQuality } from '@shared/engine/capture';
 import { hashString } from '@shared/engine/rng';
 import type { EncounterView } from '@shared/protocol/encounters';
 import * as THREE from 'three';
@@ -33,10 +34,25 @@ import {
   landingAt,
   motionAt,
 } from '../../game/encounter-scene/pokemon-motion';
+import {
+  QUALITY_TEXT,
+  ringRadius,
+  ringToken,
+  throwQuality,
+} from '../../game/encounter-scene/precision-ring';
+import {
+  flightPos,
+  impactTime,
+  planFlight,
+  resolveFlight,
+  type Flight,
+  type ThrowHit,
+} from '../../game/encounter-scene/throw-physics';
 import { FX_KIND } from '../../game/encounter-scene/type-fx';
 import { CameraService } from '../../services/ar/camera.service';
 import { OrientationService } from '../../services/ar/orientation.service';
 import { AudioService } from '../../services/game/audio.service';
+import { BagService } from '../../services/game/bag.service';
 import { DatasetService } from '../../services/game/dataset.service';
 import { EncounterApiService } from '../../services/game/encounter-api.service';
 import { HapticsService } from '../../services/game/haptics.service';
@@ -45,6 +61,7 @@ import { GameButtonComponent } from '../../shared/ui/game-button.component';
 import { GlassPanelComponent } from '../../shared/ui/glass-panel.component';
 import { EncounterCardComponent } from './encounter-card.component';
 import { EncounterHudComponent } from './encounter-hud.component';
+import { ThrowDockComponent, type ThrowIntent } from './throw-dock.component';
 
 /** Crea el escenario (renderer + bucle). Token para que los tests pongan un doble: jsdom no tiene WebGL. */
 export const ENCOUNTER_STAGE = new InjectionToken<
@@ -89,6 +106,19 @@ type Phase = 'loading' | 'error' | 'resolved' | 'ready';
 /** Si la ficha no ha cargado: quieto, en el suelo, sin efectos raros. */
 const CALM: Personality = { agility: 0, skittish: 0, hover: 0, ghostly: false, fx: 'normal' };
 
+/** Un lanzamiento en el aire: el vuelo entero, decidido al soltar (D-046). */
+interface InFlight {
+  f: Flight;
+  /** Rumbo del móvil al soltar: el marco del lanzamiento. */
+  yaw: number;
+  start: number;
+  hit: ThrowHit;
+  quality: ThrowQuality;
+  ball: BallId;
+  berry: 'RAZZ_BERRY' | null;
+  curve: boolean;
+}
+
 const prefersReducedMotion = (): boolean =>
   typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -105,6 +135,7 @@ const prefersReducedMotion = (): boolean =>
     GlassPanelComponent,
     EncounterHudComponent,
     EncounterCardComponent,
+    ThrowDockComponent,
   ],
   template: `
     <ion-content [scrollY]="false" class="full">
@@ -159,6 +190,20 @@ const prefersReducedMotion = (): boolean =>
             @if (note(); as n) {
               <p class="note" role="status">{{ n }}</p>
             }
+            @if (toast(); as t) {
+              <p class="note toast" role="status">{{ t }}</p>
+            }
+            <app-throw-dock
+              class="dock"
+              [ball]="ball()"
+              [berry]="berry()"
+              [qty]="bag.qty()"
+              [disabled]="!canThrow()"
+              (pick)="ball.set($event)"
+              (toggleBerry)="berry.set(!berry())"
+              (grabbed)="onGrab()"
+              (thrown)="launch($event)"
+            />
           }
           @default {
             <app-glass-panel size="lg" class="card">
@@ -219,7 +264,6 @@ const prefersReducedMotion = (): boolean =>
       inset: 0;
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
       gap: var(--s-3);
       padding: calc(var(--ion-safe-area-top, 0px) + var(--s-3)) var(--s-4)
         calc(var(--ion-safe-area-bottom, 0px) + var(--s-4));
@@ -231,6 +275,12 @@ const prefersReducedMotion = (): boolean =>
     .msg,
     .card {
       margin: auto;
+    }
+    .dock {
+      margin-top: auto;
+    }
+    .toast {
+      font: 700 1.1rem/1 var(--font-display);
     }
     .msg {
       font: 600 1.1rem/1.2 var(--font-display);
@@ -277,6 +327,7 @@ export class EncounterPage implements OnDestroy {
   private readonly orientation = inject(OrientationService);
   private readonly createStage = inject(ENCOUNTER_STAGE);
   private readonly loadModel = inject(POKEMON_MODEL);
+  protected readonly bag = inject(BagService);
   private readonly stageEl = viewChild.required<ElementRef<HTMLElement>>('stage');
   private readonly videoEl = viewChild.required<ElementRef<HTMLVideoElement>>('video');
   private readonly canvasEl = viewChild.required<ElementRef<HTMLCanvasElement>>('canvas');
@@ -308,6 +359,28 @@ export class EncounterPage implements OnDestroy {
     return v ? sizeClass(v.heightScale) : null;
   });
   protected readonly typeColor = computed(() => `var(--t-${this.species()?.types[0] ?? 'normal'})`);
+  protected readonly ball = signal<BallId>('POKE_BALL');
+  protected readonly berry = signal(false);
+  /** La bola está en el aire o esperando al servidor: no se lanza otra. */
+  private readonly busy = signal(false);
+  protected readonly toast = signal<string | null>(null);
+  protected readonly canThrow = computed(
+    () => !this.busy() && (this.bag.qty()?.[this.ball()] ?? 0) > 0,
+  );
+  /** Color del aro: probabilidad con esta bola/baya y sin bonus de lanzamiento (como Pokémon GO). */
+  private readonly ringColor = computed(() => {
+    const sp = this.species();
+    const chance = sp
+      ? captureChance({
+          captureRate: sp.captureRate,
+          ball: this.ball(),
+          berry: this.berry() ? 'RAZZ_BERRY' : null,
+          throwQuality: 'none',
+          curve: false,
+        })
+      : 0.5;
+    return cssColor([ringToken(chance), '#3ccf8e']);
+  });
   protected readonly message = computed(() => {
     if (this.phase() !== 'resolved') return this.error() ?? '';
     return this.view()?.status === 'caught' ? 'Ya lo atrapaste.' : 'Ya se te escapó.';
@@ -334,6 +407,8 @@ export class EncounterPage implements OnDestroy {
   /** Cuándo empezó el encuentro (ms): aterrizaje y saltos cuentan desde aquí; NO se reinicia al volver. */
   private startedAt = 0;
   private touchedDown = false;
+  private flight: InFlight | null = null;
+  private toastTimer?: ReturnType<typeof setTimeout>;
 
   constructor() {
     document.addEventListener('visibilitychange', this.onVisibility);
@@ -433,6 +508,7 @@ export class EncounterPage implements OnDestroy {
       this.watchSize();
       this.phase.set('ready');
       this.flashIn();
+      if (this.bag.qty() === null) void this.bag.load();
       void loadFirstTexture(artUrls(v.speciesId, v.shiny)).then((tex) => {
         if (tex && this.world === world) world.setTexture(tex);
         else tex?.dispose();
@@ -502,6 +578,110 @@ export class EncounterPage implements OnDestroy {
     }
     world.animate(t / 1000);
     this.placeCard(world);
+    // F2-05: aro de precisión (solo con una bola en la mano) y bola en vuelo.
+    world.setRing(this.canThrow(), this.ringColor());
+    world.updateRing(pose.lift, ringRadius(t));
+    if (this.flight) this.fly(now);
+  }
+
+  protected onGrab(): void {
+    this.haptics.tap();
+  }
+
+  /**
+   * Suelta la bola (F2-05). El vuelo se calcula entero ahora: dónde estará el Pokémon al llegar se sabe (sus saltos
+   * están programados), así que acierto, punto de impacto y calidad quedan decididos y la escena solo lo reproduce.
+   */
+  protected launch(intent: ThrowIntent): void {
+    const world = this.world;
+    if (!world || !world.isPlaced || !this.canThrow()) return;
+    const now = performance.now();
+    const t0 = now - this.startedAt;
+    // Hacia donde mira el móvil al soltar; sin AR la cámara mira al Pokémon (rumbo 0).
+    const yaw = this.arMode ? cameraYaw(this.q) : 0;
+    const rest = world.throwTarget(yaw, this.personality.hover);
+    const f = planFlight(
+      intent.power,
+      intent.aim,
+      intent.curve,
+      Math.max(0.5, rest.fwd),
+      rest.baseY + rest.height / 2,
+    );
+    const lift = this.poseAt(t0 + impactTime(f, rest.fwd) * 1000, world.heightM).lift;
+    const hit: ThrowHit =
+      rest.fwd > 0.5
+        ? resolveFlight(f, world.throwTarget(yaw, lift))
+        : { kind: 'miss', t: 1.2, fwd: 0, lat: 0 }; // detrás o al lado: ni lo intenta
+    const quality =
+      hit.kind === 'hit' ? throwQuality(hit.u, hit.v, ringRadius(t0 + hit.t * 1000)) : 'none';
+    this.flight = {
+      f,
+      yaw,
+      start: now,
+      hit,
+      quality,
+      ball: this.ball(),
+      berry: this.berry() ? 'RAZZ_BERRY' : null,
+      curve: intent.curve !== 0,
+    };
+    this.busy.set(true);
+    world.spawnBall(this.ball());
+    void this.audio.playSfx('ball-throw');
+    this.haptics.throw();
+  }
+
+  /** Un fotograma del vuelo; al llegar, acierto o fallo. */
+  private fly(now: number): void {
+    const fl = this.flight;
+    const world = this.world;
+    if (!fl || !world) return;
+    const tf = (now - fl.start) / 1000;
+    world.setBallInThrowFrame(fl.yaw, flightPos(fl.f, Math.min(tf, fl.hit.t)), tf * 18);
+    if (tf < fl.hit.t) return;
+    this.flight = null;
+    if (fl.hit.kind === 'miss') this.missed();
+    else void this.hitPokemon(fl);
+  }
+
+  /** No le dio: la bola se queda un momento en el suelo y vuelve otra a la mano. No gasta nada (D-046). */
+  private missed(): void {
+    this.showToast('¡Casi!');
+    setTimeout(() => {
+      this.world?.removeBall();
+      this.busy.set(false);
+    }, 500);
+  }
+
+  /** Le dio: el servidor decide (D-028). F2-07 cambia el mensaje por la coreografía completa. */
+  private async hitPokemon(fl: InFlight): Promise<void> {
+    void this.audio.playSfx('ball-hit');
+    this.haptics.tap();
+    if (fl.quality !== 'none') this.showToast(QUALITY_TEXT[fl.quality]);
+    if (fl.berry) this.berry.set(false); // la baya se gasta con el lanzamiento
+    try {
+      const res = await this.api.throw(this.id(), {
+        ball: fl.ball,
+        berry: fl.berry,
+        throwQuality: fl.quality,
+        curve: fl.curve,
+      });
+      this.showToast(res.captured ? '¡Capturado!' : res.fled ? '¡Huyó!' : 'Se escapó…');
+      if (res.captured || res.fled) {
+        setTimeout(() => this.back(), 1500);
+        return;
+      }
+    } catch (err) {
+      const status = err instanceof HttpErrorResponse ? err.status : undefined;
+      this.showToast(encounterErrorText(status));
+    }
+    this.world?.removeBall();
+    this.busy.set(false);
+  }
+
+  private showToast(text: string, ms = 1400): void {
+    this.toast.set(text);
+    clearTimeout(this.toastTimer);
+    this.toastTimer = setTimeout(() => this.toast.set(null), ms);
   }
 
   /** Postura en `t` ms del encuentro: cae al entrar y después se mueve según su ficha (F2-04b). */
@@ -599,6 +779,9 @@ export class EncounterPage implements OnDestroy {
   }
 
   private teardown(): void {
+    this.flight = null;
+    this.busy.set(false);
+    clearTimeout(this.toastTimer);
     this.stage?.dispose();
     this.world?.dispose();
     this.stage = null;

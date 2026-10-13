@@ -1,5 +1,5 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { Injectable, effect, inject, signal } from '@angular/core';
+import { Injectable, computed, effect, inject, signal } from '@angular/core';
 import type { LatLng } from '@shared/engine/geo';
 import type { Weather } from '@shared/engine/spawns';
 import type { NearbySpawns, VisibleSpawn } from '@shared/protocol/spawns';
@@ -38,7 +38,14 @@ export class SpawnFeedService {
   /** La petición en vuelo (para que `reportPosition` no lance otra a la vez). */
   private pending: Promise<boolean> | null = null;
 
-  readonly spawns = this._spawns.asReadonly();
+  /** Ids que este jugador ya resolvió (capturado o huyó, F2-07): no se vuelven a pintar en el mapa. */
+  private readonly hidden = signal<ReadonlySet<string>>(new Set());
+
+  readonly spawns = computed(() => {
+    const hidden = this.hidden();
+    const all = this._spawns();
+    return hidden.size ? all.filter((s) => !hidden.has(s.id)) : all;
+  });
   readonly weather = this._weather.asReadonly();
   /** Noche según el servidor (la misma que decide los spawns); null hasta la primera respuesta. */
   readonly night = this._night.asReadonly();
@@ -117,9 +124,18 @@ export class SpawnFeedService {
     }
   }
 
+  /**
+   * Ya resuelto por este jugador (F2-07): fuera del mapa aunque el servidor lo siga dando (los spawns no se guardan,
+   * D-025). Los ids llevan la franja, así que no hace falta limpiarlos: los de franjas viejas ya no vuelven.
+   */
+  hide(id: string): void {
+    this.hidden.update((s) => new Set(s).add(id));
+  }
+
   /** Al cerrar sesión o cambiar de jugador. */
   clear(): void {
     this.state = emptyState();
+    this.hidden.set(new Set());
     this._spawns.set([]);
     this._weather.set(null);
     this._night.set(null);
