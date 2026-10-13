@@ -3922,7 +3922,7 @@ export function swipeToThrow(r: Release): { power: number; aim: number } | null 
 
 **Files:** Create `src/app/game/encounter-scene/throw-physics.ts`, Test `throw-physics.spec.ts`
 
-- [ ] **5a. Test que falla:**
+- [x] **5a. Test que falla:**
 
 ```ts
 import { EYE_HEIGHT_M } from './encounter-layout';
@@ -3994,7 +3994,7 @@ describe('throw-physics', () => {
 });
 ```
 
-- [ ] **5b.** → FALLA. **5c. Implementación:**
+- [x] **5b.** → FALLA. **5c. Implementación:**
 
 ```ts
 /**
@@ -4106,7 +4106,7 @@ export function resolveFlight(f: Flight, box: TargetBox): ThrowHit {
 }
 ```
 
-- [ ] **5d.** → PASA (7). Commit `F2-05: física del vuelo y acierto` + push.
+- [x] **5d.** → PASA (7). Commit `F2-05: física del vuelo y acierto` + push.
 
 ### Paso 6 — El aro de precisión
 
