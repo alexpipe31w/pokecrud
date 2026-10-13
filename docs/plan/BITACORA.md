@@ -1083,3 +1083,35 @@ compila un APK de DEPURACIÓN, así que el APK de Render también lo registraba.
 
 **Quedó a medias:** comprobarlo en un Android (`adb logcat | grep -i SecureStorage` tras iniciar sesión → nada).
 **El siguiente debe empezar por:** el RELEVO de ESTADO (Samuel).
+
+## 2026-10-12 20:30 · @kenneth (Claude) · F2-01 · rama `feature/F2-01-spike-camara-giroscopio`
+
+**Qué se hizo:** spike de cámara + giroscopio en el WebView. Página `/dev/ar` (solo desarrollo): cámara trasera por
+`getUserMedia` de fondo, escena three.js encima (Pikachu/Charizard/Snorlax/Gyarados a tamaño real con sombra, anillo y
+400 partículas del tipo), las tres fuentes de orientación a la vez (`deviceorientation`, la absoluta y
+`RelativeOrientationSensor`), selector de cámara, "30 fps fijos", deslizadores de campo de visión y retraso, "Medir
+batería" y "Deriva 20 s". Matemática reutilizable con tests en `game/encounter-scene/`. De paso: comprobado en el A36
+que el APK ya no saca el refresh token en logcat (pendiente de Alex).
+**Archivos clave:** `src/app/game/encounter-scene/device-pose.ts` (orientación → cuaternión de cámara, rumbo, punto
+delante), `pose-delay.ts` (orientación de hace N ms), `src/app/features/dev-ar/dev-ar.page.ts` (página del spike),
+`ar-spike-scene.ts` (escena), `app.routes.ts` (`/dev/ar`), D-045, ARQUITECTURA §6.
+**Cómo se probó (salida real):**
+
+    lint OK · build OK · ng test: 57 archivos, 278 passed (17 nuevos) · test:shared 140 passed
+    Samsung A36, APK de producción, CDP (adb forward + playwright-core) y adb:
+      logcat tras abrir la app y recuperar la sesión: securestorage 0 líneas, Capacitor/Plugin 0
+      facingMode → "camera 2, facing back" (8 MP, foco fijo = gran angular); "camera 0" = 4080×3060, foco continuo
+      batería (cám. 0, 720p): solo cámara 59,3 · +Pokémon 60,0 · +400 partículas 60,0 · dpr nativo 59,7 ·
+        1080p 59,5 · sin cámara 119,9 fps; p95 16,8 ms; vídeo 23,2-23,6 fps; batería 35,5 → 35,7 °C
+      frameRate {min: 30}: sigue a 24 fps · exposición manual 25 ms/ISO 400: 26-29 fps
+      deriva 20 s quieto: event 0,5 Hz 0,1° · absoluta 0,4 Hz 0,1° · sensor 56,2 Hz −0,2°
+      a mano (Kenneth): FOV 64° sin patinar, retraso 80 ms a la par del vídeo, el sensor va más suave
+      mapa ↔ /dev/ar ×3: 0 líneas de "context lost/robustness/gpu_snapshot" en logcat
+      dumpsys media.camera: en /dev/ar con cliente; en /mapa y en segundo plano "[]"; al volver, reabre (1,3-1,8 s)
+      permiso denegado (pm revoke + user-fixed): "NotAllowedError: Permission denied", fondo ilustrado a 120 fps
+
+**Quedó a medias / roto:** nada. Falta medir el campo de visión en otro móvil (Redmi de Samuel; en PENDIENTES).
+**Decisiones nuevas:** D-045.
+**El siguiente debe empezar por:** F2-02 (plan de F2 con `writing-plans`): leer D-045 y
+`src/app/game/encounter-scene/*.ts`; la escena del encuentro reutiliza `deviceEventQuaternion`/`sensorQuaternion`,
+`cameraYaw`, `spotInFront` y `PoseDelay`, y la elección de cámara de `dev-ar.page.ts` (`listBackCams`).
