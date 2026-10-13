@@ -224,6 +224,13 @@
       Pokémon (los largos, + media profundidad); se recoloca al llegar el modelo. A36 con Slowpoke XL forzado por CDP:
       antes llenaba la pantalla, ahora ~52 % del ancho, 59,6 fps (`F2-15_01`). App 413 tests. Queda: en los largos el aro
       y la caja del lanzamiento siguen en su centro (se ven más pequeños que su cara).
+- [ ] **F2-17 · Captura legible con los Pokémon lejanos** (visto en el A36, `F2-07_*`): con un Pokémon grande y lejos
+      (Abomasnow, F2-15 lo aleja) la bola en el suelo es un punto de pocos píxeles y las sacudidas no se ven; las
+      estrellas doradas del "¡Capturado!" apenas se notan. Ideas: que la bola caiga más cerca de la cámara (o acercar la
+      cámara durante las sacudidas) y estrellas más grandes/brillantes alrededor de la bola. Dep: F2-07.
+- [ ] **F2-18 · Modelos 3D que se ven oscuros** — el `.glb` de Abomasnow (#460) sale gris oscuro en el encuentro desde
+      que carga (su arte es blanco); los demás probados se ven bien. Mirar sus materiales (`metalness`/`roughness`, mapa
+      de entorno, espacio de color de la textura) y, si son varios, una corrección general al cargar. Dep: F2-12.
 - [ ] **F2-16 · Entrada al encuentro más clara** (visto en el A36, vídeo `F2-04b_04`): (1) la copia del Pokémon que
       "crece hacia el centro" casi no se ve: hereda `transform-origin: 0 0` del original (crece hacia abajo-derecha) y
       se apaga del todo en 320 ms; (2) tras el toque el mapa se queda ~0,4 s quieto (espera a `reportPosition`) y
@@ -246,8 +253,13 @@
       **Hecho:** `GET /encounters/:id` y `POST /encounters/:id/throw`; migración `capture` aplicada. e2e 11/11 (franja,
       distancia, gasto atómico, reintento ×5 a la vez = 1 bola, 3 capturas simultáneas = 1 gana, huida, sin bolas,
       antitrampa de precisión, validación). D-028.
-- [~] **F2-07 · Secuencia de captura/escape y shiny** (@kenneth, 2026-10-12) — absorción, sacudidas, fanfarria, recompensas,
+- [x] **F2-07 · Secuencia de captura/escape y shiny** (@kenneth, 2026-10-12) — absorción, sacudidas, fanfarria, recompensas,
       pantalla de "¡Capturado!" con datos del individuo. Dep: F2-05, F2-06.
+      **Hecho:** coreografía (`capture-sequence.ts`), absorción del plano Y del modelo 3D (encoge hacia los pies, luz
+      roja con `emissive`), sonidos absorb/shake/capture/escape, naturalezas ES (las 25 comprobadas con PokéAPI), tarjeta
+      "¡Capturado!" y la página. App 75 archivos / 435 tests, shared 147, servidor 22. **A36:** Abomasnow (escape a la
+      primera, luego 3 sacudidas → capturado) y Bellsprout (2 escapes y capturado), XP del HUD 590 → 900, bolas solo al
+      acertar; con Render la bola espera ~1,5 s en el suelo. Evidencias `F2-07_0{1..4}_a36-*`. Vistos → F2-17, F2-18.
 - [x] **F2-08 · Audio del juego** (@alex, 2026-10-12) — buscar/crear SFX y música libres, `CREDITOS.md`, mezcla y volúmenes.
       Dep: F0-05.
       **Hecho (SFX; la música pasa a F2-10):** 12 efectos GENERADOS en el juego (`sfx-synth.ts`: recetas de

@@ -1366,3 +1366,44 @@ Pokémon y se ven más pequeños que su cara (D-051, "Consecuencia").
 **El siguiente debe empezar por:** mezclar el PR de F2-15; luego, con luz, F1-07 7b y F1-05 3b en la calle (joystick
 APAGADO). Sin calle: F2-07 (coreografía de captura) siguiendo `fases/F2-captura.md` → "F2-07" y la entrada de F2-05 de
 esta bitácora para aplicar los diffs a mano sobre el modelo 3D.
+
+## 2026-10-13 00:10 · @kenneth (Claude) · F2-07 · rama `feature/F2-07-captura`
+
+**Qué se hizo:** PR #60 (F2-15) mezclado. F2-07 siguiendo `fases/F2-captura.md` → "F2-07" paso a paso, con un
+commit por paso. Pasos 1, 2, 4 y 5 tal cual el plan (bloques `ts` copiados del plan). Paso 3 **adaptado al modelo 3D**
+(el plan solo tocaba el plano `body`): `setCaptureLook` también encoge el modelo hacia sus pies (`update`) y lo tiñe con
+luz roja: color × rojo **y `emissive` rojo** (con luces, solo multiplicar el color se veía como una sombra); guarda los
+colores originales en `userData` y con (0, 0) los devuelve exactos; el plano sigue oculto si hay modelo. Paso 6 aplicado
+a mano sobre la página de F2-05/F2-12/F2-13/F2-15 (se mantiene `#dock`; al capturar se cierra la ficha ⓘ). Las 25
+naturalezas del plan se comprobaron contra PokéAPI (`/nature/1..25`, `names[es]`): 25 iguales.
+**Archivos clave:** `src/app/game/encounter-scene/capture-sequence.ts`, `shared/data/natures-es.ts`,
+`src/app/game/encounter-scene/encounter-scene.ts` (`setCaptureLook`, `poseBall`, `shrink`), `src/app/services/game/sfx-synth.ts`
+(absorb/shake/capture/escape), `src/app/features/encounter/caught-card.component.ts`, `encounter.page.ts` (+ specs),
+`docs/evidencias/F2-08_sfx/{absorb,shake,capture,escape,land,shiny,ball-throw,ball-hit}.wav` (los 4 de F2-04b/F2-05
+tampoco estaban).
+**Cómo se probó (salida real):**
+
+    rojo primero en cada paso (TS2307 capture-sequence / natures-es.js / caught-card; TS2339 setCaptureLook, poseBall)
+    capture-sequence 8 · natures-es 3 · encounter-scene 34 · sfx-synth 24 · caught-card 5 · encounter.page 16 passed
+    npm run lint → All files pass linting · npm test → 75 archivos, 435 passed · test:shared → 147 passed · build OK
+    server: build OK · 22 passed
+    Samsung A36, APK de producción (Render), grabación `adb shell screenrecord`:
+      Abomasnow Nv. 15: acierto → {"captured":false,"shakes":0,"fled":false} "¡Se escapó!"; "¡Bien!" →
+        {"captured":true,"shakes":3} → tarjeta (Tímida, ♂ Macho, +110 XP)
+      Bellsprout Nv. 13: "¡Genial!" → escapó (+50 XP), otro escape, "¡Genial!" → 3 sacudidas → capturado (Afable,
+        ♀ Hembra, +150 XP). Respuestas de Render 2,6-3,1 s: la bola espera en el suelo y la secuencia sigue.
+      HUD: 590 → 900 XP; bolas 45 → 40 (solo los aciertos). Kenneth: "lo capturé y salió la tarjeta".
+    Evidencias (fondo ilustrado, sin imagen de la casa): F2-07_01 vídeo de Bellsprout (2 escapes y captura),
+      F2-07_02 tarjeta, F2-07_03 luz roja, F2-07_04 bola esperando.
+
+**Ojo (datos de producción):** para la prueba, a petición de Kenneth, se subió la mochila de SU jugador
+(`kenneth_rb`) en Supabase a Poké 30 / Super 10 / Ultra 5 / Frambu 10 (solo subir, nunca bajar; antes 12/0/0/0), con un
+script puntual fuera del repo que usa el cliente Prisma del servidor y `server/.env`. No hay comando para esto en el
+repo (a propósito, como `npm run admin`); si hace falta a menudo, que sea parte del modo demo de F8-05.
+**Quedó a medias / roto:** nada de F2-07. Vistos y anotados: F2-17 (con Pokémon lejanos la bola del suelo es diminuta
+y las estrellas apenas se ven) y F2-18 (el modelo de Abomasnow sale gris oscuro desde que carga). El shiny solo se probó
+con tests (1/512 en el móvil). Lo de "el capturado ya no está en el mapa" no se pudo mirar en el móvil: cambió la
+franja antes de volver (lo cubre `spawn-feed.service.spec`).
+**Decisiones nuevas:** ninguna (la luz roja con `emissive` está explicada en el código).
+**El siguiente debe empezar por:** mezclar el PR de F2-07; con luz, F1-07 7b y F1-05 3b en la calle (joystick
+APAGADO); después F3-01 (plan de la colección con `writing-plans`: "Mis Pokémon" ya tiene datos que enseñar).

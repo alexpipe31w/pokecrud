@@ -6335,12 +6335,12 @@ final, los pasos intermedios no "empiezan" y no suenan.
 
 - [x] **7a.** `npm run lint` · `npm run build` · `npm test -- --watch=false` (referencia: **73 archivos / 393 tests**) ·
   `npm run test:shared` (**143**) · `cd server && npm run build && npm test` (**22**).
-- [ ] **7b.** Android: grabar (`adb shell screenrecord`) una captura completa (golpe → luz roja → cae → 3 sacudidas con
+- [x] **7b.** Android: grabar (`adb shell screenrecord`) una captura completa (golpe → luz roja → cae → 3 sacudidas con
   vibración → clic con estrellas y fanfarria → tarjeta con la XP contando) y un escape (sale con su grito y se puede
   volver a lanzar). Comprobar que el capturado ya no está en el mapa al volver y que la XP del HUD subió. Con Render
   dormido (tras 15 min), la bola espera balanceándose y la secuencia sigue al despertar. Evidencias `F2-07_*`.
-- [ ] **7c.** El shiny se prueba con los tests (y en el móvil si sale: 1/512; forzarlo es el modo demo de F8-05).
-- [ ] **7d.** REGLA 2 y PR. Con F2-07 hecho, **F2 está completa** salvo F2-10 (música): siguiente, F4-07 (combate en
+- [x] **7c.** El shiny se prueba con los tests (y en el móvil si sale: 1/512; forzarlo es el modo demo de F8-05).
+- [x] **7d.** REGLA 2 y PR. Con F2-07 hecho, **F2 está completa** salvo F2-10 (música): siguiente, F4-07 (combate en
   AR), que reutiliza `CameraService`, `OrientationService`, `EncounterStage` y la escena (D-034).
 
 ---
