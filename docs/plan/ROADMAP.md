@@ -312,7 +312,7 @@
       naturaleza, movimientos, fecha/bola y mapa mini (solo al verse; si falla, coordenadas); transferir con confirmación
       y "Deshacer" 5 s (`PendingTransfer` + `TransferService`). "Ver en Mis Pokémon" abre la ficha del recién capturado.
       Probado en vista móvil con Nest y Postgres locales (`F3-03_0{1..5}_*`). Pendiente opcional: un Android.
-- [ ] **F3-04 · Pokédex 1025** — vistos/capturados por generación, ficha de especie (descripción ES,
+- [~] **F3-04 · Pokédex 1025** (@samuel, 2026-10-13) — vistos/capturados por generación, ficha de especie (descripción ES,
       debilidades calculadas, cadena evolutiva, altura/peso, hábitat). Dep: F3-01b, F3-02a.
 - [ ] **F3-05 · Evolución con caramelos** — regla de caramelos por cadena (D-053: 50 si la cadena tiene una
       evolución; 25 y 100 si tiene dos), `POST /collection/:id/evolve` transaccional, animación de evolución. Dep: F3-03.
