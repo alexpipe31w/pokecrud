@@ -215,7 +215,7 @@ para el criterio (vídeo); hasta entonces, dos ventanas del navegador a 390×844
   no gasta la decisión; solo el que debe cambiar puede actuar; 3 tiempos agotados → `inactive`; desconexión 60 s →
   `abandon`; reconectar a los 59 s → sigue; los dos fuera → `winner null`; **dos `act` del mismo jugador "a la vez"
   → se aplica una**; combate entero con semilla fija → mismo resultado que `resolveTurn` en local.
-- [ ] **Paso 3 — persistencia:** modelo `Battle` + migración `battle` (índices `(p1Id, endedAt)`, `(p2Id, endedAt)`),
+- [x] **Paso 3 — persistencia:** modelo `Battle` + migración `battle` (índices `(p1Id, endedAt)`, `(p2Id, endedAt)`),
   `BattlesRepository.save` idempotente (regla 10). e2e: guardar dos veces el mismo id → una fila. **Aplicar en Supabase
   ANTES de mezclar** (con `DIRECT_URL` y permiso del humano), como F3-02a y F3-06b.
 - [ ] **Paso 4 — `BattleRoomsService` + gateway:** `battle:act`, `battle:forfeit`, `pvp:hello` con el combate en curso,
