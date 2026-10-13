@@ -9,6 +9,8 @@ import { adminGuard, authGuard, guestGuard } from './core/auth/auth.guard';
  *  /mapa              → Mapa: pantalla principal del juego (F1-04, exige sesión). "" y rutas desconocidas → aquí
  *  /coleccion         → Mis Pokémon: lo capturado, con orden y filtros (F3-02b, exige sesión)
  *  /coleccion/:id     → Ficha de un Pokémon capturado (F3-03, exige sesión)
+ *  /pokedex           → Pokédex de las 1025 especies: vistos/capturados por generación (F3-04, exige sesión)
+ *  /pokedex/:id       → Ficha de una especie (F3-04, exige sesión)
  *  /inventario        → Inventario de la tienda (IS-11; pública). /tabs/pokedex → redirige aquí (enlaces viejos)
  *  /pokemon/nuevo     → Agregar un Pokémon (buscador PokéAPI + formulario)
  *  /pokemon/:id       → Detalle de un Pokémon
@@ -92,6 +94,16 @@ export const routes: Routes = [
     canActivate: [authGuard],
     loadComponent: () =>
       import('./features/collection/collection-detail.page').then((m) => m.CollectionDetailPage),
+  },
+  {
+    path: 'pokedex',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/pokedex-1025/pokedex.page').then((m) => m.PokedexPage),
+  },
+  {
+    path: 'pokedex/:id',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/pokedex-1025/species.page').then((m) => m.SpeciesPage),
   },
   {
     path: 'inventario',

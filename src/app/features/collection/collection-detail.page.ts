@@ -1,5 +1,5 @@
 import { Component, computed, inject, signal } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import {
   IonBackButton,
   IonButtons,
@@ -38,6 +38,7 @@ import { TransferService } from './transfer.service';
     IonTitle,
     IonContent,
     TypeChipsComponent,
+    RouterLink,
     DetailStatsComponent,
     DetailMovesComponent,
     DetailOriginComponent,
@@ -83,6 +84,7 @@ import { TransferService } from './transfer.service';
               <p class="species">{{ speciesName() }}</p>
             }
             <app-type-chips [types]="types()" />
+            <a class="dexlink" [routerLink]="['/pokedex', h.speciesId]">Ver en la Pokédex</a>
             <p class="facts">
               Nv. {{ h.level }}
               @if (h.gender) {
@@ -204,6 +206,13 @@ import { TransferService } from './transfer.service';
     }
     .fav {
       color: var(--gold);
+    }
+    .dexlink {
+      min-height: 44px;
+      display: inline-grid;
+      place-items: center;
+      color: inherit;
+      font-weight: 600;
     }
     .species,
     .facts,

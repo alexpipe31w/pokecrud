@@ -71,6 +71,7 @@ import { AudioService } from '../../services/game/audio.service';
 import { BagService } from '../../services/game/bag.service';
 import { DatasetService } from '../../services/game/dataset.service';
 import { CollectionService } from '../../services/game/collection.service';
+import { PokedexService } from '../../services/game/pokedex.service';
 import { familyBaseId } from '../../core/utils/family';
 import { EncounterApiService } from '../../services/game/encounter-api.service';
 import { HapticsService } from '../../services/game/haptics.service';
@@ -378,6 +379,7 @@ export class EncounterPage implements OnDestroy {
   private readonly api = inject(EncounterApiService);
   private readonly dataset = inject(DatasetService);
   private readonly collection = inject(CollectionService);
+  private readonly pokedex = inject(PokedexService);
   private readonly audio = inject(AudioService);
   private readonly haptics = inject(HapticsService);
   private readonly settings = inject(SettingsService);
@@ -569,6 +571,7 @@ export class EncounterPage implements OnDestroy {
       ]);
       if (seq !== this.loadSeq) return;
       this.view.set(v);
+      this.pokedex.invalidate(); // el servidor acaba de marcarlo como visto (F3-04)
       if (v.status !== 'open') {
         this.phase.set('resolved');
         return;
@@ -871,6 +874,7 @@ export class EncounterPage implements OnDestroy {
       this.cardOpen.set(false);
       this.caught.set({ view: res.caught, xp: res.xpGained, candy: res.candy?.gained ?? 0 });
       this.collection.invalidate(); // que "Mis Pokémon" lo enseñe la próxima vez
+      this.pokedex.invalidate(); // y la Pokédex, como capturado (F3-04)
       return; // la tarjeta decide (Volver al mapa)
     }
     if (res?.fled || seq.gone) {
