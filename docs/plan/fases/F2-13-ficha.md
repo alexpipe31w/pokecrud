@@ -19,11 +19,11 @@ esconde** (Alex). Cerrada por defecto: no tapa la cámara.
 
 **Pasos:**
 
-- [ ] 1. `combat-power.ts`: tests (valores calculados a mano, mínimo 10, crece con nivel e IVs) → código. Commit.
-- [ ] 2. Servidor: `SpeciesDetails.baseStats`, `details()` añade `cp`; `EncounterView.cp`; e2e de encuentros
+- [x] 1. `combat-power.ts`: tests (valores calculados a mano, mínimo 10, crece con nivel e IVs) → código. Commit.
+- [x] 2. Servidor: `SpeciesDetails.baseStats`, `details()` añade `cp`; `EncounterView.cp`; e2e de encuentros
       actualizado (lista de claves + `cp` = el de `combatPower(calcStats(...))` del spawn). Commit.
-- [ ] 3. App: `EncounterScene.screenBox()` (caja del Pokémon en píxeles) con test. Commit.
-- [ ] 4. App: `encounter-card.component.ts` (solo pinta) + botón en `app-encounter-hud` (`aria-expanded`) + la página
+- [x] 3. App: `EncounterScene.screenBox()` (caja del Pokémon en píxeles) con test. Commit.
+- [x] 4. App: `encounter-card.component.ts` (solo pinta) + botón en `app-encounter-hud` (`aria-expanded`) + la página
       (abrir/cerrar, colocar al lado). Spec de la página: cerrada por defecto, abre, muestra datos, se cierra. Commit.
-- [ ] 5. lint · build · tests · shared · servidor (build, unitarios, e2e de encuentros). Navegador 390×844 sin permiso
+- [x] 5. lint · build · tests · shared · servidor (build, unitarios, e2e de encuentros). Navegador 390×844 sin permiso
       de cámara: ficha abierta y cerrada con un modelo 3D. Evidencias `F2-13_*`.
