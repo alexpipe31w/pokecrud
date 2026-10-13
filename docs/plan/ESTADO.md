@@ -3,7 +3,7 @@
 > Se **reescribe** al cerrar cada sesión (no es histórico; el histórico es `BITACORA.md`).
 > Máximo una pantalla. Si lees esto al empezar: después lee `ROADMAP.md`.
 
-**Última actualización:** 2026-10-13 · por Alex (Claude) · F5-03 (sala de espera) en PR · `develop` con #76 (gateway)
+**Última actualización:** 2026-10-13 · por Samuel (Claude) · F5-04 en la rama `feature/F5-04-combate-pvp` · `develop` con #77
 
 ## 👉 F5 EMPIEZA AQUÍ (Alex, 2026-10-13)
 
@@ -68,7 +68,7 @@ puede, F2-07 hecha) o F2-11 (ARCore, Android); pulidos F2-17/F2-18 si sobra tiem
 
 **F0 completa.** **F1:** todo hecho salvo la calle (F1-05 3b, F1-07 7b) y F1-11 (nueva). **F2:** F2-01…F2-06, F2-08,
 F2-07, F2-12, F2-13, F2-15 hechas; faltan **F2-11**/**F2-14** (ARCore), F2-10 (música) y los pulidos F2-16…F2-18.
-**F3:** completa en código (F3-01…F3-06c); quedan los vistazos opcionales en Android. **F4:** completa en código salvo F4-07 (combate en AR 3D, D-048). **F5:** F5-01, F5-02 y F5-03 hechas; sigue F5-04.
+**F3:** completa en código (F3-01…F3-06c); quedan los vistazos opcionales en Android. **F4:** completa en código salvo F4-07 (combate en AR 3D, D-048). **F5:** F5-01…F5-03 hechas; F5-04 completa en código (falta Supabase + vídeo con dos móviles); luego F5-05.
 
 ## Hecho
 
@@ -220,12 +220,10 @@ F2-07, F2-12, F2-13, F2-15 hechas; faltan **F2-11**/**F2-14** (ARCore), F2-10 (m
 
 ## En curso
 
-- **F5-04 (Samuel, rama `feature/F5-04-combate-pvp`):** combate PvP completo. Punto de guardado: recién reclamada;
-  pasos 1-3 hechos (`pvp-view`, `BattleRoom`, tabla `Battle` + `BattlesRepository`). Migración `20261013030000_battle`
-  SOLO en el Postgres local: va a Supabase ANTES de mezclar (con permiso). Paso 4 hecho (servidor completo: `battle:act`,
-  reconexión, abandono, resultado guardado; e2e 114). Paso 5 a medias: modo remoto de `BattleController` hecho (9 tests,
-  app 549) y pantalla `/pvp/combate` (BattlePage en modo PvP + `PvpBattleSession`, barra de tiempo, "¡A combatir!" en el
-  cara a cara; app 558). Falta: probar en el navegador con dos cuentas (paso 6) y el criterio con dos móviles.
+- **F5-04 (Samuel, rama `feature/F5-04-combate-pvp`, `[~]`):** combate PvP completo EN CÓDIGO (pasos 1-5) y probado con
+  dos cuentas en el navegador. **Falta:** (1) migración `20261013030000_battle` en Supabase ANTES de mezclar (permiso del
+  humano); (2) mezclar → Render; (3) el criterio: combate entre DOS MÓVILES con el APK de producción, en vídeo
+  (`docs/evidencias/F5-04_*`). Punto de guardado: todo subido; nada a medias en el código.
 - Cuentas de prueba locales: `demo+alex@pokecrud.test` y `demo+rival@pokecrud.test` (contraseña: pídesela a Alex; no va en el repo), con equipo "Arena" de 3. `test:e2e` las borra pasada 1 h: se recrean registrándolas y con el script de la bitácora de F5-03.
 - Samuel cerró **F3-06c** (#73 mezclado; sin migración). **Con esto la F3 está completa en código.**
 - **Ojo:** el inventario de IS-11 está ahora en `/inventario` (la Pokédex 1025 ocupa `/pokedex`).
@@ -243,7 +241,8 @@ F2-07, F2-12, F2-13, F2-15 hechas; faltan **F2-11**/**F2-14** (ARCore), F2-10 (m
 
 ## Siguiente paso concreto
 
-1. **Sin móvil:** **F5-04** pasos 1-5 (`fases/F5-pvp.md`; `viewFor` y rendirse ya están). Migración `battle` a Supabase ANTES de mezclar (permiso del humano). Alternativas: F2-10 (música), F7-07 (extra).
+1. **F5-04 a producción:** migración `battle` a Supabase (con permiso) → PR → mezclar → `npm run apk` y combate entre
+   dos móviles grabado (el criterio). Sin móvil: F5-05 (espectadores, plan corto), F2-10 (música), F7-07 (extra).
    **Probar sin tocar Supabase:** Postgres 17 portátil (`embedded-postgres@17.10.0-beta.17` en una carpeta temporal),
    `DATABASE_URL`/`DIRECT_URL` a él, `npx prisma migrate deploy` y `npm run db:seed`; comprobar con `prisma migrate
    status` que apunta a 127.0.0.1. La app en `localhost:8100` (en el PC de Samuel el 4200 lo ocupa OTRO proyecto suyo).

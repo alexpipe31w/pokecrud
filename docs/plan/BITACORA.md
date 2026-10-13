@@ -1850,3 +1850,48 @@ IVs 20, `encounterId 'pvp-demo:0:i'`) + `Team` "Arena" con sus `caughtIds`. Las 
 **Decisiones nuevas:** D-057.
 **El siguiente debe empezar por:** F5-04 paso 2 de `fases/F5-pvp.md` (`BattleRoom` con decisiones y temporizador;
 el paso 1 ya tiene `viewFor`: falta `eventsFor` y `defaultAction`).
+
+## 2026-10-13 18:45 · @samuel (Claude) · F5-04 (código y navegador) · rama `feature/F5-04-combate-pvp`
+
+**Retomo de @alex** (su relevo: F5-01…F5-03 mezcladas, #75-#77). F5-04 queda `[~]`: completa en código y probada con dos
+cuentas en el navegador; falta la migración en Supabase y el vídeo con dos móviles (criterio).
+**Qué se hizo:** paso 1 `eventsFor` (gira los lados; el `switch` lleva el `PublicPokemon` que sale) y `defaultAction`.
+`validateAction` exportada del motor. Paso 2 `BattleRoom` (clase pura con reloj inyectable). Paso 3 tabla `Battle`
+(migración `20261013030000_battle`, D-058) y `BattlesRepository`. Paso 4 `BattleRoomsService` reescrito sobre `BattleRoom`
+(canal `attach`, `act`, `disconnect`/`reconnect`, guarda al cerrar) y gateway (`battle:act`, reconectar al abrir socket,
+desconectar al cerrar el último; fuera los TODO(F5-04)). Paso 5 app: modo remoto de `BattleController`,
+`PvpBattleSession`, `app-battle-pvp-bar` (cuenta atrás, rival desconectado), `/pvp/combate`, "Volver a la arena" y
+"¡A combatir!" en el cara a cara. `PVP_END_TEXT` en `battle-text.ts`.
+**Tropiezos:** (1) `npm ci` de la raíz falló con EBUSY: la extensión de Java de VS Code bloqueaba
+`node_modules/@capacitor/geolocation/android/build`; a la segunda pasó. (2) `npx eslint` dentro de `server/` usa la
+configuración de Angular: el lint del servidor es `npm run lint`. (3) El e2e del paso 4 lo escribí tras el gateway: lo
+validé desactivando `battle:act` (3/3 en rojo) y volviéndolo a poner. (4) En la prueba con Playwright: el teclado del
+código se envía solo al completar 6 letras; los combates de intentos cortados siguen vivos en memoria hasta acabar por
+tiempo; en la web la sesión es por pestaña (D-006), una pestaña nueva vuelve a entrar.
+**Archivos clave:** `shared/engine/battle/{pvp-view,battle-engine}.ts`, `server/src/pvp/{battle-room,battle-rooms.service,
+battles.repository,pvp.gateway}.ts`, `server/prisma/migrations/20261013030000_battle/`, `server/test/{battles,pvp-battle}
+.e2e-spec.ts`, `src/app/features/battle/{battle.controller,pvp-battle-session,battle-pvp-bar.component,battle.page,
+battle-dock.component}.ts`, `src/app/features/pvp/{pvp.page,pvp-versus.component}.ts`, `src/app/app.routes.ts`.
+**Cómo se probó (salida real):**
+
+    shared: pvp-view 6 nuevos en rojo ("eventsFor is not a function"…) → 10 passed; validateAction rojo → motor 108 passed;
+      todo shared 178 passed
+    servidor: battle-room 10 (rojo: "Cannot find module './battle-room.js'"; 2 fallos de MIS tests —pocos PS y relojes que
+      se pisaban— corregidos en el test, no en la sala) · battle-rooms.service 7 (rojo 7/7) → unitarios 64 passed
+      e2e: battles 3 (rojo: falta el módulo) · pvp-battle 3 (sabotaje: sin battle:act 3/3 rojos) → completo
+      Test Files 14 passed, Tests 114 passed (Postgres portátil; `migrate diff` local → migración vacía) · lint · build OK
+    app: remoto 9 · sesión 6 · barra 2 · página PvP +1 (todos en rojo primero) → 100 archivos, 558 passed · lint · build
+      sin avisos (el estilo `.soon` sobrante del cara a cara se quitó por el presupuesto)
+    navegador (playwright-core + Chrome, 2 contextos 390×844, Nest y app locales, cuentas demo+pvpa/pvpb con "Arena"):
+      invitar → código → cara a cara → "¡A combatir!" → 39 decisiones hasta "Derrota" / "¡Victoria!"; cambio forzado
+      con la hoja; un cambio sin elegir lo jugó el servidor a los 30 s (sacó a Pikachu); cerrar la pestaña de A →
+      B ve "samu… se desconectó · 59 s para volver"; A vuelve (arena → cara a cara → "¡A combatir!") en "Esperando
+      a rival…"; B se rinde → "Tu rival se rindió. ¡Ganaste!" / "Te rendiste."; filas en Battle con faint, forfeit,
+      inactive y abandon (una sin ganador); errores de consola: 0 y 0
+    Evidencias docs/evidencias/F5-04_0{1..9}_*.png
+
+**Quedó a medias:** (1) migración `battle` en Supabase (pedir permiso); (2) vídeo con dos móviles (criterio).
+**Decisiones nuevas:** D-058.
+**El siguiente debe empezar por:** con permiso, `cd server && npx prisma migrate deploy` contra Supabase (comprobar antes
+con `prisma migrate status` que apunta a Supabase y que solo falta `battle`), PR de la rama, mezclar, `npm run apk` y
+grabar un combate entre dos móviles.

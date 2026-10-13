@@ -403,6 +403,14 @@
 - [~] **F5-04 · Combate PvP completo** (@samuel, 2026-10-13) — servidor aplica el engine, temporizador 30 s, abandono 60 s,
       resultado persistido; la escena de F4-05 reutilizada. Dep: F5-03, F4-05. Criterio: combate entre dos
       móviles reales grabado en vídeo.
+      **Código hecho (pasos 1-5, Samuel):** `pvp-view` (`eventsFor`, `defaultAction`), `validateAction` en el motor,
+      `BattleRoom` (decisiones, 30 s → acción por defecto, 3 seguidas → `inactive`, 60 s → `abandon`, rendirse),
+      tabla `Battle` + `BattlesRepository` (idempotente), gateway con `battle:act`, reconexión y abandono; app: modo
+      remoto de `BattleController`, `PvpBattleSession`, `/pvp/combate` y "¡A combatir!" en el cara a cara. D-058.
+      Servidor e2e 114, unitarios 64; app 558; shared 178. Dos cuentas en el navegador: combate entero, cambio forzado,
+      tiempo agotado, desconexión y vuelta, rendirse (`F5-04_0{1..9}_*`).
+      **Falta:** (1) migración `20261013030000_battle` en Supabase ANTES de mezclar (con permiso); (2) el criterio:
+      combate entre DOS MÓVILES REALES (APK de producción contra Render) grabado en vídeo.
 - [ ] **F5-05 · Espectadores.** Dep: F5-04.
 
 ## F6 · Torneos

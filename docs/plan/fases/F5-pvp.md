@@ -230,7 +230,7 @@ para el criterio (vídeo); hasta entonces, dos ventanas del navegador a 390×844
   (`forfeit` "se rindió", `abandon` "se desconectó", `inactive` "no eligió a tiempo"). Combate interrumpido por
   reinicio del servidor: mensaje claro y vuelta a `/pvp`. Escena: la de F4-05 hasta que F4-07 (AR) la sustituya
   (D-034); todo lo de aquí vive en el controlador, así F4-07 lo hereda.
-- [ ] **Paso 6:** dos cuentas en dos pestañas a 390×844 (combate entero, rendirse, cerrar una pestaña y volver, dejar
+- [~] **Paso 6:** (navegador hecho, falta el vídeo con dos móviles) dos cuentas en dos pestañas a 390×844 (combate entero, rendirse, cerrar una pestaña y volver, dejar
   correr el tiempo). **Criterio de aceptación:** combate entre **dos móviles reales** (APK de producción contra Render)
   grabado en vídeo → `docs/evidencias/F5-04_*`. REGLA 2.
 
