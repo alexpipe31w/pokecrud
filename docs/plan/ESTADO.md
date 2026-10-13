@@ -17,8 +17,8 @@ ROADMAP: **F2-12 (modelo 3D) → F2-13 (ficha) → F2-11 (spike ARCore, Android)
 - **F2-12 hecho:** el encuentro usa el modelo 3D `.glb` (D-048) con su animación, personalidad, partículas y giro con el
   dedo; sin modelo → arte plano. Evidencias `F2-12_*`. Siguiente: **F2-13** (ficha que se abre/cierra con un botón).
 - **F2-13 hecho:** botón ⓘ en la cabecera del encuentro abre/cierra la ficha (tipos, nivel, PC del servidor, altura,
-  peso, categoría, descripción). Siguiente en orden: **F2-11 (spike ARCore, Android)**; sin Android → F2-05 NO
-  (depende de F2-14 en la práctica no, solo de F2-12: se puede hacer F2-05 en el PC si no hay móvil).
+  peso, categoría, descripción). Siguiente: con Android, **F2-11 (spike ARCore)**; sin Android, **F2-05**
+  (lanzamiento: solo depende de F2-04b y F2-12, se hace en el PC).
   Para MIRAR una especie concreta en el navegador: `page.route('**/encounters/*', r => r.fulfill({json: {...}}))`.
 
 - **F2-04b pasos 1-9a hechos** (personalidad, partículas, aterrizaje, destello, zoom desde el mapa). Fallo encontrado
