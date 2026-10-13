@@ -1341,9 +1341,9 @@ juego (DISENO §1-§4) sin cambiar su contrato ni sus servicios (`PokemonService
 
 ## F3-06c · Favoritos y Pokémon personalizados
 
-- [ ] **1. Favoritos** (`/favoritos`, contrato `/favorites` sin cambios): marcar una **especie** como favorita desde
+- [x] **1. Favoritos** (`/favoritos`, contrato `/favorites` sin cambios): marcar una **especie** como favorita desde
   la ficha de la Pokédex (F3-04) con nota y valoración 1-5 (estrellas táctiles ≥ 44 px); lista con el sistema de diseño.
-- [ ] **2. Personalizados** (`/personalizados`, contrato `/customPokemon` sin cambios): crear con nombre, 1-2 tipos,
+- [x] **2. Personalizados** (`/personalizados`, contrato `/customPokemon` sin cambios): crear con nombre, 1-2 tipos,
   stats (sliders con `app-stat-bar`), URL de imagen (vista previa; si no carga → silueta) y descripción; lista y edición.
   **Que aparezcan como spawns del grupo queda fuera** (necesita reglas de spawn nuevas y moderar imágenes de terceros):
   anotado como extra en F7.

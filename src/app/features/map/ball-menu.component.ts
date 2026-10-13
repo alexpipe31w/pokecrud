@@ -5,8 +5,10 @@ import { addIcons } from 'ionicons';
 import {
   albumsOutline,
   bookOutline,
+  colorPaletteOutline,
   flashOutline,
   gameControllerOutline,
+  heartOutline,
   logOutOutline,
   peopleOutline,
   sparklesOutline,
@@ -66,6 +68,12 @@ const DRAG_CLOSE_PX = 80;
       </button>
       <button type="button" (click)="go('/pokedex')">
         <ion-icon name="book-outline" aria-hidden="true" />Pokédex
+      </button>
+      <button type="button" (click)="go('/favoritos')">
+        <ion-icon name="heart-outline" aria-hidden="true" />Favoritos
+      </button>
+      <button type="button" (click)="go('/personalizados')">
+        <ion-icon name="color-palette-outline" aria-hidden="true" />Personalizados
       </button>
       <button type="button" (click)="go('/inventario')">
         <ion-icon name="storefront-outline" aria-hidden="true" />Inventario
@@ -211,8 +219,10 @@ export class BallMenuComponent {
     addIcons({
       albumsOutline,
       bookOutline,
+      colorPaletteOutline,
       flashOutline,
       gameControllerOutline,
+      heartOutline,
       logOutOutline,
       peopleOutline,
       sparklesOutline,

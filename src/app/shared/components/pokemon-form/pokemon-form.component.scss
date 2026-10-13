@@ -60,37 +60,3 @@
   grid-template-columns: repeat(auto-fit, minmax(96px, 1fr));
   gap: var(--s-3);
 }
-
-.types {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--s-2);
-}
-
-.type {
-  min-height: 44px;
-  padding: 0 var(--s-3);
-  border: 2px solid var(--chip);
-  border-radius: var(--r-chip);
-  background: transparent;
-  color: inherit;
-  font-weight: 700;
-  font-size: 0.85rem;
-  transition:
-    transform var(--dur-press) var(--ease-out),
-    background var(--dur-small) var(--ease-out);
-  -webkit-tap-highlight-color: transparent;
-
-  &[aria-pressed='true'] {
-    background: var(--chip);
-    color: var(--chip-text);
-  }
-
-  &:active:not(:disabled) {
-    transform: scale(0.95);
-  }
-
-  &:disabled {
-    opacity: 0.35;
-  }
-}
