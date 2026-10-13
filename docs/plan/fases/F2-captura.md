@@ -1960,18 +1960,18 @@ function firstFrame(video: HTMLVideoElement): Promise<void> {
 
 ### Paso 12 — Android (criterio)
 
-- [ ] **12a.** `npm run apk -- --install`. Abrir un encuentro real (ver "Para abrir un encuentro" arriba).
-- [ ] **12b.** Se ve la cámara **principal** (no deformada; en logcat/CDP no sale "camera 2"), el Pokémon en el suelo
+- [x] **12a.** `npm run apk -- --install`. Abrir un encuentro real (ver "Para abrir un encuentro" arriba).
+- [x] **12b.** Se ve la cámara **principal** (no deformada; en logcat/CDP no sale "camera 2"), el Pokémon en el suelo
   delante y quieto en el mundo al girar; Pikachu (0,4 m) parece de su tamaño a 2 m. Captura `F2-04a_01_*`.
-- [ ] **12c.** fps durante 10 s sin tocar (CDP, en la consola del WebView):
+- [x] **12c.** fps durante 10 s sin tocar (CDP, en la consola del WebView):
   `await new Promise(r => { let n = 0; const t0 = performance.now(); const f = () => { n++; performance.now() - t0 < 10000 ? requestAnimationFrame(f) : r(n / ((performance.now() - t0) / 1000)); }; requestAnimationFrame(f); })`
   → ≥ 55. Anotar en la bitácora.
-- [ ] **12d.** Volver al mapa y entrar 3 veces: `adb logcat -d | grep -iE "context lost|robustness|gpu_snapshot"` vacío y el
+- [x] **12d.** Volver al mapa y entrar 3 veces: `adb logcat -d | grep -iE "context lost|robustness|gpu_snapshot"` vacío y el
   mapa sigue en 3D. Botón de inicio con el encuentro abierto → `adb shell dumpsys media.camera | grep -A1 "Active Camera Clients"` = `[]`.
-- [ ] **12e.** AR apagada → fondo ilustrado con el horizonte a la altura del suelo de la escena (`F2-04a_02_*`).
+- [x] **12e.** AR apagada → fondo ilustrado con el horizonte a la altura del suelo de la escena (`F2-04a_02_*`).
   Permiso denegado (`adb shell pm revoke co.edu.fet.pokecrud android.permission.CAMERA`) → "Sin permiso de cámara: modo
   sin AR." y fondo ilustrado (`F2-04a_03_*`). Devolverlo: `adb shell pm grant co.edu.fet.pokecrud android.permission.CAMERA`.
-- [ ] **12f.** REGLA 2: ROADMAP `[x]`, ESTADO, BITACORA (salida real), PR a `develop`.
+- [x] **12f.** REGLA 2: ROADMAP `[x]`, ESTADO, BITACORA (salida real), PR a `develop`.
 
 ---
 
@@ -3148,11 +3148,11 @@ index a35e8a7..bf29e9a 100644
 ### Paso 9 — Verde y Android
 
 - [x] **9a.** `npm run lint` · `npm run build` · `npm test -- --watch=false` · `npm run test:shared` en verde.
-- [ ] **9b.** Android: tocar un Pokémon en el mapa → crece hacia el centro → destello → cae y aterriza con polvo, grito
+- [x] **9b.** Android: tocar un Pokémon en el mapa → crece hacia el centro → destello → cae y aterriza con polvo, grito
   y vibración a la vez. Un Volador/Bicho con alas flota; un Fantasma se ve semitransparente; un rápido (p. ej. Rattata)
   salta más a menudo que uno lento (Slowpoke). fps con partículas ≥ 55 (snippet del paso 12c de F2-04a). Vídeo
   corto con `adb shell screenrecord /sdcard/f204b.mp4` (Ctrl+C para parar; `adb pull`), evidencias `F2-04b_*`.
-- [ ] **9c.** REGLA 2 y PR.
+- [x] **9c.** REGLA 2 y PR.
 
 ---
 
@@ -5181,11 +5181,14 @@ Pokémon al llegar (`poseAt` en el instante del impacto, con sus saltos); aciert
 ### Paso 12 — Verde y Android
 
 - [x] **12a.** `npm run lint` · `npm run build` · `npm test -- --watch=false` · `npm run test:shared` · `cd server && npm run build && npm test`.
-- [ ] **12b.** Android (con la AR y sin ella): un lanzamiento recto y firme acierta; flojo → "¡Casi!" y NO baja la
+- [x] **12b.** Android (con la AR y sin ella): un lanzamiento recto y firme acierta; flojo → "¡Casi!" y NO baja la
   mochila; torcido falla; con una vuelta del dedo antes, la bola hace la curva y vuelve; el aro cambia de color con
   Super/Ultra/Frambu; "¡Genial!" etc. al acertar dentro del aro; la mochila baja una bola por acierto (y la Frambu);
   sin bolas de una clase, su botón se apaga. Con un Pokémon rápido, alguno falla por su salto. Evidencias `F2-05_*`.
-- [ ] **12c.** REGLA 2 y PR.
+  **Hecho (Kenneth, A36, 2026-10-12) tras arreglar el gesto (D-050):** antes 3 aciertos de 117 y la curva nunca;
+  después 3 de 5 con su puntería, curva con `curve=true`, resto del criterio OK. Sin capturas: la cámara enseñaba su
+  casa (repo público). Lo de "un rápido falla por su salto" no se aisló en el móvil (lo cubre `pokemon-motion.spec`).
+- [x] **12c.** REGLA 2 y PR.
 
 ---
 

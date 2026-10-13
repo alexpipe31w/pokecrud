@@ -129,6 +129,7 @@
 - [~] **F1-05 · Avatar 3D** (@alex, 2026-10-12; prueba en Android: @kenneth, 2026-10-12) — personaje que camina/corre/se queda quieto según velocidad, sombra,
       círculo de alcance. Dep: F1-04.
       **Falta solo 3b:** probarlo en un Android real (andar y trotar, ≥ 55 fps). Código mezclado en `develop`.
+      (Kenneth, A36, 2026-10-12: en casa con joystick el mapa va a 118,8 fps; falta salir a andar y trotar con el GPS.)
 - [x] **F1-06 · Spawns deterministas** (@alex, 2026-10-11) — `shared/engine/spawns.ts` + `rng.ts` con tests; endpoint
       `GET /spawns?lat&lng` (celdas a ≤ 200 m, salt solo en servidor, clima Open-Meteo con timeout y
       caché por celda 15 min). Dep: F0-06, F0-02. Criterio: misma entrada → mismos spawns (test); dos
@@ -140,6 +141,14 @@
 - [~] **F1-07 · Pokémon en el mapa** (@alex, 2026-10-12; prueba en Android: @kenneth, 2026-10-12) — **falta solo 7b (Android, ≥ 55 fps con los Pokémon);
       código mezclado en `develop`.** — sprites en el overlay, hierba agitándose, aparición/desaparición
       animada, grito bajito por cercanía, toque → encuentro. Dep: F1-05, F1-06.
+      (Kenneth, A36, 2026-10-12: APK de producción con 13 Pokémon de Render en el feed, 118,8 fps, p95 8,4 ms, 0 %
+      tirones; tocar lejos → "Acércate más para atraparlo", cerca → encuentro. Falta la calle con el GPS de verdad.)
+- [ ] **F1-11 · El joystick arranca donde estás, no en el Parque Santander** — `joystickMode` se guarda en ajustes
+      (D-037) y al reabrir la app `MapPage` pone el avatar en `DEFAULT_CENTER` si no hay posición: Kenneth (A36) lo
+      tenía activado desde la prueba de permisos de F1-03 y "el avatar no está en mi ubicación"; además nada en la
+      pantalla dice que va en joystick ni cómo volver al GPS (está en el menú de la Poké Ball). Propuesta: con permiso
+      de ubicación, el joystick arranca en la primera posición del GPS (o la última guardada); aviso pequeño "Modo
+      joystick" con acceso a "Usar GPS". Dep: F1-03.
 - [x] **F1-08 · Inventario y XP básicos** (@alex, 2026-10-11) — modelo `Inventory`, bolas iniciales, nivel/XP del jugador en
       el HUD. Dep: F0-07.
       **Hecho:** modelo `Inventory` + `GET /bag` (kit 30/5/0/5 al registrarse y a los existentes), curva de nivel y
@@ -164,26 +173,33 @@
       Dep: F0-03.
       **Hecho:** fórmula Gen III+ de ARQUITECTURA §6, huida por rareza/velocidad, `resolveThrow` con RNG inyectado;
       12 tests (casos calculados a mano + 40.000 lanzamientos que cuadran con la probabilidad). D-027.
-- [~] **F2-04a · Escena de encuentro en AR (base)** (@alex, 2026-10-12; prueba en Android: @kenneth, 2026-10-12) — `/encuentro/:id` definitivo: cámara trasera principal de fondo
+- [x] **F2-04a · Escena de encuentro en AR (base)** (@alex, 2026-10-12; prueba en Android: @kenneth, 2026-10-12) — `/encuentro/:id` definitivo: cámara trasera principal de fondo
       (o fondo ilustrado sin permiso / sin cámara / AR apagada), Pokémon a tamaño real con XS/XL anclado con el
       giroscopio, placa, "Huir", estados de error; cámara y sensores se sueltan al salir (D-045). Dep: F2-02, F1-07.
       Criterio: Android ≥ 55 fps; mapa ↔ encuentro ×3 sin perder el contexto WebGL. Plan: `fases/F2-captura.md`.
       **Hecho (pasos 1-11, PR):** `/encuentro/:id` definitivo; lint/build OK, app 63 archivos / 307 tests. Navegador
       390×844: escena con fondo ilustrado, aviso sin permiso, interruptor AR, "Huir", mapa ↔ encuentro ×3 sin errores.
-      **Falta:** solo el paso 12 (Android: cámara principal, ≥ 55 fps, ×3 sin perder contexto, AR apagada / sin permiso).
-- [~] **F2-04b · Personalidad, efectos del tipo y entrada** (@alex, 2026-10-12; prueba en Android: @kenneth, 2026-10-12) — idle/saltos por velocidad, vuelo, fantasma, partículas
+      **Android (Kenneth, Samsung A36, APK de producción):** "camera 0" (principal) 720p; Diggersby 3D + partículas
+      **60 fps, p95 16,7 ms, 0 % tirones**; 3 entradas sin "context lost" y el mapa en 3D al volver; Inicio suelta la
+      cámara y al volver se reabre; AR apagada y sin permiso → fondo ilustrado y el aviso; el Pokémon se queda en su
+      sitio al girar el móvil. Evidencias `F2-04a_0{5,6,7}_a36-*`. (Pikachu a 2 m no salió: tamaño no comparado.)
+- [x] **F2-04b · Personalidad, efectos del tipo y entrada** (@alex, 2026-10-12; prueba en Android: @kenneth, 2026-10-12) — idle/saltos por velocidad, vuelo, fantasma, partículas
       del tipo, transición desde el mapa, aterrizaje con polvo + grito + vibración, destello shiny (DISENO §5).
       Dep: F2-04a. Criterio: Android ≥ 55 fps con partículas; vídeo de la entrada.
       **Hecho (pasos 1-9a, PR):** personalidad, saltos con semilla, partículas por tipo, aterrizaje con polvo + grito +
       vibración, destello shiny, zoom desde el mapa; arreglo de partículas negras (D-047). App 66 archivos / 333 tests.
-      **Falta:** solo 9b (Android: fps con partículas y vídeo de la entrada).
-- [~] **F2-12 · Pokémon en 3D (.glb) en el encuentro (D-048)** — el arte plano pasa a ser el modelo 3D de
+      **Android (Kenneth, A36):** 60 fps con partículas; grito y vibración a la vez al aterrizar (Kenneth); Bramblin
+      (Planta/Fantasma) semitransparente y flotando; vídeo `F2-04b_04_a36-entrada-al-encuentro.mp4`. El "crece hacia el
+      centro" se nota poco → F2-16.
+- [x] **F2-12 · Pokémon en 3D (.glb) en el encuentro (D-048)** — el arte plano pasa a ser el modelo 3D de
       `Pokemon-3D-api/assets` (@alex, 2026-10-12; prueba en Android: @kenneth, 2026-10-12) (cargado desde su URL, NO se sube al repo): `GLTFLoader` + `DRACOLoader` (decodificador
       servido por la app), tamaño real por su caja (altura PokéAPI × XS/XL), animación si la trae, giro hacia la cámara,
       sombra; los 57 sin modelo y los shiny sin modelo → el arte plano de ahora (o tinte shiny). Con la AR de orientación
       actual; arrastrar con el dedo lo gira. Dep: F2-04b. Criterio: navegador + Android ≥ 55 fps con el modelo.
       **Hecho (pasos 1-5, PR):** Pikachu, Charizard (vuela), Gengar (fantasma semitransparente) en 3D con su animación;
-      #850 sin modelo → plano; giro con el dedo. App 67 archivos / 347 tests. **Falta:** el 6 (Android, fps).
+      #850 sin modelo → plano; giro con el dedo. App 67 archivos / 347 tests.
+      **Android (Kenneth, A36):** modelo + partículas 60 fps; los `.glb` tardan 232-678 ms por Wi-Fi (con datos móviles
+      sin medir). Los anchos (Slowpoke XL) se salen de la pantalla → F2-15.
 - [x] **F2-13 · Ficha del Pokémon junto a él en la cámara (D-048)** (@alex, 2026-10-12) — tarjeta anclada al lado del Pokémon (sigue su
       posición en pantalla): tipos (iconos), nivel, **PC** (lo calcula el servidor con los IVs y viene en
       `GET /encounters/:id`), altura y peso reales × XS/XL, categoría ("Pokémon Ratón") y descripción de Pokédex en
@@ -197,11 +213,28 @@
       fallback de orientación. Dep: F2-12. **Necesita Android (Kenneth/Samuel).**
 - [ ] **F2-14 · Encuentro con ARCore (D-048)** — el encuentro usa el plugin de F2-11: tocar el suelo detectado (o
       automático) pone al Pokémon; se le puede rodear; el lanzamiento (F2-05) funciona igual. Dep: F2-11.
-- [~] **F2-05 · Lanzamiento** (@alex, 2026-10-12; prueba en Android: @kenneth, 2026-10-12) — gesto 1:1, física, curva, círculo de precisión, bolas y bayas, hápticos.
+- [ ] **F2-15 · Los Pokémon anchos caben en la pantalla** — `encounterDistance` solo mira la ALTURA (máx(2 m, 1,8 ×
+      altura), D-045), pero en vertical la pantalla abarca ~32° de ancho frente a 64° de alto: un Slowpoke XL (1,75 m,
+      largo) "ocupaba prácticamente toda la pantalla" (Kenneth, A36) y Diggersby a 2 m se salía por los lados. Que la
+      distancia tenga en cuenta también el ancho (`aspect` del modelo/arte y el de la pantalla) y que, si el modelo
+      llega después de colocarlo, se recoloque. Ojo: la caja del lanzamiento y el aro dependen de esa distancia
+      (`throw-physics.ts`). Dep: F2-12.
+- [ ] **F2-16 · Entrada al encuentro más clara** (visto en el A36, vídeo `F2-04b_04`): (1) la copia del Pokémon que
+      "crece hacia el centro" casi no se ve: hereda `transform-origin: 0 0` del original (crece hacia abajo-derecha) y
+      se apaga del todo en 320 ms; (2) tras el toque el mapa se queda ~0,4 s quieto (espera a `reportPosition`) y
+      luego ~1 s de "Buscando al Pokémon…" en un fondo vacío; (3) la cámara llega ~2 s después de que el Pokémon
+      aterrice, y al cambiar a AR el Pokémon se vuelve a colocar delante. Dep: F2-04b.
+- [x] **F2-05 · Lanzamiento** (@alex, 2026-10-12; prueba en Android y arreglo: @kenneth, 2026-10-12) — gesto 1:1, física, curva, círculo de precisión, bolas y bayas, hápticos.
       Dep: F2-04b, F2-12 (la caja del Pokémon sale del modelo 3D). (Fallar no llama al servidor ni gasta, D-046.)
       **Hecho (pasos 1-12a, PR):** gesto, física, curva, aro, bolas y Frambu, servidor con reintentos; adaptado a F2-12
       y F2-13. Navegador con encuentro REAL: fallos sin gastar, acierto → capturado, mochila 30→29, +110 XP.
-      App 72 archivos / 390 tests. **Falta:** 12b (Android: gesto con el dedo de verdad, curva, fps).
+      App 72 archivos / 390 tests.
+      **Android (Kenneth, A36) — 12b falló y se arregló (D-050):** con el dedo se acertaban **3 de 117** (la fuerza tenía
+      que ser 1.800 px/s ± 4 %) y la curva no salía nunca (se medía alrededor del punto de agarre). Ahora zona buena de
+      fuerza 1.000-3.600 px/s y curva por el giro del dedo, con tests hechos con sus gestos reales. Después: 3 de 5
+      aciertos con su puntería, curva con `curve=true` en el servidor, flojo → "¡Casi!" sin gastar, torcido falla, el
+      aro cambia de color con Super/Frambu, "¡Genial!"/"¡Excelente!", la mochila baja solo al acertar, Ultra a 0
+      apagada. App 73 archivos / 406 tests.
 - [x] **F2-06 · Captura autoritativa en servidor** (@alex, 2026-10-11) — `POST /encounters/:id/throw` con transacción,
       descuento atómico, `UNIQUE` de idempotencia, validación de distancia (ARQUITECTURA §6); test de
       concurrencia (dos lanzamientos simultáneos). Dep: F2-03, F1-06, F1-08.
