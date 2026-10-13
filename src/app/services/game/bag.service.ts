@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, computed, effect, inject, signal } from '@angular/core';
 import { ITEMS, type ItemId } from '@shared/engine/items';
+import type { BagView } from '@shared/protocol/encounters';
 import { firstValueFrom, timeout } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { AuthService } from '../../core/auth/auth.service';
@@ -39,19 +40,23 @@ export class BagService {
 
   async load(): Promise<void> {
     try {
-      const { items } = await firstValueFrom(
-        this.http
-          .get<{ items: { item: ItemId; qty: number }[] }>(`${environment.serverUrl}/bag`)
-          .pipe(timeout(BAG_TIMEOUT_MS)),
+      this.apply(
+        await firstValueFrom(
+          this.http.get<BagView>(`${environment.serverUrl}/bag`).pipe(timeout(BAG_TIMEOUT_MS)),
+        ),
       );
-      const qty = Object.fromEntries(ITEMS.map((i) => [i, 0])) as Record<ItemId, number>;
-      for (const { item, qty: n } of items) if (item in qty) qty[item] = n;
-      this._qty.set(qty);
-      this._error.set(null);
     } catch (err) {
       console.error('[bag] no se pudo cargar la mochila', err);
       this._error.set('No se pudo cargar la mochila.');
     }
+  }
+
+  /** La mochila entera que manda el servidor (`GET /bag` o la respuesta de un lanzamiento, F2-05). */
+  apply(view: BagView): void {
+    const qty = Object.fromEntries(ITEMS.map((i) => [i, 0])) as Record<ItemId, number>;
+    for (const { item, qty: n } of view.items) if (item in qty) qty[item] = n;
+    this._qty.set(qty);
+    this._error.set(null);
   }
 
   /** Al cerrar sesión: que el siguiente jugador no vea la mochila del anterior. */

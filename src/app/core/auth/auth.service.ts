@@ -1,5 +1,6 @@
 import { HttpBackend, HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Injectable, InjectionToken, computed, inject, signal } from '@angular/core';
+import { levelForXp } from '@shared/engine/progression';
 import { firstValueFrom, timeout } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { TOKEN_STORE } from './token-store';
@@ -86,6 +87,15 @@ export class AuthService {
 
   getAccessToken(): string | null {
     return this.accessToken;
+  }
+
+  /**
+   * XP que el servidor YA sumó (respuesta de un lanzamiento, F2-07): se suma aquí para que el HUD la enseñe sin otra
+   * petición, con la misma curva que el servidor (`levelForXp`, D-026). Quien manda sigue siendo el servidor.
+   */
+  addXp(n: number): void {
+    if (!(n > 0)) return;
+    this._player.update((p) => (p ? { ...p, xp: p.xp + n, level: levelForXp(p.xp + n) } : p));
   }
 
   async register(data: Registration): Promise<void> {

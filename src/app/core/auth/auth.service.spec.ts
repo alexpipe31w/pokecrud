@@ -80,6 +80,21 @@ describe('AuthService (app)', () => {
     expect(auth.isAdmin()).toBe(true);
   });
 
+  it('addXp: suma la XP que ya sumó el servidor y sube de nivel con la misma curva (F2-07)', async () => {
+    auth.addXp(100); // sin sesión no hace nada
+    expect(auth.player()).toBeNull();
+    const done = auth.login({ email: PLAYER.email, password: 'clave-segura-123' });
+    http
+      .expectOne(`${AUTH}/login`)
+      .flush({ accessToken: 'acc-1', refreshToken: 'ref-1', player: { ...PLAYER, xp: 900 } });
+    await done;
+    auth.addXp(160); // 1060 ≥ 1000 = nivel 2 (D-026: 500·(L−1)·L)
+    expect(auth.player()).toMatchObject({ xp: 1060, level: 2 });
+    auth.addXp(0);
+    auth.addXp(-5);
+    expect(auth.player()?.xp).toBe(1060);
+  });
+
   it('restore sin token guardado → anónimo y sin peticiones', async () => {
     await auth.restore();
     expect(auth.status()).toBe('anonymous');

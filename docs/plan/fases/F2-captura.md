@@ -3343,7 +3343,7 @@ los spawns no se guardan, D-025, y el servidor lo seguiría dando).
 **Files:** Modify `src/app/services/game/bag.service.ts` (+ spec), `src/app/core/auth/auth.service.ts` (+ spec),
 `src/app/services/game/spawn-feed.service.ts` (+ spec)
 
-- [ ] **2a. Tests:**
+- [x] **2a. Tests:**
 
 ```diff
 --- a/src/app/services/game/bag.service.spec.ts
@@ -3413,7 +3413,7 @@ los spawns no se guardan, D-025, y el servidor lo seguiría dando).
      player.set({ id: 'p2' });
 ```
 
-- [ ] **2b.** → FALLAN. **2c. Implementación:**
+- [x] **2b.** → FALLAN. **2c. Implementación:**
 
 ```diff
 --- a/src/app/services/game/bag.service.ts
@@ -3531,7 +3531,7 @@ los spawns no se guardan, D-025, y el servidor lo seguiría dando).
      this._night.set(null);
 ```
 
-- [ ] **2d.** `npx ng test --include=src/app/services/game/bag.service.spec.ts --include=src/app/core/auth/auth.service.spec.ts --include=src/app/services/game/spawn-feed.service.spec.ts --watch=false`
+- [x] **2d.** `npx ng test --include=src/app/services/game/bag.service.spec.ts --include=src/app/core/auth/auth.service.spec.ts --include=src/app/services/game/spawn-feed.service.spec.ts --watch=false`
   → PASA (4 + 14 + 9). Commit `F2-05: mochila, XP y mapa se actualizan tras lanzar` + push.
 
 ### Paso 3 — `EncounterApiService.throw`

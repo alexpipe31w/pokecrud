@@ -121,6 +121,22 @@ describe('SpawnFeedService', () => {
     expect(await done).toBe(false);
   });
 
+  it('hide: el resuelto deja de salir, también en las respuestas siguientes', async () => {
+    const two = body({
+      spawns: [
+        { id: 'a', speciesId: 25, lat: O.lat, lng: O.lng },
+        { id: 'b', speciesId: 1, lat: O.lat, lng: O.lng },
+      ],
+    });
+    await respond(feed.tick(O, T0), two);
+    feed.hide('a');
+    expect(feed.spawns().map((s) => s.id)).toEqual(['b']);
+    const again = feed.reportPosition(O, T0 + 1000);
+    http.expectOne((r) => r.url === url).flush(two);
+    await again;
+    expect(feed.spawns().map((s) => s.id)).toEqual(['b']);
+  });
+
   it('al cambiar de jugador se vacía', async () => {
     await respond(feed.tick(O, T0));
     player.set({ id: 'p2' });
