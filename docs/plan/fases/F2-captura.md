@@ -1990,7 +1990,7 @@ efectos" → sin partículas ni destellos. **Android:** ≥ 55 fps con partícul
 
 **Files:** Create `src/app/game/encounter-scene/personality.ts`, Test `personality.spec.ts`
 
-- [ ] **1a. Test que falla:**
+- [x] **1a. Test que falla:**
 
 ```ts
 import type { Species } from '@shared/data/dataset.types';
@@ -2039,8 +2039,8 @@ describe('personalityOf', () => {
 });
 ```
 
-- [ ] **1b.** `npx ng test --include=src/app/game/encounter-scene/personality.spec.ts --watch=false` → FALLA.
-- [ ] **1c. Implementación:**
+- [x] **1b.** `npx ng test --include=src/app/game/encounter-scene/personality.spec.ts --watch=false` → FALLA.
+- [x] **1c. Implementación:**
 
 ```ts
 import type { Species, TypeName } from '@shared/data/dataset.types';
@@ -2077,7 +2077,7 @@ export function personalityOf(s: Species): Personality {
 }
 ```
 
-- [ ] **1d.** → PASA (4 tests). Commit `F2-04b: personalidad del Pokémon desde su ficha` + push.
+- [x] **1d.** → PASA (4 tests). Commit `F2-04b: personalidad del Pokémon desde su ficha` + push.
 
 ### Paso 2 — Aterrizaje, respiración y saltos programados
 
