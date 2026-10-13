@@ -3,7 +3,7 @@
 > Se **reescribe** al cerrar cada sesión (no es histórico; el histórico es `BITACORA.md`).
 > Máximo una pantalla. Si lees esto al empezar: después lee `ROADMAP.md`.
 
-**Última actualización:** 2026-10-12 noche · por Kenneth (Claude) · rama `feature/pendientes-android-a36` (PR a `develop`)
+**Última actualización:** 2026-10-12 noche · por Kenneth (Claude) · PR #59 mezclado; rama `feature/F2-15-anchos-caben` (PR a `develop`)
 
 ## 👉 RELEVO DE KENNETH (2026-10-12 noche): pendientes de Android probados en el Samsung A36
 
@@ -18,12 +18,14 @@
   px/s y curva por el giro del dedo; tests con los gestos reales de Kenneth. Después: 3 de 5 aciertos y curva OK.
 - **Quedan `[~]`:** F1-07 7b y F1-05 3b — hay que **salir a la calle con el GPS** (Kenneth no quiso salir de noche).
 - **Tareas nuevas vistas en el móvil:** **F1-11** (el joystick queda guardado y al reabrir pone el avatar en el Parque
-  Santander, no donde estás), **F2-15** (los Pokémon anchos como Slowpoke XL no caben: la distancia solo mira la
-  altura), **F2-16** (entrada al encuentro: el zoom casi no se ve, ~1,4 s de espera y la cámara llega tarde).
+  Santander, no donde estás; basta con desactivarlo, falta que se note), **F2-15 `[x]`** (ya hecha, D-051: los Pokémon
+  anchos y largos como Slowpoke XL caben), **F2-16** (entrada al encuentro: el zoom casi no se ve, ~1,4 s de espera y la cámara llega tarde).
 
-**Siguiente, por orden:** (1) mezclar el PR de esta rama (Kenneth confirma); (2) con luz, F1-07 7b + F1-05 3b en la
-calle (APK de producción, **joystick APAGADO** en el menú de la Poké Ball); (3) F2-15 (pequeña, TDD), F2-07
-(coreografía de captura; ver la entrada de F2-05 en la BITÁCORA para aplicar los diffs a mano) o F2-11 (ARCore).
+**Siguiente, por orden:** (1) mezclar el PR de F2-15 (Kenneth confirma); (2) con luz, F1-07 7b + F1-05 3b en la calle
+(APK de producción, **joystick APAGADO** en el menú de la Poké Ball); (3) F2-07 (coreografía de captura; ver la entrada
+de F2-05 en la BITÁCORA para aplicar los diffs a mano) o F2-11 (ARCore, Android).
+- **Ver un Pokémon concreto en el APK:** `page.route` por CDP sobre `GET /encounters/:id` cambiando `speciesId` y
+  `heightScale` (solo se ve; el servidor sigue validando el real). Cerrar luego el `node` por su PID: `TaskStop` no lo mata.
 
 **Probar en el móvil por cable (lo que funcionó esta vez):**
 - `adb` no está en el PATH: `$LOCALAPPDATA/Android/Sdk/platform-tools/adb.exe`. En Git Bash, **`MSYS_NO_PATHCONV=1`**
@@ -55,6 +57,9 @@ F2-15/F2-16. **F4:** completa en código salvo F4-07 (combate en AR 3D, D-048).
 
 ## Hecho
 
+- **F2-15 (Kenneth, rama `feature/F2-15-anchos-caben`, PR):** `encounterDistance` con ancho y largo (D-051); la escena
+  recoloca al llegar el modelo y el arte tardío ya no pisa la proporción del modelo. A36: Slowpoke XL ~52 % del ancho,
+  59,6 fps (`F2-15_01`). App 73 archivos / 413 tests.
 - **Pendientes de Android en el A36 (Kenneth, rama `feature/pendientes-android-a36`, PR):** F2-04a, F2-04b, F2-12 y
   F2-05 `[x]` (ver el relevo de arriba). Arreglo del lanzamiento con el dedo (D-050): `throw-gesture.ts` (zona buena
   de fuerza, curva por el giro del dedo), `throw-dock.component.ts` (300 muestras), tests con los gestos reales
@@ -184,16 +189,17 @@ F2-15/F2-16. **F4:** completa en código salvo F4-07 (combate en AR 3D, D-048).
 
 ## En curso
 
-- **Kenneth (2026-10-12 noche, rama `feature/F2-15-anchos-caben`): F2-15** — la distancia del encuentro tendrá en cuenta
-  el ancho del Pokémon (Slowpoke XL no cabía). PR #59 (pendientes de Android + D-050) ya mezclado.
+- Nadie. F2-15 (Kenneth) hecha en `feature/F2-15-anchos-caben`, en un PR a `develop`. PR #59 (pendientes de Android +
+  D-050) ya mezclado.
 - F1-05 y F1-07 siguen `[~]` (@alex) SOLO por su prueba en la calle (PENDIENTES).
 
 ## Siguiente paso concreto
 
-1. **Con luz, en la calle (Kenneth o Samuel):** F1-07 7b + F1-05 3b con el APK de producción y el **joystick apagado**.
-2. **F2-07** (coreografía de captura) · **F2-11** (ARCore,
+1. **Mezclar el PR de F2-15** (Kenneth confirma).
+2. **Con luz, en la calle (Kenneth o Samuel):** F1-07 7b + F1-05 3b con el APK de producción y el **joystick apagado**.
+3. **F2-07** (coreografía de captura) · **F2-11** (ARCore,
    Android) · F1-11 / F2-16 (arreglos vistos en el móvil) · sin móvil: F2-10 (música), F5-01 (plan del PvP).
-3. APK en otro PC: JDK 21 (`winget install Microsoft.OpenJDK.21`; si da "el hash no coincide",
+4. APK en otro PC: JDK 21 (`winget install Microsoft.OpenJDK.21`; si da "el hash no coincide",
    `winget install EclipseAdoptium.Temurin.21.JDK`) y `npm run apk`.
 
 ## Bloqueos / roto / pendiente de humanos
