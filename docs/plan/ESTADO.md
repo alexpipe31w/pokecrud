@@ -197,7 +197,8 @@ F2-07, F2-12, F2-13, F2-15 hechas; faltan **F2-11**/**F2-14** (ARCore), F2-10 (m
 ## En curso
 
 - **F3-04 (@samuel, 2026-10-13)** — rama `feature/F3-04-pokedex`. **Punto de guardado:** reclamada; paso siguiente:
-  paso 1 (mover IS-11 a `/inventario`). F3-01b mezclada (#68). F3-02a hecha y en producción (#65). (F0-15 #63 y F3-01a #64 mezclados.)
+  paso 1 hecho (IS-11 en `/inventario`, menú con Pokédex e Inventario).
+  Siguiente: paso 2 (`shared/engine/weaknesses.ts`). F3-01b mezclada (#68). F3-02a hecha y en producción (#65). (F0-15 #63 y F3-01a #64 mezclados.)
 - F1-05 y F1-07 siguen `[~]` (@alex) SOLO por su prueba en la calle (PENDIENTES).
 
 ## Siguiente paso concreto

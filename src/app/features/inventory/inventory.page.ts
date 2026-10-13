@@ -44,9 +44,9 @@ import { TypeChipsComponent } from '../../shared/components/type-chips/type-chip
 
 /** Listado de los Pokémon guardados en la base de datos (IS-11 · HU-03). */
 @Component({
-  selector: 'app-pokedex',
-  templateUrl: 'pokedex.page.html',
-  styleUrl: 'pokedex.page.scss',
+  selector: 'app-inventory',
+  templateUrl: 'inventory.page.html',
+  styleUrl: 'inventory.page.scss',
   imports: [
     CurrencyPipe,
     TitleCasePipe,
@@ -77,7 +77,7 @@ import { TypeChipsComponent } from '../../shared/components/type-chips/type-chip
     TypeChipsComponent,
   ],
 })
-export class PokedexPage {
+export class InventoryPage {
   private readonly pokemonService = inject(PokemonService);
   private readonly ui = inject(UiService);
   /** Solo un ADMIN ve agregar/editar/eliminar (F0-12); el servidor lo exige igualmente. */

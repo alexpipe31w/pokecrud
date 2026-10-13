@@ -5,15 +5,15 @@ import { provideRouter } from '@angular/router';
 import { provideIonicAngular } from '@ionic/angular';
 
 import { environment } from '../../../environments/environment';
-import { PokedexPage } from './pokedex.page';
+import { InventoryPage } from './inventory.page';
 
-describe('PokedexPage', () => {
-  let fixture: ComponentFixture<PokedexPage>;
+describe('InventoryPage', () => {
+  let fixture: ComponentFixture<InventoryPage>;
   let http: HttpTestingController;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [PokedexPage],
+      imports: [InventoryPage],
       providers: [
         provideIonicAngular(),
         provideRouter([]),
@@ -22,7 +22,7 @@ describe('PokedexPage', () => {
       ],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(PokedexPage);
+    fixture = TestBed.createComponent(InventoryPage);
     http = TestBed.inject(HttpTestingController);
     fixture.detectChanges();
   });

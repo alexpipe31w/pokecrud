@@ -130,7 +130,7 @@ export class PokemonAddPage {
       next: (p) => {
         this.saving.set(false);
         this.ui.toast(`${displayName(p.name)} agregado a la Pokédex`);
-        this.navCtrl.navigateBack('/pokedex');
+        this.navCtrl.navigateBack('/inventario');
       },
       error: () => {
         this.saving.set(false);

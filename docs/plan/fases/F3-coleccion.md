@@ -925,15 +925,15 @@ selector `app-inventory`); Modify `app.routes.ts`, `core/auth/auth.guard.ts` (fa
 `features/pokemon-add/pokemon-add.page.ts`, `features/pokemon-detail/pokemon-detail.page.ts`,
 `features/map/ball-menu.component.ts`, `README.md` (tabla de rutas)
 
-- [ ] **1a.** `git mv` de la carpeta y renombrar clase/selector/título ("Inventario de la tienda"). En `app.routes.ts`:
+- [x] **1a.** `git mv` de la carpeta y renombrar clase/selector/título ("Inventario de la tienda"). En `app.routes.ts`:
   `{ path: 'inventario', loadComponent: … InventoryPage }` (pública, como hoy) y `{ path: 'tabs/pokedex', redirectTo:
   '/inventario' }`. Quitar la ruta `pokedex` vieja (la nueva llega en el paso 4).
-- [ ] **1b.** Cambiar `'/pokedex'` → `'/inventario'` en el fallback de `adminGuard`, en `navigateBack` de
+- [x] **1b.** Cambiar `'/pokedex'` → `'/inventario'` en el fallback de `adminGuard`, en `navigateBack` de
   `pokemon-add` y `pokemon-detail`, y en el `defaultHref` del botón atrás de esas páginas.
   `grep -rn "'/pokedex'" src/app` → solo lo que ahora es la Pokédex nueva.
-- [ ] **1c.** Menú de la Poké Ball: "Pokédex" (→ `/pokedex`, la nueva) y "Inventario" (→ `/inventario`, icono
+- [x] **1c.** Menú de la Poké Ball: "Pokédex" (→ `/pokedex`, la nueva) y "Inventario" (→ `/inventario`, icono
   `storefront-outline`). README: tabla de rutas al día.
-- [ ] **1d.** `ng test` (el spec de la página movida se renombra con ella), lint, build. Commit + `/guardar`.
+- [x] **1d.** `ng test` (el spec de la página movida se renombra con ella), lint, build. Commit + `/guardar`.
 
 ### Paso 2 — Debilidades (puro)
 
