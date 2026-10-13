@@ -82,6 +82,8 @@ export class EncounterScene {
   /** Largo (hacia la cámara) / alto del modelo; el arte plano no tiene (F2-15). */
   private depthRatio = 0;
   private placed = false;
+  /** 0 = normal; 1 = absorbido del todo en la bola (F2-07). */
+  private shrink = 0;
   /** Hacia dónde se colocó (para recolocarlo a otra distancia sin cambiar de dirección, F2-15). */
   private yaw = 0;
   private fxKind: FxKind | null = null;
@@ -143,7 +145,8 @@ export class EncounterScene {
 
   /** Distancia a la que está (D-045: máx(2 m, 1,8 × altura), tope 12 m; F2-15: y que quepa a lo ancho). */
   get distance(): number {
-    const halfWidthTan = Math.tan(THREE.MathUtils.degToRad(this.camera.fov / 2)) * this.camera.aspect;
+    const halfWidthTan =
+      Math.tan(THREE.MathUtils.degToRad(this.camera.fov / 2)) * this.camera.aspect;
     const h = this.heightM;
     return encounterDistance(h, h * this.aspect, halfWidthTan, h * this.depthRatio);
   }
@@ -281,7 +284,9 @@ export class EncounterScene {
         i & 4 ? boxTmp.max.z : boxTmp.min.z,
       );
       // Detrás de la cámara la proyección se da la vuelta: mejor no decir nada.
-      if (cornerCam.copy(cornerTmp).applyMatrix4(this.camera.matrixWorldInverse).z > -this.camera.near)
+      if (
+        cornerCam.copy(cornerTmp).applyMatrix4(this.camera.matrixWorldInverse).z > -this.camera.near
+      )
         return null;
       cornerTmp.project(this.camera);
       const x = ((cornerTmp.x + 1) / 2) * width;
@@ -305,18 +310,19 @@ export class EncounterScene {
     const a = this.anchor;
     a.rotation.y = Math.atan2(-a.position.x, -a.position.z);
     const h = this.heightM / ART_FILL;
-    this.body.scale.set(h * this.aspect * (2 - pose.squash), h * pose.squash, 1);
+    const k = Math.max(0.001, 1 - this.shrink);
+    this.body.scale.set(h * this.aspect * (2 - pose.squash) * k, h * pose.squash * k, 1);
     this.body.position.y = pose.lift - h * (1 - ART_FILL) * 0.5;
     this.body.rotation.z = pose.lean;
     const m = this.model;
     if (m) {
       m.position.y = pose.lift;
-      m.scale.set(2 - pose.squash, pose.squash, 2 - pose.squash);
+      m.scale.set((2 - pose.squash) * k, pose.squash * k, (2 - pose.squash) * k);
       m.rotation.set(0, this.spinY, pose.lean);
     }
     // La sombra se queda en el suelo y encoge cuanto más alto está.
     const away = Math.min(0.6, pose.lift / (this.heightM + 0.5));
-    this.shadow.scale.setScalar(Math.max(0.35, this.heightM * 0.9) * (1 - away));
+    this.shadow.scale.setScalar(Math.max(0.35, this.heightM * 0.9) * (1 - away) * k);
   }
 
   /** Partículas del tipo (null = ninguna, p. ej. con "reducir efectos"). `color` CSS: '#rrggbb'. */
@@ -412,6 +418,37 @@ export class EncounterScene {
       groundY: -EYE_HEIGHT_M,
       ...this.box,
     };
+  }
+
+  /**
+   * Absorción (F2-07): `shrink` 0..1 encoge al Pokémon hacia sus pies y `red` 0..1 lo tiñe de luz roja. En el plano,
+   * el color del material multiplica el arte; en el modelo 3D (iluminado) además brilla en rojo (`emissive`), si no
+   * el rojo se vería como una sombra. Se guardan sus colores originales y (0, 0) los devuelve tal cual.
+   */
+  setCaptureLook(shrink: number, red: number): void {
+    this.shrink = Math.min(1, Math.max(0, shrink));
+    const r = Math.min(1, Math.max(0, red));
+    this.body.material.color.setRGB(1, 1 - 0.75 * r, 1 - 0.75 * r);
+    this.body.visible = !this.model && this.shrink < 0.999;
+    if (!this.model) return;
+    this.model.visible = this.shrink < 0.999;
+    eachMaterial(this.model, (m) => {
+      const mat = m as THREE.MeshStandardMaterial;
+      const base = (mat.userData['capture'] ??= {
+        color: mat.color?.clone(),
+        emissive: mat.emissive?.clone(),
+      }) as { color?: THREE.Color; emissive?: THREE.Color };
+      if (base.color)
+        mat.color.copy(base.color).multiply(tint.setRGB(1, 1 - 0.75 * r, 1 - 0.75 * r));
+      if (base.emissive) mat.emissive.copy(base.emissive).lerp(CAPTURE_GLOW, 0.8 * r);
+    });
+  }
+
+  /** Bola quieta en un punto de la escena con una inclinación lateral (sacudidas de F2-07). */
+  poseBall(x: number, y: number, z: number, tilt: number): void {
+    if (!this.ball) return;
+    this.ball.position.set(x, y, z);
+    this.ball.rotation.set(0, Math.atan2(-x, -z), tilt);
   }
 
   /** Saca a la escena una bola nueva (la de la mano es HTML); si había otra, se tira. */
@@ -523,6 +560,10 @@ function glowPoints(
 }
 
 /** Cada material de las mallas de `root` (los `.glb` pueden traer varios por malla). */
+/** Luz roja de la absorción (F2-07) en los modelos 3D. */
+const CAPTURE_GLOW = new THREE.Color(1, 0.12, 0.12);
+const tint = new THREE.Color();
+
 function eachMaterial(root: THREE.Object3D | null, fn: (m: THREE.Material) => void): void {
   root?.traverse((o) => {
     const mat = (o as THREE.Mesh).material;

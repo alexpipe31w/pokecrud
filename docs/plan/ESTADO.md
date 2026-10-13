@@ -3,7 +3,7 @@
 > Se **reescribe** al cerrar cada sesión (no es histórico; el histórico es `BITACORA.md`).
 > Máximo una pantalla. Si lees esto al empezar: después lee `ROADMAP.md`.
 
-**Última actualización:** 2026-10-12 noche · por Kenneth (Claude) · PR #59 mezclado; rama `feature/F2-15-anchos-caben` (PR a `develop`)
+**Última actualización:** 2026-10-13 00:10 · por Kenneth (Claude) · PR #59 y #60 mezclados; rama `feature/F2-07-captura` (PR a `develop`)
 
 ## 👉 RELEVO DE KENNETH (2026-10-12 noche): pendientes de Android probados en el Samsung A36
 
@@ -16,14 +16,17 @@
 - **F2-05 `[x]` tras ARREGLARLO (D-050):** con el dedo se acertaban **3 de 117** (la fuerza tenía que ser 1.800 px/s
   ± 4 %) y la curva no salía NUNCA (se medía alrededor del punto de agarre). Ahora zona buena de fuerza 1.000-3.600
   px/s y curva por el giro del dedo; tests con los gestos reales de Kenneth. Después: 3 de 5 aciertos y curva OK.
+- **F2-07 `[x]` (captura):** luz roja (también el modelo 3D), la bola cae, espera al servidor, 1-3 sacudidas con clac y
+  vibración, estrellas, fanfarria y la tarjeta "¡Capturado!" con la XP contando; escape y huida. Probado en el A36
+  (Abomasnow y Bellsprout). **F2 completa salvo** F2-10 (música), F2-11/F2-14 (ARCore) y los pulidos F2-16…F2-18.
 - **Quedan `[~]`:** F1-07 7b y F1-05 3b — hay que **salir a la calle con el GPS** (Kenneth no quiso salir de noche).
 - **Tareas nuevas vistas en el móvil:** **F1-11** (el joystick queda guardado y al reabrir pone el avatar en el Parque
   Santander, no donde estás; basta con desactivarlo, falta que se note), **F2-15 `[x]`** (ya hecha, D-051: los Pokémon
   anchos y largos como Slowpoke XL caben), **F2-16** (entrada al encuentro: el zoom casi no se ve, ~1,4 s de espera y la cámara llega tarde).
 
-**Siguiente, por orden:** (1) mezclar el PR de F2-15 (Kenneth confirma); (2) con luz, F1-07 7b + F1-05 3b en la calle
-(APK de producción, **joystick APAGADO** en el menú de la Poké Ball); (3) F2-07 (coreografía de captura; ver la entrada
-de F2-05 en la BITÁCORA para aplicar los diffs a mano) o F2-11 (ARCore, Android).
+**Siguiente, por orden:** (1) mezclar el PR de F2-07 (Kenneth confirma); (2) con luz, F1-07 7b + F1-05 3b en la calle
+(APK de producción, **joystick APAGADO** en el menú de la Poké Ball); (3) **F3-01** (plan de la colección: ya se
+puede, F2-07 hecha) o F2-11 (ARCore, Android); pulidos F2-17/F2-18 si sobra tiempo.
 - **Ver un Pokémon concreto en el APK:** `page.route` por CDP sobre `GET /encounters/:id` cambiando `speciesId` y
   `heightScale` (solo se ve; el servidor sigue validando el real). Cerrar luego el `node` por su PID: `TaskStop` no lo mata.
 
@@ -52,11 +55,15 @@ de F2-05 en la BITÁCORA para aplicar los diffs a mano) o F2-11 (ARCore, Android
 ## Fase actual
 
 **F0 completa.** **F1:** todo hecho salvo la calle (F1-05 3b, F1-07 7b) y F1-11 (nueva). **F2:** F2-01…F2-06, F2-08,
-F2-12, F2-13 hechas; faltan **F2-07** (coreografía), **F2-11**/**F2-14** (ARCore), F2-10 (música) y las nuevas
-F2-15/F2-16. **F4:** completa en código salvo F4-07 (combate en AR 3D, D-048).
+F2-07, F2-12, F2-13, F2-15 hechas; faltan **F2-11**/**F2-14** (ARCore), F2-10 (música) y los pulidos F2-16…F2-18.
+**F3:** se puede empezar (F3-01, plan). **F4:** completa en código salvo F4-07 (combate en AR 3D, D-048).
 
 ## Hecho
 
+- **F2-07 (Kenneth, rama `feature/F2-07-captura`, PR):** `capture-sequence.ts`, `shared/data/natures-es.ts`,
+  `EncounterScene.setCaptureLook`/`poseBall` (plano y modelo 3D), sonidos absorb/shake/capture/escape (+ `.wav` en
+  `F2-08_sfx/`), `app-caught-card` y la coreografía en la página. App 75 archivos / 435 tests, shared 147, servidor 22.
+  A36: dos capturas y tres escapes; XP 590 → 900. Evidencias `F2-07_0{1..4}_a36-*`.
 - **F2-15 (Kenneth, rama `feature/F2-15-anchos-caben`, PR):** `encounterDistance` con ancho y largo (D-051); la escena
   recoloca al llegar el modelo y el arte tardío ya no pisa la proporción del modelo. A36: Slowpoke XL ~52 % del ancho,
   59,6 fps (`F2-15_01`). App 73 archivos / 413 tests.
@@ -189,16 +196,14 @@ F2-15/F2-16. **F4:** completa en código salvo F4-07 (combate en AR 3D, D-048).
 
 ## En curso
 
-- Nadie. F2-15 (Kenneth) hecha en `feature/F2-15-anchos-caben`, en un PR a `develop`. PR #59 (pendientes de Android +
-  D-050) ya mezclado.
+- Nadie. F2-07 (Kenneth) hecha en `feature/F2-07-captura`, en un PR a `develop`.
 - F1-05 y F1-07 siguen `[~]` (@alex) SOLO por su prueba en la calle (PENDIENTES).
 
 ## Siguiente paso concreto
 
-1. **Mezclar el PR de F2-15** (Kenneth confirma).
+1. **Mezclar el PR de F2-07** (Kenneth confirma).
 2. **Con luz, en la calle (Kenneth o Samuel):** F1-07 7b + F1-05 3b con el APK de producción y el **joystick apagado**.
-3. **F2-07** (coreografía de captura) · **F2-11** (ARCore,
-   Android) · F1-11 / F2-16 (arreglos vistos en el móvil) · sin móvil: F2-10 (música), F5-01 (plan del PvP).
+3. **F3-01** (plan de la colección) · **F2-11** (ARCore, Android) · F1-11 / F2-16…F2-18 (arreglos vistos en el móvil) · sin móvil: F2-10 (música), F5-01 (plan del PvP).
 4. APK en otro PC: JDK 21 (`winget install Microsoft.OpenJDK.21`; si da "el hash no coincide",
    `winget install EclipseAdoptium.Temurin.21.JDK`) y `npm run apk`.
 

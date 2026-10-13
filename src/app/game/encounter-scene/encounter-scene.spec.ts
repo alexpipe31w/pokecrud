@@ -89,7 +89,10 @@ describe('EncounterScene', () => {
     s.setViewport(390, 844);
     s.placeAt(0);
     s.aimAtPokemon(0.6);
-    const c = s.anchor.position.clone().setY(s.anchor.position.y + 0.6 + 0.85).project(s.camera);
+    const c = s.anchor.position
+      .clone()
+      .setY(s.anchor.position.y + 0.6 + 0.85)
+      .project(s.camera);
     expect(c.y).toBeCloseTo(0, 6);
     s.dispose();
   });
@@ -208,6 +211,34 @@ describe('EncounterScene', () => {
     const [outer, inner] = s.ring.children as THREE.Mesh[];
     expect(outer.scale.y).toBeCloseTo(0.2, 6);
     expect(inner.scale.x).toBeCloseTo(outer.scale.x / 2, 6);
+    s.dispose();
+  });
+
+  it('absorción: encoge y se tiñe de rojo; (0, 0) lo deja como estaba', () => {
+    const s = new EncounterScene(1);
+    s.placeAt(0);
+    s.update(null);
+    const full = s.body.scale.y;
+    s.setCaptureLook(0.5, 1);
+    s.update(null);
+    expect(s.body.scale.y).toBeCloseTo(full / 2, 6);
+    expect(s.body.material.color.g).toBeCloseTo(0.25, 6);
+    s.setCaptureLook(1, 1);
+    expect(s.body.visible).toBe(false);
+    s.setCaptureLook(0, 0);
+    s.update(null);
+    expect(s.body.visible).toBe(true);
+    expect(s.body.scale.y).toBeCloseTo(full, 6);
+    expect(s.body.material.color.getHexString()).toBe('ffffff');
+    s.dispose();
+  });
+
+  it('poseBall: la bola en un punto, de cara a la cámara y ladeada', () => {
+    const s = new EncounterScene(1);
+    const ball = s.spawnBall('ULTRA_BALL');
+    s.poseBall(0, -1.34, -2, 0.3);
+    expect(ball.position.toArray()).toEqual([0, -1.34, -2]);
+    expect(ball.rotation.z).toBeCloseTo(0.3, 6);
     s.dispose();
   });
 });
@@ -346,6 +377,35 @@ describe('EncounterScene con modelo 3D (F2-12)', () => {
     s.dispose();
   });
 
+  it('absorción también con el modelo 3D (F2-07): encoge hacia los pies, luz roja y vuelve como estaba', () => {
+    const s = new EncounterScene(1);
+    s.placeAt(0);
+    const m = fakeModel();
+    const mat = (m.scene.children[0] as THREE.Mesh).material as THREE.MeshStandardMaterial;
+    mat.color.set('#88aaff');
+    mat.emissive.set('#102030');
+    s.setModel(m);
+    s.update(null);
+    const full = s.model!.scale.y;
+    s.setCaptureLook(0.5, 1);
+    s.update(null);
+    expect(s.model!.scale.y).toBeCloseTo(full / 2, 6);
+    expect(s.model!.position.y).toBeCloseTo(0, 6); // los pies no se mueven
+    expect(mat.color.g).toBeLessThan(new THREE.Color('#88aaff').g); // más rojo
+    expect(mat.emissive.r).toBeGreaterThan(0.5); // brilla en rojo: es luz, no sombra
+    expect(s.body.visible).toBe(false); // el plano sigue oculto detrás del modelo
+    s.setCaptureLook(1, 1);
+    expect(s.model!.visible).toBe(false);
+    s.setCaptureLook(0, 0);
+    s.update(null);
+    expect(s.model!.visible).toBe(true);
+    expect(s.body.visible).toBe(false);
+    expect(s.model!.scale.y).toBeCloseTo(full, 6);
+    expect(mat.color.getHexString()).toBe('88aaff');
+    expect(mat.emissive.getHexString()).toBe('102030');
+    s.dispose();
+  });
+
   it('dispose libera también el modelo', () => {
     const s = new EncounterScene(1);
     const m = fakeModel();
@@ -407,7 +467,10 @@ describe('EncounterScene: modelos con huesos y caja en reposo (arreglos F2-12/F2
     geo.setAttribute('skinIndex', new THREE.Uint16BufferAttribute(new Array(n * 4).fill(0), 4));
     geo.setAttribute(
       'skinWeight',
-      new THREE.Float32BufferAttribute(Array.from({ length: n * 4 }, (_, i) => (i % 4 ? 0 : 1)), 4),
+      new THREE.Float32BufferAttribute(
+        Array.from({ length: n * 4 }, (_, i) => (i % 4 ? 0 : 1)),
+        4,
+      ),
     );
     const mesh = new THREE.SkinnedMesh(geo, new THREE.MeshStandardMaterial());
     const bone = new THREE.Bone();

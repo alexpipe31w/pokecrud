@@ -5209,7 +5209,7 @@ fotograma. "Reducir efectos": todo al doble de rápido, sin estrellas. **Android
 
 **Files:** Create `src/app/game/encounter-scene/capture-sequence.ts`, Test `capture-sequence.spec.ts`
 
-- [ ] **1a. Test que falla:**
+- [x] **1a. Test que falla:**
 
 ```ts
 import {
@@ -5298,7 +5298,7 @@ describe('ballDropY y shakeAngle', () => {
 });
 ```
 
-- [ ] **1b.** → FALLA. **1c. Implementación:**
+- [x] **1b.** → FALLA. **1c. Implementación:**
 
 ```ts
 /**
@@ -5396,7 +5396,7 @@ export function ballDropY(k: number, fromY: number, restY: number): number {
 export const shakeAngle = (k: number): number => 0.45 * Math.sin(k * Math.PI * 4) * (1 - k);
 ```
 
-- [ ] **1d.** → PASA (8). Commit `F2-07: coreografía de la captura` + push.
+- [x] **1d.** → PASA (8). Commit `F2-07: coreografía de la captura` + push.
 
 ### Paso 2 — Naturalezas en español
 
@@ -5405,7 +5405,7 @@ inventa nada (REGLA 3).
 
 **Files:** Create `shared/data/natures-es.ts`, Test `shared/data/natures-es.spec.ts`
 
-- [ ] **2a. Test que falla:**
+- [x] **2a. Test que falla:**
 
 ```ts
 import { NATURES } from '../engine/spawns.js';
@@ -5428,7 +5428,7 @@ describe('NATURE_NAMES_ES', () => {
 });
 ```
 
-- [ ] **2b.** `npm run test:shared -- natures` → FALLA. **2c. Implementación:**
+- [x] **2b.** `npm run test:shared -- natures` → FALLA. **2c. Implementación:**
 
 ```ts
 import type { Nature } from '../engine/spawns.js';
@@ -5470,13 +5470,13 @@ export const natureNameEs = (nature: string): string =>
   (NATURE_NAMES_ES as Record<string, string>)[nature] ?? nature;
 ```
 
-- [ ] **2d.** → PASA (3). Commit `F2-07: naturalezas en español (PokéAPI)` + push.
+- [x] **2d.** → PASA (3). Commit `F2-07: naturalezas en español (PokéAPI)` + push.
 
 ### Paso 3 — Absorción y bola quieta en la escena
 
 **Files:** Modify `src/app/game/encounter-scene/encounter-scene.ts`, `encounter-scene.spec.ts`
 
-- [ ] **3a. Tests:**
+- [x] **3a. Tests:**
 
 ```diff
 --- a/src/app/game/encounter-scene/encounter-scene.spec.ts
@@ -5516,7 +5516,7 @@ export const natureNameEs = (nature: string): string =>
  });
 ```
 
-- [ ] **3b.** → FALLAN. **3c. Implementación:**
+- [x] **3b.** → FALLAN. **3c. Implementación:**
 
 ```diff
 --- a/src/app/game/encounter-scene/encounter-scene.ts
@@ -5573,11 +5573,11 @@ export const natureNameEs = (nature: string): string =>
      this.removeBall();
 ```
 
-- [ ] **3d.** → PASA (17). Commit + push.
+- [x] **3d.** → PASA (17). Commit + push.
 
 ### Paso 4 — Sonidos de la captura
 
-- [ ] **4a.** En `SFX_RECIPES` (`sfx-synth.ts`):
+- [x] **4a.** En `SFX_RECIPES` (`sfx-synth.ts`):
 
 ```ts
   /** El Pokémon se convierte en luz y entra en la bola (F2-07). */
@@ -5606,14 +5606,14 @@ export const natureNameEs = (nature: string): string =>
   ],
 ```
 
-- [ ] **4b.** `npx ng test --include=src/app/services/game/sfx-synth.spec.ts --watch=false` → PASA (24). Regenerar los
+- [x] **4b.** `npx ng test --include=src/app/services/game/sfx-synth.spec.ts --watch=false` → PASA (24). Regenerar los
   `.wav` para escucharlos como en F2-08 (`docs/evidencias/F2-08_sfx/`) y añadir los nuevos. Commit + push.
 
 ### Paso 5 — La tarjeta "¡Capturado!"
 
 **Files:** Create `src/app/features/encounter/caught-card.component.ts`, Test `caught-card.component.spec.ts`
 
-- [ ] **5a. Test que falla:**
+- [x] **5a. Test que falla:**
 
 ```ts
 import { TestBed } from '@angular/core/testing';
@@ -5702,7 +5702,7 @@ describe('CaughtCardComponent', () => {
 });
 ```
 
-- [ ] **5b.** → FALLA. **5c. Implementación:**
+- [x] **5b.** → FALLA. **5c. Implementación:**
 
 ```ts
 import { Component, OnDestroy, computed, effect, input, output, signal } from '@angular/core';
@@ -5869,7 +5869,7 @@ export class CaughtCardComponent implements OnDestroy {
 }
 ```
 
-- [ ] **5d.** → PASA (5). Commit `F2-07: tarjeta de capturado` + push.
+- [x] **5d.** → PASA (5). Commit `F2-07: tarjeta de capturado` + push.
 
 ### Paso 6 — La página: la coreografía entera
 
@@ -5881,7 +5881,7 @@ final, los pasos intermedios no "empiezan" y no suenan.
 
 **Files:** Modify `src/app/features/encounter/encounter.page.ts`, `encounter.page.spec.ts`
 
-- [ ] **6a. Tests:**
+- [x] **6a. Tests:**
 
 ```diff
 --- a/src/app/features/encounter/encounter.page.spec.ts
@@ -5977,7 +5977,7 @@ final, los pasos intermedios no "empiezan" y no suenan.
    it('un lanzamiento flojo no llega y no llama al servidor (D-046)', async () => {
 ```
 
-- [ ] **6b.** → FALLAN. **6c. Implementación:**
+- [x] **6b.** → FALLAN. **6c. Implementación:**
 
 ```diff
 --- a/src/app/features/encounter/encounter.page.ts
@@ -6329,18 +6329,18 @@ final, los pasos intermedios no "empiezan" y no suenan.
      this.stage?.dispose();
 ```
 
-- [ ] **6d.** `npx ng test --include=src/app/features/encounter/encounter.page.spec.ts --watch=false` → PASA (13). Commit + push.
+- [x] **6d.** `npx ng test --include=src/app/features/encounter/encounter.page.spec.ts --watch=false` → PASA (13). Commit + push.
 
 ### Paso 7 — Verde y Android
 
-- [ ] **7a.** `npm run lint` · `npm run build` · `npm test -- --watch=false` (referencia: **73 archivos / 393 tests**) ·
+- [x] **7a.** `npm run lint` · `npm run build` · `npm test -- --watch=false` (referencia: **73 archivos / 393 tests**) ·
   `npm run test:shared` (**143**) · `cd server && npm run build && npm test` (**22**).
-- [ ] **7b.** Android: grabar (`adb shell screenrecord`) una captura completa (golpe → luz roja → cae → 3 sacudidas con
+- [x] **7b.** Android: grabar (`adb shell screenrecord`) una captura completa (golpe → luz roja → cae → 3 sacudidas con
   vibración → clic con estrellas y fanfarria → tarjeta con la XP contando) y un escape (sale con su grito y se puede
   volver a lanzar). Comprobar que el capturado ya no está en el mapa al volver y que la XP del HUD subió. Con Render
   dormido (tras 15 min), la bola espera balanceándose y la secuencia sigue al despertar. Evidencias `F2-07_*`.
-- [ ] **7c.** El shiny se prueba con los tests (y en el móvil si sale: 1/512; forzarlo es el modo demo de F8-05).
-- [ ] **7d.** REGLA 2 y PR. Con F2-07 hecho, **F2 está completa** salvo F2-10 (música): siguiente, F4-07 (combate en
+- [x] **7c.** El shiny se prueba con los tests (y en el móvil si sale: 1/512; forzarlo es el modo demo de F8-05).
+- [x] **7d.** REGLA 2 y PR. Con F2-07 hecho, **F2 está completa** salvo F2-10 (música): siguiente, F4-07 (combate en
   AR), que reutiliza `CameraService`, `OrientationService`, `EncounterStage` y la escena (D-034).
 
 ---

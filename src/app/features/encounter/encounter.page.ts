@@ -14,13 +14,29 @@ import { Router } from '@angular/router';
 import { IonContent } from '@ionic/angular';
 import { captureChance, type BallId, type ThrowQuality } from '@shared/engine/capture';
 import { hashString } from '@shared/engine/rng';
-import type { EncounterView } from '@shared/protocol/encounters';
+import type { CaughtView, EncounterView, ThrowResult } from '@shared/protocol/encounters';
 import * as THREE from 'three';
 
 import { loadFirstTexture } from '../../game/encounter-scene/art-texture';
+import { BALL_RADIUS_M } from '../../game/encounter-scene/ball-mesh';
+import {
+  ballDropY,
+  preTimeline,
+  resultTimeline,
+  shakeAngle,
+  stepAt,
+  timelineEnd,
+  type SeqItem,
+  type SeqResult,
+} from '../../game/encounter-scene/capture-sequence';
 import { cssColor } from '../../game/encounter-scene/css-color';
 import { cameraYaw } from '../../game/encounter-scene/device-pose';
-import { artUrls, pokemonHeightM, sizeClass } from '../../game/encounter-scene/encounter-layout';
+import {
+  EYE_HEIGHT_M,
+  artUrls,
+  pokemonHeightM,
+  sizeClass,
+} from '../../game/encounter-scene/encounter-layout';
 import { EncounterScene, type PokemonPose } from '../../game/encounter-scene/encounter-scene';
 import {
   EncounterStage,
@@ -60,6 +76,7 @@ import { SettingsService } from '../../services/game/settings.service';
 import { GameButtonComponent } from '../../shared/ui/game-button.component';
 import { GlassPanelComponent } from '../../shared/ui/glass-panel.component';
 import { cardSpot } from './card-spot';
+import { CaughtCardComponent } from './caught-card.component';
 import { EncounterCardComponent } from './encounter-card.component';
 import { EncounterHudComponent } from './encounter-hud.component';
 import { ThrowDockComponent, type ThrowIntent } from './throw-dock.component';
@@ -120,6 +137,22 @@ interface InFlight {
   curve: boolean;
 }
 
+/** La coreografía de la captura en curso (F2-07). */
+interface Sequence {
+  items: SeqItem[];
+  speed: number;
+  /** Donde golpeó la bola (de ahí cae al suelo). */
+  at: THREE.Vector3;
+  restY: number;
+  last: SeqItem | null;
+  /** Ya respondió el servidor (o falló). */
+  known: boolean;
+  result: ThrowResult | null;
+  /** El Pokémon ya no está (404/410): se va. */
+  gone: boolean;
+  error: string | null;
+}
+
 const prefersReducedMotion = (): boolean =>
   typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -137,6 +170,7 @@ const prefersReducedMotion = (): boolean =>
     EncounterHudComponent,
     EncounterCardComponent,
     ThrowDockComponent,
+    CaughtCardComponent,
   ],
   template: `
     <ion-content [scrollY]="false" class="full">
@@ -194,18 +228,30 @@ const prefersReducedMotion = (): boolean =>
             @if (toast(); as t) {
               <p class="note toast" role="status">{{ t }}</p>
             }
-            <app-throw-dock
-              #dock
-              class="dock"
-              [ball]="ball()"
-              [berry]="berry()"
-              [qty]="bag.qty()"
-              [disabled]="!canThrow()"
-              (pick)="ball.set($event)"
-              (toggleBerry)="berry.set(!berry())"
-              (grabbed)="onGrab()"
-              (thrown)="launch($event)"
-            />
+            @if (caught(); as c) {
+              <app-caught-card
+                class="caught"
+                [caught]="c.view"
+                [name]="name()"
+                [moveNames]="caughtMoves()"
+                [xp]="c.xp"
+                [instant]="reduce()"
+                (done)="back()"
+              />
+            } @else {
+              <app-throw-dock
+                #dock
+                class="dock"
+                [ball]="ball()"
+                [berry]="berry()"
+                [qty]="bag.qty()"
+                [disabled]="!canThrow()"
+                (pick)="ball.set($event)"
+                (toggleBerry)="berry.set(!berry())"
+                (grabbed)="onGrab()"
+                (thrown)="launch($event)"
+              />
+            }
           }
           @default {
             <app-glass-panel size="lg" class="card">
@@ -281,6 +327,10 @@ const prefersReducedMotion = (): boolean =>
     .dock {
       margin-top: auto;
     }
+    .caught {
+      margin: auto;
+      width: min(100%, 360px);
+    }
     .toast {
       font: 700 1.1rem/1 var(--font-display);
     }
@@ -347,7 +397,7 @@ export class EncounterPage implements OnDestroy {
   protected readonly horizon = signal('34%');
   protected readonly arOn = computed(() => this.settings.settings().arEnabled);
   /** "Reducir efectos" (ajustes) o "reducir movimiento" (sistema): sin partículas ni destellos (D-033). */
-  private readonly reduce = computed(
+  protected readonly reduce = computed(
     () => this.settings.settings().reduceEffects || prefersReducedMotion(),
   );
   protected readonly species = computed(() => {
@@ -384,6 +434,13 @@ export class EncounterPage implements OnDestroy {
       : 0.5;
     return cssColor([ringToken(chance), '#3ccf8e']);
   });
+  /** Lo capturado (F2-07): la tarjeta de "¡Capturado!". */
+  protected readonly caught = signal<{ view: CaughtView; xp: number } | null>(null);
+  protected readonly caughtMoves = computed(() =>
+    (this.caught()?.view.moves ?? []).map(
+      (id) => this.dataset.moves().get(id)?.names.es ?? `#${id}`,
+    ),
+  );
   protected readonly message = computed(() => {
     if (this.phase() !== 'resolved') return this.error() ?? '';
     return this.view()?.status === 'caught' ? 'Ya lo atrapaste.' : 'Ya se te escapó.';
@@ -411,6 +468,7 @@ export class EncounterPage implements OnDestroy {
   private startedAt = 0;
   private touchedDown = false;
   private flight: InFlight | null = null;
+  private seq: Sequence | null = null;
   private toastTimer?: ReturnType<typeof setTimeout>;
 
   constructor() {
@@ -585,6 +643,7 @@ export class EncounterPage implements OnDestroy {
     world.setRing(this.canThrow(), this.ringColor());
     world.updateRing(pose.lift, ringRadius(t));
     if (this.flight) this.fly(now);
+    if (this.seq) this.playSequence(now);
   }
 
   protected onGrab(): void {
@@ -643,7 +702,7 @@ export class EncounterPage implements OnDestroy {
     if (tf < fl.hit.t) return;
     this.flight = null;
     if (fl.hit.kind === 'miss') this.missed();
-    else void this.hitPokemon(fl);
+    else this.hitPokemon(fl, now);
   }
 
   /** No le dio: la bola se queda un momento en el suelo y vuelve otra a la mano. No gasta nada (D-046). */
@@ -655,29 +714,154 @@ export class EncounterPage implements OnDestroy {
     }, 500);
   }
 
-  /** Le dio: el servidor decide (D-028). F2-07 cambia el mensaje por la coreografía completa. */
-  private async hitPokemon(fl: InFlight): Promise<void> {
+  /**
+   * Le dio (F2-07): empieza la parte conocida de la coreografía (absorber, caer) y a la vez se pregunta al servidor
+   * (D-028); cuando responde se añaden sus sacudidas y el final. Si tarda (Render despertando), la bola espera en el
+   * suelo balanceándose.
+   */
+  private hitPokemon(fl: InFlight, now: number): void {
+    const world = this.world;
+    if (!world?.ball) return;
     void this.audio.playSfx('ball-hit');
     this.haptics.tap();
     if (fl.quality !== 'none') this.showToast(QUALITY_TEXT[fl.quality]);
     if (fl.berry) this.berry.set(false); // la baya se gasta con el lanzamiento
-    try {
-      const res = await this.api.throw(this.id(), {
+    const speed = this.reduce() ? 2 : 1;
+    const seq: Sequence = {
+      items: preTimeline(now, speed),
+      speed,
+      at: world.ball.position.clone(),
+      restY: -EYE_HEIGHT_M + BALL_RADIUS_M,
+      last: null,
+      known: false,
+      result: null,
+      gone: false,
+      error: null,
+    };
+    this.seq = seq;
+    this.api
+      .throw(this.id(), {
         ball: fl.ball,
         berry: fl.berry,
         throwQuality: fl.quality,
         curve: fl.curve,
-      });
-      this.showToast(res.captured ? '¡Capturado!' : res.fled ? '¡Huyó!' : 'Se escapó…');
-      if (res.captured || res.fled) {
-        setTimeout(() => this.back(), 1500);
+      })
+      .then(
+        (res) => this.addResult(seq, res, res),
+        (err: unknown) => {
+          const status = err instanceof HttpErrorResponse ? err.status : undefined;
+          seq.gone = status === 404 || status === 410;
+          seq.error = encounterErrorText(status);
+          // Sin respuesta válida: la bola se abre sin sacudidas (y si ya no está, se va).
+          this.addResult(seq, { captured: false, shakes: 0, fled: seq.gone }, null);
+        },
+      );
+  }
+
+  private addResult(seq: Sequence, r: SeqResult, res: ThrowResult | null): void {
+    if (this.seq !== seq) return;
+    seq.known = true;
+    seq.result = res;
+    seq.items = [
+      ...seq.items,
+      ...resultTimeline(r, Math.max(timelineEnd(seq.items), performance.now()), seq.speed),
+    ];
+  }
+
+  /** Un fotograma de la coreografía (lo que pasa con el Pokémon y la bola en cada paso). */
+  private playSequence(now: number): void {
+    const seq = this.seq;
+    const world = this.world;
+    if (!seq || !world) return;
+    const { x, y, z } = seq.at;
+    const cur = stepAt(seq.items, now);
+    if (!cur) {
+      if (now < timelineEnd(seq.items)) return;
+      if (!seq.known) {
+        world.poseBall(x, seq.restY, z, 0.08 * Math.sin(now / 250)); // esperando al servidor
         return;
       }
-    } catch (err) {
-      const status = err instanceof HttpErrorResponse ? err.status : undefined;
-      this.showToast(encounterErrorText(status));
+      this.finishSequence(seq);
+      return;
     }
+    const { item, k } = cur;
+    if (item !== seq.last) {
+      seq.last = item;
+      this.stepStarted(item, now);
+    }
+    switch (item.step) {
+      case 'absorb':
+        world.setCaptureLook(k, Math.min(1, 2 * k));
+        world.poseBall(x, y, z, 0);
+        break;
+      case 'drop':
+        world.setCaptureLook(1, 1);
+        world.poseBall(x, ballDropY(k, y, seq.restY), z, 0);
+        break;
+      case 'shake':
+        world.poseBall(x, seq.restY, z, shakeAngle(k));
+        break;
+      case 'burst':
+        world.setCaptureLook(1 - k, 1 - k);
+        break;
+      case 'flee':
+        world.setOpacity(1 - k);
+        break;
+      default: // pause, click
+        world.poseBall(x, seq.restY, z, 0);
+    }
+  }
+
+  /** Sonido y vibración en el MISMO fotograma en que empieza cada paso (DISENO §4.10). */
+  private stepStarted(item: SeqItem, now: number): void {
+    switch (item.step) {
+      case 'absorb':
+        void this.audio.playSfx('absorb');
+        break;
+      case 'shake':
+        void this.audio.playSfx('shake');
+        this.haptics.shake();
+        break;
+      case 'click':
+        void this.audio.playSfx('capture');
+        this.haptics.success();
+        if (!this.reduce()) {
+          this.world?.startBurst(
+            (now - this.startedAt) / 1000,
+            cssColor(['--gold', '#ffcb3d']),
+            true,
+          );
+        }
+        break;
+      case 'burst':
+        void this.audio.playSfx('escape');
+        void this.audio.playCry(this.view()?.speciesId ?? 0);
+        this.haptics.tap();
+        this.world?.removeBall();
+        break;
+    }
+  }
+
+  private finishSequence(seq: Sequence): void {
+    this.seq = null;
+    const res = seq.result;
+    if (seq.error) this.showToast(seq.error, 2000);
+    if (res?.captured && res.caught) {
+      this.world?.removeBall();
+      this.cardOpen.set(false);
+      this.caught.set({ view: res.caught, xp: res.xpGained });
+      return; // la tarjeta decide (Volver al mapa)
+    }
+    if (res?.fled || seq.gone) {
+      if (!seq.error) this.showToast('¡Huyó!');
+      setTimeout(() => this.back(), 1500);
+      return;
+    }
+    // Se escapó: el encuentro sigue.
+    this.world?.setCaptureLook(0, 0);
+    this.world?.setOpacity(this.personality.ghostly ? 0.7 : 1);
     this.world?.removeBall();
+    if (!seq.error) this.showToast('¡Se escapó!');
     this.busy.set(false);
   }
 
@@ -739,7 +923,6 @@ export class EncounterPage implements OnDestroy {
     el.style.transform = `translate(${spot.x}px, ${spot.y}px)`;
   }
 
-
   private async openCamera(): Promise<void> {
     const stream = await this.camera.open();
     if (!stream) return;
@@ -777,6 +960,8 @@ export class EncounterPage implements OnDestroy {
 
   private teardown(): void {
     this.flight = null;
+    this.seq = null;
+    this.caught.set(null);
     this.busy.set(false);
     clearTimeout(this.toastTimer);
     this.stage?.dispose();
