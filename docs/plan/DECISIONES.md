@@ -539,3 +539,57 @@ licencias de terceros (D-010: libres o propios → son propios); (2) nada que de
 suenan al instante (los gritos tardaban > 6 s); (3) en el PC no hay codificador de audio para preparar archivos.
 Para cambiar un sonido se toca su receta (y se regeneran los .wav de `docs/evidencias/F2-08_sfx/` para oírlo).
 Sigue existiendo `SFX_CATALOG` para sonidos grabados que lleguen más tarde (en `assets/audio/sfx/*.ogg`).
+
+## D-045 · AR del encuentro y del combate: `getUserMedia` con la cámara PRINCIPAL + `RelativeOrientationSensor` (F2-01) (2026-10-12, Kenneth)
+
+**Medido en el Samsung A36** (Android 16, Adreno 710, WebView Chrome 154, pantalla de 120 Hz, 384×832 a dpr 2,81) con
+`/dev/ar` del APK de producción. Evidencias `F2-01_0{1..6}_*`.
+
+| Configuración (cámara principal, Pikachu, móvil apoyado) | fps | p95 | tirones | vídeo |
+|---|---|---|---|---|
+| Solo cámara 720p | 59,3 | 16,8 ms | 0 % | 23,2 |
+| Cámara + Pokémon | 60,0 | 16,8 ms | 0 % | 23,6 |
+| + 400 partículas | 60,0 | 16,8 ms | 0 % | 23,6 |
+| + resolución nativa (dpr 2,81) | 59,7 | 16,7 ms | 0,2 % | 23,6 |
+| Cámara 1080p + todo | 59,5 | 16,8 ms | 0,3 % | 23,3 |
+| Sin cámara (fondo ilustrado) + todo | 119,9 | 8,4 ms | 0 % | — |
+
+- **Cámara = `getUserMedia` en el WebView.** Funciona a la primera; el permiso lo pide Capacitor solo
+  (`BridgeWebChromeClient` → diálogo de Android). **El plan B (`camera-preview`) se descarta:** no hace falta ninguna
+  dependencia nativa. Denegado (también "no volver a preguntar") → `NotAllowedError` al instante, sin cuelgues →
+  fondo ilustrado (DISENO §6).
+- **`facingMode: 'environment'` abre el GRAN ANGULAR** ("camera 2, facing back": 8 MP, enfoque fijo; ve más oscuro y
+  deforma). La principal es "camera 0, facing back" (4080×3060, autoenfoque continuo). **Regla:** tras tener permiso,
+  `enumerateDevices()`, quedarse con la trasera de número menor y abrirla con `deviceId: { exact }` (guardar su
+  `deviceId` para abrir directo la próxima vez). Abrirla directa: 0,8 s hasta el primer fotograma; con el cambio desde
+  el gran angular, 1,2-1,4 s. Sin etiquetas (antes del permiso) se abre con `facingMode` y se cambia.
+- **720p** (1280×720, llega como 720×1280 en vertical). 1080p no se ve mejor en la pantalla y tarda más en abrir (1,85 s).
+- **El vídeo va a ~24 fps en interior** (en un cuarto oscuro con el gran angular, 15): la autoexposición alarga a 42 ms
+  con la ISO al mínimo. `frameRate: { min: 30 }` se acepta pero no cambia nada; la exposición manual (25 ms, ISO 400)
+  da 26-29 fps pero no se adapta a la luz (en la calle saldría quemada) → **no se usa**. Aceptado: el Pokémon y los
+  efectos van a 60 fps aunque el fondo vaya a 24; con luz de día la cámara expone corto sola.
+- **Rendimiento sobrado:** 60 fps con Pokémon + 400 partículas, 0 % tirones. Con vídeo en pantalla el móvil baja la
+  pantalla a 60 Hz (sin vídeo, 120): el tope lo pone la pantalla, no la GPU. **`setPixelRatio(min(dpr, 2))`**: el nativo
+  no se nota y sube el peor fotograma a 50 ms. Temperatura de la batería +0,2 °C en ~2 min (enchufado por USB);
+  la prueba de 10 min sigue en F8-02.
+- **Orientación = `RelativeOrientationSensor`** (Generic Sensor API, `frequency: 60`, `referenceFrame: 'device'`): existe
+  en el WebView, da **56 Hz constantes** y a mano **va más suave** (Kenneth). `deviceorientation` da 35-54 Hz y **deja de
+  emitir con el móvil quieto** (Chrome solo lo manda si cambia el valor). Si el sensor no existe o da error →
+  `deviceorientation`. La absoluta (brújula) no hace falta: el Pokémon se pone delante de hacia donde mira el móvil al
+  entrar. Deriva con el móvil quieto 20 s: ≤ 0,2° en las tres fuentes.
+- **Calibrado a ojo en el A36:** campo de visión **vertical 64°** (cámara principal, 720p, `object-fit: cover` en
+  vertical; el teórico de 26 mm es ~67°) y **retraso de la orientación 80 ms** (el vídeo llega tarde respecto a los
+  sensores; sin retraso el Pokémon se adelanta al girar rápido). El campo de visión depende del móvil: **pendiente
+  comprobarlo en el Redmi Note 10 de Samuel**; si cambia mucho, ajuste en Ajustes o tabla por modelo.
+- **Sin WebXR** (`navigator.xr` no existe en el WebView): AR de 3 grados de libertad (solo orientación), como el "AR
+  clásico" de Pokémon GO: si el jugador camina, el Pokémon no se queda en su sitio. Aceptado. 6DoF exigiría ARCore
+  nativo: fuera de alcance.
+- **Ciclo de vida (comprobado con `dumpsys media.camera`):** soltar la cámara (`track.stop()`) y los sensores en
+  `ionViewWillLeave` y con `document.hidden`; reabrir en `ionViewDidEnter` / al volver. Tres idas y vueltas mapa ↔ AR:
+  mapa vectorial siempre y **0 pérdidas de contexto WebGL** en logcat (D-038 a salvo). La escena tiene su propio
+  `WebGLRenderer` y al destruirla `dispose()` + `forceContextLoss()`.
+- **El `<video>` se oculta hasta su primer fotograma:** vacío, el WebView pinta un póster gris con un "play" gigante
+  (`F2-01_05`).
+- **Código para F2-04/F4-07:** `src/app/game/encounter-scene/device-pose.ts` (orientación → cámara three.js, rumbo,
+  punto del suelo delante) y `pose-delay.ts` (orientación de hace N ms), con tests. Suelo a 1,4 m bajo la cámara;
+  distancia del Pokémon = máx(2 m, 1,8 × altura real del dataset). `/dev/ar` se queda para medir otros móviles.

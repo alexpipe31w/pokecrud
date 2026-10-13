@@ -143,12 +143,15 @@ servidor tenga que guardar cada spawn.
 
 ## 6. Encuentro y captura
 
-- Cámara: `navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })` en un
-  `<video>` de fondo; three.js con fondo transparente encima. Permiso de cámara en
-  `AndroidManifest.xml`. **[SPIKE F2-01]** si getUserMedia va mal en el WebView, plan B =
-  `@capacitor-community/camera-preview` con `toBack: true`.
-- AR por giroscopio (`deviceorientation` → cuaternión de la cámara three.js): el Pokémon queda fijo en
-  el mundo. Sin giroscopio o con AR apagado → fondo ilustrado según bioma/hora.
+- Cámara (**confirmado en F2-01, D-045**): `navigator.mediaDevices.getUserMedia` a 720p en un `<video>` de fondo
+  (oculto hasta su primer fotograma); three.js con fondo transparente encima (`setPixelRatio(min(dpr, 2))`). **Ojo:**
+  `facingMode: 'environment'` abre el gran angular en el Samsung A36: tras el permiso se elige la trasera de número
+  menor de `enumerateDevices()` ("camera 0") y se abre con `deviceId`. El permiso lo pide Capacitor; denegado →
+  `NotAllowedError` → fondo ilustrado. Sin plan B nativo (`camera-preview` descartado).
+- AR por giroscopio con **`RelativeOrientationSensor`** (60 Hz; si no existe, `deviceorientation`) → cuaternión de la
+  cámara three.js (`game/encounter-scene/device-pose.ts`), retrasado 80 ms para ir a la par del vídeo
+  (`pose-delay.ts`); campo de visión vertical 64° en el A36. Solo orientación (sin WebXR en el WebView): el Pokémon
+  queda fijo al girar, no al caminar. Sin giroscopio o con AR apagado → fondo ilustrado según bioma/hora.
 - Tamaño real: altura PokéAPI (decímetros) × variación individual (XS 0.5–XL 1.5) → metros en la
   escena; la distancia de la cámara se ajusta para que quepa pero se note la escala.
 - Representación: arte `home` (PNG 512) como sprite con animación procedimental (respirar, saltar,

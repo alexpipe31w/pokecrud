@@ -148,8 +148,14 @@
 
 ## F2 · Encuentro en AR y captura
 
-- [ ] **F2-01 · [SPIKE] Cámara + giroscopio en el WebView** — getUserMedia vs camera-preview, AR por
+- [x] **F2-01 · [SPIKE] Cámara + giroscopio en el WebView** (@kenneth, 2026-10-12) — getUserMedia vs camera-preview, AR por
       giroscopio, fps. Decisión en DECISIONES. Dep: F0-09.
+      **Hecho:** `/dev/ar` medido en el Samsung A36: `getUserMedia` funciona (camera-preview descartado), 60 fps con
+      Pokémon + 400 partículas y 0 % tirones, vídeo ~24 fps en interior. `facingMode` abre el gran angular → elegir
+      "camera 0" por `deviceId`. `RelativeOrientationSensor` 56 Hz y más suave que `deviceorientation`; deriva ≤ 0,2°
+      en 20 s; calibrado FOV 64° y retraso 80 ms. Sin WebXR (AR solo de orientación). Cámara y sensores se sueltan al
+      salir y en segundo plano; 3 idas y vueltas al mapa sin perder el contexto WebGL. Evidencias `F2-01_0{1..6}_*`. D-045.
+      Código para F2-04: `game/encounter-scene/device-pose.ts` y `pose-delay.ts` (17 tests).
 - [ ] **F2-02 · Plan detallado de F2** (`docs/plan/fases/F2-captura.md`). Dep: F2-01.
 - [x] **F2-03 · Fórmula de captura** (@alex, 2026-10-11) — `shared/engine/capture.ts` (+ huida) con tests de casos conocidos.
       Dep: F0-03.

@@ -3,7 +3,12 @@
 > Se **reescribe** al cerrar cada sesión (no es histórico; el histórico es `BITACORA.md`).
 > Máximo una pantalla. Si lees esto al empezar: después lee `ROADMAP.md`.
 
-**Última actualización:** 2026-10-12 noche · por Alex (Claude) · `develop` (hasta F2-08 mezclado)
+**Última actualización:** 2026-10-12 noche · por Kenneth (Claude) · rama `feature/F2-01-spike-camara-giroscopio`
+
+**Kenneth (2026-10-12, noche), en paralelo al relevo de abajo:** hecho **F2-01** (spike de cámara + giroscopio en
+el Samsung A36, D-045) y comprobado que el APK ya **no** saca el refresh token en logcat. Con eso **F2-02 (plan de F2)
+queda libre**. Samuel: lo tuyo sigue igual (7b y 3b), y si puedes, abre `/dev/ar` en tu Redmi para comprobar el
+campo de visión (ver "PENDIENTES DE HUMANOS").
 
 ## 👉 RELEVO DE ALEX A SAMUEL (2026-10-12, noche)
 
@@ -15,10 +20,9 @@ F1-10 el HUD sigue al día/noche del mapa · F2-08 efectos de sonido generados +
 
 1. **Cómo trabajamos ahora:** rama `feature/…` → PR → **lo mezclas tú mismo** en cuanto el CI esté verde (lint + test +
    build de app y servidor). `develop` está protegida: no deja mezclar en rojo ni push directo.
-2. **Con tu Redmi (Android), lo más valioso:** `npm run apk -- --install` (comprueba también que `adb logcat` ya NO
-   saca el refresh token: ver "PENDIENTES DE HUMANOS") y en la calle: 7b de F1-07 (≥ 55 fps con
+2. **Con tu Redmi (Android), lo más valioso:** `npm run apk -- --install` y en la calle: 7b de F1-07 (≥ 55 fps con
    Pokémon, grito, toque → encuentro) y 3b de F1-05 (avatar). Mide fps por CDP. Si van bien, marca las dos `[x]`.
-   Luego F2-01 (spike cámara + giroscopio), que desbloquea la captura y el combate en AR.
+   ~~Lo de logcat~~ y ~~F2-01~~: hechos por Kenneth (ver arriba). Lo siguiente de la AR es F2-02 (plan de F2).
 3. **Sin móvil:** F2-10 (música) o F5-01 (plan del PvP).
 4. **Leer antes de tocar el mapa:** D-038, D-039, D-040, D-041, D-042 (los Pokémon son `<img>` en `.pokemon-layer`
    colocados desde `MapOverlay.onBeforeDraw`; la hierba y la sombra siguen en three.js). Sonido: D-044.
@@ -36,9 +40,17 @@ la parte visual (F4-07).
 spike (F1-01), plan (F1-02), ubicación y brújula (F1-03), **pantalla `/mapa` (F1-04)**,
 spawns (F1-06), mochila/XP (F1-08) y **avatar 3D (F1-05, falta probarlo en Android)** hechos; faltan los Pokémon en
 el mapa (F1-07). **F2:**
-fórmula (F2-03) y captura en servidor (F2-06) hechas; lo visual del encuentro espera al spike F2-01 (cámara + giroscopio).
+fórmula (F2-03), captura en servidor (F2-06), audio (F2-08) y **spike de cámara + giroscopio (F2-01)** hechos; lo
+siguiente es el plan de la fase (F2-02) y luego la escena del encuentro (F2-04).
 
 ## Hecho
+
+- **F2-01 (Kenneth, rama `feature/F2-01-spike-camara-giroscopio`):** `/dev/ar` medido en el Samsung A36. `getUserMedia`
+  funciona en el WebView (sin plugin nativo); 60 fps con Pokémon + 400 partículas, 0 % tirones; vídeo ~24 fps en
+  interior. **`facingMode` abre el gran angular** → se elige "camera 0" por `deviceId`. `RelativeOrientationSensor`
+  (56 Hz, más suave) en vez de `deviceorientation`; calibrado FOV vertical 64° y retraso 80 ms. Sin WebXR (AR solo de
+  orientación). Cámara y sensores se sueltan al salir y en segundo plano; mapa ↔ AR ×3 sin perder el contexto WebGL.
+  Código para F2-04: `game/encounter-scene/device-pose.ts` y `pose-delay.ts`. App 278 tests. D-045.
 
 - **F2-08 (Alex, mezclado):** efectos de sonido generados en el juego (D-044) y sonando en el combate; gritos
   precargados al empezar el combate. Música → F2-10. Escuchar: `docs/evidencias/F2-08_sfx/*.wav`.
@@ -152,12 +164,14 @@ fórmula (F2-03) y captura en servidor (F2-06) hechas; lo visual del encuentro e
 
 ## En curso
 
-- Nadie. F1-05 (3b) y F1-07 (7b) solo esperan la prueba en Android.
+- Nadie (Kenneth cerró F2-01; PR abierto a `develop`). F1-05 (3b) y F1-07 (7b) solo esperan la prueba en Android.
 
 ## Siguiente paso concreto
 
-1. **Con Android:** cerrar F1-05 (paso 3b) y después F2-01 (spike de cámara y giroscopio, desbloquea la AR).
-2. **Sin Android:** F1-07 (Pokémon en el mapa) siguiendo `docs/plan/fases/F1-mapa.md` → F1-07; o F1-09 / F1-10.
+1. **F2-02 · plan de F2** (`docs/plan/fases/F2-captura.md`, skill `writing-plans`), partiendo de D-045 y de
+   `src/app/game/encounter-scene/` (orientación → cámara y retraso, ya con tests). No necesita móvil.
+2. **Con Android:** 7b de F1-07 y 3b de F1-05 (Samuel, en la calle); FOV de `/dev/ar` en el Redmi.
+3. **Sin Android:** F2-10 (música) o F5-01 (plan del PvP).
 3. Para generar el APK en otro PC: JDK 21 (`winget install Microsoft.OpenJDK.21`; si da "el hash no coincide",
    `winget install EclipseAdoptium.Temurin.21.JDK`) y `npm run apk`.
 
@@ -184,6 +198,9 @@ fórmula (F2-03) y captura en servidor (F2-06) hechas; lo visual del encuentro e
 - [ ] **F1-07 paso 7b:** en la calle con el APK de producción: ≥ 55 fps con los Pokémon de verdad (capa HTML, D-042), grito bajito al
       acercarse, tocar uno lejos → "Acércate más", uno al alcance → encuentro. Anotar cuántos había y los fps.
 - [ ] **F1-05 paso 3b:** andar y trotar con el APK, fps ≥ 55 en `/mapa` con el avatar nuevo (CDP). Marcar F1-05 `[x]`.
+- [ ] **F2-01 (D-045) en otro móvil (Samuel, Redmi Note 10):** abrir `/dev/ar` por CDP (`history.pushState` + `popstate`;
+      no hay botón), apuntar a un Pokémon sobre una mesa y girar despacio: con qué **campo de visión** se queda quieto
+      (en el A36, 64°), qué cámara elige ("Cám. 0"?) y los fps de "Medir batería". Anotarlo en D-045.
 
 **Kenneth:**
 
@@ -199,10 +216,11 @@ fórmula (F2-03) y captura en servidor (F2-06) hechas; lo visual del encuentro e
 
 **Quien coja F8-02 / F8-04 (rendimiento y APK de release):**
 
-- [~] (Alex, 2026-10-12) El registro de Capacitor escribía en la consola/logcat lo que lee `SecureStorage`, **incluido el
+- [x] (Alex, 2026-10-12) El registro de Capacitor escribía en la consola/logcat lo que lee `SecureStorage`, **incluido el
       refresh token**, y `npm run apk` siempre compila un APK de depuración (también el de Render). Arreglado en
-      `capacitor.config.ts`: `loggingBehavior` = `'none'` salvo en el APK de desarrollo (`-- device`). **Falta (Android):**
-      `npm run apk -- --install`, iniciar sesión y comprobar con `adb logcat | grep -i SecureStorage` que no sale nada.
+      `capacitor.config.ts`: `loggingBehavior` = `'none'` salvo en el APK de desarrollo (`-- device`).
+      **Comprobado (Kenneth, Samsung A36, 2026-10-12):** APK de producción, sesión recuperada al abrir (lee el token) →
+      `adb logcat | grep -ic securestorage` = 0 y 0 líneas de `Capacitor/Plugin`.
 - [ ] El APK pasó de 8,4 a 11,4 MB con `@capacitor/geolocation` (librería nativa de ubicación; `classes.dex` sin
       minificar). Medir con el de release (minify/R8).
 - [ ] En el Samsung A36 (pantalla de 120 Hz) `/dev/mapa` con 30 Pokémon marca 40-120 fps según la zona; medir en F8-02.
