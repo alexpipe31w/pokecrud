@@ -26,6 +26,7 @@ import {
   type EncounterStageLike,
 } from '../../game/encounter-scene/encounter-stage';
 import { personalityOf, type Personality } from '../../game/encounter-scene/personality';
+import { loadPokemonModel, type PokemonModel } from '../../game/encounter-scene/pokemon-model';
 import {
   TOUCHDOWN_MS,
   jumpSchedule,
@@ -52,8 +53,19 @@ export const ENCOUNTER_STAGE = new InjectionToken<
   factory: () => (canvas, world) => new EncounterStage(canvas, world),
 });
 
+/** Carga el modelo 3D del Pokémon (F2-12, D-048); null = sin modelo → arte plano. Token para los tests (sin red). */
+export const POKEMON_MODEL = new InjectionToken<
+  (speciesId: number, shiny: boolean) => Promise<PokemonModel | null>
+>('POKEMON_MODEL', {
+  providedIn: 'root',
+  factory: () => (speciesId, shiny) => loadPokemonModel(speciesId, shiny),
+});
+
 /** Sin ninguna lectura de orientación en este tiempo → sin giroscopio: cámara quieta mirando al Pokémon. */
 export const NO_GYRO_MS = 1500;
+
+/** Radianes que gira el Pokémon por píxel arrastrado (media pantalla ≈ media vuelta). */
+const SPIN_PER_PX = Math.PI / 200;
 
 /** Texto de cada error de `GET /encounters/:id` (D-028). */
 export function encounterErrorText(status: number | undefined): string {
@@ -95,6 +107,10 @@ const prefersReducedMotion = (): boolean =>
         [class.stage--ill]="!streaming()"
         [style.--horizon]="horizon()"
         [style.--enc-color]="typeColor()"
+        (pointerdown)="dragStart($event)"
+        (pointermove)="dragMove($event)"
+        (pointerup)="dragEnd()"
+        (pointercancel)="dragEnd()"
       >
         <video #video muted playsinline [hidden]="!streaming()"></video>
         <canvas #canvas></canvas>
@@ -148,6 +164,7 @@ const prefersReducedMotion = (): boolean =>
     }
     .stage {
       background: var(--ink);
+      touch-action: none;
     }
     .stage--ill {
       background:
@@ -230,6 +247,7 @@ export class EncounterPage implements OnDestroy {
   private readonly camera = inject(CameraService);
   private readonly orientation = inject(OrientationService);
   private readonly createStage = inject(ENCOUNTER_STAGE);
+  private readonly loadModel = inject(POKEMON_MODEL);
   private readonly stageEl = viewChild.required<ElementRef<HTMLElement>>('stage');
   private readonly videoEl = viewChild.required<ElementRef<HTMLVideoElement>>('video');
   private readonly canvasEl = viewChild.required<ElementRef<HTMLCanvasElement>>('canvas');
@@ -327,6 +345,23 @@ export class EncounterPage implements OnDestroy {
     else this.closeCamera();
   }
 
+  /** X del dedo mientras arrastra para girar al Pokémon (F2-12); null = sin arrastrar. */
+  private dragX: number | null = null;
+
+  protected dragStart(e: PointerEvent): void {
+    this.dragX = e.clientX;
+  }
+
+  protected dragMove(e: PointerEvent): void {
+    if (this.dragX === null) return;
+    this.world?.spin((e.clientX - this.dragX) * SPIN_PER_PX);
+    this.dragX = e.clientX;
+  }
+
+  protected dragEnd(): void {
+    this.dragX = null;
+  }
+
   private async load(): Promise<void> {
     const seq = ++this.loadSeq;
     this.teardown();
@@ -363,6 +398,12 @@ export class EncounterPage implements OnDestroy {
       void loadFirstTexture(artUrls(v.speciesId, v.shiny)).then((tex) => {
         if (tex && this.world === world) world.setTexture(tex);
         else tex?.dispose();
+      });
+      // El modelo 3D (D-048) sustituye al plano en cuanto llega; si no hay, se queda el plano (sin esperar).
+      void this.loadModel(v.speciesId, v.shiny).then((model) => {
+        if (!model || this.world !== world) return;
+        world.setModel(model);
+        if (this.personality.ghostly) world.setOpacity(0.7);
       });
       this.resume();
     } catch (err) {
