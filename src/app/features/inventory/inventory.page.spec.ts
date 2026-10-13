@@ -7,6 +7,8 @@ import { provideIonicAngular } from '@ionic/angular';
 
 import { environment } from '../../../environments/environment';
 import { AuthService } from '../../core/auth/auth.service';
+import { AudioService } from '../../services/game/audio.service';
+import { HapticsService } from '../../services/game/haptics.service';
 import { InventoryPage } from './inventory.page';
 
 const LIST_URL = `${environment.serverUrl}/pokemon?_sort=id&_order=asc`;
@@ -24,6 +26,8 @@ describe('InventoryPage', () => {
         provideHttpClient(),
         provideHttpClientTesting(),
         { provide: AuthService, useValue: { isAdmin: signal(admin) } },
+        { provide: HapticsService, useValue: { tap: vi.fn() } },
+        { provide: AudioService, useValue: { playSfx: vi.fn() } },
       ],
     }).compileComponents();
 

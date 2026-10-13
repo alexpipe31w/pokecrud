@@ -4,93 +4,108 @@
       <ion-back-button defaultHref="/inventario" text="Inventario"></ion-back-button>
     </ion-buttons>
     <ion-title>{{ pokemon() ? (pokemon()!.name | titlecase) : 'Detalle' }}</ion-title>
-    @if (pokemon() && isAdmin()) {
-      <ion-buttons slot="end">
-        <ion-button (click)="edit()" aria-label="Editar">
-          <ion-icon slot="icon-only" name="create-outline"></ion-icon>
-        </ion-button>
-        <ion-button color="danger" (click)="remove()" aria-label="Eliminar">
-          <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
-        </ion-button>
-      </ion-buttons>
-    }
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
   @if (loading()) {
-    <div class="state"><ion-spinner name="crescent"></ion-spinner></div>
+    <p class="state" role="status">Cargando…</p>
   } @else if (notFound()) {
     <div class="state">
-      <ion-text color="medium">
-        <p>El Pokémon #{{ id() }} no está en la base de datos.</p>
-      </ion-text>
-      <ion-button fill="outline" (click)="goToList()"> Volver a la Pokédex </ion-button>
+      <p>El Pokémon #{{ id() }} no está en la base de datos.</p>
+      <app-game-button label="Volver al inventario" variant="glass" (pressed)="goToList()" />
     </div>
   } @else if (pokemon(); as p) {
-    <section class="hero">
-      <span class="dex">{{ dexNumber(p.id) }}</span>
-      @if (p.imageUrl) {
-        <img [src]="p.imageUrl" [alt]="p.name" />
-      }
-      <h1>{{ p.name | titlecase }}</h1>
-      <app-type-chips [types]="p.types"></app-type-chips>
-    </section>
+    <div class="page" [style.--tint]="tint()">
+      <section class="hero">
+        <span class="dex">{{ dexNumber(p.id) }}</span>
+        <img
+          [src]="art()"
+          [alt]="p.name | titlecase"
+          width="200"
+          height="200"
+          (error)="nextArt()"
+        />
+        <h1>{{ p.name | titlecase }}</h1>
+        <app-type-chips [types]="p.types"></app-type-chips>
+      </section>
 
-    <section class="cards">
-      <div class="card">
-        <span class="label">Precio</span>
-        <strong>{{ p.price | currency: 'COP' : 'symbol-narrow' : '1.0-0' }}</strong>
-      </div>
-      <div class="card">
-        <span class="label">Stock</span>
-        <strong [class.out]="p.stock === 0">{{ p.stock }} uds.</strong>
-      </div>
-      <div class="card">
-        <span class="label">Altura</span>
-        <strong>{{ p.height | number: '1.1-1' }} m</strong>
-      </div>
-      <div class="card">
-        <span class="label">Peso</span>
-        <strong>{{ p.weight | number: '1.1-1' }} kg</strong>
-      </div>
-      <div class="card">
-        <span class="label">Exp. base</span>
-        <strong>{{ p.baseExperience }}</strong>
-      </div>
-    </section>
-
-    <section class="block">
-      <h2>Descripción</h2>
-      @if (description() === null) {
-        <ion-spinner name="dots"></ion-spinner>
-      } @else {
-        <p>{{ description() || 'Sin descripción disponible.' }}</p>
-      }
-    </section>
-
-    <section class="block">
-      <h2>Habilidades</h2>
-      <p>
-        @for (a of p.abilities; track a; let last = $last) {
-          {{ a | titlecase }}{{ last ? '' : ', ' }}
-        } @empty {
-          —
-        }
-      </p>
-    </section>
-
-    <section class="block">
-      <h2>Estadísticas base</h2>
-      @for (s of statLabels; track s.key) {
-        <div class="stat">
-          <span class="stat-label">{{ s.label }}</span>
-          <span class="stat-value">{{ p.stats[s.key] }}</span>
-          <ion-progress-bar [value]="p.stats[s.key] / 255"></ion-progress-bar>
+      <section class="shop" aria-label="Tienda">
+        <div class="tile price">
+          <span class="label">Precio</span>
+          <strong>{{ p.price | currency: 'COP' : 'symbol-narrow' : '1.0-0' }}</strong>
         </div>
-      }
-    </section>
+        <div class="tile stock" [class.out]="p.stock === 0">
+          <span class="label">Stock</span>
+          <strong>{{ p.stock === 0 ? 'Agotado' : p.stock + ' uds.' }}</strong>
+        </div>
+      </section>
 
-    <p class="updated">Actualizado: {{ p.updatedAt.slice(0, 10) }}</p>
+      <dl class="facts">
+        <div>
+          <dt>Altura</dt>
+          <dd>{{ p.height | number: '1.1-1' }} m</dd>
+        </div>
+        <div>
+          <dt>Peso</dt>
+          <dd>{{ p.weight | number: '1.1-1' }} kg</dd>
+        </div>
+        <div>
+          <dt>Exp. base</dt>
+          <dd>{{ p.baseExperience }}</dd>
+        </div>
+      </dl>
+
+      <section class="block">
+        <h2>Descripción</h2>
+        @if (description() === null) {
+          <p class="muted">Cargando…</p>
+        } @else {
+          <p>{{ description() || 'Sin descripción disponible.' }}</p>
+        }
+      </section>
+
+      <section class="block">
+        <h2>Habilidades</h2>
+        <ul class="abilities">
+          @for (a of p.abilities; track a) {
+            <li>{{ a | titlecase }}</li>
+          } @empty {
+            <li class="muted">—</li>
+          }
+        </ul>
+      </section>
+
+      <section class="block">
+        <h2>Estadísticas base</h2>
+        @for (s of statLabels; track s.key) {
+          <app-stat-bar [label]="s.label" [value]="p.stats[s.key]" [color]="tint()" />
+        }
+      </section>
+
+      <p class="updated">Actualizado: {{ p.updatedAt.slice(0, 10) }}</p>
+
+      @if (isAdmin()) {
+        @if (!confirming()) {
+          <div class="actions">
+            <app-game-button label="Editar" variant="glass" [block]="true" (pressed)="edit()" />
+            <button type="button" class="danger" (click)="confirming.set(true)">Eliminar</button>
+          </div>
+        } @else {
+          <div class="confirm" role="alertdialog" aria-label="Confirmar eliminación">
+            <p>¿Eliminar a {{ p.name | titlecase }} ({{ dexNumber(p.id) }}) del inventario?</p>
+            <div class="row">
+              <button type="button" class="plain" (click)="confirming.set(false)">Cancelar</button>
+              <button type="button" class="danger" [disabled]="deleting()" (click)="remove()">
+                Eliminar
+              </button>
+            </div>
+          </div>
+        }
+        @if (notice(); as n) {
+          <p class="notice" role="alert">{{ n }}</p>
+        }
+      }
+    </div>
   }
 </ion-content>
