@@ -220,7 +220,7 @@ F2-07, F2-12, F2-13, F2-15 hechas; faltan **F2-11**/**F2-14** (ARCore), F2-10 (m
 
 ## En curso
 
-- Nadie. **F5-02** (Alex) hecha: socket `/pvp` + `PvpSocketService`. **Siguiente: F5-03** (invitar / código / buscar rival).
+- **F5-03 (Alex, rama `feature/F5-03-sala-espera`):** sala de espera PvP. Punto de guardado: paso 0.
 - Samuel cerró **F3-06c** (#73 mezclado; sin migración). **Con esto la F3 está completa en código.**
 - **Ojo:** el inventario de IS-11 está ahora en `/inventario` (la Pokédex 1025 ocupa `/pokedex`).
 

@@ -395,7 +395,7 @@
       jugador, 20 mensajes / 10 s por socket, validación en el borde, `pvp:hello`), guards globales solo HTTP (D-056) y
       `PvpSocketService` en la app (token vigente en cada reconexión, un reintento tras `unauthorized`). Las salas de
       combate y la idempotencia por `decision` (el `seq` de antes) son de F5-04, según el plan.
-- [ ] **F5-03 · Invitar / código / buscar rival** — emparejamiento y selección de equipo (nivel 50). Dep: F5-02.
+- [~] **F5-03 · Invitar / código / buscar rival** (@alex, 2026-10-13) — emparejamiento y selección de equipo (nivel 50). Dep: F5-02.
 - [ ] **F5-04 · Combate PvP completo** — servidor aplica el engine, temporizador 30 s, abandono 60 s,
       resultado persistido; la escena de F4-05 reutilizada. Dep: F5-03, F4-05. Criterio: combate entre dos
       móviles reales grabado en vídeo.
