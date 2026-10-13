@@ -177,17 +177,21 @@ para el criterio (vídeo); hasta entonces, dos ventanas del navegador a 390×844
 
 ## F5-03 · Invitar / código / buscar rival
 
-- [ ] **Paso 1 — `PvpTeamsService.load(playerId, teamId)`** → `PokemonInit[]` a nivel 50 (regla 1 y 2), en UNA consulta
+- [x] **Paso 1 — `PvpTeamsService.load(playerId, teamId)`** → `PokemonInit[]` a nivel 50 (regla 1 y 2), en UNA consulta
   de equipo + UNA de Pokémon (nada de N+1). e2e con BD: equipo ajeno → `team-not-found`; equipo con un transferido → lo
   salta; vacío → `team-empty`; stats = `calcStats(..., 50, ...)`.
-- [ ] **Paso 2 — `PvpLobbyService`** (puro con reloj e `idGen` inyectados, + spec): `createInvite` (código con
+- [x] **Paso 2 — `PvpLobbyService`** (puro con reloj e `idGen` inyectados, + spec): `createInvite` (código con
   `crypto.randomInt` sobre `PVP_INVITE_ALPHABET`, sin colisión con los vivos, caduca a los 5 min), `joinInvite`
   (reclamar el código = `get` + `delete` SIN `await` en medio; propio → `own-invite`), cola FIFO, una entrada por
   jugador, `leave`, limpieza de caducados en cada operación (sin `setInterval`). **Test de concurrencia:** dos
   `joinInvite` del mismo código "a la vez" (`Promise.all`) → uno empieza combate y el otro `invite-not-found`.
-- [ ] **Paso 3 — gateway:** `pvp:invite:create`, `pvp:invite:join`, `pvp:queue:join`, `pvp:lobby:leave`. El equipo se
+- [x] **Paso 3 — gateway:** `pvp:invite:create`, `pvp:invite:join`, `pvp:queue:join`, `pvp:lobby:leave`. El equipo se
   carga (await) ANTES de reclamar el código o entrar en la cola. Al emparejar llama a `BattleRoomsService.start(a, b)`
   (en F5-03, un doble que emite `battle:start` con una vista mínima; la sala real llega en F5-04).
+  **Cambio al hacerlo (Alex):** en vez de un doble, `BattleRoomsService` ya crea el combate de verdad
+  (`createBattle` + `BattleDataService`) y manda la vista con `viewFor` (adelantado del paso 1 de F5-04, en
+  `shared/engine/battle/pvp-view.ts`), y ya sabe **rendirse** (`battle:forfeit`): sin eso, dos jugadores emparejados se
+  quedaban atascados en `already-in-battle` hasta reiniciar el servidor. La clase es `PvpLobby` (pura), no un servicio.
 - [ ] **Paso 4 — pantalla `/pvp`** (DISENO, `impeccable`, nada de Ionic por defecto): elegir equipo (de `/equipos`;
   sin equipos → enlace a crear uno), "Invitar" (código grande con letras separadas, botón copiar, cuenta atrás de 5 min,
   cancelar), "Unirme" (6 casillas, mayúsculas solas, pegar), "Buscar rival" (animación de espera, cancelar), estados
