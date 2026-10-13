@@ -217,7 +217,7 @@ export function artUrls(id: number, shiny: boolean): string[] {
 
 **Files:** Create `src/app/game/encounter-scene/art-texture.ts`, Test `art-texture.spec.ts`
 
-- [ ] **2a. Test que falla:**
+- [x] **2a. Test que falla:**
 
 ```ts
 import * as THREE from 'three';
@@ -244,8 +244,8 @@ describe('loadFirstTexture', () => {
 });
 ```
 
-- [ ] **2b.** `npx ng test --include=src/app/game/encounter-scene/art-texture.spec.ts --watch=false` → FALLA.
-- [ ] **2c. Implementación:**
+- [x] **2b.** `npx ng test --include=src/app/game/encounter-scene/art-texture.spec.ts --watch=false` → FALLA.
+- [x] **2c. Implementación:**
 
 ```ts
 import * as THREE from 'three';
@@ -276,7 +276,7 @@ export async function loadFirstTexture(
 }
 ```
 
-- [ ] **2d.** → PASA (2 tests). Commit `F2-04a: carga del arte con alternativas` + push.
+- [x] **2d.** → PASA (2 tests). Commit `F2-04a: carga del arte con alternativas` + push.
 
 ### Paso 3 — La escena three.js (sin renderer)
 
