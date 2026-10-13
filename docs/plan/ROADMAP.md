@@ -126,7 +126,7 @@
       `prefers-color-scheme` (resto de pantallas, sin cambios) y como clases `.theme-day`/`.theme-night`, que `MapPage`
       pone en su raíz según `night()`. Probado: móvil oscuro + mapa de día → HUD claro; móvil claro + mapa de noche →
       HUD oscuro; el login sigue al sistema (F1-10_01/02).
-- [~] **F1-05 · Avatar 3D** (@alex, 2026-10-12) — personaje que camina/corre/se queda quieto según velocidad, sombra,
+- [~] **F1-05 · Avatar 3D** (@alex, 2026-10-12; prueba en Android: @kenneth, 2026-10-12) — personaje que camina/corre/se queda quieto según velocidad, sombra,
       círculo de alcance. Dep: F1-04.
       **Falta solo 3b:** probarlo en un Android real (andar y trotar, ≥ 55 fps). Código mezclado en `develop`.
 - [x] **F1-06 · Spawns deterministas** (@alex, 2026-10-11) — `shared/engine/spawns.ts` + `rng.ts` con tests; endpoint
@@ -137,7 +137,7 @@
       server unit 21/21, e2e 46/46 (dos jugadores en el mismo sitio → respuesta idéntica). Probado en vivo con Open-Meteo
       real: 10 Pokémon a 200 m en Neiva. D-024, D-025. **Pendiente de humanos:** `SPAWN_SALT` en Render (Samuel) +
       Manual Deploy; sin ella `/spawns` da 503 y lo demás sigue igual.
-- [~] **F1-07 · Pokémon en el mapa** (@alex, 2026-10-12) — **falta solo 7b (Android, ≥ 55 fps con los Pokémon);
+- [~] **F1-07 · Pokémon en el mapa** (@alex, 2026-10-12; prueba en Android: @kenneth, 2026-10-12) — **falta solo 7b (Android, ≥ 55 fps con los Pokémon);
       código mezclado en `develop`.** — sprites en el overlay, hierba agitándose, aparición/desaparición
       animada, grito bajito por cercanía, toque → encuentro. Dep: F1-05, F1-06.
 - [x] **F1-08 · Inventario y XP básicos** (@alex, 2026-10-11) — modelo `Inventory`, bolas iniciales, nivel/XP del jugador en
@@ -164,21 +164,21 @@
       Dep: F0-03.
       **Hecho:** fórmula Gen III+ de ARQUITECTURA §6, huida por rareza/velocidad, `resolveThrow` con RNG inyectado;
       12 tests (casos calculados a mano + 40.000 lanzamientos que cuadran con la probabilidad). D-027.
-- [~] **F2-04a · Escena de encuentro en AR (base)** (@alex, 2026-10-12) — `/encuentro/:id` definitivo: cámara trasera principal de fondo
+- [~] **F2-04a · Escena de encuentro en AR (base)** (@alex, 2026-10-12; prueba en Android: @kenneth, 2026-10-12) — `/encuentro/:id` definitivo: cámara trasera principal de fondo
       (o fondo ilustrado sin permiso / sin cámara / AR apagada), Pokémon a tamaño real con XS/XL anclado con el
       giroscopio, placa, "Huir", estados de error; cámara y sensores se sueltan al salir (D-045). Dep: F2-02, F1-07.
       Criterio: Android ≥ 55 fps; mapa ↔ encuentro ×3 sin perder el contexto WebGL. Plan: `fases/F2-captura.md`.
       **Hecho (pasos 1-11, PR):** `/encuentro/:id` definitivo; lint/build OK, app 63 archivos / 307 tests. Navegador
       390×844: escena con fondo ilustrado, aviso sin permiso, interruptor AR, "Huir", mapa ↔ encuentro ×3 sin errores.
       **Falta:** solo el paso 12 (Android: cámara principal, ≥ 55 fps, ×3 sin perder contexto, AR apagada / sin permiso).
-- [~] **F2-04b · Personalidad, efectos del tipo y entrada** (@alex, 2026-10-12) — idle/saltos por velocidad, vuelo, fantasma, partículas
+- [~] **F2-04b · Personalidad, efectos del tipo y entrada** (@alex, 2026-10-12; prueba en Android: @kenneth, 2026-10-12) — idle/saltos por velocidad, vuelo, fantasma, partículas
       del tipo, transición desde el mapa, aterrizaje con polvo + grito + vibración, destello shiny (DISENO §5).
       Dep: F2-04a. Criterio: Android ≥ 55 fps con partículas; vídeo de la entrada.
       **Hecho (pasos 1-9a, PR):** personalidad, saltos con semilla, partículas por tipo, aterrizaje con polvo + grito +
       vibración, destello shiny, zoom desde el mapa; arreglo de partículas negras (D-047). App 66 archivos / 333 tests.
       **Falta:** solo 9b (Android: fps con partículas y vídeo de la entrada).
 - [~] **F2-12 · Pokémon en 3D (.glb) en el encuentro (D-048)** — el arte plano pasa a ser el modelo 3D de
-      `Pokemon-3D-api/assets` (@alex, 2026-10-12) (cargado desde su URL, NO se sube al repo): `GLTFLoader` + `DRACOLoader` (decodificador
+      `Pokemon-3D-api/assets` (@alex, 2026-10-12; prueba en Android: @kenneth, 2026-10-12) (cargado desde su URL, NO se sube al repo): `GLTFLoader` + `DRACOLoader` (decodificador
       servido por la app), tamaño real por su caja (altura PokéAPI × XS/XL), animación si la trae, giro hacia la cámara,
       sombra; los 57 sin modelo y los shiny sin modelo → el arte plano de ahora (o tinte shiny). Con la AR de orientación
       actual; arrastrar con el dedo lo gira. Dep: F2-04b. Criterio: navegador + Android ≥ 55 fps con el modelo.
@@ -197,7 +197,7 @@
       fallback de orientación. Dep: F2-12. **Necesita Android (Kenneth/Samuel).**
 - [ ] **F2-14 · Encuentro con ARCore (D-048)** — el encuentro usa el plugin de F2-11: tocar el suelo detectado (o
       automático) pone al Pokémon; se le puede rodear; el lanzamiento (F2-05) funciona igual. Dep: F2-11.
-- [~] **F2-05 · Lanzamiento** (@alex, 2026-10-12) — gesto 1:1, física, curva, círculo de precisión, bolas y bayas, hápticos.
+- [~] **F2-05 · Lanzamiento** (@alex, 2026-10-12; prueba en Android: @kenneth, 2026-10-12) — gesto 1:1, física, curva, círculo de precisión, bolas y bayas, hápticos.
       Dep: F2-04b, F2-12 (la caja del Pokémon sale del modelo 3D). (Fallar no llama al servidor ni gasta, D-046.)
       **Hecho (pasos 1-12a, PR):** gesto, física, curva, aro, bolas y Frambu, servidor con reintentos; adaptado a F2-12
       y F2-13. Navegador con encuentro REAL: fallos sin gastar, acierto → capturado, mochila 30→29, +110 XP.

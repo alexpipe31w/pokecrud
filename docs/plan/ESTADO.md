@@ -181,7 +181,10 @@ y **F2-14** (ARCore) y F2-10 (música). **F4:** completa en código salvo F4-07 
 
 ## En curso
 
-- Nadie. F2-04a, F2-04b, F2-05 y F2-12 (@alex) están en `develop` y en `[~]` SOLO por su prueba en Android (PENDIENTES).
+- **Kenneth (2026-10-12 noche, rama `feature/pendientes-android-a36`): la tanda de PENDIENTES de Android en el
+  Samsung A36** (F2-04a 12, F2-04b 9b, F2-12 6, F2-05 12b, F1-07 7b, F1-05 3b). Samuel: no la repitas en el A36;
+  en tu Redmi sigue valiendo para D-045 (FOV) y para comparar fps. F2-04a, F2-04b, F2-05 y F2-12 (@alex) están en
+  `develop` y en `[~]` SOLO por esa prueba.
 
 ## Siguiente paso concreto
 
