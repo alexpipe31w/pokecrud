@@ -259,3 +259,43 @@ describe('EncounterScene con modelo 3D (F2-12)', () => {
     expect(mat).toHaveBeenCalled();
   });
 });
+
+describe('EncounterScene.screenBox (F2-13)', () => {
+  it('caja del Pokémon en píxeles: centrada si se le mira de frente, más alta cuanto más grande', () => {
+    const small = new EncounterScene(0.4);
+    small.setViewport(390, 844);
+    small.placeAt(0);
+    small.aimAtPokemon();
+    small.update(null);
+    const a = small.screenBox(390, 844)!;
+    expect((a.left + a.right) / 2).toBeCloseTo(195, 0);
+    expect((a.top + a.bottom) / 2).toBeCloseTo(422, -1);
+    expect(a.bottom - a.top).toBeGreaterThan(50);
+
+    const big = new EncounterScene(1);
+    big.setViewport(390, 844);
+    big.placeAt(0);
+    big.aimAtPokemon();
+    big.update(null);
+    big.setModel({
+      scene: new THREE.Group().add(new THREE.Mesh(new THREE.BoxGeometry(1, 2, 1))) as THREE.Group,
+      clips: [],
+    });
+    big.update(null);
+    const b = big.screenBox(390, 844)!;
+    expect((b.left + b.right) / 2).toBeCloseTo(195, 0);
+    expect(b.right - b.left).toBeGreaterThan(20);
+    small.dispose();
+    big.dispose();
+  });
+
+  it('null si aún no está colocado o queda detrás de la cámara', () => {
+    const s = new EncounterScene(0.4);
+    s.setViewport(390, 844);
+    expect(s.screenBox(390, 844)).toBeNull();
+    s.placeAt(Math.PI); // detrás
+    s.update(null);
+    expect(s.screenBox(390, 844)).toBeNull();
+    s.dispose();
+  });
+});
