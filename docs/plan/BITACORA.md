@@ -1197,3 +1197,29 @@ NEGROS: el canvas es transparente y el aditivo con color × alfa deja alfa 1. Ah
 características del Pokémon; ver ESTADO. F2-05 parado hasta decidir cómo.
 **Decisiones nuevas:** D-047.
 **El siguiente debe empezar por:** leer la decisión de ESTADO ("la AR tiene que ser 3D") y D-048 si ya existe.
+
+## 2026-10-12 23:20 · @alex (Claude) · D-048 + F2-12 · ramas `feature/D-048-ar-3d-arcore`, `feature/F2-12-pokemon-3d`
+
+**Qué se hizo:** Alex decidió que la AR es 3D y con la ficha del Pokémon (D-048, PR #53: modelos `.glb` de
+`Pokemon-3D-api/assets`, verificados 968/1025, + ARCore + ficha; tareas F2-11..F2-14). F2-12 (plan
+`docs/plan/fases/F2-12-pokemon-3d.md`): `pokemon-model.ts` (GLTFLoader + Draco, shiny solo su modelo, null → plano,
+timeout 20 s), `EncounterScene.setModel` (normaliza a la altura real con su caja, pies en el suelo, centrado; postura,
+giro con el dedo, primera animación en bucle, luces, opacidad del fantasma, dispose), token `POKEMON_MODEL` en la
+página, arrastre horizontal para girar, decodificador Draco copiado a `assets/draco/` por `angular.json`.
+**Archivos clave:** `src/app/game/encounter-scene/{pokemon-model,encounter-scene}.ts`,
+`src/app/features/encounter/encounter.page.ts`, `angular.json`.
+**Cómo se probó (salida real):**
+
+    lint: All files pass linting. · build: complete (sin avisos) y www/assets/draco/{draco_decoder.js,.wasm,wrapper}
+    ng test: 67 archivos, 347 passed · test:shared: 140 passed
+    navegador 390×844 SIN permiso de cámara (cuenta f212@pokecrud.test → "borradas 1"; la especie se forzó con
+      page.route sobre GET /encounters/:id solo para mirar el render): Pikachu, Charizard (vuela, partículas de fuego),
+      Gengar (semitransparente) en 3D; #850 Sizzlipede sin modelo → plano. Charizard medido: 1,92 m renderizado (1,7 m
+      + pose de su animación), en pantalla NDC −0,62..0,58 tras el arreglo de `aimAtPokemon(hover)`. Giro con el dedo:
+      se le ve de espaldas (F2-12_6_girado).
+
+**Quedó a medias / roto:** paso 6 (Android). En un salto, un Pokémon grande se sale ~0,7 s por arriba (saltos de
+F2-04b escalan con la altura): mirar en Android. Alex preguntó por los sonidos: los gritos ya son los de PokéAPI; en los
+juegos no dicen su nombre (solo Pikachu, "¡Pika!") y las voces del anime tienen copyright.
+**Decisiones nuevas:** D-048 (y en F2-13: la ficha se abre y se cierra con un botón).
+**El siguiente debe empezar por:** F2-13 (ficha con botón). Para el PC: servidor añade `cp` a `GET /encounters/:id`.

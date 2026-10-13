@@ -182,10 +182,13 @@
       servido por la app), tamaño real por su caja (altura PokéAPI × XS/XL), animación si la trae, giro hacia la cámara,
       sombra; los 57 sin modelo y los shiny sin modelo → el arte plano de ahora (o tinte shiny). Con la AR de orientación
       actual; arrastrar con el dedo lo gira. Dep: F2-04b. Criterio: navegador + Android ≥ 55 fps con el modelo.
+      **Hecho (pasos 1-5, PR):** Pikachu, Charizard (vuela), Gengar (fantasma semitransparente) en 3D con su animación;
+      #850 sin modelo → plano; giro con el dedo. App 67 archivos / 347 tests. **Falta:** el 6 (Android, fps).
 - [ ] **F2-13 · Ficha del Pokémon junto a él en la cámara (D-048)** — tarjeta anclada al lado del Pokémon (sigue su
       posición en pantalla): tipos (iconos), nivel, **PC** (lo calcula el servidor con los IVs y viene en
       `GET /encounters/:id`), altura y peso reales × XS/XL, categoría ("Pokémon Ratón") y descripción de Pokédex en
-      español (`genus`/`flavor` del dataset). Plegable para que no tape el lanzamiento. Dep: F2-04a.
+      español (`genus`/`flavor` del dataset). **Alex: la ficha sale SOLO al pulsar un botón y se vuelve a esconder al
+      pulsarlo otra vez** (cerrada por defecto, que no invada la pantalla). Dep: F2-04a.
 - [ ] **F2-11 · Spike ARCore en Capacitor (D-048)** — plugin nativo Android propio (Kotlin): sesión ARCore, imagen de
       la cámara, pose del móvil y matriz de proyección por fotograma hacia three.js, detección del suelo y ancla.
       Medir en el A36 y el Redmi: Pokémon `.glb` quieto en el suelo al **rodearlo andando**, ≥ 55 fps, sin ARCore →

@@ -27,11 +27,15 @@ shiny sin modelo, red caída) → el arte plano de F2-04a, sin esperar.
 
 **Pasos:**
 
-- [ ] 1. `pokemon-model.ts`: test (URLs, shiny solo shiny, null si falla, timeout) → código. Commit.
-- [ ] 2. `EncounterScene.setModel` + postura + giro + animación + opacidad + dispose: tests → código. Commit.
-- [ ] 3. `angular.json`: decodificador Draco en `assets/draco/`. `npm run build` y comprobar que sale `www/assets/draco/`.
-- [ ] 4. `EncounterPage`: token `POKEMON_MODEL`, carga, arrastre para girar; spec con doble. Commit.
-- [ ] 5. lint · build (sin avisos de presupuesto) · tests · shared. Navegador 390×844 **sin permiso de cámara**
+- [x] 1. `pokemon-model.ts`: test (URLs, shiny solo shiny, null si falla, timeout) → código. Commit.
+- [x] 2. `EncounterScene.setModel` + postura + giro + animación + opacidad + dispose: tests → código. Commit.
+- [x] 3. `angular.json`: decodificador Draco en `assets/draco/`. `npm run build` y comprobar que sale `www/assets/draco/`.
+- [x] 4. `EncounterPage`: token `POKEMON_MODEL`, carga, arrastre para girar; spec con doble. Commit.
+- [x] 5. lint · build (sin avisos de presupuesto) · tests · shared. Navegador 390×844 **sin permiso de cámara**
       (`context.clearPermissions()`: una captura con la webcam real NO se sube): Pikachu, Charizard (vuela) y Gengar
       (fantasma) en 3D; uno sin modelo (#850) en plano. Evidencias `F2-12_*`.
 - [ ] 6. Android: ≥ 55 fps con el modelo y partículas (snippet de F2-04a 12c). Si no hay móvil → PENDIENTES.
+
+**Hecho (Alex, 2026-10-12):** pasos 1-5. Extra: sin AR la cámara apunta también a lo que flota (`aimAtPokemon(hover)`),
+si no Charizard se salía por arriba. Visto: en un SALTO un Pokémon grande aún se sale por arriba ~0,7 s (los saltos de
+F2-04b escalan con la altura): revisarlo en Android antes de tocarlo.

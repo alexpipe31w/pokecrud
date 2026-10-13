@@ -652,7 +652,7 @@ cámara debe ser 3D"** y **"deben salir las características del Pokémon"**.
    three.js, detección del suelo y ancla. Primero un spike (F2-11) con Android. Sin ARCore → la AR de orientación de
    D-045 queda como alternativa (no se tira lo hecho).
 3. **Ficha junto al Pokémon** en la cámara: tipos, nivel, PC, altura y peso reales × XS/XL, categoría y descripción de
-   Pokédex (ES). **El PC lo calcula el servidor** (tiene los IVs, REGLA 3) y viene en `GET /encounters/:id`.
+   Pokédex (ES). **Se abre y se cierra con un botón** (cerrada por defecto: que no tape la cámara). **El PC lo calcula el servidor** (tiene los IVs, REGLA 3) y viene en `GET /encounters/:id`.
 4. **"Todo en cámara"** incluye el combate en AR (F4-07): mismos modelos y ARCore.
 **Orden:** F2-12 (modelo 3D, se puede hacer en el PC) → F2-13 (ficha) → F2-11 (spike ARCore, Android) → F2-14
 (encuentro con ARCore) → F2-05 → F2-07. Lo de F2-04a/F2-04b sigue valiendo: personalidad, saltos, partículas, sonidos y
