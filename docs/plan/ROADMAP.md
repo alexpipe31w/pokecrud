@@ -386,7 +386,10 @@
 
 ## F5 · PvP en tiempo real
 
-- [ ] **F5-01 · Plan detallado de F5** (contrato de mensajes en `shared/protocol/`). Dep: F4-04.
+- [x] **F5-01 · Plan detallado de F5** (@alex, 2026-10-13) (contrato de mensajes en `shared/protocol/`). Dep: F4-04.
+      **Hecho:** `docs/plan/fases/F5-pvp.md` (F5-02…F5-05 paso a paso) y contrato `shared/protocol/pvp.ts` (compila en
+      app y servidor). Spike de Socket.IO en Nest 12 verificado y borrado: los guards globales rompen el socket
+      (JwtAuthGuard revienta; ThrottlerGuard pierde mensajes) → arreglos medidos en el plan. D-056.
 - [ ] **F5-02 · Gateway Socket.IO** — auth en handshake, salas, `seq` idempotente, reconexión. Dep: F5-01, F0-07.
 - [ ] **F5-03 · Invitar / código / buscar rival** — emparejamiento y selección de equipo (nivel 50). Dep: F5-02.
 - [ ] **F5-04 · Combate PvP completo** — servidor aplica el engine, temporizador 30 s, abandono 60 s,

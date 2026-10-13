@@ -197,6 +197,9 @@ servidor tenga que guardar cada spawn.
   defecto), el servidor aplica `battle-engine`, emite `battle:events` a los dos y a espectadores.
 - Mensajes cliente→servidor con `seq` por jugador: el servidor ignora `seq` repetidos (reconexión
   con reintento ≠ doble ataque). Reconexión: el cliente re-entra a la sala y recibe `battle:state`.
+  **Concretado en D-056 / `fases/F5-pvp.md`:** el `seq` es la `decision` numerada de la sala, cada jugador recibe
+  la vista y los eventos girados (él = lado 0) sin la información oculta del rival, y la reconexión usa `pvp:hello`.
+  Contrato: `shared/protocol/pvp.ts`.
 - Desconexión > 60 s → derrota por abandono.
 - Emparejamiento: por invitación (código de 6 caracteres) y "buscar rival" (cola simple en memoria).
 - Torneo: `tournaments`, `tournament_players`, `tournament_matches(round, slot, p1, p2, winner)`.

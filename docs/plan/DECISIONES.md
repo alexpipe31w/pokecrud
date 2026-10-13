@@ -768,3 +768,29 @@ jugador dentro de su transacción. Para pintar los equipos sin una petición por
 (≤ 50, solo lo tuyo).
 **Consecuencia:** el combate debe leer `caughtIds`, no `pokemonIds`. La migración se aplicó en Supabase el 2026-10-13
 ANTES de mezclar (2 equipos existentes → `caughtIds` vacío).
+
+## D-056 · PvP (plan de F5, F5-01): servidor árbitro, tú siempre eres el lado 0, decisiones idempotentes y nivel 50 (2026-10-13, Alex)
+
+**Contexto:** ARQUITECTURA §8 esbozaba el PvP (Socket.IO, salas en memoria, `seq`, 30 s, 60 s). Al planearlo hubo que
+cerrar lo que no decía: qué ve cada jugador del rival, cómo se reutiliza la escena de F4-05, qué equipo se usa y qué
+pasa con los guards globales del servidor.
+**Decisión** (detalle y pasos en `docs/plan/fases/F5-pvp.md`; contrato en `shared/protocol/pvp.ts`):
+1. **Perspectiva:** el servidor manda cada mensaje girado para quien lo recibe: **tú eres siempre el lado 0**. La escena
+   y el `BattleController` no cambian de lado. El evento `switch` lleva el Pokémon que sale (`PublicPokemon`).
+2. **Información oculta:** del rival solo lo que se ve en los juegos (lo que ya salió: especie, nivel, tipos, PS, estado;
+   y cuántos le quedan). Nunca movimientos, PP, stats ni IVs (REGLA 3).
+3. **`decision` sustituye a `seq`:** cada espera de acciones abre una decisión numerada; la acción va con su número; la
+   misma dos veces no hace nada (`duplicate`), una vieja → `stale-decision`. La primera acción manda.
+4. **Equipo = `Team.caughtIds` (D-054)**, congelado al empezar, **nivel 50** con `calcStats` y `defaultMoves(…, 50)`;
+   IVs y naturaleza del individuo cuentan. Sin premios en la v1 (con dos cuentas se farmearía).
+5. **Tiempo y abandono:** 30 s por decisión → acción por defecto; 3 seguidas → derrota `inactive`; desconectado 60 s →
+   `abandon` (el combate sigue corriendo mientras). Resultado en la tabla `Battle` (`seed` + acciones → reproducible),
+   insertado con el id de la sala y `ON CONFLICT DO NOTHING`.
+6. **Guards globales solo para HTTP (verificado en el spike):** `JwtAuthGuard` revienta con mensajes de socket (usa
+   `switchToHttp()`) y `ThrottlerGuard` mete todos los sockets en un mismo cubo (22 de 140 mensajes perdidos en
+   silencio). Ambos pasan a ignorar lo que no es HTTP; el socket se autentica en el handshake y tiene su propio límite
+   por socket (20 mensajes / 10 s).
+7. **Versiones:** `@nestjs/websockets` y `@nestjs/platform-socket.io` **12.1.2** (iguales al núcleo instalado; traen
+   `socket.io` 4.8.3) y `socket.io-client` **4.8.3** en la app, exactas.
+**Consecuencia:** quien añada un guard global nuevo, que lo haga ignorar el contexto `ws` o lo pruebe con el e2e del
+gateway. Un despliegue en Render corta los combates en curso (salas en memoria, D-005): no mezclar durante la demo.
