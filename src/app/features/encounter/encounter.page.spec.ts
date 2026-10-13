@@ -29,6 +29,7 @@ const view: EncounterView = {
   gender: 'M',
   shiny: false,
   heightScale: 1.45,
+  cp: 312,
   expiresAt: '2026-10-12T20:10:00Z',
   status: 'open',
 };

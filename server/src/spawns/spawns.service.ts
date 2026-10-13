@@ -40,6 +40,8 @@ const round6 = (n: number): number => Math.round(n * 1e6) / 1e6;
 /** Lo que necesitan el encuentro y la captura de cada especie (F2-06). */
 export interface SpeciesDetails {
   id: number;
+  /** Para el PC del encuentro (D-049). */
+  baseStats: Species['baseStats'];
   captureRate: number;
   speed: number;
   isLegendary: boolean;
@@ -92,6 +94,7 @@ export class SpawnsService {
       for (const s of all) {
         this.details.set(s.id, {
           id: s.id,
+          baseStats: s.baseStats,
           captureRate: s.captureRate,
           speed: s.baseStats.spe,
           isLegendary: s.isLegendary,

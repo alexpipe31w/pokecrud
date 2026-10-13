@@ -9,6 +9,8 @@ export interface EncounterView {
   gender: 'M' | 'F' | null;
   shiny: boolean;
   heightScale: number;
+  /** PC del individuo (D-049): lo calcula el servidor con sus IVs y naturaleza, que no salen de él. */
+  cp: number;
   expiresAt: string;
   /** Si este jugador ya lo resolvió. */
   status: 'open' | 'caught' | 'fled';
