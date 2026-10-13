@@ -3,7 +3,7 @@
 > Se **reescribe** al cerrar cada sesión (no es histórico; el histórico es `BITACORA.md`).
 > Máximo una pantalla. Si lees esto al empezar: después lee `ROADMAP.md`.
 
-**Última actualización:** 2026-10-13 · por Samuel (Claude) · `develop` con #63…#72; F3-06c en PR
+**Última actualización:** 2026-10-13 · por Samuel (Claude) · `develop` con #63…#73 (F3 completa)
 
 ## 👉 RELEVO DE KENNETH (2026-10-12 noche): pendientes de Android probados en el Samsung A36
 
@@ -60,7 +60,7 @@ F2-07, F2-12, F2-13, F2-15 hechas; faltan **F2-11**/**F2-14** (ARCore), F2-10 (m
 
 ## Hecho
 
-- **F3-06c (Samuel, rama `feature/F3-06c-favoritos-personalizados`, PR):** favoritos desde la ficha de especie (estrellas
+- **F3-06c (Samuel, #73 mezclado):** favoritos desde la ficha de especie (estrellas
   táctiles + nota) y `/favoritos`; `/personalizados` y su editor; `app-star-rating`, `app-type-picker`. Sin cambios en
   el servidor. Postman 46/82/0, app 514. Evidencias `F3-06c_0{1..7}_*`.
 - **F3-06b (Samuel, #72 mezclado):** equipos con Pokémon capturados (D-054): `caughtIds`,
@@ -208,7 +208,7 @@ F2-07, F2-12, F2-13, F2-15 hechas; faltan **F2-11**/**F2-14** (ARCore), F2-10 (m
 
 ## En curso
 
-- Nadie. Samuel cerró **F3-06c** (PR a `develop`; sin migración). **Con esto la F3 está completa en código.**
+- Nadie. Samuel cerró **F3-06c** (#73 mezclado; sin migración). **Con esto la F3 está completa en código.**
 - **Ojo:** el inventario de IS-11 está ahora en `/inventario` (la Pokédex 1025 ocupa `/pokedex`).
 
 ### PRUEBAS EN EL MÓVIL PENDIENTES (con el APK de producción, `npm run apk -- --install`)
