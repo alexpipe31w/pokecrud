@@ -1561,3 +1561,31 @@ Corregida en el plan la firma real `effectiveness(chart, ataque, tiposDefensor)`
 **Quedó a medias:** nada.
 **Decisiones nuevas:** ninguna aún (D-053 y D-054 se anotan al implementar F3-05 y F3-06b).
 **El siguiente debe empezar por:** F3-04 paso 1 (mover IS-11 a `/inventario`).
+
+## 2026-10-13 19:30 · @samuel (Claude) · F3-04 · rama `feature/F3-04-pokedex`
+
+**Qué se hizo:** #68 mezclado. Paso 1: el inventario de IS-11 se mudó de `/pokedex` a `/inventario`
+(`features/inventory/`, `InventoryPage`; guard de admin, vuelta atrás de agregar/detalle, menú "Inventario", README);
+`/tabs/pokedex` redirige a `/inventario` y `/pokemon/…` no cambia. **Tropiezo:** el primer commit de la mudanza solo
+llevó los renombrados (`git add` falló por la carpeta ya movida y el `&&` se cortó); el siguiente commit completó el
+contenido. Pasos 2-3: `shared/engine/weaknesses.ts` (`defenseProfile`) y `evolution-chain.ts` (`evolutionTree`,
+`methodText`) con tests. Paso 4-5: `PokedexService` (caché; el encuentro lo invalida al abrir y al capturar),
+`/pokedex` (generaciones, sin ver / visto / capturado) y `/pokedex/:id` (`app-species-weaknesses`,
+`app-evolution-chain` con ramas en 2 columnas si hay más de 3); "Ver en la Pokédex" en la ficha del individuo.
+**Cómo se probó (salida real):**
+
+    shared: weaknesses + evolution-chain 7 passed (rojo primero: "Cannot find module './weaknesses.js'")
+    app: pokedex.service 3 passed; inventario/menú/guard/detalle 18 passed tras la mudanza
+    build: falló una vez por `@for (g of gens; …)` (signal sin llamar; tsc no lo ve, la plantilla sí) → corregido
+    Chrome sin ventana 390×844, Nest + Postgres locales (cuenta demo+…, 34 capturadas + 9 vistas sembradas):
+      "34 capturados · 43 vistos · de 1025"; gen I "34 de 151 capturados"; Nº1 capturado, Nº2 visto, Nº8 sin ver
+      gen II → 100 celdas desde "Nº 152, Chikorita, visto"
+      Charizard: "Muy débil ×4 ROCA · Débil ×2 AGUA ELÉCTRICO · Resiste ×½ FUEGO LUCHA ACERO HADA · ×¼ PLANTA BICHO ·
+        Inmune ×0 TIERRA"; cadena "Charmander → Charmeleon Nivel 16 → Charizard Nivel 36"
+      Eevee: 9 nodos, 5 sin ver; Mew sin ver → solo silueta, sin debilidades
+      /tabs/pokedex → /inventario (buscador "Buscar por número o nombre"); 0 errores en consola
+      Evidencias docs/evidencias/F3-04_0{1..4}_*.png
+
+**Quedó a medias:** vistazo en Android (opcional).
+**Decisiones nuevas:** ninguna (la mudanza de IS-11 ya estaba en el plan de F3-01b).
+**El siguiente debe empezar por:** F3-05 paso 1 (`shared/engine/evolution.ts`, regla D-053) en `fases/F3-coleccion.md`.

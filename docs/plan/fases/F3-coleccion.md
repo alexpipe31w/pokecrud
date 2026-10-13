@@ -1099,11 +1099,11 @@ export function methodText(link: EvolutionLink): string {
 **Files:** Create `src/app/services/game/pokedex.service.ts` (+ spec), `src/app/features/pokedex-1025/pokedex.page.ts`;
 Modify `app.routes.ts`, `features/encounter/encounter.page.ts` (invalidar al capturar, como la colección)
 
-- [ ] **4a. `PokedexService`** (test primero, patrón de `CollectionService`): `load()` → `GET /pokedex` una vez y
+- [x] **4a. `PokedexService`** (test primero, patrón de `CollectionService`): `load()` → `GET /pokedex` una vez y
   publica `entries` como `Map<speciesId, 'seen' | 'caught'>`; `seenCount`, `caughtCount` (`computed`); `invalidate()`
   (lo llama el encuentro al capturar y también al ABRIR un encuentro: el servidor marca "visto" en ese momento).
   Tests: carga y cuenta; un segundo `load()` sin invalidar no pide nada; tras `invalidate()` sí.
-- [ ] **4b. Página `/pokedex`** (`authGuard`): cabecera "Pokédex · vistos 120 · capturados 34 / 1025"; fila de 9 chips
+- [x] **4b. Página `/pokedex`** (`authGuard`): cabecera "Pokédex · vistos 120 · capturados 34 / 1025"; fila de 9 chips
   de generación (I…IX, con "x/y capturados" de cada una); rejilla de 3-4 columnas de la generación elegida (máx. 156
   celdas: no hace falta virtualizar). Celda: Nº en `tabular-nums` y:
   - **no visto** → silueta (el arte con `filter: brightness(0) opacity(.25)`) y "???"; no se puede abrir;
@@ -1111,27 +1111,27 @@ Modify `app.routes.ts`, `features/encounter/encounter.page.ts` (invalidar al cap
   - **capturado** → arte + icono de Poké Ball; se abre.
   Imágenes con `loading="lazy"` y el fallback de `spriteUrls`. La generación elegida se recuerda en `localStorage`
   (conveniencia; con try/catch). Estados: cargando (esqueletos), error con "Reintentar".
-- [ ] **4c.** Commit + `/guardar`.
+- [x] **4c.** Commit + `/guardar`.
 
 ### Paso 5 — Ficha de la especie `/pokedex/:id`
 
 **Files:** Create `src/app/features/pokedex-1025/species.page.ts`, `species-weaknesses.component.ts`,
 `evolution-chain.component.ts`
 
-- [ ] **5a.** Si la especie no está vista → pantalla "Aún no has visto este Pokémon" con su silueta (nada de datos: se
+- [x] **5a.** Si la especie no está vista → pantalla "Aún no has visto este Pokémon" con su silueta (nada de datos: se
   descubre jugando). Si está vista: arte grande teñido por su tipo, Nº, nombre, `genus` ("Pokémon Ratón"), tipos,
   `flavor` (descripción ES), altura y peso **de la especie** (sin XS/XL), hábitat en español (`grassland` Pradera,
   `forest` Bosque, `waters-edge` Orilla, `mountain` Montaña, `cave` Cueva, `sea` Mar, `urban` Ciudad,
   `rough-terrain` Terreno agreste, `rare` Raro; `null` → no se muestra), generación y botón de grito.
-- [ ] **5b. `app-species-weaknesses`:** `defenseProfile(types, chart)` con el `chart` construido de
+- [x] **5b. `app-species-weaknesses`:** `defenseProfile(types, chart)` con el `chart` construido de
   `DatasetService.types()`; grupos "Muy débil ×4", "Débil ×2", "Resiste ×½", "Resiste mucho ×¼", "Inmune ×0" con
   `app-type-chips`; los grupos vacíos no salen. **Siempre texto + color** (DISENO §7).
-- [ ] **5c. `app-evolution-chain`:** el árbol de `evolutionTree` en horizontal (ramas en columnas, como Eevee), cada
+- [x] **5c. `app-evolution-chain`:** el árbol de `evolutionTree` en horizontal (ramas en columnas, como Eevee), cada
   nodo con su arte pequeño (silueta si no está visto), nombre y bajo la flecha `methodText` + **el coste en caramelos de
   F3-05** cuando exista (`evolutionCost`, paso 1 de F3-05; hasta entonces, solo el método). Tocar un nodo visto → su
   ficha.
-- [ ] **5d.** Desde la ficha del individuo (`/coleccion/:id`), el nombre de la especie enlaza a `/pokedex/:speciesId`.
-- [ ] **5e.** Navegador 390×844 (Chrome sin ventana con `playwright-core`, ver bitácora de F3-02b/F3-03): Pokédex
+- [x] **5d.** Desde la ficha del individuo (`/coleccion/:id`), el nombre de la especie enlaza a `/pokedex/:speciesId`.
+- [x] **5e.** Navegador 390×844 (Chrome sin ventana con `playwright-core`, ver bitácora de F3-02b/F3-03): Pokédex
   con una cuenta con vistos y capturados; ficha de Charizard (debilidades del test), Eevee (8 ramas), un no visto.
   Evidencias `docs/evidencias/F3-04_0{1..4}_*.png`. REGLA 2.
 

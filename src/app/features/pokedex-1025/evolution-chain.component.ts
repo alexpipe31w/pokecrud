@@ -28,7 +28,7 @@ interface Step {
           @if (!first) {
             <span class="arrow" aria-hidden="true">→</span>
           }
-          <div class="stage">
+          <div class="stage" [class.many]="stage.length > 3">
             @for (s of stage; track s.id) {
               <a
                 class="node"
@@ -66,6 +66,9 @@ interface Step {
     .stage {
       display: grid;
       gap: var(--s-1);
+    }
+    .many {
+      grid-template-columns: repeat(2, auto);
     }
     .arrow {
       font-size: 1.2rem;
