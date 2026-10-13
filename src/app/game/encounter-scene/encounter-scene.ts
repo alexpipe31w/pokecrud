@@ -179,7 +179,7 @@ export class EncounterScene {
           this.pt,
         );
         pos.setXYZ(i, p.x, p.y, p.z);
-        col.setXYZ(i, c.r * p.alpha, c.g * p.alpha, c.b * p.alpha); // aditivo: oscuro = transparente
+        col.setXYZW(i, c.r, c.g, c.b, p.alpha); // se apaga el alfa, no el color: el canvas es transparente
       }
       pos.needsUpdate = true;
       col.needsUpdate = true;
@@ -200,7 +200,7 @@ export class EncounterScene {
         ? this.heightM * (0.2 + 1.1 * k * (0.5 + seed(i, 2)))
         : 0.05 + 0.3 * k * (1 - k);
       pos.setXYZ(i, Math.cos(ang) * r, y, Math.sin(ang) * r);
-      col.setXYZ(i, c.r * (1 - k), c.g * (1 - k), c.b * (1 - k));
+      col.setXYZW(i, c.r, c.g, c.b, 1 - k);
     }
     pos.needsUpdate = true;
     col.needsUpdate = true;
@@ -255,7 +255,9 @@ function glowPoints(
 ): THREE.Points<THREE.BufferGeometry, THREE.PointsMaterial> {
   const g = new THREE.BufferGeometry();
   g.setAttribute('position', new THREE.BufferAttribute(new Float32Array(n * 3), 3));
-  g.setAttribute('color', new THREE.BufferAttribute(new Float32Array(n * 3), 3));
+  // RGBA por punto: sobre un canvas TRANSPARENTE (encima del vídeo) apagar el color en vez del alfa deja puntos
+  // negros; con alfa por punto y alfa premultiplicado, el aditivo suma (color·α, α) y lo apagado no se ve.
+  g.setAttribute('color', new THREE.BufferAttribute(new Float32Array(n * 4), 4));
   const p = new THREE.Points(
     g,
     new THREE.PointsMaterial({
@@ -265,6 +267,7 @@ function glowPoints(
       transparent: true,
       depthWrite: false,
       blending: THREE.AdditiveBlending,
+      premultipliedAlpha: true,
     }),
   );
   p.frustumCulled = false;

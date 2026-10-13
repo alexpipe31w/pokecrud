@@ -623,3 +623,15 @@ Sigue existiendo `SFX_CATALOG` para sonidos grabados que lleguen más tarde (en 
 - **F2-04 se parte en F2-04a (escena AR base) y F2-04b (personalidad, efectos y entrada).**
 - Recetas de sonido nuevas (D-044): `land`, `shiny`, `ball-throw` (no `throw`: es un sonido de archivo en el spec de
   `AudioService`), `ball-hit`, `absorb`, `shake`, `capture`, `escape`.
+
+## D-047 · Partículas del encuentro: se apaga el ALFA, no el color (F2-04b) (2026-10-12, Alex)
+
+**Contexto:** el plan de F2-04b pintaba las partículas con mezcla aditiva y color × alfa ("oscuro = transparente").
+Eso solo vale sobre un fondo opaco. El canvas del encuentro es **transparente** (debajo va el `<video>` o el fondo
+ilustrado): el canal alfa del canvas suma el de la textura del punto (1 en el centro), así que una partícula que se
+apaga queda con color casi negro y alfa 1 → **puntos negros** (visto en el navegador, `F2-04b_02_ANTES-*`).
+**Decisión:** atributo `color` RGBA (itemSize 4): RGB = color del tipo y A = alfa de la partícula, y
+`premultipliedAlpha: true` en el `PointsMaterial` (three usa `blendFunc(ONE, ONE)` y el shader premultiplica): se suma
+(color·α, α) y lo apagado no se ve. Vale para `fx` y `burst` (también las estrellas de F2-07).
+**Consecuencia:** en F2-05/F2-07, al escribir colores de puntos usar `setXYZW(i, r, g, b, alfa)`, nunca `r·α`. Un tipo
+de color oscuro (Siniestro `#705746`) sigue viéndose como motas oscuras: es su color, no el fallo.

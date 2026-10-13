@@ -136,6 +136,18 @@ describe('EncounterScene', () => {
     s.dispose();
   });
 
+  it('una partícula que se apaga se vuelve transparente, no negra (el canvas es transparente)', () => {
+    const s = new EncounterScene(1);
+    s.startBurst(0, '#efe8d8', false);
+    s.animate(BURST_S * 0.99);
+    const col = s.burst.geometry.getAttribute('color');
+    expect(col.itemSize).toBe(4);
+    expect(col.getX(0)).toBeCloseTo(new THREE.Color('#efe8d8').r, 6); // el color no se oscurece
+    expect(col.getW(0)).toBeLessThan(0.02); // se apaga el alfa
+    expect(s.burst.material.premultipliedAlpha).toBe(true);
+    s.dispose();
+  });
+
   it('el punto de luz de las partículas es blanco y opaco en el centro', () => {
     const tex = blobTexture(9, 255, 255);
     const at = (x: number, y: number, c: number) => tex.image.data![(y * 9 + x) * 4 + c];
