@@ -794,3 +794,15 @@ pasa con los guards globales del servidor.
    `socket.io` 4.8.3) y `socket.io-client` **4.8.3** en la app, exactas.
 **Consecuencia:** quien añada un guard global nuevo, que lo haga ignorar el contexto `ws` o lo pruebe con el e2e del
 gateway. Un despliegue en Render corta los combates en curso (salas en memoria, D-005): no mezclar durante la demo.
+
+## D-057 · Sala de espera del PvP: cerrar la app cancela tu invitación, y el cara a cara ya existe antes de los turnos (F5-03) (2026-10-13, Alex)
+
+- **Cerrar el último socket** del jugador (cerrar la app, recargar, perder la conexión) **cancela su invitación o lo
+  saca de la cola**: nadie se empareja con alguien que ya no mira. Por eso `pvp:hello` solo recupera la sala de espera
+  si hay otro socket del mismo jugador abierto (otra pestaña); un combate, en cambio, sí se recupera siempre.
+- Emparejar crea ya el combate real en el servidor (`createBattle` con los equipos a nivel 50) y manda `battle:start` con
+  la vista de cada uno; hasta F5-04 solo se puede **rendirse** (sin eso los dos se quedaban atascados en
+  `already-in-battle` hasta reiniciar el servidor). La rendición aún NO se guarda en la tabla `Battle` (llega en F5-04).
+- Código de error nuevo `server-error` en el contrato (fallo inesperado; queda en el log con el jugador).
+- La pantalla `/pvp` es de noche siempre (arena), no sigue al día/noche del mapa: es modo _Experience_ y el color lo
+  ponen los Pokémon de cada lado.

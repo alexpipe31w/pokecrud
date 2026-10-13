@@ -1808,3 +1808,45 @@ con ack y 8 s, `on` que sobrevive a crear el socket después, signals `status`/`
 de `socket.io-client` no se ve aún en el build (nada usa el servicio): comprobarlo en F5-03.
 **Decisiones nuevas:** ninguna (todo era D-056).
 **El siguiente debe empezar por:** F5-03 paso 1 de `fases/F5-pvp.md` (`PvpTeamsService.load` con su e2e).
+
+## 2026-10-13 16:40 · @alex (Claude) · F5-03 · rama `feature/F5-03-sala-espera`
+
+**Qué se hizo:** servidor: `PvpTeamsService.load` (equipo `caughtIds` → `PokemonInit[]` a nivel 50 en 2 consultas;
+transferidos se saltan; `team-not-found`/`team-empty`), `PvpLobby` (clase pura: código de 6 letras con
+`crypto.randomInt` sin colisiones, 5 min, cola FIFO, una entrada por jugador, sin `await` entre comprobar y cambiar),
+`BattleDataService` (movimientos + tabla de tipos), `BattleRoomsService` (empezar con `createBattle`, vista para
+`hello`, rendirse; adelantado de F5-04 para no hacer un doble que tirar), `PvpFailure`, gateway con
+`pvp:invite:create|join`, `pvp:queue:join`, `pvp:lobby:leave`, `battle:forfeit` y `hello` con combate/sala; cerrar el
+último socket cancela la invitación (D-057). `shared/engine/battle/pvp-view.ts` (`viewFor`, `mirrorSide`,
+`publicPokemon`). Contrato: código `server-error`. App: `PvpSocketService.ready()` (espera hasta 70 s a que despierte
+Render), `PvpLobbyStore` (máquina de estados), pantalla `/pvp` "Combate en vivo" (arena de noche; elegir equipo, buscar
+rival, invitar con el código en fichas y mecha de 5 min, escribir el código en 6 fichas sobre un input real, radar
+buscando rival, cara a cara con cada mitad teñida del tipo de su Pokémon y "VS"; rendirse con confirmación) y entrada en
+el menú de la Poké Ball. Componentes pequeños por el presupuesto de 2 kB de estilos. Diseño con `impeccable` sobre
+DISENO.md (Alex eligió no hacer la entrevista de PRODUCT.md).
+**Archivos clave:** `server/src/pvp/*`, `shared/engine/battle/pvp-view.ts`, `shared/protocol/pvp.ts`,
+`src/app/features/pvp/*`, `src/app/services/game/pvp-socket.service.ts`, `src/app/app.routes.ts`,
+`src/app/features/map/ball-menu.component.ts`, `server/test/pvp-{teams,lobby}.e2e-spec.ts`.
+**Cómo se probó (salida real):**
+
+    unitarios servidor: pvp-lobby 10, battle-rooms 5 (+ los de F5-02) → 52 passed; shared pvp-view 4 → 171 passed
+    e2e: pvp-teams 3/3, pvp-lobby 5/5 (incluye dos uniéndose al MISMO código a la vez → uno entra, otro invite-not-found)
+    e2e completo: la 1.ª vez 105/108 con 3 fallos en bag.e2e-spec.ts (no tocado; no guardé el mensaje); bag solo 7/7 y
+      el completo otra vez 108/108 → intermitente, a vigilar
+    app: store 11, socket 10, página 5, menú 8 → 97 archivos / 540 passed · lint OK · ng build OK sin avisos
+    Socket.IO: chunk-CLfaRNCr2.js 42 046 bytes, 0 apariciones en main
+    navegador (playwright-core + Chrome, 2 contextos 390×844, servidores locales, cuentas demo+alex y demo+rival):
+      código X2N4WV/ZE9RMY · "zzzzzz" → "Ese código no existe o ya caducó." · cara a cara "alexdemo con Charizard contra
+      rivaldemo con Blastoise" en las dos · rendirse → "Tu rival se rindió. ¡Ganaste!" / "Te rendiste." · buscar rival
+      → emparejados · errores de consola: ninguno. 1.ª ronda de capturas: títulos en tinta sobre fondo oscuro, huecos
+      invisibles, botones grises → arreglado (--color de ion-content, contorno claro, cabecera oscura); 2.ª ronda OK.
+    detector de impeccable: 3 avisos, falsos positivos (tambaleo de la Poké Ball; img con [src] dinámico)
+    Evidencias docs/evidencias/F5-03_0{1..7}_*.png
+
+**Cuentas demo** (`@pokecrud.test`, PLAYER, contraseña por privado): se registran por `POST /auth/register` y se les
+da equipo con un script temporal en `server/` (`npx tsx`, Prisma como `prisma/admin.ts`): 3 `CaughtPokemon` (nivel 30,
+IVs 20, `encounterId 'pvp-demo:0:i'`) + `Team` "Arena" con sus `caughtIds`. Las borra `test:e2e` pasada 1 h.
+**Quedó a medias:** nada de F5-03. Rendirse aún no se guarda (tabla `Battle` en F5-04).
+**Decisiones nuevas:** D-057.
+**El siguiente debe empezar por:** F5-04 paso 2 de `fases/F5-pvp.md` (`BattleRoom` con decisiones y temporizador;
+el paso 1 ya tiene `viewFor`: falta `eventsFor` y `defaultAction`).

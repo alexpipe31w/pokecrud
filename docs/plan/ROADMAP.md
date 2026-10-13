@@ -395,7 +395,11 @@
       jugador, 20 mensajes / 10 s por socket, validación en el borde, `pvp:hello`), guards globales solo HTTP (D-056) y
       `PvpSocketService` en la app (token vigente en cada reconexión, un reintento tras `unauthorized`). Las salas de
       combate y la idempotencia por `decision` (el `seq` de antes) son de F5-04, según el plan.
-- [ ] **F5-03 · Invitar / código / buscar rival** — emparejamiento y selección de equipo (nivel 50). Dep: F5-02.
+- [x] **F5-03 · Invitar / código / buscar rival** (@alex, 2026-10-13) — emparejamiento y selección de equipo (nivel 50). Dep: F5-02.
+      **Hecho:** servidor (`PvpTeamsService` equipo a nivel 50, `PvpLobby` código de 6 letras / 5 min y cola FIFO,
+      `BattleRoomsService` empieza el combate de verdad y sabe rendirse, `viewFor` en `shared/`) y pantalla `/pvp`
+      (arena: elegir equipo, invitar, escribir código, buscar rival, cara a cara con el tipo de cada Pokémon). En el
+      menú de la Poké Ball: "Combate en vivo". Los turnos llegan en F5-04. D-057.
 - [ ] **F5-04 · Combate PvP completo** — servidor aplica el engine, temporizador 30 s, abandono 60 s,
       resultado persistido; la escena de F4-05 reutilizada. Dep: F5-03, F4-05. Criterio: combate entre dos
       móviles reales grabado en vídeo.

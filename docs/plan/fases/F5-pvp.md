@@ -177,23 +177,30 @@ para el criterio (vídeo); hasta entonces, dos ventanas del navegador a 390×844
 
 ## F5-03 · Invitar / código / buscar rival
 
-- [ ] **Paso 1 — `PvpTeamsService.load(playerId, teamId)`** → `PokemonInit[]` a nivel 50 (regla 1 y 2), en UNA consulta
+- [x] **Paso 1 — `PvpTeamsService.load(playerId, teamId)`** → `PokemonInit[]` a nivel 50 (regla 1 y 2), en UNA consulta
   de equipo + UNA de Pokémon (nada de N+1). e2e con BD: equipo ajeno → `team-not-found`; equipo con un transferido → lo
   salta; vacío → `team-empty`; stats = `calcStats(..., 50, ...)`.
-- [ ] **Paso 2 — `PvpLobbyService`** (puro con reloj e `idGen` inyectados, + spec): `createInvite` (código con
+- [x] **Paso 2 — `PvpLobbyService`** (puro con reloj e `idGen` inyectados, + spec): `createInvite` (código con
   `crypto.randomInt` sobre `PVP_INVITE_ALPHABET`, sin colisión con los vivos, caduca a los 5 min), `joinInvite`
   (reclamar el código = `get` + `delete` SIN `await` en medio; propio → `own-invite`), cola FIFO, una entrada por
   jugador, `leave`, limpieza de caducados en cada operación (sin `setInterval`). **Test de concurrencia:** dos
   `joinInvite` del mismo código "a la vez" (`Promise.all`) → uno empieza combate y el otro `invite-not-found`.
-- [ ] **Paso 3 — gateway:** `pvp:invite:create`, `pvp:invite:join`, `pvp:queue:join`, `pvp:lobby:leave`. El equipo se
+- [x] **Paso 3 — gateway:** `pvp:invite:create`, `pvp:invite:join`, `pvp:queue:join`, `pvp:lobby:leave`. El equipo se
   carga (await) ANTES de reclamar el código o entrar en la cola. Al emparejar llama a `BattleRoomsService.start(a, b)`
   (en F5-03, un doble que emite `battle:start` con una vista mínima; la sala real llega en F5-04).
-- [ ] **Paso 4 — pantalla `/pvp`** (DISENO, `impeccable`, nada de Ionic por defecto): elegir equipo (de `/equipos`;
+  **Cambio al hacerlo (Alex):** en vez de un doble, `BattleRoomsService` ya crea el combate de verdad
+  (`createBattle` + `BattleDataService`) y manda la vista con `viewFor` (adelantado del paso 1 de F5-04, en
+  `shared/engine/battle/pvp-view.ts`), y ya sabe **rendirse** (`battle:forfeit`): sin eso, dos jugadores emparejados se
+  quedaban atascados en `already-in-battle` hasta reiniciar el servidor. La clase es `PvpLobby` (pura), no un servicio.
+- [x] **Paso 4 — pantalla `/pvp`** (DISENO, `impeccable`, nada de Ionic por defecto): elegir equipo (de `/equipos`;
   sin equipos → enlace a crear uno), "Invitar" (código grande con letras separadas, botón copiar, cuenta atrás de 5 min,
   cancelar), "Unirme" (6 casillas, mayúsculas solas, pegar), "Buscar rival" (animación de espera, cancelar), estados
   sin conexión / servidor despertando (D-043). Entrada en el menú de la Poké Ball.
-- [ ] **Paso 5:** e2e con dos clientes (invitación y cola), vista móvil 390×844 con dos cuentas en dos pestañas,
+- [x] **Paso 5:** e2e con dos clientes (invitación y cola), vista móvil 390×844 con dos cuentas en dos pestañas,
   evidencias `F5-03_*`, REGLA 2.
+  **Hecho (2026-10-13, Alex):** e2e `pvp-lobby` 5/5 y `pvp-teams` 3/3; navegador con `demo+alex` y `demo+rival` (equipo
+  "Arena"): menú, código, código malo, cara a cara en las dos ventanas, rendición, buscar rival → emparejados, 0
+  errores de consola. Socket.IO va en un chunk perezoso de 42 KB (no en `main`).
 
 ## F5-04 · Combate PvP completo
 

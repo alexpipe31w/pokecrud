@@ -115,6 +115,11 @@ export const routes: Routes = [
     loadComponent: () => import('./features/teams/team-editor.page').then((m) => m.TeamEditorPage),
   },
   {
+    path: 'pvp',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/pvp/pvp.page').then((m) => m.PvpPage),
+  },
+  {
     path: 'favoritos',
     canActivate: [authGuard],
     loadComponent: () => import('./features/favorites/favorites.page').then((m) => m.FavoritesPage),

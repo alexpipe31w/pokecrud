@@ -11,6 +11,8 @@ import { AuthService } from '../../core/auth/auth.service';
 
 /** Lo que espera una petición antes de darla por perdida. */
 export const PVP_REQUEST_TIMEOUT_MS = 8000;
+/** Render gratis tarda ~1 min en despertar (como `TeamsService`). */
+export const PVP_CONNECT_TIMEOUT_MS = 70_000;
 
 export type PvpStatus = 'offline' | 'connecting' | 'online';
 
@@ -78,6 +80,21 @@ export class PvpSocketService {
     if (this.socket) return Promise.resolve();
     this.opening ??= this.open().finally(() => (this.opening = null));
     return this.opening;
+  }
+
+  /**
+   * Espera a estar conectado (Socket.IO reintenta solo mientras el servidor despierta). Lanza un error legible si no
+   * llega a tiempo o si el servidor cerró la conexión (sesión caducada…).
+   */
+  async ready(timeoutMs = PVP_CONNECT_TIMEOUT_MS): Promise<void> {
+    await this.connect();
+    const started = Date.now();
+    while (this._status() !== 'online') {
+      if (this._status() === 'offline' || Date.now() - started > timeoutMs) {
+        throw new Error(this._error() ?? 'Sin conexión con el servidor. Inténtalo otra vez.');
+      }
+      await new Promise((r) => setTimeout(r, 200));
+    }
   }
 
   disconnect(): void {

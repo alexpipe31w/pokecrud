@@ -6,6 +6,7 @@ import {
   albumsOutline,
   bookOutline,
   colorPaletteOutline,
+  flameOutline,
   flashOutline,
   gameControllerOutline,
   heartOutline,
@@ -77,6 +78,9 @@ const DRAG_CLOSE_PX = 80;
       </button>
       <button type="button" (click)="go('/inventario')">
         <ion-icon name="storefront-outline" aria-hidden="true" />Inventario
+      </button>
+      <button type="button" (click)="go('/pvp')">
+        <ion-icon name="flame-outline" aria-hidden="true" />Combate en vivo
       </button>
       <button type="button" (click)="go('/combate/prueba')">
         <ion-icon name="flash-outline" aria-hidden="true" />Combate de prueba
@@ -220,6 +224,7 @@ export class BallMenuComponent {
       albumsOutline,
       bookOutline,
       colorPaletteOutline,
+      flameOutline,
       flashOutline,
       gameControllerOutline,
       heartOutline,

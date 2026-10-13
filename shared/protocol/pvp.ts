@@ -50,7 +50,8 @@ export type PvpErrorCode =
   | 'battle-not-found' // el combate no existe (terminó o el servidor se reinició)
   | 'stale-decision' // esa decisión ya se resolvió: llegará (o llegó) `battle:turn`
   | 'invalid-action' // el motor la rechaza (sin PP, cambiar a un debilitado…)
-  | 'not-your-turn'; // ahora no te toca elegir (p. ej. solo el rival debe cambiar)
+  | 'not-your-turn' // ahora no te toca elegir (p. ej. solo el rival debe cambiar)
+  | 'server-error'; // fallo inesperado del servidor (queda en su log con el id del jugador)
 
 export type PvpReply<T = object> = ({ ok: true } & T) | { ok: false; code: PvpErrorCode };
 

@@ -7,18 +7,33 @@ import {
   OnGatewayDisconnect,
   SubscribeMessage,
   WebSocketGateway,
+  WebSocketServer,
 } from '@nestjs/websockets';
-import type { Socket } from 'socket.io';
+import type { Namespace, Socket } from 'socket.io';
 import {
   PVP_NAMESPACE,
+  type BattleForfeitReply,
   type HelloReply,
+  type InviteCreateReply,
+  type InviteJoinReply,
+  type LobbyLeaveReply,
   type PvpErrorCode,
   type PvpReply,
+  type QueueJoinReply,
 } from '../../../shared/protocol/pvp.js';
 import { JWT_VERIFY_OPTIONS } from '../auth/jwt.config.js';
 import { corsOrigins } from '../common/cors.js';
+import { BattleRoomsService, type Outgoing } from './battle-rooms.service.js';
+import { PvpFailure } from './pvp-failure.js';
+import { PvpLobby } from './pvp-lobby.js';
 import { PvpSessions } from './pvp-sessions.js';
-import { parseEmpty } from './pvp.validation.js';
+import { PvpTeamsService } from './pvp-teams.service.js';
+import {
+  parseBattleForfeit,
+  parseEmpty,
+  parseInviteJoin,
+  parseTeamRequest,
+} from './pvp.validation.js';
 import { SocketRateLimiter } from './socket-rate-limit.js';
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -31,9 +46,9 @@ interface SocketData {
 }
 
 /**
- * Socket `/pvp` (F5-02, D-056). SOLO transporte: autentica en el handshake, limita por socket, valida la carga y
- * delega (sala de espera en F5-03, combate en F5-04). El `playerId` sale SIEMPRE del token, nunca del cuerpo.
- * Los guards globales (`JwtAuthGuard`, `HttpThrottlerGuard`) ignoran este contexto: aquí se hace lo suyo.
+ * Socket `/pvp` (F5-02/F5-03, D-056). SOLO transporte: autentica en el handshake, limita por socket, valida la carga
+ * y delega en la sala de espera (`PvpLobby`) y los combates (`BattleRoomsService`). El `playerId` sale SIEMPRE del
+ * token, nunca del cuerpo. Los guards globales (`JwtAuthGuard`, `HttpThrottlerGuard`) ignoran este contexto.
  */
 @WebSocketGateway({
   namespace: PVP_NAMESPACE,
@@ -47,11 +62,18 @@ interface SocketData {
   maxHttpBufferSize: MAX_MESSAGE_BYTES,
 })
 export class PvpGateway implements OnGatewayConnection, OnGatewayDisconnect {
+  @WebSocketServer() private readonly server!: Namespace;
+
   private readonly logger = new Logger(PvpGateway.name);
   private readonly sessions = new PvpSessions();
   private readonly limiter = new SocketRateLimiter();
 
-  constructor(private readonly jwt: JwtService) {}
+  constructor(
+    private readonly jwt: JwtService,
+    private readonly lobby: PvpLobby,
+    private readonly rooms: BattleRoomsService,
+    private readonly teams: PvpTeamsService,
+  ) {}
 
   async handleConnection(client: Socket): Promise<void> {
     const playerId = await this.verify(client.handshake.auth);
@@ -74,29 +96,131 @@ export class PvpGateway implements OnGatewayConnection, OnGatewayDisconnect {
       socketId: client.id,
       remaining: left.remaining,
     });
-    // TODO(F5-04): si `left.remaining === 0` y el jugador está en un combate, avisar a la sala (gracia de 60 s).
+    // Sin ningún socket abierto, nadie puede aceptar tu invitación ni emparejarte: se cancela.
+    if (left.remaining === 0) this.lobby.leave(left.playerId);
+    // TODO(F5-04): si está en un combate, avisar a la sala (gracia de 60 s).
   }
 
   @SubscribeMessage('pvp:hello')
   hello(
     @ConnectedSocket() client: Socket,
     @MessageBody() body: unknown,
-  ): HelloReply {
-    return this.handle(client, body, parseEmpty, () => ({
+  ): Promise<HelloReply> {
+    return this.handle(client, body, parseEmpty, (playerId) => ({
       ok: true,
-      // F5-03 rellena `lobby`; F5-04, `battle`.
-      battle: null,
-      lobby: null,
+      battle: this.rooms.viewFor(playerId),
+      lobby: this.lobby.status(playerId),
     }));
   }
 
-  /** Lo común a todo mensaje: sesión, límite por socket y validación. Siempre devuelve algo por el ack. */
-  private handle<B, R extends object>(
+  @SubscribeMessage('pvp:invite:create')
+  inviteCreate(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() body: unknown,
+  ): Promise<InviteCreateReply> {
+    return this.handle(
+      client,
+      body,
+      parseTeamRequest,
+      async (playerId, { teamId }) => {
+        const side = await this.loadTeam(playerId, teamId);
+        return { ok: true, ...this.lobby.createInvite({ playerId, side }) };
+      },
+    );
+  }
+
+  @SubscribeMessage('pvp:invite:join')
+  inviteJoin(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() body: unknown,
+  ): Promise<InviteJoinReply> {
+    return this.handle(
+      client,
+      body,
+      parseInviteJoin,
+      async (playerId, { code, teamId }) => {
+        const side = await this.loadTeam(playerId, teamId);
+        // Desde aquí, síncrono: reclamar el código y crear el combate sin `await` en medio.
+        const host = this.lobby.joinInvite(playerId, code);
+        const { battleId, out } = this.rooms.start(host, { playerId, side });
+        this.send(out);
+        return { ok: true, battleId };
+      },
+    );
+  }
+
+  @SubscribeMessage('pvp:queue:join')
+  queueJoin(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() body: unknown,
+  ): Promise<QueueJoinReply> {
+    return this.handle(
+      client,
+      body,
+      parseTeamRequest,
+      async (playerId, { teamId }): Promise<QueueJoinReply> => {
+        const side = await this.loadTeam(playerId, teamId);
+        const rival = this.lobby.joinQueue({ playerId, side });
+        if (!rival) return { ok: true, matched: false };
+        this.send(this.rooms.start(rival, { playerId, side }).out);
+        return { ok: true, matched: true };
+      },
+    );
+  }
+
+  @SubscribeMessage('pvp:lobby:leave')
+  lobbyLeave(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() body: unknown,
+  ): Promise<LobbyLeaveReply> {
+    return this.handle(client, body, parseEmpty, (playerId) => {
+      this.lobby.leave(playerId);
+      return { ok: true };
+    });
+  }
+
+  @SubscribeMessage('battle:forfeit')
+  forfeit(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() body: unknown,
+  ): Promise<BattleForfeitReply> {
+    return this.handle(
+      client,
+      body,
+      parseBattleForfeit,
+      (playerId, { battleId }) => {
+        this.send(this.rooms.forfeit(playerId, battleId));
+        return { ok: true };
+      },
+    );
+  }
+
+  /**
+   * El equipo se carga (await) ANTES de reclamar un código o entrar en la cola, y después se vuelve a mirar que no
+   * haya entrado en un combate mientras tanto (p. ej. desde otra pestaña).
+   */
+  private async loadTeam(playerId: string, teamId: number) {
+    if (this.rooms.has(playerId)) throw new PvpFailure('already-in-battle');
+    const side = await this.teams.load(playerId, teamId);
+    if (this.rooms.has(playerId)) throw new PvpFailure('already-in-battle');
+    return side;
+  }
+
+  private send(out: Outgoing[]): void {
+    for (const o of out)
+      this.server.to(`player:${o.playerId}`).emit(o.event, o.msg);
+  }
+
+  /**
+   * Lo común a todo mensaje: sesión, límite por socket, validación y errores. Siempre devuelve algo por el ack:
+   * `PvpFailure` → su código; cualquier otro error → `server-error` (y al log con el jugador).
+   */
+  private async handle<B, R extends object>(
     client: Socket,
     body: unknown,
     parse: (v: unknown) => B | null,
-    run: (playerId: string, body: B) => PvpReply<R>,
-  ): PvpReply<R> {
+    run: (playerId: string, body: B) => PvpReply<R> | Promise<PvpReply<R>>,
+  ): Promise<PvpReply<R>> {
     // Un mensaje puede llegar antes de que termine la verificación del handshake.
     const playerId = (client.data as SocketData).playerId;
     if (!playerId) return { ok: false, code: 'unauthorized' };
@@ -104,7 +228,17 @@ export class PvpGateway implements OnGatewayConnection, OnGatewayDisconnect {
       return { ok: false, code: 'rate-limited' };
     const parsed = parse(body);
     if (parsed === null) return { ok: false, code: 'bad-request' };
-    return run(playerId, parsed);
+    try {
+      return await run(playerId, parsed);
+    } catch (err) {
+      if (err instanceof PvpFailure) return { ok: false, code: err.code };
+      this.logger.error({
+        msg: 'pvp.unexpected_error',
+        playerId,
+        reason: err instanceof Error ? err.message : String(err),
+      });
+      return { ok: false, code: 'server-error' };
+    }
   }
 
   /** `sub` del access token (HS256, iss, aud), o null. Igual que `JwtAuthGuard`. */
