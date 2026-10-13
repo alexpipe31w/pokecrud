@@ -204,7 +204,7 @@ fórmula (F2-03), captura en servidor (F2-06), audio (F2-08), **spike de cámara
 
 ## En curso
 
-- Nadie (F2-02 mezclado, PR #49). F1-05 (3b) y F1-07 (7b) solo esperan la prueba en Android.
+- F2-04a (@alex) · rama `feature/F2-04a-escena-encuentro-ar` · recién reclamada; empieza en el paso 1 del plan. F1-05 (3b) y F1-07 (7b) solo esperan la prueba en Android.
 
 ## Siguiente paso concreto
 
