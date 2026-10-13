@@ -14,6 +14,7 @@ import {
   resolveThrow,
 } from '../../../shared/engine/capture.js';
 import { calcStats } from '../../../shared/engine/battle/stats.js';
+import { CANDY_PER_CATCH } from '../../../shared/engine/candy.js';
 import { combatPower } from '../../../shared/engine/combat-power.js';
 import { createRng } from '../../../shared/engine/rng.js';
 import {
@@ -115,6 +116,7 @@ export class EncountersService {
     now = Date.now(),
   ): Promise<EncounterView> {
     const spawn = await this.reachableSpawn(playerId, encounterId, now);
+    await this.markSeen(playerId, spawn.speciesId);
     const result = await this.prisma.encounterResult.findUnique({
       where: { playerId_encounterId: { playerId, encounterId } },
       select: { outcome: true },
@@ -185,84 +187,133 @@ export class EncountersService {
 
     // 4) Todo o nada.
     try {
-      const caught = await this.prisma.$transaction(async (tx) => {
-        const resolved = await tx.encounterResult.findUnique({
-          where: { playerId_encounterId: { playerId, encounterId } },
-          select: { outcome: true },
-        });
-        if (resolved) {
-          throw new ConflictException(
-            resolved.outcome === 'CAUGHT'
-              ? 'Ya capturaste este Pokémon'
-              : 'Este Pokémon ya huyó',
-          );
-        }
-        await this.spend(
-          tx,
-          playerId,
-          dto.ball,
-          'No te quedan bolas de ese tipo',
-        );
-        if (dto.berry) {
+      const { created: caught, candy } = await this.prisma.$transaction(
+        async (tx) => {
+          const resolved = await tx.encounterResult.findUnique({
+            where: { playerId_encounterId: { playerId, encounterId } },
+            select: { outcome: true },
+          });
+          if (resolved) {
+            throw new ConflictException(
+              resolved.outcome === 'CAUGHT'
+                ? 'Ya capturaste este Pokémon'
+                : 'Este Pokémon ya huyó',
+            );
+          }
           await this.spend(
             tx,
             playerId,
-            dto.berry,
-            'No te quedan bayas de ese tipo',
+            dto.ball,
+            'No te quedan bolas de ese tipo',
           );
-        }
-        const created = outcome.captured
-          ? await tx.caughtPokemon.create({
-              data: {
+          if (dto.berry) {
+            await this.spend(
+              tx,
+              playerId,
+              dto.berry,
+              'No te quedan bayas de ese tipo',
+            );
+          }
+          const created = outcome.captured
+            ? await tx.caughtPokemon.create({
+                data: {
+                  playerId,
+                  speciesId: spawn.speciesId,
+                  level: spawn.level,
+                  ivs: { ...spawn.ivs },
+                  nature: spawn.nature,
+                  gender: spawn.gender,
+                  shiny: spawn.shiny,
+                  heightScale: this.spawns.heightScale(spawn.id),
+                  moves: this.spawns.defaultMoves(spawn.speciesId, spawn.level),
+                  // D-052: guardado para ordenar y paginar la colección por PC.
+                  cp: combatPower(
+                    calcStats(
+                      species.baseStats,
+                      spawn.ivs,
+                      spawn.level,
+                      spawn.nature,
+                    ),
+                  ),
+                  ball: dto.ball,
+                  encounterId,
+                  caughtLat: spawn.lat,
+                  caughtLng: spawn.lng,
+                },
+              })
+            : null;
+          // F3-02a (D-052): caramelos de su familia y Pokédex, en la MISMA transacción que la captura.
+          const candy = created
+            ? await tx.candy.upsert({
+                where: {
+                  playerId_familyId: { playerId, familyId: species.familyId },
+                },
+                create: {
+                  playerId,
+                  familyId: species.familyId,
+                  qty: CANDY_PER_CATCH,
+                },
+                update: { qty: { increment: CANDY_PER_CATCH } },
+              })
+            : null;
+          if (created) {
+            await tx.pokedexEntry.upsert({
+              where: {
+                playerId_speciesId: { playerId, speciesId: spawn.speciesId },
+              },
+              create: {
                 playerId,
                 speciesId: spawn.speciesId,
-                level: spawn.level,
-                ivs: { ...spawn.ivs },
-                nature: spawn.nature,
-                gender: spawn.gender,
-                shiny: spawn.shiny,
-                heightScale: this.spawns.heightScale(spawn.id),
-                moves: this.spawns.defaultMoves(spawn.speciesId, spawn.level),
-                ball: dto.ball,
-                encounterId,
-                caughtLat: spawn.lat,
-                caughtLng: spawn.lng,
+                caught: true,
+                firstCaughtAt: new Date(now),
               },
-            })
-          : null;
-        if (outcome.captured || outcome.fled) {
-          // UNIQUE (playerId, encounterId): si otro lanzamiento simultáneo ya lo resolvió, esto falla y se deshace
-          // TODO (incluida la bola gastada).
-          await tx.encounterResult.create({
+              update: { caught: true },
+            });
+            // La primera fecha de captura nunca se pisa (la fila pudo existir solo como "vista").
+            await tx.pokedexEntry.updateMany({
+              where: {
+                playerId,
+                speciesId: spawn.speciesId,
+                firstCaughtAt: null,
+              },
+              data: { firstCaughtAt: new Date(now) },
+            });
+          }
+          if (outcome.captured || outcome.fled) {
+            // UNIQUE (playerId, encounterId): si otro lanzamiento simultáneo ya lo resolvió, esto falla y se deshace
+            // TODO (incluida la bola gastada).
+            await tx.encounterResult.create({
+              data: {
+                playerId,
+                encounterId,
+                outcome: outcome.captured ? 'CAUGHT' : 'FLED',
+              },
+            });
+          }
+          if (xpGained > 0) {
+            await this.progression.addXp(playerId, xpGained, tx);
+          }
+          // UNIQUE (playerId, clientThrowId): un reintento simultáneo con el mismo id falla aquí y no gasta nada.
+          await tx.throw.create({
             data: {
               playerId,
+              clientThrowId: dto.clientThrowId,
               encounterId,
-              outcome: outcome.captured ? 'CAUGHT' : 'FLED',
+              ball: dto.ball,
+              berry: dto.berry ?? null,
+              throwQuality: quality,
+              curve: dto.curve,
+              captured: outcome.captured,
+              shakes: outcome.shakes,
+              fled: outcome.fled,
+              xpGained,
+              caughtPokemonId: created?.id ?? null,
             },
           });
-        }
-        if (xpGained > 0) {
-          await this.progression.addXp(playerId, xpGained, tx);
-        }
-        // UNIQUE (playerId, clientThrowId): un reintento simultáneo con el mismo id falla aquí y no gasta nada.
-        await tx.throw.create({
-          data: {
-            playerId,
-            clientThrowId: dto.clientThrowId,
-            encounterId,
-            ball: dto.ball,
-            berry: dto.berry ?? null,
-            throwQuality: quality,
-            curve: dto.curve,
-            captured: outcome.captured,
-            shakes: outcome.shakes,
-            fled: outcome.fled,
-            xpGained,
-            caughtPokemonId: created?.id ?? null,
-          },
-        });
-        return created;
-      }, TX_OPTIONS);
+          return { created, candy };
+        },
+        TX_OPTIONS,
+      );
 
       this.logger.log({
         msg: 'encounter.throw',
@@ -284,6 +335,13 @@ export class EncountersService {
         throwQuality: quality,
         xpGained,
         caught: caught ? caughtView(caught) : null,
+        candy: candy
+          ? {
+              familyId: candy.familyId,
+              gained: CANDY_PER_CATCH,
+              total: candy.qty,
+            }
+          : null,
         bag: await this.bag.get(playerId),
       };
     } catch (err) {
@@ -397,8 +455,41 @@ export class EncountersService {
       throwQuality: stored.throwQuality,
       xpGained: stored.xpGained,
       caught: caught ? caughtView(caught) : null,
+      candy: caught ? await this.candyOf(playerId, caught.speciesId) : null,
       bag: await this.bag.get(playerId),
     };
+  }
+
+  /** Caramelos actuales de la familia (para repetir la respuesta de un reintento: lo ganado fue CANDY_PER_CATCH). */
+  private async candyOf(
+    playerId: string,
+    speciesId: number,
+  ): Promise<ThrowResult['candy']> {
+    const familyId = this.spawns.speciesDetails(speciesId)?.familyId;
+    if (familyId === undefined) return null;
+    const row = await this.prisma.candy.findUnique({
+      where: { playerId_familyId: { playerId, familyId } },
+      select: { qty: true },
+    });
+    return { familyId, gained: CANDY_PER_CATCH, total: row?.qty ?? 0 };
+  }
+
+  /** Pokédex: abrir un encuentro = especie vista (F3-02a). Mejor esfuerzo: si falla, el encuentro sigue. */
+  private async markSeen(playerId: string, speciesId: number): Promise<void> {
+    try {
+      await this.prisma.pokedexEntry.upsert({
+        where: { playerId_speciesId: { playerId, speciesId } },
+        create: { playerId, speciesId },
+        update: {},
+      });
+    } catch (err) {
+      this.logger.warn({
+        msg: 'pokedex.seen_failed',
+        playerId,
+        speciesId,
+        reason: err instanceof Error ? err.message : String(err),
+      });
+    }
   }
 
   /** Retención (D-028), mejor esfuerzo y fuera de la respuesta: si falla, queda en el log y se reintenta al siguiente lanzamiento. */

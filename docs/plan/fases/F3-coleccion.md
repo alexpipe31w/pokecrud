@@ -365,7 +365,7 @@ ON CONFLICT ("playerId", "speciesId") DO NOTHING;
 **Files:** Modify `server/src/spawns/spawns.service.ts`, `server/src/encounters/encounters.service.ts`,
 `shared/protocol/encounters.ts`, `server/test/encounters.e2e-spec.ts`
 
-- [ ] **5a. e2e que fallan** (en `encounters.e2e-spec.ts`, con el `forced` que ya existe):
+- [x] **5a. e2e que fallan** (en `encounters.e2e-spec.ts`, con el `forced` que ya existe):
 
 ```ts
   it('capturar guarda el PC, suma 3 caramelos a la familia y marca la Pokédex', async () => {
@@ -401,9 +401,9 @@ ON CONFLICT ("playerId", "speciesId") DO NOTHING;
 
   (Si el archivo no tiene `nearbySpawn`/`enc`/`throwBody` con esos nombres, usar los equivalentes que ya usan sus
   tests de captura; no duplicar helpers.) `cd server && npm run test:e2e -- encounters` → FALLA.
-- [ ] **5b.** `SpeciesDetails` gana `familyId: number` (= `familyOf(species)`) y `types: TypeName[]`, rellenados donde
+- [x] **5b.** `SpeciesDetails` gana `familyId: number` (= `familyOf(species)`) y `types: TypeName[]`, rellenados donde
   se construye hoy (`speciesDetails`).
-- [ ] **5c.** En `details()`, tras `reachableSpawn`, marcar "visto" (fuera de cualquier transacción, mejor esfuerzo:
+- [x] **5c.** En `details()`, tras `reachableSpawn`, marcar "visto" (fuera de cualquier transacción, mejor esfuerzo:
   si falla, se registra y la respuesta sigue):
 
 ```ts
@@ -416,7 +416,7 @@ ON CONFLICT ("playerId", "speciesId") DO NOTHING;
       .catch((err) => this.logger.warn({ msg: 'pokedex.seen', playerId, err: String(err) }));
 ```
 
-- [ ] **5d.** En `throw()`, dentro de la transacción, si `outcome.captured`: `cp` en el `create` de `caughtPokemon`
+- [x] **5d.** En `throw()`, dentro de la transacción, si `outcome.captured`: `cp` en el `create` de `caughtPokemon`
   (`combatPower(calcStats(species.baseStats, spawn.ivs, spawn.level, spawn.nature))`) y después:
 
 ```ts
@@ -436,10 +436,10 @@ ON CONFLICT ("playerId", "speciesId") DO NOTHING;
   `where: { playerId, speciesId, firstCaughtAt: null } data: { firstCaughtAt: new Date(now) }` (así nunca se pisa la
   primera fecha). La transacción devuelve `{ created, candy }` y la respuesta lleva
   `candy: created ? { familyId: candy.familyId, gained: CANDY_PER_CATCH, total: candy.qty } : null`.
-- [ ] **5e. Reintentos:** `replay()` devuelve lo guardado; como `Throw` no guarda los caramelos, en un reintento de una
+- [x] **5e. Reintentos:** `replay()` devuelve lo guardado; como `Throw` no guarda los caramelos, en un reintento de una
   captura se lee la fila `Candy` actual (`gained: CANDY_PER_CATCH`, `total` = lo que haya). Test e2e: dos POST con el
   mismo `clientThrowId` → el segundo da el mismo `candy.familyId` y `gained: 3`, y la base tiene 3 (no 6).
-- [ ] **5f.** `ThrowResult.candy` en `shared/protocol/encounters.ts` (bloque de "Contrato"). En la app, de momento solo
+- [x] **5f.** `ThrowResult.candy` en `shared/protocol/encounters.ts` (bloque de "Contrato"). En la app, de momento solo
   compila (lo pinta F3-02b). e2e → PASA; `npm run build`, `npm test`, lint del servidor; `ng test` y build de la app.
   Commit + `/guardar`.
 

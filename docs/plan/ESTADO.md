@@ -198,7 +198,8 @@ F2-07, F2-12, F2-13, F2-15 hechas; faltan **F2-11**/**F2-14** (ARCore), F2-10 (m
 
 - **F3-02a (@samuel, 2026-10-13)** — rama `feature/F3-02a-coleccion-servidor`. **Punto de guardado:** reclamada;
   pasos 1-4 hechos (reglas puras + contrato + migración `20261013010000_collection`, probada SOLO en un Postgres 17
-  portátil). Paso siguiente: paso 5 (la captura guarda PC, caramelos y Pokédex). (F0-15 #63 y F3-01a #64 mezclados.)
+  portátil); paso 5 hecho (la captura guarda PC, +3 caramelos y Pokédex; abrir encuentro = visto; e2e 14/14).
+  Paso siguiente: paso 6 (`GET /collection` y `GET /pokedex`). (F0-15 #63 y F3-01a #64 mezclados.)
 - F1-05 y F1-07 siguen `[~]` (@alex) SOLO por su prueba en la calle (PENDIENTES).
 
 ## Siguiente paso concreto
