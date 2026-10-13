@@ -1,3 +1,4 @@
+import { A36_CURVE_GESTURES } from './a36-curve-gestures.data';
 import { EYE_HEIGHT_M } from './encounter-layout';
 import {
   GOOD_MAX_PX_S,
@@ -5,8 +6,8 @@ import {
   MIN_FLICK_PX_S,
   curveOf,
   releaseVelocity,
-  spinAngle,
   swipeToThrow,
+  turnAngle,
   type GestureSample,
 } from './throw-gesture';
 import { hitBox, planFlight, resolveFlight, type TargetBox } from './throw-physics';
@@ -65,15 +66,44 @@ describe('releaseVelocity', () => {
   });
 });
 
-describe('curva', () => {
+/** `n` muestras de un tirón recto hacia arriba desde (x, y), con temblor de ±`jitter` px a los lados. */
+const flick = (x: number, y: number, n = 12, jitter = 0): GestureSample[] =>
+  Array.from({ length: n }, (_, i) => ({ x: x + (i % 2 ? jitter : -jitter), y: y - i * 30, t: i * 16 }));
+
+const fromA36 = (g: readonly (readonly [number, number, number])[]): GestureSample[] =>
+  g.map(([x, y, t]) => ({ x, y, t }));
+
+describe('curva (D-050: cuenta lo que GIRA el dedo, no dónde está)', () => {
   it('una vuelta en sentido horario = curva 1; al revés −1', () => {
-    expect(spinAngle(circle(1), 200, 700)).toBeCloseTo(2 * Math.PI, 6);
-    expect(curveOf(circle(1), 200, 700)).toBe(1);
-    expect(curveOf(circle(-1), 200, 700)).toBe(-1);
+    expect(turnAngle(circle(1))).toBeGreaterThan(1.8 * Math.PI);
+    expect(curveOf(circle(1))).toBe(1);
+    expect(curveOf(circle(-1))).toBe(-1);
   });
 
   it('media vuelta no basta', () => {
-    expect(curveOf(circle(0.5), 200, 700)).toBe(0);
+    expect(curveOf(circle(0.5))).toBe(0);
+  });
+
+  it('un círculo que EMPIEZA donde se agarra la bola (el gesto natural) también es curva', () => {
+    // Antes se medía alrededor del punto de agarre: ese punto queda en el borde del círculo y nunca pasaba de ½ vuelta.
+    const fromEdge = circle(1).map((p) => ({ ...p, x: p.x - 40 }));
+    expect(curveOf(fromEdge)).toBe(1);
+  });
+
+  it('el tirón final hacia arriba no deshace la vuelta', () => {
+    const c = circle(1.2);
+    const end = c[c.length - 1];
+    const tail = flick(end.x, end.y).map((p) => ({ ...p, t: p.t + end.t + 10 }));
+    expect(curveOf([...c, ...tail])).toBe(1);
+    expect(curveOf([...circle(-1.2), ...tail])).toBe(-1);
+  });
+
+  it('un lanzamiento recto con temblor no es curva', () => {
+    expect(curveOf(flick(200, 700, 20, 2))).toBe(0);
+  });
+
+  it('los 4 lanzamientos con curva reales del A36 son curva, en su sentido (horario)', () => {
+    for (const g of A36_CURVE_GESTURES) expect(curveOf(fromA36(g))).toBe(1);
   });
 });
 

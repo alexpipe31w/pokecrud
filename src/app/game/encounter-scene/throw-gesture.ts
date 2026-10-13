@@ -1,7 +1,7 @@
 /**
  * Gesto de lanzar la Poké Ball (F2-05, DISENO §4.6): el dedo arrastra la bola 1:1 y al soltarla sale con la
- * velocidad de los últimos ~80 ms. Si antes de lanzar se hace girar la bola (casi una vuelta con el dedo alrededor de
- * ella), sale con efecto (curva, ×1,7 en la captura, D-027). Píxeles CSS y ms, con la Y de la pantalla hacia abajo.
+ * velocidad de los últimos ~80 ms. Si antes de lanzar se dibuja un círculo con la bola (casi una vuelta del dedo),
+ * sale con efecto (curva, ×1,7 en la captura, D-027). Píxeles CSS y ms, con la Y de la pantalla hacia abajo.
  */
 export interface GestureSample {
   x: number;
@@ -26,7 +26,7 @@ export const MIN_FLICK_PX_S = 350;
 export const GOOD_MIN_PX_S = 1000;
 export const GOOD_MAX_PX_S = 3600;
 export const MAX_AIM_RAD = Math.PI / 4;
-/** ~0,9 vueltas alrededor de la bola = con efecto. */
+/** ~0,9 vueltas del dedo (un círculo dibujado con la bola) = con efecto. */
 export const CURVE_MIN_SPIN_RAD = Math.PI * 1.8;
 
 const clamp = (n: number, lo: number, hi: number): number => Math.min(hi, Math.max(lo, n));
@@ -46,23 +46,42 @@ export function releaseVelocity(
   return { vx: (last.x - first.x) / dt, vy: (last.y - first.y) / dt };
 }
 
-/** Ángulo total (radianes, + = sentido horario en pantalla) que recorre el dedo alrededor de (cx, cy). */
-export function spinAngle(samples: readonly GestureSample[], cx: number, cy: number): number {
-  let total = 0;
+/** Tramos más cortos que esto no cuentan para el rumbo del dedo (temblor). */
+export const MIN_TURN_SEGMENT_PX = 4;
+
+/**
+ * Cuánto ha girado el RUMBO del dedo (radianes, + = sentido horario en pantalla): un círculo dibujado = 2π esté donde
+ * esté (D-050; medirlo alrededor del punto de agarre no valía: ese punto queda en el borde del círculo). Devuelve el
+ * giro máximo alcanzado, para que el tirón final hacia arriba no lo deshaga.
+ */
+export function turnAngle(samples: readonly GestureSample[]): number {
+  if (samples.length < 2) return 0;
+  let sum = 0;
+  let peak = 0;
+  let heading: number | null = null;
+  let { x: ax, y: ay } = samples[0];
   for (let i = 1; i < samples.length; i++) {
-    let d =
-      Math.atan2(samples[i].y - cy, samples[i].x - cx) -
-      Math.atan2(samples[i - 1].y - cy, samples[i - 1].x - cx);
-    if (d > Math.PI) d -= 2 * Math.PI;
-    if (d < -Math.PI) d += 2 * Math.PI;
-    total += d;
+    const dx = samples[i].x - ax;
+    const dy = samples[i].y - ay;
+    if (Math.hypot(dx, dy) < MIN_TURN_SEGMENT_PX) continue;
+    const h = Math.atan2(dy, dx);
+    if (heading !== null) {
+      let d = h - heading;
+      if (d > Math.PI) d -= 2 * Math.PI;
+      if (d < -Math.PI) d += 2 * Math.PI;
+      sum += d;
+      if (Math.abs(sum) > Math.abs(peak)) peak = sum;
+    }
+    heading = h;
+    ax = samples[i].x;
+    ay = samples[i].y;
   }
-  return total;
+  return peak;
 }
 
 /** Sentido de la curva: 1 si giró en sentido horario (se abre a la derecha), −1 al revés, 0 sin efecto. */
-export function curveOf(samples: readonly GestureSample[], cx: number, cy: number): -1 | 0 | 1 {
-  const a = spinAngle(samples, cx, cy);
+export function curveOf(samples: readonly GestureSample[]): -1 | 0 | 1 {
+  const a = turnAngle(samples);
   if (Math.abs(a) < CURVE_MIN_SPIN_RAD) return 0;
   return a > 0 ? 1 : -1;
 }

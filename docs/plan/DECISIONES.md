@@ -685,3 +685,10 @@ los diminutos), los **saltos** del Pokémon, el **aro** (Bien/Genial/Excelente) 
 reales: rectos, 17/17 le dan a un diminuto a 2 m; con su puntería real, 13/17.
 **Consecuencia:** quien toque el gesto o la física, que mantenga el test `lanzar con el dedo de verdad` de
 `throw-gesture.spec.ts`; los datos del ratón no sirven para calibrar.
+**Curva (mismo día, mismo motivo):** la curva no salía NUNCA con el dedo: se medía cuánto giraba el dedo alrededor
+del punto donde se agarró la bola, pero al dibujar un círculo ese punto queda en su BORDE (como mucho ½ vuelta). En
+4 curvas reales de Kenneth: 0,75 / 1,74 / 0,75 / −0,26 vueltas → el servidor recibió `curve=false` en los 3 aciertos.
+Ahora `turnAngle` suma cuánto gira el **rumbo** del dedo (tramos ≥ 4 px, para ignorar el temblor) y se queda con el
+máximo alcanzado (el tirón final hacia arriba no lo deshace): esas 4 curvas dan 2,17-2,32 vueltas. Umbral igual
+(0,9 vueltas). `MAX_SAMPLES` del gesto 120 → 300 (en el A36 llegan ~50 muestras/s y dos círculos + lanzar ≈ 1,7 s).
+Sus recorridos están en `a36-curve-gestures.data.ts` y el test los usa.
