@@ -1,17 +1,29 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import type { Stats } from '../../../shared/engine/battle/stats.js';
 import { calcStats } from '../../../shared/engine/battle/stats.js';
+import { CANDY_PER_TRANSFER } from '../../../shared/engine/candy.js';
+import type { BallId } from '../../../shared/engine/capture.js';
 import { combatPower } from '../../../shared/engine/combat-power.js';
+import { normalizeNickname } from '../../../shared/engine/nickname.js';
 import type { Nature } from '../../../shared/engine/spawns.js';
 import type {
+  CollectionDetail,
   CollectionItem,
   CollectionPage,
   PokedexView,
+  TransferResult,
 } from '../../../shared/protocol/collection.js';
 import { Prisma } from '../generated/prisma/client.js';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { SpawnsService } from '../spawns/spawns.service.js';
-import type { CollectionQueryDto } from './collection.dto.js';
+import type {
+  CollectionPatchDto,
+  CollectionQueryDto,
+} from './collection.dto.js';
 
 const ITEM_SELECT = {
   id: true,
@@ -29,6 +41,10 @@ const ITEM_SELECT = {
 } satisfies Prisma.CaughtPokemonSelect;
 
 type ItemRow = Prisma.CaughtPokemonGetPayload<{ select: typeof ITEM_SELECT }>;
+
+const NOT_YOURS = 'Ese Pokémon no está en tu colección';
+/** Como la captura (D-028): transferir desde dos pestañas a la vez se espera por el bloqueo de la fila. */
+const TX_OPTIONS = { maxWait: 5_000, timeout: 10_000 };
 
 /**
  * Colección del jugador (F3-02a, D-052). Todo filtra por el `playerId` del token: lo ajeno no existe.
@@ -96,6 +112,100 @@ export class CollectionService {
         caught: r.caught,
       })),
     };
+  }
+
+  /** `GET /collection/:id` (F3-03): la ficha. Los IVs y las stats salen solo para su dueño (D-052). */
+  async detail(playerId: string, id: string): Promise<CollectionDetail> {
+    const row = await this.prisma.caughtPokemon.findFirst({
+      where: { id, playerId },
+    });
+    if (!row) throw new NotFoundException(NOT_YOURS);
+    const species = this.spawns.speciesDetails(row.speciesId);
+    if (!species)
+      throw new NotFoundException('Esa especie no está en el juego');
+    const ivs = row.ivs as unknown as Stats;
+    const candy = await this.prisma.candy.findUnique({
+      where: { playerId_familyId: { playerId, familyId: species.familyId } },
+      select: { qty: true },
+    });
+    return {
+      ...this.toItem(row),
+      ivs,
+      nature: row.nature,
+      stats: calcStats(species.baseStats, ivs, row.level, row.nature as Nature),
+      heightScale: row.heightScale,
+      moves: row.moves,
+      ball: row.ball as BallId,
+      caughtLat: row.caughtLat,
+      caughtLng: row.caughtLng,
+      candy: { familyId: species.familyId, qty: candy?.qty ?? 0 },
+    };
+  }
+
+  /** `PATCH /collection/:id` (F3-03): mote y favorito. */
+  async patch(
+    playerId: string,
+    id: string,
+    dto: CollectionPatchDto,
+  ): Promise<CollectionItem> {
+    if (dto.nickname === undefined && dto.favorite === undefined) {
+      throw new BadRequestException(
+        'Nada que cambiar: manda nickname o favorite',
+      );
+    }
+    let nickname: string | null | undefined;
+    try {
+      nickname =
+        dto.nickname === undefined
+          ? undefined
+          : normalizeNickname(dto.nickname);
+    } catch (err) {
+      throw new BadRequestException(
+        err instanceof RangeError ? err.message : 'Mote no válido',
+      );
+    }
+    const { count } = await this.prisma.caughtPokemon.updateMany({
+      where: { id, playerId },
+      data: {
+        ...(nickname === undefined ? {} : { nickname }),
+        ...(dto.favorite === undefined ? {} : { favorite: dto.favorite }),
+      },
+    });
+    if (count !== 1) throw new NotFoundException(NOT_YOURS);
+    const row = await this.prisma.caughtPokemon.findFirstOrThrow({
+      where: { id, playerId },
+      select: ITEM_SELECT,
+    });
+    return this.toItem(row);
+  }
+
+  /**
+   * `DELETE /collection/:id` (F3-03): transferir = +1 caramelo de su familia, en UNA transacción. El `deleteMany` con
+   * `playerId` es a la vez la autorización y el candado: de dos a la vez, el segundo ve `count = 0` → 404 y no suma.
+   */
+  async transfer(playerId: string, id: string): Promise<TransferResult> {
+    return this.prisma.$transaction(async (tx) => {
+      const row = await tx.caughtPokemon.findFirst({
+        where: { id, playerId },
+        select: { speciesId: true },
+      });
+      if (!row) throw new NotFoundException(NOT_YOURS);
+      const { count } = await tx.caughtPokemon.deleteMany({
+        where: { id, playerId },
+      });
+      if (count !== 1) throw new NotFoundException(NOT_YOURS);
+      const familyId = this.spawns.speciesDetails(row.speciesId)?.familyId;
+      if (familyId === undefined)
+        throw new NotFoundException('Esa especie no está en el juego');
+      const candy = await tx.candy.upsert({
+        where: { playerId_familyId: { playerId, familyId } },
+        create: { playerId, familyId, qty: CANDY_PER_TRANSFER },
+        update: { qty: { increment: CANDY_PER_TRANSFER } },
+      });
+      return {
+        candy: { familyId, qty: candy.qty, gained: CANDY_PER_TRANSFER },
+      };
+    }, TX_OPTIONS);
   }
 
   /** PC de una fila: el guardado o, si es de antes de F3-02a, calculado al vuelo (D-049). */

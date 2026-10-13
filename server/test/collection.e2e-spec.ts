@@ -1,7 +1,12 @@
 import { randomUUID } from 'node:crypto';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { Test } from '@nestjs/testing';
 import request from 'supertest';
+import type { Species } from '../../shared/data/dataset.types.js';
+import { type Stats, calcStats } from '../../shared/engine/battle/stats.js';
+import type { Nature } from '../../shared/engine/spawns.js';
 import { AppModule } from '../src/app.module.js';
 import { PrismaService } from '../src/prisma/prisma.service.js';
 import { TEST_DOMAIN, cleanupTestPlayers } from './support/cleanup.js';
@@ -265,5 +270,132 @@ describe('Colección (e2e)', { timeout: 60_000 }, () => {
       { speciesId: 1, seen: true, caught: false },
       { speciesId: 25, seen: true, caught: true },
     ]);
+  });
+
+  // F3-03: la ficha del individuo.
+  const dataset = new Map(
+    (
+      JSON.parse(
+        readFileSync(
+          resolve(process.cwd(), '../src/assets/data/pokedex.json'),
+          'utf8',
+        ),
+      ) as Species[]
+    ).map((s) => [s.id, s]),
+  );
+  const pikachuFamily = dataset.get(25)!.evolutionChainId;
+  const onlyCaught = async (p: Player) => {
+    await seedCaught(p, 1);
+    return prisma.caughtPokemon.findFirstOrThrow({
+      where: { playerId: p.id },
+    });
+  };
+  const candyQty = async (p: Player) =>
+    (
+      await prisma.candy.findUnique({
+        where: {
+          playerId_familyId: { playerId: p.id, familyId: pikachuFamily },
+        },
+      })
+    )?.qty ?? 0;
+
+  it('GET /collection/:id: la ficha con IVs, stats reales y caramelos; lo ajeno 404; id raro 400', async () => {
+    const p = await register();
+    const row = await onlyCaught(p);
+    const res = await as(p, http().get(`/collection/${row.id}`)).expect(200);
+    expect(res.body).toMatchObject({
+      id: row.id,
+      speciesId: 25,
+      level: 10,
+      nature: 'hardy',
+      ball: 'POKE_BALL',
+      ivs: row.ivs,
+      candy: { familyId: pikachuFamily, qty: 0 },
+    });
+    expect(res.body.stats).toEqual(
+      calcStats(
+        dataset.get(25)!.baseStats,
+        row.ivs as unknown as Stats,
+        row.level,
+        row.nature as Nature,
+      ),
+    );
+    await prisma.candy.create({
+      data: { playerId: p.id, familyId: pikachuFamily, qty: 7 },
+    });
+    expect(
+      (await as(p, http().get(`/collection/${row.id}`)).expect(200)).body.candy
+        .qty,
+    ).toBe(7);
+
+    const other = await register();
+    await as(other, http().get(`/collection/${row.id}`)).expect(404);
+    await as(p, http().get(`/collection/${randomUUID()}`)).expect(404);
+    await as(p, http().get('/collection/no-es-uuid')).expect(400);
+    await as(undefined, http().get(`/collection/${row.id}`)).expect(401);
+  });
+
+  it('PATCH /collection/:id: mote limpio, quitarlo, favorito; validación; lo ajeno 404', async () => {
+    const p = await register();
+    const row = await onlyCaught(p);
+    const patch = (body: object, who: Player = p) =>
+      as(who, http().patch(`/collection/${row.id}`).send(body));
+
+    expect(
+      (await patch({ nickname: '  Chispa  ' }).expect(200)).body,
+    ).toMatchObject({
+      nickname: 'Chispa',
+    });
+    expect((await patch({ favorite: true }).expect(200)).body).toMatchObject({
+      nickname: 'Chispa',
+      favorite: true,
+    });
+    expect(
+      (await patch({ nickname: null }).expect(200)).body.nickname,
+    ).toBeNull();
+    for (const bad of [
+      { nickname: 'a'.repeat(13) },
+      { nickname: '<b>' },
+      { nickname: 5 },
+      { favorite: 'sí' },
+      {},
+      { level: 100 },
+    ]) {
+      await patch(bad).expect(400);
+    }
+    await patch({ favorite: false }, await register()).expect(404);
+    const stored = await prisma.caughtPokemon.findUniqueOrThrow({
+      where: { id: row.id },
+    });
+    expect(stored).toMatchObject({ nickname: null, favorite: true, level: 10 });
+  });
+
+  it('DELETE /collection/:id (transferir): +1 caramelo de su familia; repetir o de otro → 404 sin sumar', async () => {
+    const p = await register();
+    const row = await onlyCaught(p);
+    await as(await register(), http().delete(`/collection/${row.id}`)).expect(
+      404,
+    );
+    const res = await as(p, http().delete(`/collection/${row.id}`)).expect(200);
+    expect(res.body).toEqual({
+      candy: { familyId: pikachuFamily, qty: 1, gained: 1 },
+    });
+    expect(await prisma.caughtPokemon.count({ where: { id: row.id } })).toBe(0);
+    await as(p, http().delete(`/collection/${row.id}`)).expect(404);
+    expect(await candyQty(p)).toBe(1);
+  });
+
+  it('dos transferencias a la vez del mismo Pokémon → una 200 y otra 404, y +1 caramelo (no +2)', async () => {
+    const p = await register();
+    const row = await onlyCaught(p);
+    const codes = (
+      await Promise.all(
+        [1, 2].map(() => as(p, http().delete(`/collection/${row.id}`))),
+      )
+    )
+      .map((r) => r.status)
+      .sort();
+    expect(codes).toEqual([200, 404]);
+    expect(await candyQty(p)).toBe(1);
   });
 });

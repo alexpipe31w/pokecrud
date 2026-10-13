@@ -5,9 +5,12 @@ import {
   IsIn,
   IsInt,
   IsOptional,
+  IsString,
   IsUUID,
   Max,
+  MaxLength,
   Min,
+  ValidateIf,
 } from 'class-validator';
 import type { TypeName } from '../../../shared/data/dataset.types.js';
 import { TYPE_NAMES } from '../../../shared/engine/battle/type-chart.js';
@@ -15,6 +18,23 @@ import type {
   CollectionSort,
   SortOrder,
 } from '../../../shared/protocol/collection.js';
+
+/**
+ * `PATCH /collection/:id` (F3-03). `nickname: null` quita el mote; la forma la decide `normalizeNickname` (shared/),
+ * la misma regla que el formulario de la app. Cualquier otro campo → 400 (forbidNonWhitelisted).
+ */
+export class CollectionPatchDto {
+  @ValidateIf(
+    (o: CollectionPatchDto) => o.nickname !== null && o.nickname !== undefined,
+  )
+  @IsString()
+  @MaxLength(64)
+  nickname?: string | null;
+
+  @IsOptional()
+  @IsBoolean()
+  favorite?: boolean;
+}
 
 export const COLLECTION_DEFAULT_LIMIT = 30;
 export const COLLECTION_MAX_LIMIT = 50;

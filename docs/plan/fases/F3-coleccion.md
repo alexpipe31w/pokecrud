@@ -667,7 +667,7 @@ mini, renombrar, transferir (con deshacer).
 
 **Files:** Modify `server/src/collection/*`; Test `server/test/collection.e2e-spec.ts`
 
-- [ ] **1a. e2e que fallan:**
+- [x] **1a. e2e que fallan:**
   1. `GET /collection/:id` propio → `CollectionDetail` con `ivs`, `stats` (= `calcStats` de shared), `cp`, `candy` de su
      familia (0 si no tiene fila); de OTRO jugador → 404; id que no es UUID → 400.
   2. `PATCH { nickname: '  Chispa  ' }` → `nickname: 'Chispa'`; `{ nickname: null }` lo quita; 13 caracteres o `<b>` →
@@ -675,10 +675,10 @@ mini, renombrar, transferir (con deshacer).
   3. `DELETE` → 200 `{ candy: { familyId, qty, gained: 1 } }`, la fila ya no existe y `qty` subió 1; repetir → 404
      (y los caramelos NO suben otra vez); de otro → 404.
   4. Concurrencia: dos `DELETE` a la vez del mismo → uno 200 y otro 404, y +1 caramelo (no +2).
-- [ ] **1b.** DTO del PATCH: `nickname?: string | null` con `@ValidateIf((o) => o.nickname !== null)` +
+- [x] **1b.** DTO del PATCH: `nickname?: string | null` con `@ValidateIf((o) => o.nickname !== null)` +
   `@IsString()` y la normalización con `normalizeNickname` en el servicio (un `RangeError` → 400 con su mensaje);
   `favorite?: @IsBoolean()`; validador de "al menos un campo".
-- [ ] **1c. Transferir** (una transacción; el `deleteMany` con `playerId` hace a la vez de autorización y de candado):
+- [x] **1c. Transferir** (una transacción; el `deleteMany` con `playerId` hace a la vez de autorización y de candado):
 
 ```ts
   async transfer(playerId: string, id: string): Promise<TransferResult> {
@@ -700,7 +700,7 @@ mini, renombrar, transferir (con deshacer).
 
   (Con dos `DELETE` simultáneos el segundo `deleteMany` espera al bloqueo de la fila y da `count = 0` → 404 y su
   transacción no suma caramelos.) Equipos (F3-06) que apunten a ese Pokémon: se resuelve en F3-01b; anotarlo en el PR.
-- [ ] **1d.** e2e → PASA; build, unitarios, lint. Commit + `/guardar`.
+- [x] **1d.** e2e → PASA; build, unitarios, lint. Commit + `/guardar`.
 
 ### Paso 2 — Transferir con deshacer (puro)
 
