@@ -616,7 +616,7 @@ export class CollectionService {
 
 **Files:** Create `src/app/features/collection/collection-filters.component.ts`
 
-- [ ] **3a.** Hoja inferior (mismo patrón que `ball-menu`: `--ease-drawer`, `--dur-panel`, se cierra arrastrando o
+- [x] **3a.** Hoja inferior (mismo patrón que `ball-menu`: `--ease-drawer`, `--dur-panel`, se cierra arrastrando o
   tocando fuera): orden (Recientes · PC · Nº de Pokédex, y ascendente/descendente), tipo (los 18 `app-type-chip`
   seleccionables, uno o ninguno), interruptores Shiny y Favoritos, botón "Quitar filtros". Cada cambio llama a
   `collection.setQuery(...)` al momento (sin botón "Aplicar"). Commit + `/guardar`.
@@ -626,17 +626,17 @@ export class CollectionService {
 **Files:** Create `src/app/features/collection/collection.page.ts`; Modify `src/app/app.routes.ts`,
 `src/app/features/map/ball-menu.component.ts`
 
-- [ ] **4a.** Ruta `{ path: 'coleccion', canActivate: [authGuard], loadComponent: … }` (y comentario de rutas). En
+- [x] **4a.** Ruta `{ path: 'coleccion', canActivate: [authGuard], loadComponent: … }` (y comentario de rutas). En
   `ball-menu`, primera opción "Mis Pokémon" → `/coleccion` (icono de Ionicons ya registrado o `addIcons` nuevo).
-- [ ] **4b.** Página con `ion-header` (botón atrás `defaultHref="/mapa"`, título "Mis Pokémon" y el total "· 12"),
+- [x] **4b.** Página con `ion-header` (botón atrás `defaultHref="/mapa"`, título "Mis Pokémon" y el total "· 12"),
   botón "Filtros" con un punto si hay alguno activo, rejilla de 2 columnas (3 a partir de 600 px) de
   `app-collection-card`, y al final un centinela con `IntersectionObserver` que llama a `loadMore()` (no
   `ion-infinite-scroll`: así se controla la animación y el "cargando").
-- [ ] **4c. Estados (DISENO §6):** cargando la primera vez → 6 tarjetas esqueleto con brillo que pasa (respeta
+- [x] **4c. Estados (DISENO §6):** cargando la primera vez → 6 tarjetas esqueleto con brillo que pasa (respeta
   "reducir movimiento"); vacía sin filtros → ilustración + "Aún no has capturado ningún Pokémon" + botón "Salir a
   buscar" (→ `/mapa`); vacía CON filtros → "Ningún Pokémon con estos filtros" + "Quitar filtros"; error → texto +
   "Reintentar"; servidor despertando → lo cubre ya el interceptor de F1-09 (D-043).
-- [ ] **4d.** Al volver de la ficha (`ionViewWillEnter`) NO se recarga entera: la ficha ya llamó a `patchItem` /
+- [x] **4d.** Al volver de la ficha (`ionViewWillEnter`) NO se recarga entera: la ficha ya llamó a `patchItem` /
   `removeItem`. Commit + `/guardar`.
 
 ### Paso 5 — Caramelos en "¡Capturado!"

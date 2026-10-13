@@ -7,6 +7,7 @@ import { adminGuard, authGuard, guestGuard } from './core/auth/auth.guard';
  *  /login             → Iniciar sesión (solo sin sesión)
  *  /registro          → Crear cuenta (solo sin sesión)
  *  /mapa              → Mapa: pantalla principal del juego (F1-04, exige sesión). "" y rutas desconocidas → aquí
+ *  /coleccion         → Mis Pokémon: lo capturado, con orden y filtros (F3-02b, exige sesión)
  *  /pokedex           → Pokédex (listado; pública). /tabs/pokedex → redirige aquí (enlaces viejos)
  *  /pokemon/nuevo     → Agregar un Pokémon (buscador PokéAPI + formulario)
  *  /pokemon/:id       → Detalle de un Pokémon
@@ -78,6 +79,12 @@ export const routes: Routes = [
     path: 'mapa',
     canActivate: [authGuard],
     loadComponent: () => import('./features/map/map.page').then((m) => m.MapPage),
+  },
+  {
+    path: 'coleccion',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/collection/collection.page').then((m) => m.CollectionPage),
   },
   {
     path: 'pokedex',
