@@ -22,6 +22,7 @@ import { PokemonService } from '../../services/pokemon.service';
 import { AuthService } from '../../core/auth/auth.service';
 import { UiService } from '../../services/ui.service';
 import { TypeChipsComponent } from '../../shared/components/type-chips/type-chips.component';
+import { ConfirmPanelComponent } from '../../shared/ui/confirm-panel.component';
 import { GameButtonComponent } from '../../shared/ui/game-button.component';
 import { StatBarComponent } from '../../shared/ui/stat-bar.component';
 
@@ -55,6 +56,7 @@ const STAT_LABELS: { key: keyof PokemonStats; label: string }[] = [
     TypeChipsComponent,
     GameButtonComponent,
     StatBarComponent,
+    ConfirmPanelComponent,
   ],
 })
 export class PokemonDetailPage implements ViewWillEnter {

@@ -35,7 +35,7 @@
           <span class="label">Precio</span>
           <strong>{{ p.price | currency: 'COP' : 'symbol-narrow' : '1.0-0' }}</strong>
         </div>
-        <div class="tile stock" [class.out]="p.stock === 0">
+        <div class="tile" [class.out]="p.stock === 0">
           <span class="label">Stock</span>
           <strong>{{ p.stock === 0 ? 'Agotado' : p.stock + ' uds.' }}</strong>
         </div>
@@ -89,18 +89,26 @@
         @if (!confirming()) {
           <div class="actions">
             <app-game-button label="Editar" variant="glass" [block]="true" (pressed)="edit()" />
-            <button type="button" class="danger" (click)="confirming.set(true)">Eliminar</button>
+            <app-game-button
+              label="Eliminar"
+              variant="danger"
+              [block]="true"
+              (pressed)="confirming.set(true)"
+            />
           </div>
         } @else {
-          <div class="confirm" role="alertdialog" aria-label="Confirmar eliminación">
-            <p>¿Eliminar a {{ p.name | titlecase }} ({{ dexNumber(p.id) }}) del inventario?</p>
-            <div class="row">
-              <button type="button" class="plain" (click)="confirming.set(false)">Cancelar</button>
-              <button type="button" class="danger" [disabled]="deleting()" (click)="remove()">
-                Eliminar
-              </button>
-            </div>
-          </div>
+          <app-confirm-panel
+            class="confirm"
+            label="Confirmar eliminación"
+            [message]="
+              '¿Eliminar a ' + (p.name | titlecase) + ' (' + dexNumber(p.id) + ') del inventario?'
+            "
+            confirmLabel="Eliminar"
+            [danger]="true"
+            [busy]="deleting()"
+            (confirmed)="remove()"
+            (cancelled)="confirming.set(false)"
+          />
         }
         @if (notice(); as n) {
           <p class="notice" role="alert">{{ n }}</p>

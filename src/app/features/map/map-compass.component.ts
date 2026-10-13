@@ -18,7 +18,11 @@ import { HapticsService } from '../../services/game/haptics.service';
       (pointerdown)="haptics.tap()"
       (click)="modeToggle.emit()"
     >
-      <svg viewBox="0 0 40 40" aria-hidden="true" [style.transform]="'rotate(' + -heading() + 'deg)'">
+      <svg
+        viewBox="0 0 40 40"
+        aria-hidden="true"
+        [style.transform]="'rotate(' + -heading() + 'deg)'"
+      >
         <path class="n" d="M20 4 L25 20 L15 20 Z" />
         <path class="s" d="M20 36 L25 20 L15 20 Z" />
         <text x="20" y="3.5" text-anchor="middle">N</text>

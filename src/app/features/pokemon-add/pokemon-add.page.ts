@@ -8,13 +8,6 @@ import {
   IonButtons,
   IonContent,
   IonHeader,
-  IonItem,
-  IonLabel,
-  IonList,
-  IonSearchbar,
-  IonSpinner,
-  IonText,
-  IonThumbnail,
   IonTitle,
   IonToolbar,
   NavController,
@@ -27,6 +20,8 @@ import { PokeApiService, filterRefs } from '../../services/poke-api.service';
 import { PokemonService } from '../../services/pokemon.service';
 import { UiService } from '../../services/ui.service';
 import { PokemonFormComponent } from '../../shared/components/pokemon-form/pokemon-form.component';
+import { GameButtonComponent } from '../../shared/ui/game-button.component';
+import { SearchFieldComponent } from '../../shared/ui/search-field.component';
 
 /** Resultados que se muestran a la vez en el buscador. */
 const MAX_RESULTS = 30;
@@ -47,15 +42,10 @@ const MAX_RESULTS = 30;
     IonBackButton,
     IonTitle,
     IonContent,
-    IonSearchbar,
-    IonList,
-    IonItem,
-    IonThumbnail,
-    IonLabel,
-    IonSpinner,
-    IonText,
     IonButton,
     PokemonFormComponent,
+    GameButtonComponent,
+    SearchFieldComponent,
   ],
 })
 export class PokemonAddPage {
@@ -87,10 +77,6 @@ export class PokemonAddPage {
   protected readonly dexNumber = dexNumber;
   protected readonly spriteUrl = spriteUrl;
 
-  protected onSearch(event: Event): void {
-    this.term.set((event as CustomEvent<{ value?: string | null }>).detail.value ?? '');
-  }
-
   protected pick(ref: PokemonRef): void {
     this.loadingDetail.set(true);
     this.alreadySaved.set(false);
@@ -120,7 +106,7 @@ export class PokemonAddPage {
   protected save(draft: PokemonDraft): void {
     if (this.alreadySaved()) {
       this.ui.toast(
-        `${dexNumber(draft.id)} ya está en la base de datos. Edítalo en su lugar.`,
+        `${dexNumber(draft.id)} ya está en el inventario. Edítalo en su lugar.`,
         'warning',
       );
       return;
@@ -129,12 +115,12 @@ export class PokemonAddPage {
     this.pokemonService.create(draft).subscribe({
       next: (p) => {
         this.saving.set(false);
-        this.ui.toast(`${displayName(p.name)} agregado a la Pokédex`);
+        this.ui.toast(`${displayName(p.name)} agregado al inventario`);
         this.navCtrl.navigateBack('/inventario');
       },
       error: () => {
         this.saving.set(false);
-        this.ui.toast('No se pudo guardar. ¿Está corriendo `npm run api`?', 'danger');
+        this.ui.toast('No se pudo guardar. Inténtalo de nuevo.', 'danger');
       },
     });
   }

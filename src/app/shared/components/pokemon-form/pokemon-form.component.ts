@@ -1,51 +1,34 @@
-import { Component, effect, inject, input, output } from '@angular/core';
+import { Component, computed, effect, inject, input, output } from '@angular/core';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import {
-  IonButton,
-  IonInput,
-  IonItem,
-  IonList,
-  IonListHeader,
-  IonLabel,
-  IonSelect,
-  IonSelectOption,
-  IonSpinner,
-} from '@ionic/angular';
 
 import { POKEMON_TYPES, POKEMON_TYPE_KEYS } from '../../../core/constants/pokemon-types';
 import { dexNumber } from '../../../core/utils/pokemon-defaults';
 import { PokemonDraft } from '../../../models/pokemon.model';
+import { GameButtonComponent } from '../../ui/game-button.component';
+
+/** Un Pokémon tiene como mucho 2 tipos. */
+const MAX_TYPES = 2;
 
 /** Campos de stats que se muestran en el formulario. */
 const STAT_FIELDS = [
   { key: 'hp', label: 'PS' },
   { key: 'attack', label: 'Ataque' },
   { key: 'defense', label: 'Defensa' },
-  { key: 'specialAttack', label: 'Ataque esp.' },
-  { key: 'specialDefense', label: 'Defensa esp.' },
+  { key: 'specialAttack', label: 'At. Esp.' },
+  { key: 'specialDefense', label: 'Def. Esp.' },
   { key: 'speed', label: 'Velocidad' },
 ] as const;
 
 /**
  * Formulario de un Pokémon. Se usa para agregar (prellenado con PokéAPI)
- * y para editar (prellenado con la base de datos).
+ * y para editar (prellenado con la base de datos). Con los campos del juego (`forms.scss`) y los tipos como chips
+ * táctiles de máx. 2 (F3-06a); la forma del formulario y lo que emite no cambian.
  */
 @Component({
   selector: 'app-pokemon-form',
   templateUrl: 'pokemon-form.component.html',
   styleUrl: 'pokemon-form.component.scss',
-  imports: [
-    ReactiveFormsModule,
-    IonList,
-    IonListHeader,
-    IonLabel,
-    IonItem,
-    IonInput,
-    IonSelect,
-    IonSelectOption,
-    IonButton,
-    IonSpinner,
-  ],
+  imports: [ReactiveFormsModule, GameButtonComponent],
 })
 export class PokemonFormComponent {
   /** Datos con los que se rellena el formulario. */
@@ -58,6 +41,10 @@ export class PokemonFormComponent {
   protected readonly types = POKEMON_TYPES;
   protected readonly statFields = STAT_FIELDS;
   protected readonly dexNumber = dexNumber;
+  /** Color del tipo principal del Pokémon (fondo del arte). */
+  protected readonly tint = computed(
+    () => POKEMON_TYPES[this.initial().types[0] ?? '']?.color ?? 'var(--ink-2)',
+  );
 
   private readonly fb = inject(NonNullableFormBuilder);
 
@@ -91,6 +78,23 @@ export class PokemonFormComponent {
     });
   }
 
+  protected isType(key: string): boolean {
+    return this.form.controls.types.value.includes(key);
+  }
+
+  protected typesFull(): boolean {
+    return this.form.controls.types.value.length >= MAX_TYPES;
+  }
+
+  /** Pulsar un tipo lo añade (si quedan huecos) o lo quita. */
+  protected toggleType(key: string): void {
+    const control = this.form.controls.types;
+    const current = control.value;
+    if (current.includes(key)) control.setValue(current.filter((t) => t !== key));
+    else if (current.length < MAX_TYPES) control.setValue([...current, key]);
+    control.markAsTouched();
+  }
+
   protected invalid(path: string): boolean {
     const control = this.form.get(path);
     return !!control && control.invalid && (control.touched || control.dirty);
@@ -102,7 +106,7 @@ export class PokemonFormComponent {
       return;
     }
     const v = this.form.getRawValue();
-    const types = v.types.slice(0, 2);
+    const types = v.types.slice(0, MAX_TYPES);
     this.save.emit({
       ...this.initial(),
       ...v,

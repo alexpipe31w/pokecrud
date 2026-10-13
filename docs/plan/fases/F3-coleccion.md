@@ -1318,7 +1318,7 @@ juego (DISENO §1-§4) sin cambiar su contrato ni sus servicios (`PokemonService
   (D-023).
 - [x] **2.** `/pokemon/:id`: ficha con el tinte del tipo, stats con `app-stat-bar`, precio/stock destacados, editar y
   eliminar (solo ADMIN) con confirmación diseñada (nada de `alert` del sistema).
-- [ ] **3.** `/pokemon/nuevo` y `/pokemon/:id/editar`: `PokemonFormComponent` con los estilos de `src/theme/forms.scss`
+- [x] **3.** `/pokemon/nuevo` y `/pokemon/:id/editar`: `PokemonFormComponent` con los estilos de `src/theme/forms.scss`
   (`.form`, `.field__*`, D-018) y `app-game-button`.
 - [ ] **4.** Postman (colección del repo) sigue pasando entera contra el servidor local; `ng test`, lint, build;
   capturas `F3-06a_*`. REGLA 2.

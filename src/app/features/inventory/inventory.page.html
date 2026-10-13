@@ -14,18 +14,12 @@
   </ion-refresher>
 
   <div class="page">
-    <label class="search">
-      <span class="visually-hidden">Buscar en el inventario</span>
-      <span class="search__icon" aria-hidden="true"></span>
-      <input
-        #q
-        type="search"
-        placeholder="Buscar por número o nombre"
-        autocomplete="off"
-        enterkeyhint="search"
-        (input)="onSearch(q.value)"
-      />
-    </label>
+    <app-search-field
+      class="search"
+      label="Buscar en el inventario"
+      placeholder="Buscar por número o nombre"
+      (query)="onSearch($event)"
+    />
 
     @if (loading()) {
       <p class="state" role="status">Cargando el inventario…</p>
@@ -39,35 +33,7 @@
 
       <ul class="grid">
         @for (p of visible(); track p.id; let i = $index) {
-          <li>
-            <a
-              class="inv-card"
-              [class.out]="p.stock === 0"
-              [routerLink]="['/pokemon', p.id]"
-              [attr.aria-label]="label(p)"
-              [style.--tint]="tint(p)"
-              [style.animation-delay.ms]="delay(i)"
-            >
-              <span class="dex" aria-hidden="true">{{ dexNumber(p.id) }}</span>
-              <span class="stock" aria-hidden="true">
-                {{ p.stock === 0 ? 'Agotado' : p.stock + ' en stock' }}
-              </span>
-              <img
-                [src]="art(p.id)"
-                alt=""
-                width="96"
-                height="96"
-                loading="lazy"
-                decoding="async"
-                (error)="nextArt($event, p.id)"
-              />
-              <span class="name" aria-hidden="true">{{ p.name | titlecase }}</span>
-              <app-type-chips [types]="p.types" aria-hidden="true" />
-              <span class="price" aria-hidden="true">{{
-                p.price | currency: 'COP' : 'symbol-narrow' : '1.0-0'
-              }}</span>
-            </a>
-          </li>
+          <li><app-inventory-card [pokemon]="p" [index]="i" /></li>
         } @empty {
           <li class="state">
             @if (pokemon().length === 0) {
