@@ -635,3 +635,27 @@ apaga queda con color casi negro y alfa 1 → **puntos negros** (visto en el nav
 (color·α, α) y lo apagado no se ve. Vale para `fx` y `burst` (también las estrellas de F2-07).
 **Consecuencia:** en F2-05/F2-07, al escribir colores de puntos usar `setXYZW(i, r, g, b, alfa)`, nunca `r·α`. Un tipo
 de color oscuro (Siniestro `#705746`) sigue viéndose como motas oscuras: es su color, no el fallo.
+
+## D-048 · La AR es 3D: modelos `.glb` + ARCore, y la ficha del Pokémon en la cámara (2026-10-12, Alex)
+
+**Contexto:** F2-04a/F2-04b dejaron la AR "de orientación" de D-045 (como el AR clásico de Pokémon GO): el arte oficial
+plano mirando a la cámara, quieto al girar el móvil pero sin poder rodearlo andando. Alex lo vio y decidió: **"todo en
+cámara debe ser 3D"** y **"deben salir las características del Pokémon"**.
+**Decisión (Alex, 2026-10-12):**
+1. **Modelos 3D** de `github.com/Pokemon-3D-api/assets` (`models/opt/regular/<id>.glb`, Draco + WebP). Verificado el
+   12-10: 968 de 1025 en forma normal (faltan 57, sobre todo gen 8: 521, 668, 850-854…), media 335 KB, máx. 14 MB;
+   shiny solo 150; rigueados, con 0-1 animaciones irregulares (Pikachu "Impactrueno", Charizard "dizzy", Gengar
+   ninguna). Los modelos son © Nintendo/Creatures/GAME FREAK (extraídos de los juegos): proyecto académico sin
+   publicar (D-010), **se cargan desde su URL y NO se suben a nuestro repo público**. Sin modelo → arte plano actual.
+2. **ARCore** para pegar al Pokémon al suelo real y poder rodearlo (como el AR+ de Pokémon GO). El WebView no tiene
+   WebXR (D-045), así que va un **plugin nativo de Capacitor propio** (Kotlin): pose + proyección por fotograma a
+   three.js, detección del suelo y ancla. Primero un spike (F2-11) con Android. Sin ARCore → la AR de orientación de
+   D-045 queda como alternativa (no se tira lo hecho).
+3. **Ficha junto al Pokémon** en la cámara: tipos, nivel, PC, altura y peso reales × XS/XL, categoría y descripción de
+   Pokédex (ES). **El PC lo calcula el servidor** (tiene los IVs, REGLA 3) y viene en `GET /encounters/:id`.
+4. **"Todo en cámara"** incluye el combate en AR (F4-07): mismos modelos y ARCore.
+**Orden:** F2-12 (modelo 3D, se puede hacer en el PC) → F2-13 (ficha) → F2-11 (spike ARCore, Android) → F2-14
+(encuentro con ARCore) → F2-05 → F2-07. Lo de F2-04a/F2-04b sigue valiendo: personalidad, saltos, partículas, sonidos y
+entrada se aplican al modelo 3D igual que al plano.
+**Riesgos:** el repo de modelos es de terceros (si desaparece, los Pokémon vuelven al arte plano; se puede espejar en
+un almacenamiento privado); modelos de hasta 14 MB (cargar con barra y caché); ARCore solo en móviles compatibles.
