@@ -1347,7 +1347,7 @@ juego (DISENO §1-§4) sin cambiar su contrato ni sus servicios (`PokemonService
   stats (sliders con `app-stat-bar`), URL de imagen (vista previa; si no carga → silueta) y descripción; lista y edición.
   **Que aparezcan como spawns del grupo queda fuera** (necesita reglas de spawn nuevas y moderar imágenes de terceros):
   anotado como extra en F7.
-- [ ] **3.** Tests, lint, build, Postman entera, capturas `F3-06c_*`. REGLA 2.
+- [x] **3.** Tests, lint, build, Postman entera, capturas `F3-06c_*`. REGLA 2.
 
 ## Riesgos (parte 2)
 
