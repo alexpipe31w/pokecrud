@@ -105,8 +105,9 @@ const wrapDeg = (d: number) => ((((d + 180) % 360) + 360) % 360) - 180;
   imports: [IonContent],
   template: `
     <ion-content [scrollY]="false" class="full">
-      <div class="stage" [class.ill]="!cameraOn()">
-        <video #video muted playsinline [hidden]="!cameraOn()"></video>
+      <!-- El vídeo se oculta hasta su primer fotograma: vacío, el WebView pinta un póster gris con un "play". -->
+      <div class="stage" [class.ill]="!streaming()">
+        <video #video muted playsinline [hidden]="!streaming()"></video>
         <canvas #canvas></canvas>
       </div>
 
@@ -353,15 +354,21 @@ export class DevArPage implements OnDestroy {
   protected readonly status = signal('');
   protected readonly panel = signal(true);
   protected readonly busy = signal(false);
-  protected readonly source = signal<Source>('event');
+  /** Calibrado en el Samsung A36 (D-045): el sensor va más suave; si no existe, `deviceorientation`. */
+  protected readonly source = signal<Source>('sensor');
   protected readonly cameraOn = signal(true);
+  /** Hay imagen de la cámara (desde su primer fotograma hasta que se suelta). */
+  protected readonly streaming = signal(false);
   protected readonly res = signal<Res>(720);
   protected readonly sceneOn = signal(true);
   protected readonly particlesOn = signal(false);
   protected readonly dpr = signal<Dpr>('x2');
   protected readonly dexId = signal(DEX_IDS[0]);
-  /** Vertical en pantalla: el lado largo de un objetivo de 26 mm equivalentes (4:3) es ~67°. Se afina con el deslizador. */
-  protected readonly fov = signal(67);
+  /**
+   * Vertical en pantalla (cámara principal a 720p, `object-fit: cover` en vertical). Teórico para 26 mm equivalentes:
+   * ~67°; a ojo en el A36 el Pokémon queda quieto sobre la mesa con 64° (D-045). Se afina con el deslizador.
+   */
+  protected readonly fov = signal(64);
   /** Cámaras traseras por número de Camera2 (la 0 es la principal; `facingMode` abre el gran angular en el A36). */
   protected readonly backCams = signal<{ n: number; id: string }[]>([]);
   protected readonly camId = signal<string | null>(null);
@@ -370,7 +377,8 @@ export class DevArPage implements OnDestroy {
     const cam = this.backCams().find((c) => c.id === this.camId());
     return cam ? `Cám. ${cam.n}` : 'Cám. ?';
   });
-  protected readonly delayMs = signal(0);
+  /** El vídeo llega ~80 ms tarde respecto a los sensores en el A36 (a ojo, girando rápido; D-045). */
+  protected readonly delayMs = signal(80);
   protected readonly results = signal<BenchResult[]>([]);
   protected readonly drift = signal<DriftResult[]>([]);
 
@@ -663,6 +671,7 @@ export class DevArPage implements OnDestroy {
       this.camInfo.set(
         `${this.camLabel()} · ${s.width}×${s.height} @ ${s.frameRate} · 1.er fotograma ${Math.round(ttff)} ms`,
       );
+      this.streaming.set(true);
       this.countVideoFrames(video, stream);
       console.log(
         '[F2-01] cámara',
@@ -696,6 +705,7 @@ export class DevArPage implements OnDestroy {
     this.stream = null;
     const video = this.videoEl().nativeElement;
     video.srcObject = null;
+    this.streaming.set(false);
     this.videoFps.set(0);
     if (!this.cameraOn()) this.camInfo.set('apagada');
   }
@@ -716,7 +726,7 @@ export class DevArPage implements OnDestroy {
     window.addEventListener('deviceorientationabsolute', this.onAbsolute);
     const Ctor = (window as unknown as { RelativeOrientationSensor?: OrientationSensorCtor })
       .RelativeOrientationSensor;
-    if (!Ctor) return;
+    if (!Ctor) return this.sensorFailed('no existe');
     try {
       const sensor = new Ctor({ frequency: 60, referenceFrame: 'device' });
       sensor.addEventListener('reading', () => {
@@ -724,13 +734,19 @@ export class DevArPage implements OnDestroy {
           this.push('sensor', sensorQuaternion(sensor.quaternion, screenAngle(), this.tmp));
       });
       sensor.addEventListener('error', (e) =>
-        console.warn('[F2-01] RelativeOrientationSensor', (e as Event & { error?: Error }).error),
+        this.sensorFailed((e as Event & { error?: Error }).error),
       );
       sensor.start();
       this.sensor = sensor;
     } catch (err) {
-      console.warn('[F2-01] RelativeOrientationSensor', err);
+      this.sensorFailed(err);
     }
+  }
+
+  /** Sin Generic Sensor API (u otro error): se sigue con el evento `deviceorientation`. */
+  private sensorFailed(err: unknown): void {
+    console.warn('[F2-01] RelativeOrientationSensor', err);
+    if (this.source() === 'sensor') this.setSource('event');
   }
 
   private stopSensors(): void {
