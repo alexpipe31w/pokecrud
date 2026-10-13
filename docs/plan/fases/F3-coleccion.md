@@ -1152,7 +1152,7 @@ Pikachu→Raichu 100; Wurmple→Silcoon 25). Sin nivel mínimo, sin piedras ni i
 método de los juegos se enseña como información (F3-04). El nivel, IVs, naturaleza, shiny, tamaño y mote se
 **conservan**; cambian especie, stats, PC y movimientos (los 4 por defecto de la especie nueva a su nivel, D-030).
 
-- [ ] **1a. Test que falla** (dataset real):
+- [x] **1a. Test que falla** (dataset real):
 
 ```ts
 import { readFileSync } from 'node:fs';
@@ -1189,7 +1189,7 @@ describe('evolutionOptions', () => {
 });
 ```
 
-- [ ] **1b.** falla. **1c.**
+- [x] **1b.** falla. **1c.**
 
 ```ts
 import type { Species } from '../data/dataset.types.js';
@@ -1229,7 +1229,7 @@ export function evolutionOptions(dex: Dex, from: number): EvolutionOption[] {
 }
 ```
 
-- [ ] **1d.** pasa. Anotar **D-053** (la regla de arriba y por qué: como Pokémon GO, sin objetos ni intercambios que el
+- [x] **1d.** pasa. Anotar **D-053** (la regla de arriba y por qué: como Pokémon GO, sin objetos ni intercambios que el
   juego no tiene). Commit + `/guardar`.
 
 ### Paso 2 — Servidor: `POST /collection/:id/evolve`

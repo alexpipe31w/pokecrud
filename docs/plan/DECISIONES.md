@@ -726,3 +726,18 @@ que su cara (`F2-15_01`). Si molesta, la caja podría ir a su frente (`throwTarg
 - **Despliegue:** la migración `20261013010000_collection` + `db:backfill-collection` se aplican en Supabase **ANTES** de
   mezclar (si Render despliega antes, cada captura da 500 porque faltan las tablas). El script es idempotente: rellena el
   PC que falte, la Pokédex de todo lo capturado y los caramelos solo a jugadores sin ninguno.
+
+## D-053 · Evolución con caramelos: el coste depende de la profundidad de la cadena (F3-05) (2026-10-13, Samuel)
+
+**Contexto:** el juego no tiene piedras, intercambios, amistad ni objetos; los métodos de los juegos (nivel 16, Piedra
+Trueno, intercambio…) se enseñan solo como información en la Pokédex (F3-04). Hacía falta una regla única y barata.
+**Decisión:** como Pokémon GO, en `shared/engine/evolution.ts` (`evolutionOptions`): cadenas de **una** evolución
+(Rattata→Raticate, Magikarp→Gyarados y las 8 ramas de Eevee) cuestan **50** caramelos de la familia; en cadenas de
+**dos**, la primera **25** y la segunda **100** (Bulbasaur→Ivysaur 25, Ivysaur→Venusaur 100; Pichu→Pikachu 25,
+Pikachu→Raichu 100; Wurmple→Silcoon/Cascoon 25). La etapa se cuenta con `evolvesFrom`; la profundidad de la cadena, una
+vez por mapa de especies. Sin nivel mínimo. Al evolucionar se **conservan** nivel, IVs, naturaleza, género, shiny,
+tamaño, mote, favorito y lugar/fecha de captura; cambian especie, stats, PC (D-049) y movimientos (los 4 por defecto de
+la especie nueva a su nivel, D-030). La Pokédex marca la especie nueva como capturada.
+**Consecuencia:** el servidor decide (REGLA 3): `POST /collection/:id/evolve { to }` usa la MISMA función; la app solo la
+usa para pintar los botones. Si F8-05 quiere evolucionar en la demo sin farmear, que regale caramelos en el modo demo
+(nunca un endpoint público).
