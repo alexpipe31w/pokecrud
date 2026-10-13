@@ -3,12 +3,13 @@
 > Se **reescribe** al cerrar cada sesión (no es histórico; el histórico es `BITACORA.md`).
 > Máximo una pantalla. Si lees esto al empezar: después lee `ROADMAP.md`.
 
-**Última actualización:** 2026-10-12 noche · por Kenneth (Claude) · rama `feature/F2-01-spike-camara-giroscopio`
+**Última actualización:** 2026-10-12 noche · por Kenneth (Claude) · F2-01 mezclado (PR #48); F2-02 en PR
 
-**Kenneth (2026-10-12, noche), en paralelo al relevo de abajo:** hecho **F2-01** (spike de cámara + giroscopio en
-el Samsung A36, D-045) y comprobado que el APK ya **no** saca el refresh token en logcat. Con eso **F2-02 (plan de F2)
-queda libre**. Samuel: lo tuyo sigue igual (7b y 3b), y si puedes, abre `/dev/ar` en tu Redmi para comprobar el
-campo de visión (ver "PENDIENTES DE HUMANOS").
+**Kenneth (2026-10-12, noche), en paralelo al relevo de abajo:** hechos **F2-01** (spike de cámara + giroscopio en
+el Samsung A36, D-045) y **F2-02** (plan de F2 en `docs/plan/fases/F2-captura.md`, D-046), y comprobado que el APK ya
+**no** saca el refresh token en logcat. **Siguiente de la AR: F2-04a** (necesita Android). El plan trae TODO el código
+y sus tests ya verificados: ejecutarlo es seguir los pasos y probar en el móvil. Samuel: lo tuyo sigue igual (7b y
+3b), y si puedes, abre `/dev/ar` en tu Redmi para comprobar el campo de visión (ver "PENDIENTES DE HUMANOS").
 
 ## 👉 RELEVO DE ALEX A SAMUEL (2026-10-12, noche)
 
@@ -22,7 +23,7 @@ F1-10 el HUD sigue al día/noche del mapa · F2-08 efectos de sonido generados +
    build de app y servidor). `develop` está protegida: no deja mezclar en rojo ni push directo.
 2. **Con tu Redmi (Android), lo más valioso:** `npm run apk -- --install` y en la calle: 7b de F1-07 (≥ 55 fps con
    Pokémon, grito, toque → encuentro) y 3b de F1-05 (avatar). Mide fps por CDP. Si van bien, marca las dos `[x]`.
-   ~~Lo de logcat~~ y ~~F2-01~~: hechos por Kenneth (ver arriba). Lo siguiente de la AR es F2-02 (plan de F2).
+   ~~Lo de logcat~~, ~~F2-01~~ y ~~F2-02~~: hechos por Kenneth (ver arriba). Lo siguiente de la AR es F2-04a.
 3. **Sin móvil:** F2-10 (música) o F5-01 (plan del PvP).
 4. **Leer antes de tocar el mapa:** D-038, D-039, D-040, D-041, D-042 (los Pokémon son `<img>` en `.pokemon-layer`
    colocados desde `MapOverlay.onBeforeDraw`; la hierba y la sombra siguen en three.js). Sonido: D-044.
@@ -40,11 +41,16 @@ la parte visual (F4-07).
 spike (F1-01), plan (F1-02), ubicación y brújula (F1-03), **pantalla `/mapa` (F1-04)**,
 spawns (F1-06), mochila/XP (F1-08) y **avatar 3D (F1-05, falta probarlo en Android)** hechos; faltan los Pokémon en
 el mapa (F1-07). **F2:**
-fórmula (F2-03), captura en servidor (F2-06), audio (F2-08) y **spike de cámara + giroscopio (F2-01)** hechos; lo
-siguiente es el plan de la fase (F2-02) y luego la escena del encuentro (F2-04).
+fórmula (F2-03), captura en servidor (F2-06), audio (F2-08), **spike de cámara + giroscopio (F2-01)** y **plan
+(F2-02)** hechos; lo siguiente es F2-04a → F2-04b → F2-05 → F2-07 siguiendo `docs/plan/fases/F2-captura.md`.
 
 ## Hecho
 
+- **F2-02 (Kenneth, rama `feature/F2-02-plan-captura`):** plan de F2 (`docs/plan/fases/F2-captura.md`): F2-04a
+  (escena AR base), F2-04b (personalidad, efectos del tipo, entrada), F2-05 (lanzamiento) y F2-07 (captura, escape,
+  shiny). **Todo su código se escribió, compiló y probó capa a capa antes de subir el plan** (estado final: app 73
+  archivos / 393 tests, shared 143, servidor 22; los diffs del plan reproducen ese estado byte a byte) y luego se
+  borró. D-046 (quién decide qué al lanzar; fallar no gasta). F2-04 partida en a/b.
 - **F2-01 (Kenneth, rama `feature/F2-01-spike-camara-giroscopio`):** `/dev/ar` medido en el Samsung A36. `getUserMedia`
   funciona en el WebView (sin plugin nativo); 60 fps con Pokémon + 400 partículas, 0 % tirones; vídeo ~24 fps en
   interior. **`facingMode` abre el gran angular** → se elige "camera 0" por `deviceId`. `RelativeOrientationSensor`
@@ -164,12 +170,12 @@ siguiente es el plan de la fase (F2-02) y luego la escena del encuentro (F2-04).
 
 ## En curso
 
-- Nadie (Kenneth cerró F2-01; PR abierto a `develop`). F1-05 (3b) y F1-07 (7b) solo esperan la prueba en Android.
+- Nadie (Kenneth cerró F2-02; PR abierto a `develop`). F1-05 (3b) y F1-07 (7b) solo esperan la prueba en Android.
 
 ## Siguiente paso concreto
 
-1. **F2-02 · plan de F2** (`docs/plan/fases/F2-captura.md`, skill `writing-plans`), partiendo de D-045 y de
-   `src/app/game/encounter-scene/` (orientación → cámara y retraso, ya con tests). No necesita móvil.
+1. **F2-04a · escena del encuentro en AR** siguiendo `docs/plan/fases/F2-captura.md` (skill `executing-plans`):
+   el código está en el plan, paso a paso con TDD; el criterio es probarlo en un Android (fps, cámara, ida y vuelta).
 2. **Con Android:** 7b de F1-07 y 3b de F1-05 (Samuel, en la calle); FOV de `/dev/ar` en el Redmi.
 3. **Sin Android:** F2-10 (música) o F5-01 (plan del PvP).
 3. Para generar el APK en otro PC: JDK 21 (`winget install Microsoft.OpenJDK.21`; si da "el hash no coincide",

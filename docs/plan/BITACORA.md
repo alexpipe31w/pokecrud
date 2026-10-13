@@ -1115,3 +1115,29 @@ delante), `pose-delay.ts` (orientación de hace N ms), `src/app/features/dev-ar/
 **El siguiente debe empezar por:** F2-02 (plan de F2 con `writing-plans`): leer D-045 y
 `src/app/game/encounter-scene/*.ts`; la escena del encuentro reutiliza `deviceEventQuaternion`/`sensorQuaternion`,
 `cameraYaw`, `spotInFront` y `PoseDelay`, y la elección de cámara de `dev-ar.page.ts` (`listBackCams`).
+
+## 2026-10-12 21:30 · @kenneth (Claude) · F2-02 · rama `feature/F2-02-plan-captura`
+
+**Qué se hizo:** plan detallado de F2 (`docs/plan/fases/F2-captura.md`, skill `writing-plans`): F2-04a (escena del
+encuentro en AR: cámara principal, Pokémon a tamaño real anclado, sin AR con cámara quieta mirándolo), F2-04b
+(personalidad desde la ficha, partículas por tipo, entrada desde el mapa con aterrizaje), F2-05 (gesto, física
+normalizada por distancia, curva, aro de precisión, bolas y Frambu, petición al servidor con reintentos) y F2-07
+(coreografía de captura/escape/huida, tarjeta "¡Capturado!" con naturaleza en español). **Para que el plan no tuviera
+errores, todo su código se escribió y se probó capa a capa** (F2-04a → 04b → 05 → 07, sin commitear) y después se
+borró; el plan se monta con un script que inserta ese código tal cual. D-046. ROADMAP: F2-04 partida en F2-04a/F2-04b.
+Naturalezas en español sacadas de PokéAPI (`/nature/1..25`). Hallazgos al verificar: `project()` necesita
+`updateMatrixWorld()` tras `lookAt()`; una receta de sonido llamada `throw` rompe un test de `AudioService` (es un
+sonido de archivo allí) → `ball-throw`; `whenStable()` no espera a promesas de dobles (los specs hacen `setTimeout 0`).
+**Archivos clave:** `docs/plan/fases/F2-captura.md`, `docs/plan/DECISIONES.md` (D-046), `docs/plan/ROADMAP.md`.
+**Cómo se probó (salida real, en el árbol de trabajo, antes de borrar el código):**
+
+    estado F2-04a: lint OK · build OK · ng test 62 archivos, 306 passed
+    estado final (04a+04b+05+07): lint OK · build OK (sin avisos de presupuesto) · ng test 73 archivos, 393 passed
+      · test:shared 13 archivos, 143 passed · server: build OK, 22 passed (lint: 1 aviso que ya existía)
+    los 13 diffs del plan aplicados en orden sobre los archivos de F2-04a → 7 archivos IGUALES byte a byte al estado final
+
+**Quedó a medias / roto:** nada (el plan es solo el plan; el código se borró a propósito). Sin probar: el móvil, que es
+el criterio de cada tarea.
+**Decisiones nuevas:** D-046.
+**El siguiente debe empezar por:** `/inicio` → F2-04a: abrir `docs/plan/fases/F2-captura.md` → "F2-04a" y seguir los
+pasos 1-12 (código copiado tal cual del plan; necesita un Android para el paso 12).
