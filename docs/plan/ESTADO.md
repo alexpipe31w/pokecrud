@@ -165,7 +165,8 @@ siguiente es el plan de la fase (F2-02) y luego la escena del encuentro (F2-04).
 ## En curso
 
 - **F2-02 (Kenneth, rama `feature/F2-02-plan-captura`):** plan de F2 en `docs/plan/fases/F2-captura.md`. **Punto de
-  guardado:** recién reclamada. (F2-01 ya mezclado, PR #48.)
+  guardado:** WIP con la cabecera, el mapa de archivos y F2-04a completos (código verificado); faltan F2-04b, F2-05 y
+  F2-07. (F2-01 ya mezclado, PR #48.)
 - F1-05 (3b) y F1-07 (7b) solo esperan la prueba en Android.
 
 ## Siguiente paso concreto
