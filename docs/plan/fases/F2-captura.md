@@ -2265,7 +2265,7 @@ function activeJump(tMs: number, jumps: readonly number[]): number | null {
 
 **Files:** Create `src/app/game/encounter-scene/type-fx.ts`, Test `type-fx.spec.ts`
 
-- [ ] **3a. Test que falla:**
+- [x] **3a. Test que falla:**
 
 ```ts
 import { FX_KIND, particleAt, type FxKind } from './type-fx';
@@ -2311,7 +2311,7 @@ describe('type-fx', () => {
 });
 ```
 
-- [ ] **3b.** → FALLA. **3c. Implementación:**
+- [x] **3b.** → FALLA. **3c. Implementación:**
 
 ```ts
 import type { TypeName } from '@shared/data/dataset.types';
@@ -2413,7 +2413,7 @@ export function particleAt(
 }
 ```
 
-- [ ] **3d.** → PASA (4 tests). Commit `F2-04b: partículas por tipo` + push.
+- [x] **3d.** → PASA (4 tests). Commit `F2-04b: partículas por tipo` + push.
 
 ### Paso 4 — Colores de los tokens para three.js
 
