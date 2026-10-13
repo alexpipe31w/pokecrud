@@ -79,6 +79,8 @@ export class EncounterScene {
   private readonly shadowTex: THREE.Texture;
   private readonly glowTex: THREE.Texture;
   private aspect = 1;
+  /** Largo (hacia la cámara) / alto del modelo; el arte plano no tiene (F2-15). */
+  private depthRatio = 0;
   private placed = false;
   /** Hacia dónde se colocó (para recolocarlo a otra distancia sin cambiar de dirección, F2-15). */
   private yaw = 0;
@@ -142,7 +144,8 @@ export class EncounterScene {
   /** Distancia a la que está (D-045: máx(2 m, 1,8 × altura), tope 12 m; F2-15: y que quepa a lo ancho). */
   get distance(): number {
     const halfWidthTan = Math.tan(THREE.MathUtils.degToRad(this.camera.fov / 2)) * this.camera.aspect;
-    return encounterDistance(this.heightM, this.heightM * this.aspect, halfWidthTan);
+    const h = this.heightM;
+    return encounterDistance(h, h * this.aspect, halfWidthTan, h * this.depthRatio);
   }
 
   setTexture(tex: THREE.Texture): void {
@@ -187,6 +190,7 @@ export class EncounterScene {
     this.anchor.add(pivot);
     this.model = pivot;
     this.aspect = size.x / size.y;
+    this.depthRatio = size.z / size.y;
     this.refit();
     this.restBox.set(
       new THREE.Vector3((-size.x * k) / 2, 0, (-size.z * k) / 2),

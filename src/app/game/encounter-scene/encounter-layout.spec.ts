@@ -39,6 +39,12 @@ describe('encounter-layout', () => {
     it('el tope de 12 m sigue mandando', () => {
       expect(encounterDistance(1, 20, a36)).toBe(12);
     });
+
+    it('los largos (cabeza a cola hacia la cámara) se miden desde su FRENTE: el centro va media profundidad más allá', () => {
+      // Slowpoke XL con la regla aplicada a su centro: la cara quedaba ~1,7 m más cerca y llenaba la pantalla (A36).
+      expect(encounterDistance(1.75, 1.75, a36, 3.5)).toBeCloseTo(encounterDistance(1.75, 1.75, a36) + 1.75, 6);
+      expect(encounterDistance(0.4, 0.4, a36, 0.4)).toBeCloseTo(2.2, 6);
+    });
   });
 
   it('sizeClass: XS por debajo de 0,6, XL por encima de 1,4', () => {
