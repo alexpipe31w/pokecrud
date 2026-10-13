@@ -185,6 +185,13 @@ y **F2-14** (ARCore) y F2-10 (música). **F4:** completa en código salvo F4-07 
   Samsung A36** (F2-04a 12, F2-04b 9b, F2-12 6, F2-05 12b, F1-07 7b, F1-05 3b). Samuel: no la repitas en el A36;
   en tu Redmi sigue valiendo para D-045 (FOV) y para comparar fps. F2-04a, F2-04b, F2-05 y F2-12 (@alex) están en
   `develop` y en `[~]` SOLO por esa prueba.
+  **Punto de guardado (22:55):** APK de producción en el A36. OK: mapa 118,8 fps; encuentro con modelo 3D + partículas
+  60 fps / 0 % tirones / cámara "camera 0" 720p; 3 idas y vueltas sin "context lost"; Inicio suelta la cámara; AR
+  apagada y sin permiso → fondo ilustrado (F2-04a 12 completo); entrada con grito + vibración a la vez, Bramblin
+  (Fantasma) semitransparente y flotando. **FALLA F2-05 12b:** 3 aciertos de 117 lanzamientos; los gestos reales de
+  Kenneth sueltan a 1.119-3.329 px/s y el juego solo acierta a 1.800 ± 4 % con un Pokémon pequeño. **Siguiente:**
+  arreglar `swipeToThrow` (zona buena de velocidad, D-050) con TDD, APK y repetir; luego anotar la tarea nueva del
+  joystick (arranca en Parque Santander al reabrir, no donde estás).
 
 ## Siguiente paso concreto
 
