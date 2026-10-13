@@ -1,14 +1,10 @@
 import * as THREE from 'three';
 
+import { spriteUrls } from '../../core/utils/sprites';
 import { SPRITE_M, type PokemonVisual } from './spawn-layer';
 
-const SPRITES = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon';
-/** Orden de prueba (CLAUDE.md: no todas las especies tienen todos los sprites). */
-export const spriteUrls = (id: number): string[] => [
-  `${SPRITES}/other/home/${id}.png`,
-  `${SPRITES}/other/official-artwork/${id}.png`,
-  `${SPRITES}/${id}.png`,
-];
+// Se reexporta: el spec del mapa y otros la importaban de aquí (F3-02b la movió a core/utils para la colección).
+export { spriteUrls };
 
 const v = new THREE.Vector4();
 

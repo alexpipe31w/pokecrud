@@ -598,7 +598,7 @@ export class CollectionService {
 
 **Files:** Create `src/app/features/collection/collection-card.component.ts` (+ spec corto)
 
-- [ ] **2a.** `app-collection-card` con `input.required<CollectionItem>()` y `index` (para el retardo escalonado):
+- [x] **2a.** `app-collection-card` con `input.required<CollectionItem>()` y `index` (para el retardo escalonado):
   - Arte `home` (o `home/shiny`), con el mismo fallback de siempre (CLAUDE.md: `home` → `official-artwork` →
     `front_default`). Si existe ya una función de URLs de sprites en la app, **reusarla** (buscar `official-artwork` en
     `src/app`); si no, crearla en `src/app/core/utils/sprites.ts` y usarla también aquí.
@@ -610,7 +610,7 @@ export class CollectionService {
     solo fundido.
   - Es un `<a>` a `/coleccion/:id` (accesible con teclado), área ≥ 44 px, `aria-label` "Pikachu, PC 412, nivel 12,
     shiny, favorito".
-- [ ] **2b.** Spec: el `aria-label` incluye nombre, PC y "shiny" solo si lo es. Commit + `/guardar`.
+- [x] **2b.** Spec: el `aria-label` incluye nombre, PC y "shiny" solo si lo es. Commit + `/guardar`.
 
 ### Paso 3 — Filtros y orden
 
