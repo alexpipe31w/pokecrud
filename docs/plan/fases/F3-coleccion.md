@@ -448,7 +448,7 @@ ON CONFLICT ("playerId", "speciesId") DO NOTHING;
 **Files:** Create `server/src/collection/collection.module.ts`, `collection.controller.ts`, `collection.service.ts`,
 `collection.dto.ts`; Test `server/test/collection.e2e-spec.ts`; Modify `server/src/app.module.ts`
 
-- [ ] **6a. e2e que fallan** (`collection.e2e-spec.ts`, prefijo de limpieza propio `col+`, D-021). Para crear capturas
+- [x] **6a. e2e que fallan** (`collection.e2e-spec.ts`, prefijo de limpieza propio `col+`, D-021). Para crear capturas
   sin depender de spawns, insertar filas con Prisma directamente (helper `seedCaught(p, n, over?)` que pone `speciesId`,
   `cp`, `shiny`, `favorite`, `caughtAt` y el resto con valores válidos):
   1. sin sesión → 401; con sesión y nada capturado → `{ items: [], nextCursor: null, total: 0 }`.
@@ -458,10 +458,10 @@ ON CONFLICT ("playerId", "speciesId") DO NOTHING;
   4. `type=fire` → solo especies de tipo Fuego (4, 5, 6 sí; 1 no); `shiny=true`; `favorite=true`; `total` con filtros.
   5. lo de otro jugador no sale nunca; `limit=51` → 400; `sort=nombre` → 400; `cursor=no-uuid` → 400.
   6. `GET /pokedex` → solo especies vistas, con `caught` correcto.
-- [ ] **6b. DTO** (`class-validator`; booleanos de query como `'true'|'false'` con `@Transform`):
+- [x] **6b. DTO** (`class-validator`; booleanos de query como `'true'|'false'` con `@Transform`):
   `sort ∈ CollectionSort` (por defecto `caughtAt`), `order ∈ asc|desc` (por defecto `desc`), `type ∈ TYPE_NAMES`,
   `shiny`, `favorite`, `cursor @IsUUID()`, `limit @IsInt() @Min(1) @Max(50)` (por defecto 30).
-- [ ] **6c. Servicio:**
+- [x] **6c. Servicio:**
 
 ```ts
   async list(playerId: string, q: CollectionQueryDto): Promise<CollectionPage> {
@@ -500,8 +500,8 @@ ON CONFLICT ("playerId", "speciesId") DO NOTHING;
   `ivs`, `nature`, `level` en `ITEM_SELECT`). Un `cursor` que no es de este jugador o no existe → Prisma no devuelve
   nada raro (el `where` incluye `playerId`), pero un cursor inexistente lanza: capturarlo y responder 400
   "Cursor no válido". `speciesIdsOfType(type)` se calcula una vez al cargar el dataset (`Map<TypeName, number[]>`).
-- [ ] **6d.** `GET /pokedex` → `findMany({ where: { playerId }, select: { speciesId, caught } })` → `PokedexView`.
-- [ ] **6e.** Controlador con `@CurrentPlayer()` (sesión obligatoria por el guard global) y límite propio 60/min por IP
+- [x] **6d.** `GET /pokedex` → `findMany({ where: { playerId }, select: { speciesId, caught } })` → `PokedexView`.
+- [x] **6e.** Controlador con `@CurrentPlayer()` (sesión obligatoria por el guard global) y límite propio 60/min por IP
   (`@Throttle`), como `/spawns`. e2e → PASA; build, unitarios, lint. Commit + `/guardar`.
 
 ### Paso 7 — Recuperar lo capturado antes
