@@ -16,8 +16,8 @@ export interface ThrowIntent {
 }
 
 const BALLS: BallId[] = ['POKE_BALL', 'GREAT_BALL', 'ULTRA_BALL'];
-/** Muestras que se guardan del gesto (de sobra para ~1 vuelta y el lanzamiento). */
-const MAX_SAMPLES = 120;
+/** Muestras que se guardan del gesto: en el A36 llegan ~50 por segundo y dos círculos + lanzar duran ~1,7 s (D-050). */
+const MAX_SAMPLES = 300;
 
 /**
  * Abajo del encuentro (F2-05): qué bola y si con Frambu (con cuántas quedan) y la bola en la mano. La bola sigue al
@@ -179,11 +179,7 @@ export class ThrowDockComponent {
   protected release(e: PointerEvent): void {
     if (!this.dragging()) return;
     this.samples.push({ x: e.clientX, y: e.clientY, t: e.timeStamp });
-    const curve = curveOf(
-      this.samples,
-      this.origin.x + this.offset.x,
-      this.origin.y + this.offset.y,
-    );
+    const curve = curveOf(this.samples);
     const r = releaseVelocity(this.samples);
     const t = r ? swipeToThrow(r) : null;
     this.cancel();

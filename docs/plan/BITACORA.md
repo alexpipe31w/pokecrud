@@ -1290,3 +1290,50 @@ f213b@pokecrud.test → "borradas 1"): Pikachu de pie en el suelo (pies a −0,0
 **Ojo:** la ventana del Chromium de Playwright es más pequeña que la pantalla simulada (390×844) y corta la parte de
 abajo (la mano y las bolas): Alex creyó que no salían. Mirar las capturas, no la ventana.
 **El siguiente debe empezar por:** F2-07 (coreografía de captura), igual que decía la entrada anterior.
+
+## 2026-10-12 23:30 · @kenneth (Claude) · Pendientes de Android (F2-04a/F2-04b/F2-12/F2-05) + arreglo de F2-05 · rama `feature/pendientes-android-a36`
+
+**Qué se hizo:** con el relevo de Alex (para Samuel, pero el A36 de Kenneth estaba conectado) se probó en el móvil lo
+que faltaba de F2. APK de producción contra Render, medido por CDP (`playwright-core` `connectOverCDP` por
+`adb forward`) y `adb` (capturas, `screenrecord`, `logcat`, `dumpsys`). Como el APK de producción no tiene `ng`, el
+avatar se movió con `adb shell input motionevent` sobre el joystick y los Pokémon se tocaron con `input tap`.
+F2-05 12b FALLÓ con el dedo y se arregló aquí (D-050): la fuerza ya no tiene que ser exacta y la curva se mide por el
+giro del dedo. Tres tareas nuevas en el ROADMAP con lo visto: F1-11 (joystick), F2-15 (anchos), F2-16 (entrada).
+**Archivos clave:** `src/app/game/encounter-scene/throw-gesture.ts` (`GOOD_MIN_PX_S`/`GOOD_MAX_PX_S`, `turnAngle`,
+`curveOf(samples)`), `throw-gesture.spec.ts` (tests con los gestos reales del A36), `a36-curve-gestures.data.ts`
+(recorridos reales de 4 curvas), `src/app/features/encounter/throw-dock.component.ts` (`MAX_SAMPLES` 300),
+`docs/plan/DECISIONES.md` (D-050), `docs/evidencias/F2-04a_0{5,6,7}_a36-*.jpg`, `F2-04b_04_a36-entrada-al-encuentro.mp4`.
+**Cómo se probó (salida real):**
+
+    Samsung A36, APK de producción 11,44 MB, Render /health/ready → {"status":"ok","db":"ok"}
+    /mapa (13 Pokémon en el feed, joystick):  {"fps":118.8,"p95ms":8.4,"worstMs":25,"jank":0}
+    /encuentro Diggersby 3D + partículas:     {"fps":60,"p95ms":16.7,"worstMs":16.8,"jank":0}
+      cámara: {"label":"camera 0, facing back","w":720,"h":1280}
+    3 entradas mapa ↔ encuentro: logcat "context lost|robustness|gpu_snapshot" → 0 líneas; mapa en 3D al volver
+    dumpsys media.camera "Active Camera Clients": encuentro abierto → [ ... ] ; tras KEYCODE_HOME → []
+    AR apagada → fondo ilustrado (F2-04a_05); pm revoke CAMERA → diálogo de Android → "No permitir" →
+      "Sin permiso de cámara: modo sin AR." (F2-04a_06); pm grant de vuelta
+    Bramblin (Planta/Fantasma): semitransparente y flotando; entrada: copia que crece + destello (DIV.flash) + polvo;
+      grito y vibración a la vez (lo confirmó Kenneth). Vídeo F2-04b_04.
+    .glb por Wi-Fi: 946 → 678 ms, 406 → 378/445 ms, 273 → 232 ms
+    F2-05 ANTES: 117 lanzamientos → 114 "¡Casi!", 3 aciertos (2 capturas, 1 escape)
+      17 gestos de Kenneth al soltar: 1.119-3.329 px/s (mediana ~2.240), puntería −4,9° a +11,4°
+      física: con un diminuto a 2 m solo acierta la potencia 0,962-1,042 (1.732-1.876 px/s)
+      4 curvas: giro alrededor del agarre 0,75 / 1,74 / 0,75 / −0,26 vueltas → servidor curve=false siempre
+    ng test throw-gesture.spec: 11 → 15 passed (los nuevos fallaban antes del cambio: TS2305 / curveOf con 3 args)
+    npm run lint → All files pass linting · npm test → 73 archivos, 406 passed · test:shared → 144 passed · build OK
+    F2-05 DESPUÉS (APK nuevo): Klefki 5 lanzamientos → 3 aciertos (¡Excelente!, ¡Genial! con Super+Frambu, uno fuera
+      del aro) y 2 "¡Casi!" (674 px/s torcido 12°; 1.628 px/s a 4,6°); Klefki se escapó y huyó (RNG del servidor).
+      Curvas: 2,26 / 2,24 / 2,19 vueltas de giro → acierto con {"curve":true} → Zigzagoon capturado; las dos falladas
+      salieron a 9,5° y 7,9°. Recto: ¡Excelente! → Slowpoke capturado. Aro cambia de color con Super/Frambu, mochila
+      baja solo al acertar, Ultra a 0 apagada, el Pokémon se queda en su sitio al girar (Kenneth).
+
+**Quedó a medias / roto:** F1-07 7b y F1-05 3b (hay que andar por la calle con el GPS; Kenneth no salió de noche).
+Sin capturas de F2-05 ni de la AR con cámara: enseñaban su casa y el repo es público. Datos móviles sin medir para
+los `.glb`. "Un rápido salta más que uno lento" no se comparó en el móvil (solo en `personality`/`pokemon-motion`).
+Visto y apuntado como tareas: el joystick guardado pone el avatar en el Parque Santander al reabrir (F1-11); Slowpoke
+XL no cabía en la pantalla (F2-15); la entrada al encuentro (F2-16).
+**Decisiones nuevas:** D-050 (zona buena de fuerza y curva por el giro del dedo).
+**El siguiente debe empezar por:** mezclar el PR de esta rama; después, con luz, F1-07 7b y F1-05 3b en la calle con
+el APK de producción y el joystick APAGADO (menú de la Poké Ball → Joystick: No), fps por CDP con el snippet de F2-04a
+12c. Si no hay móvil: F2-15 (`encounterDistance` con el ancho; tests en `encounter-layout.spec.ts`).

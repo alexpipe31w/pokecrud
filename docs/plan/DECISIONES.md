@@ -669,3 +669,26 @@ ataque = 7/8 del mayor + 1/8 del menor de (Ataque, At. Esp.); defensa = 5/8 del 
 Def. Esp.); `PC = max(10, floor(ataque · √defensa · √PS / 10))`. Ejemplos: Pikachu Nv. 12 con IVs 15 → 46; Kricketot
 Nv. 22 → 81. **Lo calcula el servidor** (`EncounterView.cp`; los IVs y la naturaleza no salen de él, REGLA 3).
 La colección (F3-02/F3-03) debe usar la MISMA función. Peso del individuo = peso × heightScale (lineal).
+
+## D-050 · Lanzamiento: la fuerza del dedo tiene una ZONA BUENA, no un valor exacto (F2-05, prueba en Android) (2026-10-12, Kenneth)
+
+**Contexto:** en el Samsung A36 (APK de producción) Kenneth acertó **3 de 117** lanzamientos (2 capturas, 1 escape) y
+lo describió como "muy difícil darle". D-046 normalizaba la potencia a un solo gesto (`REF_FLICK_PX_S` = 1800 px/s =
+potencia 1) y la potencia escala TODO el vuelo: con un Pokémon diminuto a 2 m solo se acierta con potencia 0,96-1,04,
+es decir 1.732-1.876 px/s. Medidos 17 lanzamientos "como salgan" con el dedo: **1.119-3.329 px/s** al soltar (mediana
+~2.240) y puntería de −5° a +11°. Nadie controla la velocidad del dedo al ±4 %; en el navegador no se vio porque el
+ratón sale lento y regular (bitácora de F2-05).
+**Decisión:** `swipeToThrow` da **potencia 1 entre `GOOD_MIN_PX_S` = 1000 y `GOOD_MAX_PX_S` = 3600 px/s**; por debajo,
+`v / 1000` (flojo → corto → "¡Casi!", sin gastar, D-046); por encima, `v / 3600` (pasa por encima). La física
+(`throw-physics.ts`) no cambia. Lo difícil queda donde debe (como en Pokémon GO): **apuntar** (caja de ±5° a 2 m con
+los diminutos), los **saltos** del Pokémon, el **aro** (Bien/Genial/Excelente) y la **curva**. Test con los 17 gestos
+reales: rectos, 17/17 le dan a un diminuto a 2 m; con su puntería real, 13/17.
+**Consecuencia:** quien toque el gesto o la física, que mantenga el test `lanzar con el dedo de verdad` de
+`throw-gesture.spec.ts`; los datos del ratón no sirven para calibrar.
+**Curva (mismo día, mismo motivo):** la curva no salía NUNCA con el dedo: se medía cuánto giraba el dedo alrededor
+del punto donde se agarró la bola, pero al dibujar un círculo ese punto queda en su BORDE (como mucho ½ vuelta). En
+4 curvas reales de Kenneth: 0,75 / 1,74 / 0,75 / −0,26 vueltas → el servidor recibió `curve=false` en los 3 aciertos.
+Ahora `turnAngle` suma cuánto gira el **rumbo** del dedo (tramos ≥ 4 px, para ignorar el temblor) y se queda con el
+máximo alcanzado (el tirón final hacia arriba no lo deshace): esas 4 curvas dan 2,17-2,32 vueltas. Umbral igual
+(0,9 vueltas). `MAX_SAMPLES` del gesto 120 → 300 (en el A36 llegan ~50 muestras/s y dos círculos + lanzar ≈ 1,7 s).
+Sus recorridos están en `a36-curve-gestures.data.ts` y el test los usa.
