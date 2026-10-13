@@ -243,6 +243,7 @@ fórmula (F2-03), captura en servidor (F2-06), audio (F2-08), **spike de cámara
 - F2-04b (@alex) · pasos 1-9a mezclados en `develop`; `[~]` solo por el 9b (Android, ver PENDIENTES).
 - F2-12 (@alex) · pasos 1-5 mezclados en `develop`; `[~]` solo por el 6 (Android). Siguiente: **F2-13** (ficha con botón).
 - F2-13 hecha (ficha con botón, PC del servidor, D-049).
+- F2-05 (@alex) · rama `feature/F2-05-lanzamiento` · recién reclamada; plan en `fases/F2-captura.md` → F2-05 (adaptado a F2-12/F2-13).
 
 ## Siguiente paso concreto
 
