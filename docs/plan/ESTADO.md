@@ -196,16 +196,14 @@ F2-07, F2-12, F2-13, F2-15 hechas; faltan **F2-11**/**F2-14** (ARCore), F2-10 (m
 
 ## En curso
 
-- **F3-01a (@samuel, 2026-10-13)** — rama `feature/F3-01a-plan-coleccion`. F3-01 partida en a/b (consejo de
-  Kenneth). **Punto de guardado:** reclamada; paso siguiente: leer el modelo `CaughtPokemon` y la captura del servidor
-  y escribir `docs/plan/fases/F3-coleccion.md` con `writing-plans`.
+- Nadie. **F3-01a (Samuel) hecha, PR abierto:** plan de la colección en `docs/plan/fases/F3-coleccion.md`.
 - F1-05 y F1-07 siguen `[~]` (@alex) SOLO por su prueba en la calle (PENDIENTES).
 
 ## Siguiente paso concreto
 
-1. **F3-01** (plan de la colección y la Pokédex con `writing-plans`). Consejo: es grande, partirla en F3-01a
-   (Mis Pokémon + ficha + lo que el servidor debe guardar ya: PC, caramelos por familia, Pokédex visto/capturado) y
-   F3-01b (Pokédex 1025, evolución, CRUD del curso). Para los e2e sin tocar Supabase: Postgres portátil con
+1. **F3-02a (URGENTE, sin móvil):** la colección en el servidor según `docs/plan/fases/F3-coleccion.md` (cada captura
+   sumará caramelos y Pokédex). **Migración + `db:backfill-collection` en Supabase ANTES de mezclar** (si no, las
+   capturas dan 500). Luego F3-02b y F3-03. En paralelo, sin móvil: **F3-01b** (plan de Pokédex, evolución y CRUD). Para los e2e sin tocar Supabase: Postgres portátil con
    `embedded-postgres` de npm (sin Docker), `DATABASE_URL`/`DIRECT_URL` a él y `npx prisma migrate deploy`.
 2. **Con luz, en la calle (Kenneth o Samuel):** F1-07 7b + F1-05 3b con el APK de producción y el **joystick apagado**.
 3. **F2-11** (ARCore, Android) · F1-11 / F2-16…F2-18 (arreglos vistos en el móvil) · sin móvil: F2-10 (música), F5-01 (plan del PvP).
@@ -229,6 +227,10 @@ F2-07, F2-12, F2-13, F2-15 hechas; faltan **F2-11**/**F2-14** (ARCore), F2-10 (m
 - [x] Añadir **`SPAWN_SALT`** en Render (≥ 32 caracteres aleatorios, propia de Render). (2026-10-12)
 - [x] ~~Manual Deploy tras cada mezcla~~: no hace falta, Render despliega solo al cambiar `develop` (comprobado).
 - [x] Su `server/.env`: puerto 6543, `JWT_SECRET` y `SPAWN_SALT` propios. (2026-10-12)
+
+**Quien haga F3-02a (tiene que tener `DIRECT_URL`):**
+
+- [ ] Migración `20261013010000_collection` + `npm run db:backfill-collection` en Supabase ANTES de mezclar el PR.
 
 **Kenneth o Samuel (Android):**
 

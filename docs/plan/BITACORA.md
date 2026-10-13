@@ -1407,3 +1407,21 @@ franja antes de volver (lo cubre `spawn-feed.service.spec`).
 **Decisiones nuevas:** ninguna (la luz roja con `emissive` está explicada en el código).
 **El siguiente debe empezar por:** mezclar el PR de F2-07; con luz, F1-07 7b y F1-05 3b en la calle (joystick
 APAGADO); después F3-01 (plan de la colección con `writing-plans`: "Mis Pokémon" ya tiene datos que enseñar).
+
+## 2026-10-13 13:30 · @samuel (Claude) · F3-01a · rama `feature/F3-01a-plan-coleccion`
+
+**Qué se hizo:** F3-01 partida en F3-01a/F3-01b (consejo de Kenneth). F3-01a: plan de la colección con `writing-plans`
+en `docs/plan/fases/F3-coleccion.md` (parte 1), a partir de `CaughtPokemon`, la transacción de captura
+(`encounters.service.ts`), `shared/protocol/encounters.ts`, `combat-power.ts` (D-049), el dataset
+(`evolutionChainId`) y las pantallas actuales. F3-02 partida en **F3-02a** (servidor, urgente: desde que se despliegue,
+cada captura guarda PC, +3 caramelos por cadena evolutiva y Pokédex; abrir un encuentro marca "visto"; `GET /collection`
+con cursor/orden/filtros, `GET /pokedex`, script que recupera lo capturado antes) y **F3-02b** (pantalla Mis Pokémon,
+"+3 caramelos" en "¡Capturado!"); F3-03 (ficha: IVs con valoración, stats, movimientos, mapa mini, renombrar, transferir
+con deshacer de 5 s sin "des-transferir" en el servidor). Propone D-052 (se anota al implementar F3-02a): PC guardado,
+caramelos por cadena, IVs visibles para su dueño.
+**Cómo se probó:** es un documento. Autorrevisión: tests de valoración de IVs y del mote recalculados a mano; exports
+del contrato comprobados (`TypeName` está en `shared/data/dataset.types.ts`, corregido).
+**Quedó a medias / roto:** nada. F3-01b (parte 2 del plan) libre.
+**Decisiones nuevas:** ninguna aún (D-052 propuesta en el plan).
+**El siguiente debe empezar por:** F3-02a paso 1 (`shared/engine/candy.ts`), con el Postgres portátil para los e2e; y
+recordar el paso 8: migración en Supabase ANTES de mezclar.
