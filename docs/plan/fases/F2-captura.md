@@ -4297,7 +4297,7 @@ Pokémon y los aros son `MeshBasic`).
 
 **Files:** Modify `src/app/game/encounter-scene/encounter-scene.ts`, `encounter-scene.spec.ts`
 
-- [ ] **8a. Tests:**
+- [x] **8a. Tests:**
 
 ```diff
 --- a/src/app/game/encounter-scene/encounter-scene.spec.ts
@@ -4347,7 +4347,7 @@ Pokémon y los aros son `MeshBasic`).
  });
 ```
 
-- [ ] **8b.** → FALLAN. **8c. Implementación:**
+- [x] **8b.** → FALLAN. **8c. Implementación:**
 
 ```diff
 --- a/src/app/game/encounter-scene/encounter-scene.ts
@@ -4485,7 +4485,7 @@ Pokémon y los aros son `MeshBasic`).
        p.material.dispose();
 ```
 
-- [ ] **8d.** → PASA (15). Commit + push.
+- [x] **8d.** → PASA (15). Commit + push.
 
 ### Paso 9 — Sonidos del lanzamiento
 
