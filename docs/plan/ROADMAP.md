@@ -302,7 +302,7 @@
       (18 tipos, Shiny, Favoritos) al momento; cargando, vacía, vacía con filtros y error. "+3 caramelos de Pichu" y "Ver
       en Mis Pokémon" en "¡Capturado!"; la lista se recarga tras capturar. Probado en vista móvil 390×844 contra el Nest y
       un Postgres locales con 35 capturas (`F3-02_0{1..4}_*`). Pendiente opcional: scroll en un Android (no usa GPS/cámara).
-- [ ] **F3-03 · Ficha del individuo** — arte, grito, PC, IVs, naturaleza, stats calculados, movimientos,
+- [~] **F3-03 · Ficha del individuo** (@samuel, 2026-10-13) — arte, grito, PC, IVs, naturaleza, stats calculados, movimientos,
       dónde/cuándo se capturó, mapa mini, renombrar, transferir (con deshacer). Dep: F3-02b.
 - [ ] **F3-04 · Pokédex 1025** — vistos/capturados por generación, ficha de especie (descripción ES,
       debilidades calculadas, cadena evolutiva, altura/peso, hábitat). Dep: F3-01b, F3-02a.

@@ -196,8 +196,8 @@ F2-07, F2-12, F2-13, F2-15 hechas; faltan **F2-11**/**F2-14** (ARCore), F2-10 (m
 
 ## En curso
 
-- Nadie. **F3-02b (Samuel) hecha, PR abierto:** "Mis Pokémon" en `/coleccion`. Siguiente: **F3-03** (ficha del
-  individuo) siguiendo `fases/F3-coleccion.md`. F3-02a hecha y en producción (#65). (F0-15 #63 y F3-01a #64 mezclados.)
+- **F3-03 (@samuel, 2026-10-13)** — rama `feature/F3-03-ficha`. **Punto de guardado:** reclamada; paso siguiente:
+  paso 1 de F3-03 (e2e de `GET/PATCH/DELETE /collection/:id`). F3-02b mezclada (#66). F3-02a hecha y en producción (#65). (F0-15 #63 y F3-01a #64 mezclados.)
 - F1-05 y F1-07 siguen `[~]` (@alex) SOLO por su prueba en la calle (PENDIENTES).
 
 ## Siguiente paso concreto
