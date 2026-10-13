@@ -7,6 +7,7 @@ import type { EncounterView } from '@shared/protocol/encounters';
 import { CameraService, type CameraState } from '../../services/ar/camera.service';
 import { OrientationService } from '../../services/ar/orientation.service';
 import { AudioService } from '../../services/game/audio.service';
+import { BagService } from '../../services/game/bag.service';
 import { DatasetService } from '../../services/game/dataset.service';
 import { EncounterApiService } from '../../services/game/encounter-api.service';
 import { HapticsService } from '../../services/game/haptics.service';
@@ -60,7 +61,11 @@ describe('encounterErrorText (D-028)', () => {
 });
 
 describe('EncounterPage', () => {
-  const api = { view: vi.fn() };
+  const api = { view: vi.fn(), throw: vi.fn() };
+  const bag = {
+    qty: signal({ POKE_BALL: 3, GREAT_BALL: 0, ULTRA_BALL: 0, RAZZ_BERRY: 1 }),
+    load: vi.fn(),
+  };
   const playCry = vi.fn(() => Promise.resolve(true));
   const playSfx = vi.fn(() => Promise.resolve());
   const camState = signal<CameraState>('off');
@@ -83,6 +88,7 @@ describe('EncounterPage', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.useRealTimers();
     localStorage.clear();
     camState.set('off');
     stage.onFrame = null;
@@ -92,9 +98,10 @@ describe('EncounterPage', () => {
       providers: [
         provideRouter([]),
         { provide: EncounterApiService, useValue: api },
+        { provide: BagService, useValue: bag },
         { provide: AudioService, useValue: { playCry, playSfx } },
         // El plugin real de Capacitor no existe en web.
-        { provide: HapticsService, useValue: { tap: vi.fn() } },
+        { provide: HapticsService, useValue: { tap: vi.fn(), throw: vi.fn() } },
         {
           provide: DatasetService,
           useValue: {
@@ -152,6 +159,39 @@ describe('EncounterPage', () => {
     await open(Promise.resolve({ ...view, shiny: true }));
     stage.onFrame!(performance.now() + 600);
     expect(playSfx).toHaveBeenCalledWith('shiny');
+  });
+
+  /** Lanza tras el aterrizaje (el reloj de `performance` es falso: se adelanta 1 s) y deja volar la bola. */
+  const throwAt = async (
+    f: Awaited<ReturnType<typeof open>>,
+    intent: { power: number; aim: number; curve: -1 | 0 | 1 },
+  ) => {
+    vi.advanceTimersByTime(1000);
+    stage.onFrame!(performance.now()); // coloca al Pokémon (sin AR: delante)
+    (f.componentInstance as unknown as { launch(i: typeof intent): void }).launch(intent);
+    vi.advanceTimersByTime(2000);
+    stage.onFrame!(performance.now()); // la bola llega
+    await settle(f);
+  };
+
+  it('lanzar (F2-05): si le da, el servidor decide con la bola elegida y se enseña lo que diga', async () => {
+    vi.useFakeTimers({ toFake: ['performance'] });
+    api.throw.mockResolvedValueOnce({ captured: true, fled: false, shakes: 3 });
+    const f = await open(Promise.resolve(view));
+    await throwAt(f, { power: 1, aim: 0, curve: 0 });
+    expect(api.throw).toHaveBeenCalledWith(
+      '12:34:5',
+      expect.objectContaining({ ball: 'POKE_BALL', berry: null, curve: false }),
+    );
+    expect(text(f)).toContain('¡Capturado!');
+  });
+
+  it('un lanzamiento flojo no llega y no llama al servidor (D-046)', async () => {
+    vi.useFakeTimers({ toFake: ['performance'] });
+    const f = await open(Promise.resolve(view));
+    await throwAt(f, { power: 0.4, aim: 0, curve: 0 });
+    expect(api.throw).not.toHaveBeenCalled();
+    expect(text(f)).toContain('¡Casi!');
   });
 
   it('un 403 dice que está demasiado lejos y no monta la escena', async () => {

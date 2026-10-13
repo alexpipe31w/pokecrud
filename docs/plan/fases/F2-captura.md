@@ -4787,7 +4787,7 @@ Pokémon al llegar (`poseAt` en el instante del impacto, con sus saltos); aciert
 
 **Files:** Modify `src/app/features/encounter/encounter.page.ts`, `encounter.page.spec.ts`
 
-- [ ] **11a. Tests:**
+- [x] **11a. Tests:**
 
 ```diff
 --- a/src/app/features/encounter/encounter.page.spec.ts
@@ -4875,7 +4875,7 @@ Pokémon al llegar (`poseAt` en el instante del impacto, con sus saltos); aciert
      expect(text(f)).toContain('Estás demasiado lejos.');
 ```
 
-- [ ] **11b.** → FALLAN. **11c. Implementación:**
+- [x] **11b.** → FALLAN. **11c. Implementación:**
 
 ```diff
 --- a/src/app/features/encounter/encounter.page.ts
@@ -5176,7 +5176,7 @@ Pokémon al llegar (`poseAt` en el instante del impacto, con sus saltos); aciert
      this.stage = null;
 ```
 
-- [ ] **11d.** `npx ng test --include=src/app/features/encounter/encounter.page.spec.ts --watch=false` → PASA (11). Commit + push.
+- [x] **11d.** `npx ng test --include=src/app/features/encounter/encounter.page.spec.ts --watch=false` → PASA (11). Commit + push.
 
 ### Paso 12 — Verde y Android
 
