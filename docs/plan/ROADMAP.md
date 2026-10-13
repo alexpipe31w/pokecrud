@@ -285,8 +285,10 @@
       Pokémon (F3-02), ficha del individuo (F3-03) y lo que el servidor debe empezar a guardar YA al capturar (caramelos
       por familia, Pokédex visto/capturado), para que nada capturado desde hoy se pierda. Dep: F2-07.
       **Hecho:** plan de F3-02a, F3-02b y F3-03 con contrato, código y tests (TDD). F3-02 partida en a/b.
-- [ ] **F3-01b · Plan de F3 (parte 2): Pokédex, evolución y CRUD del curso** — mismo archivo: F3-04, F3-05, F3-06.
+- [x] **F3-01b · Plan de F3 (parte 2): Pokédex, evolución y CRUD del curso** (@samuel, 2026-10-13) — mismo archivo: F3-04, F3-05, F3-06.
       Dep: F3-01a.
+      **Hecho:** parte 2 de `fases/F3-coleccion.md` (valores de los tests comprobados contra el dataset y la tabla de
+      tipos reales). IS-11 pasa de `/pokedex` a `/inventario` (en F3-04 paso 1). F3-06 partida en F3-06a/b/c.
 - [x] **F3-02a · Colección en el servidor (URGENTE)** (@samuel, 2026-10-13) — al capturar se guarda el PC, +3 caramelos por familia y la
       Pokédex; abrir un encuentro marca "visto"; `GET /collection` (cursor, orden, filtros) y `GET /pokedex`; script que
       recupera lo capturado antes. **Migración + script en Supabase ANTES de mezclar.** Plan: `fases/F3-coleccion.md`.
@@ -312,12 +314,16 @@
       Probado en vista móvil con Nest y Postgres locales (`F3-03_0{1..5}_*`). Pendiente opcional: un Android.
 - [ ] **F3-04 · Pokédex 1025** — vistos/capturados por generación, ficha de especie (descripción ES,
       debilidades calculadas, cadena evolutiva, altura/peso, hábitat). Dep: F3-01b, F3-02a.
-- [ ] **F3-05 · Evolución con caramelos** — regla de caramelos por cadena, endpoint transaccional,
-      animación de evolución. Dep: F3-03.
-- [ ] **F3-06 · Inventario (IS-11), equipos, favoritos y personalizados con la nueva UI** — reutilizar los servicios,
-      modelo y formulario de IS-11 (HU-03 a HU-05) y las HU del curso (HU-08 a
-      HU-18) rehechas con el sistema de diseño; los personalizados pueden aparecer como spawns del grupo.
+- [ ] **F3-05 · Evolución con caramelos** — regla de caramelos por cadena (D-053: 50 si la cadena tiene una
+      evolución; 25 y 100 si tiene dos), `POST /collection/:id/evolve` transaccional, animación de evolución. Dep: F3-03.
+- [ ] **F3-06a · Inventario de IS-11 con la nueva UI** — `/inventario`, detalle, agregar y editar (HU-03/04/05/14)
+      con el sistema de diseño, mismos servicios, modelo, formulario y contrato; Postman sigue pasando. Dep: F3-04.
+- [ ] **F3-06b · Equipos con Pokémon capturados** — `Team.caughtIds` (≤ 6, solo tuyos; `pokemonIds` se conserva por
+      el contrato del curso, D-054), quitar del equipo al transferir; pantalla `/equipos` que elige de "Mis Pokémon".
       Dep: F0-08, F3-02b.
+- [ ] **F3-06c · Favoritos y Pokémon personalizados** — `/favoritos` (desde la ficha de la Pokédex, nota y 1-5) y
+      `/personalizados` (crear/editar) con el sistema de diseño; contratos sin cambios. Que los personalizados salgan como
+      spawns del grupo → extra de F7. Dep: F0-08, F3-04.
 
 ## F4 · Motor de combate y combate contra IA
 

@@ -1541,3 +1541,23 @@ cuenta de prueba manual con ese prefijo desaparece al pasarlos. Para pruebas a m
 **Decisiones nuevas:** ninguna.
 **El siguiente debe empezar por:** F3-01b (parte 2 del plan de `fases/F3-coleccion.md`: Pokédex 1025, evolución con
 caramelos, CRUD del curso).
+
+## 2026-10-13 18:30 · @samuel (Claude) · F3-01b · rama `feature/F3-01b-plan-pokedex`
+
+**Qué se hizo:** #67 mezclado. Parte 2 del plan de F3 (al final de `fases/F3-coleccion.md`) con `writing-plans`:
+**F3-04** Pokédex 1025 (paso 1: el inventario de IS-11 se muda de `/pokedex` a `/inventario` sin tocar `/pokemon/…`;
+`defenseProfile` y `evolutionTree`/`methodText` puros; `PokedexService`; rejilla por generación con no visto / visto /
+capturado; ficha de especie con debilidades, cadena y hábitat en español), **F3-05** evolución con caramelos (regla
+D-053: 50 si la cadena tiene una evolución, 25 y 100 si tiene dos; `POST /collection/:id/evolve` con gasto condicional y
+`updateMany … speciesId = origen` para que dos a la vez no evolucionen dos veces; animación A↔B acelerando → destello)
+y **F3-06 partida en a/b/c** (IS-11 con la nueva UI; equipos con `caughtIds` sin romper `pokemonIds`, D-054;
+favoritos y personalizados).
+**Cómo se probó:** es un documento. Los valores de los tests del plan se comprobaron contra el código y el dataset
+reales con un spec temporal (borrado, no se sube): Charizard {"0":["ground"],"2":["water","electric"],"4":["rock"],
+"0.5":["fire","fighting","steel","fairy"],"0.25":["grass","bug"]}; Normal {"0":["ghost"],"2":["fighting"]}; Bulbasaur
+→ 2 a nivel 16; Kadabra → 65 por intercambio; etapas/profundidad: Bulbasaur 0/2, Ivysaur 1/2, Eevee 0/1 (8 ramas),
+Pichu 0/2, Pikachu 1/2, Wurmple 0/2 (ramas 266, 268), Tauros 0/0; 0 destinos repetidos o fuera del dataset.
+Corregida en el plan la firma real `effectiveness(chart, ataque, tiposDefensor)`.
+**Quedó a medias:** nada.
+**Decisiones nuevas:** ninguna aún (D-053 y D-054 se anotan al implementar F3-05 y F3-06b).
+**El siguiente debe empezar por:** F3-04 paso 1 (mover IS-11 a `/inventario`).

@@ -196,14 +196,14 @@ F2-07, F2-12, F2-13, F2-15 hechas; faltan **F2-11**/**F2-14** (ARCore), F2-10 (m
 
 ## En curso
 
-- Nadie. **F3-03 (Samuel) hecha, PR abierto:** la ficha `/coleccion/:id`. Siguiente: **F3-01b** (plan de la
-  Pokédex 1025, la evolución con caramelos y el CRUD del curso con la nueva UI). F3-02a hecha y en producción (#65). (F0-15 #63 y F3-01a #64 mezclados.)
+- Nadie. **F3-01b (Samuel) hecha, PR abierto:** parte 2 del plan de F3 (`fases/F3-coleccion.md`). F3-02a hecha y en producción (#65). (F0-15 #63 y F3-01a #64 mezclados.)
 - F1-05 y F1-07 siguen `[~]` (@alex) SOLO por su prueba en la calle (PENDIENTES).
 
 ## Siguiente paso concreto
 
-1. **F3-01b (sin móvil):** parte 2 del plan en `docs/plan/fases/F3-coleccion.md`: F3-04 (Pokédex 1025 con
-   `GET /pokedex`, que ya existe), F3-05 (evolución con caramelos: el servidor ya los guarda) y F3-06 (CRUD del curso).
+1. **F3-04 (sin móvil):** Pokédex 1025 según la parte 2 de `docs/plan/fases/F3-coleccion.md` (empieza moviendo el
+   inventario de IS-11 a `/inventario`). Independientes y también sin móvil: **F3-05** (evolución con caramelos),
+   **F3-06a/b/c** (CRUD del curso con la nueva UI).
    **Probar sin tocar Supabase:** Postgres 17 portátil (`embedded-postgres@17.10.0-beta.17` en una carpeta temporal),
    `DATABASE_URL`/`DIRECT_URL` a él, `npx prisma migrate deploy` y `npm run db:seed`; la app en `localhost:8100` (en el
    PC de Samuel el 4200 lo ocupa OTRO proyecto suyo). Ver la bitácora de F3-02a/F3-02b.
