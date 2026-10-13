@@ -1776,3 +1776,35 @@ cliente Prisma anterior a F3 → `npx prisma generate` (anotado en ESTADO).
 **Decisiones nuevas:** D-056.
 **El siguiente debe empezar por:** F5-02 paso 1 de `fases/F5-pvp.md` (instalar versiones exactas tras `/guardar`,
 los dos arreglos de guards con su e2e que falla primero).
+
+## 2026-10-13 16:05 · @alex (Claude) · F5-02 · rama `feature/F5-02-gateway-socketio`
+
+**Qué se hizo:** dependencias exactas (`@nestjs/websockets`/`platform-socket.io` 12.1.2; `socket.io-client` 4.8.3 en la
+app y como devDependency del servidor para los e2e). Guards globales solo para HTTP (D-056): `JwtAuthGuard` sale si el
+contexto no es `http` y `HttpThrottlerGuard` (nuevo) sustituye a `ThrottlerGuard`. `server/src/pvp/`: `PvpGateway`
+(namespace `/pvp`, JWT del handshake con `JWT_VERIFY_OPTIONS` y `sub` UUID, `client.data.playerId`, sala
+`player:<id>`, `pvp:error` + desconexión al rechazar, CORS con la misma lista que HTTP leída en cada petición,
+`maxHttpBufferSize` 16 KB, `pvp:hello`), `PvpSessions` (máx. 3 sockets por jugador, comprobar y añadir sin `await`),
+`SocketRateLimiter` (20 mensajes / 10 s por socket, ventana deslizante), `pvp.validation.ts` (cargas del contrato,
+campos de más → `bad-request`). `common/cors.ts` (lista compartida con `main.ts`); `AuthModule` exporta `JwtModule`.
+App: `PvpSocketService` (`connect` idempotente, `socket.io-client` por import dinámico, `autoConnect: false`, `auth`
+como función → token vigente en cada reconexión o refrescado, `unauthorized` → refresca y reintenta UNA vez, `request`
+con ack y 8 s, `on` que sobrevive a crear el socket después, signals `status`/`error`).
+**Archivos clave:** `server/src/pvp/*`, `server/src/common/{cors,http-throttler.guard}.ts`,
+`server/src/auth/{jwt-auth.guard,auth.module}.ts`, `server/src/app.module.ts`, `server/test/pvp-gateway.e2e-spec.ts`,
+`src/app/services/game/pvp-socket.service.ts` (+ spec).
+**Cómo se probó (salida real):**
+
+    unitarios nuevos primero en rojo ("Cannot find module './pvp-sessions.js'" ×3) → 15 passed
+    e2e del gateway con el guard de antes: "TypeError: Cannot read properties of undefined (reading 'authorization')"
+      → con los arreglos 6/6; con el ThrottlerGuard original otra vez: "expected [ …(120) ] to have a length of 140"
+    servidor: lint sin avisos nuevos · unitarios 7 archivos / 37 passed · nest build OK · e2e 10 archivos / 100 passed
+    app: PvpSocketService 9 passed (el spec se escribió antes, pero su primera ejecución ya fue con el código: falló
+      por tipos del socket falso) · app 95 archivos / 523 passed · lint OK · ng build OK · test:shared 167
+    contra el servidor de desarrollo corriendo: login 200 (demo+alex) → socket con Origin localhost:8100 →
+      hello {"ok":true,"battle":null,"lobby":null}
+
+**Quedó a medias:** nada de F5-02. `handleDisconnect` deja un `TODO(F5-04)` para avisar a la sala. El chunk perezoso
+de `socket.io-client` no se ve aún en el build (nada usa el servicio): comprobarlo en F5-03.
+**Decisiones nuevas:** ninguna (todo era D-056).
+**El siguiente debe empezar por:** F5-03 paso 1 de `fases/F5-pvp.md` (`PvpTeamsService.load` con su e2e).

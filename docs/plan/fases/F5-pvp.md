@@ -163,13 +163,13 @@ para el criterio (vídeo); hasta entonces, dos ventanas del navegador a 390×844
 - [x] **Paso 3 — límite por socket** (`socket-rate-limit.ts`, puro con reloj inyectado, + spec) y validación
   (`pvp.validation.ts` + spec: cada carga del contrato, válida e inválida).
 - [x] **Paso 4 — `pvp:hello`** devuelve `{ok:true, battle:null, lobby:null}` (se rellena en F5-03/F5-04).
-- [ ] **Paso 5 — app:** `PvpSocketService` (`providedIn: 'root'`, se conecta solo cuando se entra en `/pvp` o hay un
+- [x] **Paso 5 — app:** `PvpSocketService` (`providedIn: 'root'`, se conecta solo cuando se entra en `/pvp` o hay un
   combate PvP; `auth: (cb) => cb({ token: <access actual o refrescado> })`, `transports: ['websocket']`,
   reconexión con espera creciente que trae Socket.IO), signal `status` (`offline | connecting | online`), `request<K>`
   tipado con `PvpClientEvents` y `timeout(8000)` → error "Sin conexión con el servidor". Al recibir `unauthorized`:
   `auth.refresh()` y reintentar UNA vez; si vuelve a fallar, sesión perdida (como el interceptor HTTP). Tests del
   servicio con un socket falso.
-- [ ] **Paso 6:** e2e del gateway (sin token / token falso / caducado; con token → hello OK; 21 mensajes en 10 s → el
+- [x] **Paso 6:** e2e del gateway (sin token / token falso / caducado; con token → hello OK; 21 mensajes en 10 s → el
   21.º `rate-limited`; 4.º socket rechazado), lint, build de app y servidor, REGLA 2.
 
 ## F5-03 · Invitar / código / buscar rival
