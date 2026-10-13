@@ -24,6 +24,18 @@ const view: EncounterView = {
   status: 'open',
 };
 
+/** Lo que la pantalla lee de la ficha (tamaño, tipo y personalidad). */
+const PIKACHU = {
+  names: { es: 'Pikachu' },
+  height: 4,
+  types: ['electric'],
+  baseStats: { hp: 35, atk: 55, def: 40, spa: 50, spd: 50, spe: 90 },
+  captureRate: 190,
+  shape: 'quadruped',
+  isLegendary: false,
+  isMythical: false,
+};
+
 describe('encounterErrorText (D-028)', () => {
   it('cada error del servidor tiene su texto', () => {
     expect(encounterErrorText(403)).toBe('Estás demasiado lejos.');
@@ -37,6 +49,7 @@ describe('encounterErrorText (D-028)', () => {
 describe('EncounterPage', () => {
   const api = { view: vi.fn() };
   const playCry = vi.fn(() => Promise.resolve(true));
+  const playSfx = vi.fn(() => Promise.resolve());
   const camState = signal<CameraState>('off');
   const camera = { state: camState, open: vi.fn(async () => null), close: vi.fn() };
   const orientation = { start: vi.fn(), stop: vi.fn(), pose: vi.fn(() => false) };
@@ -60,15 +73,14 @@ describe('EncounterPage', () => {
       providers: [
         provideRouter([]),
         { provide: EncounterApiService, useValue: api },
-        { provide: AudioService, useValue: { playCry } },
+        { provide: AudioService, useValue: { playCry, playSfx } },
         // El plugin real de Capacitor no existe en web.
         { provide: HapticsService, useValue: { tap: vi.fn() } },
         {
           provide: DatasetService,
           useValue: {
             load: () => Promise.resolve(),
-            species: () =>
-              new Map([[25, { names: { es: 'Pikachu' }, height: 4, types: ['electric'] }]]),
+            species: () => new Map([[25, PIKACHU]]),
           },
         },
         { provide: CameraService, useValue: camera },
@@ -94,17 +106,32 @@ describe('EncounterPage', () => {
   };
   const text = (f: { nativeElement: HTMLElement }) => f.nativeElement.textContent ?? '';
 
-  it('abre el encuentro: nombre, nivel, XL, grito, escena, sensores y cámara', async () => {
+  it('abre el encuentro: nombre, nivel, XL, escena, sensores y cámara', async () => {
     const f = await open(Promise.resolve(view));
     expect(api.view).toHaveBeenCalledWith('12:34:5');
     expect(text(f)).toContain('Pikachu');
     expect(text(f)).toContain('Nv. 12');
     expect(text(f)).toContain('XL');
-    expect(playCry).toHaveBeenCalledWith(25);
     expect(createStage).toHaveBeenCalledTimes(1);
     expect(stage.start).toHaveBeenCalled();
     expect(orientation.start).toHaveBeenCalled();
     expect(camera.open).toHaveBeenCalled();
+  });
+
+  it('al tocar el suelo (F2-04b): grito completo y golpe, una sola vez', async () => {
+    await open(Promise.resolve(view));
+    expect(playCry).not.toHaveBeenCalled();
+    stage.onFrame!(performance.now() + 600);
+    stage.onFrame!(performance.now() + 700);
+    expect(playCry).toHaveBeenCalledTimes(1);
+    expect(playCry).toHaveBeenCalledWith(25);
+    expect(playSfx).toHaveBeenCalledWith('land');
+  });
+
+  it('si es shiny suena su destello', async () => {
+    await open(Promise.resolve({ ...view, shiny: true }));
+    stage.onFrame!(performance.now() + 600);
+    expect(playSfx).toHaveBeenCalledWith('shiny');
   });
 
   it('un 403 dice que está demasiado lejos y no monta la escena', async () => {

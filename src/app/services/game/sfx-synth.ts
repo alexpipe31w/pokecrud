@@ -91,6 +91,17 @@ export const SFX_RECIPES = {
     { wave: 'square', from: 1047, to: 1047, start: 0.39, duration: 0.45, gain: 0.16 },
     { wave: 'triangle', from: 523, to: 523, start: 0.39, duration: 0.45, gain: 0.2 },
   ],
+  /** El Pokémon aterriza en el encuentro (F2-04b): golpe sordo con polvo. */
+  land: [
+    { wave: 'noise', from: 700, to: 200, start: 0, duration: 0.16, gain: 0.4, attack: 0.003 },
+    { wave: 'sine', from: 120, to: 50, start: 0, duration: 0.26, gain: 0.6, attack: 0.004 },
+  ],
+  /** Aparece un shiny (F2-04b): tres destellos que suben. */
+  shiny: [
+    { wave: 'triangle', from: 1800, to: 2400, start: 0, duration: 0.12, gain: 0.22 },
+    { wave: 'triangle', from: 2400, to: 3200, start: 0.1, duration: 0.15, gain: 0.22 },
+    { wave: 'sine', from: 3200, to: 3600, start: 0.22, duration: 0.3, gain: 0.18, attack: 0.01 },
+  ],
 } satisfies Record<string, Voice[]>;
 
 export type SfxName = keyof typeof SFX_RECIPES;

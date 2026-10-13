@@ -1990,7 +1990,7 @@ efectos" → sin partículas ni destellos. **Android:** ≥ 55 fps con partícul
 
 **Files:** Create `src/app/game/encounter-scene/personality.ts`, Test `personality.spec.ts`
 
-- [ ] **1a. Test que falla:**
+- [x] **1a. Test que falla:**
 
 ```ts
 import type { Species } from '@shared/data/dataset.types';
@@ -2039,8 +2039,8 @@ describe('personalityOf', () => {
 });
 ```
 
-- [ ] **1b.** `npx ng test --include=src/app/game/encounter-scene/personality.spec.ts --watch=false` → FALLA.
-- [ ] **1c. Implementación:**
+- [x] **1b.** `npx ng test --include=src/app/game/encounter-scene/personality.spec.ts --watch=false` → FALLA.
+- [x] **1c. Implementación:**
 
 ```ts
 import type { Species, TypeName } from '@shared/data/dataset.types';
@@ -2077,7 +2077,7 @@ export function personalityOf(s: Species): Personality {
 }
 ```
 
-- [ ] **1d.** → PASA (4 tests). Commit `F2-04b: personalidad del Pokémon desde su ficha` + push.
+- [x] **1d.** → PASA (4 tests). Commit `F2-04b: personalidad del Pokémon desde su ficha` + push.
 
 ### Paso 2 — Aterrizaje, respiración y saltos programados
 
@@ -2087,7 +2087,7 @@ encuentro, sin acumular.
 
 **Files:** Create `src/app/game/encounter-scene/pokemon-motion.ts`, Test `pokemon-motion.spec.ts`
 
-- [ ] **2a. Test que falla:**
+- [x] **2a. Test que falla:**
 
 ```ts
 import {
@@ -2163,7 +2163,7 @@ describe('landingAt', () => {
 });
 ```
 
-- [ ] **2b.** → FALLA. **2c. Implementación:**
+- [x] **2b.** → FALLA. **2c. Implementación:**
 
 ```ts
 import { createRng } from '@shared/engine/rng';
@@ -2259,13 +2259,13 @@ function activeJump(tMs: number, jumps: readonly number[]): number | null {
 }
 ```
 
-- [ ] **2d.** → PASA (8 tests). Commit `F2-04b: aterrizaje, respiración y saltos del Pokémon` + push.
+- [x] **2d.** → PASA (8 tests). Commit `F2-04b: aterrizaje, respiración y saltos del Pokémon` + push.
 
 ### Paso 3 — Partículas por tipo
 
 **Files:** Create `src/app/game/encounter-scene/type-fx.ts`, Test `type-fx.spec.ts`
 
-- [ ] **3a. Test que falla:**
+- [x] **3a. Test que falla:**
 
 ```ts
 import { FX_KIND, particleAt, type FxKind } from './type-fx';
@@ -2311,7 +2311,7 @@ describe('type-fx', () => {
 });
 ```
 
-- [ ] **3b.** → FALLA. **3c. Implementación:**
+- [x] **3b.** → FALLA. **3c. Implementación:**
 
 ```ts
 import type { TypeName } from '@shared/data/dataset.types';
@@ -2413,7 +2413,7 @@ export function particleAt(
 }
 ```
 
-- [ ] **3d.** → PASA (4 tests). Commit `F2-04b: partículas por tipo` + push.
+- [x] **3d.** → PASA (4 tests). Commit `F2-04b: partículas por tipo` + push.
 
 ### Paso 4 — Colores de los tokens para three.js
 
@@ -2421,7 +2421,7 @@ three.js no lee variables CSS: se lee el token al crear el material (lo usan la 
 
 **Files:** Create `src/app/game/encounter-scene/css-color.ts`
 
-- [ ] **4a.** Crear (se prueba a través de `ball-mesh.spec.ts` en F2-05: en jsdom devuelve el valor escrito):
+- [x] **4a.** Crear (se prueba a través de `ball-mesh.spec.ts` en F2-05: en jsdom devuelve el valor escrito):
 
 ```ts
 /**
@@ -2441,7 +2441,7 @@ Puntos redondos con una `DataTexture` (sin canvas, D-038) en mezcla aditiva: el 
 
 **Files:** Modify `src/app/game/encounter-scene/encounter-scene.ts`, `encounter-scene.spec.ts`
 
-- [ ] **5a. Tests** (añadir al spec):
+- [x] **5a. Tests** (añadir al spec):
 
 ```diff
 --- a/src/app/game/encounter-scene/encounter-scene.spec.ts
@@ -2515,7 +2515,7 @@ Puntos redondos con una `DataTexture` (sin canvas, D-038) en mezcla aditiva: el 
  });
 ```
 
-- [ ] **5b.** → FALLAN (no existen `setFx`, `startBurst`, `animate`, `BURST_*`). **5c. Implementación:**
+- [x] **5b.** → FALLAN (no existen `setFx`, `startBurst`, `animate`, `BURST_*`). **5c. Implementación:**
 
 ```diff
 --- a/src/app/game/encounter-scene/encounter-scene.ts
@@ -2709,13 +2709,13 @@ Puntos redondos con una `DataTexture` (sin canvas, D-038) en mezcla aditiva: el 
 +  p.geometry.getAttribute(name) as THREE.BufferAttribute;
 ```
 
-- [ ] **5d.** `npx ng test --include=src/app/game/encounter-scene/encounter-scene.spec.ts --watch=false` → PASA (12). Commit + push.
+- [x] **5d.** `npx ng test --include=src/app/game/encounter-scene/encounter-scene.spec.ts --watch=false` → PASA (12). Commit + push.
 
 ### Paso 6 — Sonidos de la entrada
 
 **Files:** Modify `src/app/services/game/sfx-synth.ts` (su spec ya prueba TODAS las recetas: que suenen, no saturen y duren < 1 s)
 
-- [ ] **6a.** Añadir dentro de `SFX_RECIPES`, antes del `} satisfies …`:
+- [x] **6a.** Añadir dentro de `SFX_RECIPES`, antes del `} satisfies …`:
 
 ```ts
   /** El Pokémon aterriza en el encuentro (F2-04b): golpe sordo con polvo. */
@@ -2731,7 +2731,7 @@ Puntos redondos con una `DataTexture` (sin canvas, D-038) en mezcla aditiva: el 
   ],
 ```
 
-- [ ] **6b.** `npx ng test --include=src/app/services/game/sfx-synth.spec.ts --watch=false` → PASA. Commit + push.
+- [x] **6b.** `npx ng test --include=src/app/services/game/sfx-synth.spec.ts --watch=false` → PASA. Commit + push.
   **Ojo:** no llames a una receta `throw`: el spec de `AudioService` usa `'throw'` como sonido de ARCHIVO del catálogo y
   una receta con ese nombre le gana (por eso en F2-05 es `'ball-throw'`).
 
@@ -2743,7 +2743,7 @@ ficha falsa con todo lo que se lee.
 
 **Files:** Modify `src/app/features/encounter/encounter.page.ts`, `encounter.page.spec.ts`
 
-- [ ] **7a. Tests:**
+- [x] **7a. Tests:**
 
 ```diff
 --- a/src/app/features/encounter/encounter.page.spec.ts
@@ -2832,7 +2832,7 @@ ficha falsa con todo lo que se lee.
      expect(text(f)).toContain('Estás demasiado lejos.');
 ```
 
-- [ ] **7b.** → FALLAN. **7c. Implementación:**
+- [x] **7b.** → FALLAN. **7c. Implementación:**
 
 ```diff
 --- a/src/app/features/encounter/encounter.page.ts
@@ -3013,7 +3013,7 @@ ficha falsa con todo lo que se lee.
    private async openCamera(): Promise<void> {
 ```
 
-- [ ] **7d.** `npx ng test --include=src/app/features/encounter/encounter.page.spec.ts --watch=false` → PASA (9). Commit + push.
+- [x] **7d.** `npx ng test --include=src/app/features/encounter/encounter.page.spec.ts --watch=false` → PASA (9). Commit + push.
 
 ### Paso 8 — Del mapa al encuentro sin corte
 
@@ -3022,7 +3022,7 @@ mientras se manda la posición (a la vez: no añade espera). Con "reducir efecto
 
 **Files:** Modify `src/app/game/map-scene/pokemon-dom.ts`, `pokemon-dom.spec.ts`, `src/app/features/map/map.page.ts`
 
-- [ ] **8a.** Test de `elementOf` y código:
+- [x] **8a.** Test de `elementOf` y código:
 
 ```diff
 diff --git a/src/app/features/map/map.page.ts b/src/app/features/map/map.page.ts
@@ -3143,11 +3143,11 @@ index a35e8a7..bf29e9a 100644
      for (const { img } of this.items.values()) img.style.visibility = 'hidden';
 ```
 
-- [ ] **8b.** `npx ng test --include=src/app/game/map-scene/pokemon-dom.spec.ts --watch=false` → PASA. Commit + push.
+- [x] **8b.** `npx ng test --include=src/app/game/map-scene/pokemon-dom.spec.ts --watch=false` → PASA. Commit + push.
 
 ### Paso 9 — Verde y Android
 
-- [ ] **9a.** `npm run lint` · `npm run build` · `npm test -- --watch=false` · `npm run test:shared` en verde.
+- [x] **9a.** `npm run lint` · `npm run build` · `npm test -- --watch=false` · `npm run test:shared` en verde.
 - [ ] **9b.** Android: tocar un Pokémon en el mapa → crece hacia el centro → destello → cae y aterriza con polvo, grito
   y vibración a la vez. Un Volador/Bicho con alas flota; un Fantasma se ve semitransparente; un rápido (p. ej. Rattata)
   salta más a menudo que uno lento (Slowpoke). fps con partículas ≥ 55 (snippet del paso 12c de F2-04a). Vídeo

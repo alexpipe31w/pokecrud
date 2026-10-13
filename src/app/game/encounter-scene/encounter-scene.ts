@@ -2,6 +2,7 @@ import * as THREE from 'three';
 
 import { spotInFront } from './device-pose';
 import { EYE_HEIGHT_M, encounterDistance } from './encounter-layout';
+import { FX_COUNT, particleAt, type FxKind, type FxPoint } from './type-fx';
 
 /** Postura del Pokémon en un fotograma (la da `motionAt` en F2-04b; quieto hasta entonces). */
 export interface PokemonPose {
@@ -15,6 +16,10 @@ export const STILL: PokemonPose = { lift: 0, squash: 1, lean: 0 };
 const ART_FILL = 0.8;
 /** Campo de visión vertical calibrado en el A36 (D-045). */
 export const ENCOUNTER_FOV_DEG = 64;
+
+/** Puntos de una ráfaga (polvo al aterrizar, destello shiny; estrellas de la captura en F2-07). */
+export const BURST_COUNT = 28;
+export const BURST_S = 0.8;
 
 const horizon = new THREE.Vector3();
 
@@ -30,9 +35,20 @@ export class EncounterScene {
   readonly anchor = new THREE.Group();
   readonly body: THREE.Mesh<THREE.PlaneGeometry, THREE.MeshBasicMaterial>;
   readonly shadow: THREE.Mesh<THREE.CircleGeometry, THREE.MeshBasicMaterial>;
+  /** Partículas del tipo, alrededor del Pokémon (F2-04b). */
+  readonly fx: THREE.Points<THREE.BufferGeometry, THREE.PointsMaterial>;
+  /** Ráfaga: polvo por el suelo o chispas que suben (F2-04b; estrellas en F2-07). */
+  readonly burst: THREE.Points<THREE.BufferGeometry, THREE.PointsMaterial>;
   private readonly shadowTex: THREE.Texture;
+  private readonly glowTex: THREE.Texture;
   private aspect = 1;
   private placed = false;
+  private fxKind: FxKind | null = null;
+  private readonly fxColor = new THREE.Color();
+  private readonly burstColor = new THREE.Color();
+  private burstStart = Number.NaN;
+  private burstUp = false;
+  private readonly pt: FxPoint = { x: 0, y: 0, z: 0, alpha: 0 };
 
   constructor(readonly heightM: number) {
     this.body = new THREE.Mesh(
@@ -46,7 +62,12 @@ export class EncounterScene {
       new THREE.MeshBasicMaterial({ map: this.shadowTex, transparent: true, depthWrite: false }),
     );
     this.shadow.position.y = 0.01;
-    this.anchor.add(this.shadow, this.body);
+    this.glowTex = blobTexture(32, 255, 255);
+    this.fx = glowPoints(FX_COUNT, 0.08, this.glowTex);
+    this.burst = glowPoints(BURST_COUNT, 0.12, this.glowTex);
+    this.fx.visible = false;
+    this.burst.visible = false;
+    this.anchor.add(this.shadow, this.body, this.fx, this.burst);
     this.anchor.visible = false;
     this.scene.add(this.anchor);
   }
@@ -124,7 +145,73 @@ export class EncounterScene {
     this.shadow.scale.setScalar(Math.max(0.35, this.heightM * 0.9) * (1 - away));
   }
 
+  /** Partículas del tipo (null = ninguna, p. ej. con "reducir efectos"). `color` CSS: '#rrggbb'. */
+  setFx(kind: FxKind | null, color = '#ffffff'): void {
+    this.fxKind = kind;
+    this.fxColor.set(color);
+    this.fx.visible = kind !== null;
+  }
+
+  /** Empieza una ráfaga en `tSec`: `up` = chispas que suben (shiny, estrellas); si no, polvo por el suelo. */
+  startBurst(tSec: number, color: string, up: boolean): void {
+    this.burstStart = tSec;
+    this.burstColor.set(color);
+    this.burstUp = up;
+    this.burst.visible = true;
+  }
+
+  /** Anima partículas y ráfaga; `tSec` = segundos desde que empezó el encuentro. */
+  animate(tSec: number): void {
+    const radius = Math.max(0.25, this.heightM * 0.45 * this.aspect);
+    if (this.fxKind) {
+      const pos = attr(this.fx, 'position');
+      const col = attr(this.fx, 'color');
+      const c = this.fxColor;
+      for (let i = 0; i < FX_COUNT; i++) {
+        const p = particleAt(
+          this.fxKind,
+          seed(i, 0),
+          seed(i, 1),
+          seed(i, 2),
+          tSec,
+          this.heightM,
+          radius,
+          this.pt,
+        );
+        pos.setXYZ(i, p.x, p.y, p.z);
+        col.setXYZW(i, c.r, c.g, c.b, p.alpha); // se apaga el alfa, no el color: el canvas es transparente
+      }
+      pos.needsUpdate = true;
+      col.needsUpdate = true;
+    }
+    if (!this.burst.visible) return;
+    const k = (tSec - this.burstStart) / BURST_S;
+    if (!(k >= 0 && k < 1)) {
+      this.burst.visible = false;
+      return;
+    }
+    const pos = attr(this.burst, 'position');
+    const col = attr(this.burst, 'color');
+    const c = this.burstColor;
+    for (let i = 0; i < BURST_COUNT; i++) {
+      const ang = (i / BURST_COUNT) * Math.PI * 2;
+      const r = radius * (0.3 + 1.2 * k) * (0.7 + 0.3 * seed(i, 1));
+      const y = this.burstUp
+        ? this.heightM * (0.2 + 1.1 * k * (0.5 + seed(i, 2)))
+        : 0.05 + 0.3 * k * (1 - k);
+      pos.setXYZ(i, Math.cos(ang) * r, y, Math.sin(ang) * r);
+      col.setXYZW(i, c.r, c.g, c.b, 1 - k);
+    }
+    pos.needsUpdate = true;
+    col.needsUpdate = true;
+  }
+
   dispose(): void {
+    for (const p of [this.fx, this.burst]) {
+      p.geometry.dispose();
+      p.material.dispose();
+    }
+    this.glowTex.dispose();
     this.body.geometry.dispose();
     this.body.material.map?.dispose();
     this.body.material.dispose();
@@ -135,19 +222,57 @@ export class EncounterScene {
 }
 
 /**
- * Mancha difuminada para la sombra, calculada en un array (sin canvas: ni otro contexto que cuente para el límite
- * del WebView, D-038, ni avisos de jsdom en los tests). Negro con alfa 0,5 en el centro → 0 en el borde.
+ * Mancha difuminada calculada en un array (sin canvas: ni otro contexto que cuente para el límite del WebView, D-038,
+ * ni avisos de jsdom en los tests). Por defecto la sombra: negro con alfa 0,5 en el centro → 0 en el borde; con
+ * `rgb` 255 y `maxAlpha` 255, el punto de luz redondo de las partículas.
  */
-export function blobTexture(size = 64): THREE.DataTexture {
+export function blobTexture(size = 64, rgb = 0, maxAlpha = 127): THREE.DataTexture {
   const data = new Uint8Array(size * size * 4);
   const c = (size - 1) / 2;
   for (let y = 0; y < size; y++) {
     for (let x = 0; x < size; x++) {
       const d = Math.min(1, Math.hypot(x - c, y - c) / c);
-      data[(y * size + x) * 4 + 3] = Math.round(127 * (1 - d) * (1 - d));
+      const i = (y * size + x) * 4;
+      data[i] = data[i + 1] = data[i + 2] = rgb;
+      data[i + 3] = Math.round(maxAlpha * (1 - d) * (1 - d));
     }
   }
   const tex = new THREE.DataTexture(data, size, size);
   tex.needsUpdate = true;
   return tex;
 }
+
+/** Semilla fija en [0, 1) de la partícula `i` (`k` = 0, 1, 2): sin Math.random, la escena es determinista. */
+function seed(i: number, k: number): number {
+  const x = Math.sin((i + 1) * (12.9898 + k * 78.233)) * 43758.5453;
+  return x - Math.floor(x);
+}
+
+function glowPoints(
+  n: number,
+  size: number,
+  map: THREE.Texture,
+): THREE.Points<THREE.BufferGeometry, THREE.PointsMaterial> {
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.BufferAttribute(new Float32Array(n * 3), 3));
+  // RGBA por punto: sobre un canvas TRANSPARENTE (encima del vídeo) apagar el color en vez del alfa deja puntos
+  // negros; con alfa por punto y alfa premultiplicado, el aditivo suma (color·α, α) y lo apagado no se ve.
+  g.setAttribute('color', new THREE.BufferAttribute(new Float32Array(n * 4), 4));
+  const p = new THREE.Points(
+    g,
+    new THREE.PointsMaterial({
+      size,
+      map,
+      vertexColors: true,
+      transparent: true,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending,
+      premultipliedAlpha: true,
+    }),
+  );
+  p.frustumCulled = false;
+  return p;
+}
+
+const attr = (p: THREE.Points, name: string): THREE.BufferAttribute =>
+  p.geometry.getAttribute(name) as THREE.BufferAttribute;

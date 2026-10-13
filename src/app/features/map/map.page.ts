@@ -26,6 +26,7 @@ import { nearestN } from '../../game/map-scene/spawn-diff';
 import { AudioService } from '../../services/game/audio.service';
 import { BagService } from '../../services/game/bag.service';
 import { HapticsService } from '../../services/game/haptics.service';
+import { SettingsService } from '../../services/game/settings.service';
 import { SpawnFeedService } from '../../services/game/spawn-feed.service';
 import { CompassService } from '../../services/location/compass.service';
 import { DEFAULT_CENTER, LocationService } from '../../services/location/location.service';
@@ -185,6 +186,7 @@ export class MapPage implements ViewDidEnter, ViewWillLeave, OnDestroy {
   private readonly audio = inject(AudioService);
   private readonly haptics = inject(HapticsService);
   private readonly router = inject(Router);
+  private readonly settings = inject(SettingsService);
 
   protected readonly night = signal(isNightLocal(new Date()));
   /** Por qué no se pudo cargar Google Maps (la pantalla de estados lo muestra con "Reintentar"). */
@@ -556,10 +558,57 @@ export class MapPage implements ViewDidEnter, ViewWillLeave, OnDestroy {
     if (this.opening || !pos) return;
     this.opening = true;
     try {
-      await this.spawnFeed.reportPosition({ lat: pos.lat, lng: pos.lng });
+      await Promise.all([
+        this.spawnFeed.reportPosition({ lat: pos.lat, lng: pos.lng }),
+        this.zoomToEncounter(id),
+      ]);
       await this.router.navigateByUrl(`/encuentro/${encodeURIComponent(id)}`);
     } finally {
       this.opening = false;
+    }
+  }
+
+  /**
+   * Continuidad mapa → encuentro (DISENO §4.8, F2-04b): una copia del Pokémon tocado crece hacia el centro y se funde
+   * en blanco; el encuentro empieza con un destello blanco que se va. Sin animación con "reducir efectos/movimiento".
+   */
+  private async zoomToEncounter(id: string): Promise<void> {
+    const img = this.pokemonDom?.elementOf(id);
+    const reduce =
+      this.settings.settings().reduceEffects ||
+      (typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches);
+    if (!img || reduce || typeof img.animate !== 'function') return;
+    const r = img.getBoundingClientRect();
+    const ghost = img.cloneNode() as HTMLImageElement;
+    Object.assign(ghost.style, {
+      position: 'fixed',
+      left: `${r.left}px`,
+      top: `${r.top}px`,
+      width: `${r.width}px`,
+      height: `${r.height}px`,
+      transform: 'none',
+      zIndex: '1000',
+      pointerEvents: 'none',
+    });
+    document.body.append(ghost);
+    const dx = innerWidth / 2 - (r.left + r.width / 2);
+    const dy = innerHeight / 2 - (r.top + r.height / 2);
+    try {
+      await ghost.animate(
+        [
+          { transform: 'translate(0, 0) scale(1)', opacity: 1, filter: 'brightness(1)' },
+          {
+            transform: `translate(${dx}px, ${dy}px) scale(3)`,
+            opacity: 0,
+            filter: 'brightness(3)',
+          },
+        ],
+        { duration: 320, easing: 'cubic-bezier(0.23, 1, 0.32, 1)' },
+      ).finished;
+    } catch {
+      // cancelada: da igual, se abre el encuentro
+    } finally {
+      ghost.remove();
     }
   }
 
