@@ -2743,7 +2743,7 @@ ficha falsa con todo lo que se lee.
 
 **Files:** Modify `src/app/features/encounter/encounter.page.ts`, `encounter.page.spec.ts`
 
-- [ ] **7a. Tests:**
+- [x] **7a. Tests:**
 
 ```diff
 --- a/src/app/features/encounter/encounter.page.spec.ts
@@ -2832,7 +2832,7 @@ ficha falsa con todo lo que se lee.
      expect(text(f)).toContain('Estás demasiado lejos.');
 ```
 
-- [ ] **7b.** → FALLAN. **7c. Implementación:**
+- [x] **7b.** → FALLAN. **7c. Implementación:**
 
 ```diff
 --- a/src/app/features/encounter/encounter.page.ts
@@ -3013,7 +3013,7 @@ ficha falsa con todo lo que se lee.
    private async openCamera(): Promise<void> {
 ```
 
-- [ ] **7d.** `npx ng test --include=src/app/features/encounter/encounter.page.spec.ts --watch=false` → PASA (9). Commit + push.
+- [x] **7d.** `npx ng test --include=src/app/features/encounter/encounter.page.spec.ts --watch=false` → PASA (9). Commit + push.
 
 ### Paso 8 — Del mapa al encuentro sin corte
 

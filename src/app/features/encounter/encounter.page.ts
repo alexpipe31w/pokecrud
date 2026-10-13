@@ -12,17 +12,27 @@ import {
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { IonContent } from '@ionic/angular';
+import { hashString } from '@shared/engine/rng';
 import type { EncounterView } from '@shared/protocol/encounters';
 import * as THREE from 'three';
 
 import { loadFirstTexture } from '../../game/encounter-scene/art-texture';
+import { cssColor } from '../../game/encounter-scene/css-color';
 import { cameraYaw } from '../../game/encounter-scene/device-pose';
 import { artUrls, pokemonHeightM, sizeClass } from '../../game/encounter-scene/encounter-layout';
-import { EncounterScene } from '../../game/encounter-scene/encounter-scene';
+import { EncounterScene, type PokemonPose } from '../../game/encounter-scene/encounter-scene';
 import {
   EncounterStage,
   type EncounterStageLike,
 } from '../../game/encounter-scene/encounter-stage';
+import { personalityOf, type Personality } from '../../game/encounter-scene/personality';
+import {
+  TOUCHDOWN_MS,
+  jumpSchedule,
+  landingAt,
+  motionAt,
+} from '../../game/encounter-scene/pokemon-motion';
+import { FX_KIND } from '../../game/encounter-scene/type-fx';
 import { CameraService } from '../../services/ar/camera.service';
 import { OrientationService } from '../../services/ar/orientation.service';
 import { AudioService } from '../../services/game/audio.service';
@@ -63,6 +73,12 @@ export function encounterErrorText(status: number | undefined): string {
 
 type Phase = 'loading' | 'error' | 'resolved' | 'ready';
 
+/** Si la ficha no ha cargado: quieto, en el suelo, sin efectos raros. */
+const CALM: Personality = { agility: 0, skittish: 0, hover: 0, ghostly: false, fx: 'normal' };
+
+const prefersReducedMotion = (): boolean =>
+  typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
+
 /**
  * Encuentro en AR (F2-04a, D-045): la cámara trasera principal de fondo y el Pokémon a su tamaño real anclado en el
  * suelo con el giroscopio, delante de donde se miraba al entrar. Sin cámara (permiso, AR apagada) o sin giroscopio:
@@ -82,6 +98,7 @@ type Phase = 'loading' | 'error' | 'resolved' | 'ready';
       >
         <video #video muted playsinline [hidden]="!streaming()"></video>
         <canvas #canvas></canvas>
+        <div #flash class="flash" aria-hidden="true"></div>
       </div>
       <div class="layer">
         @switch (phase()) {
@@ -150,6 +167,13 @@ type Phase = 'loading' | 'error' | 'resolved' | 'ready';
     video {
       object-fit: cover;
     }
+    .flash {
+      position: absolute;
+      inset: 0;
+      background: var(--paper);
+      opacity: 0;
+      pointer-events: none;
+    }
     .layer {
       position: absolute;
       inset: 0;
@@ -209,6 +233,7 @@ export class EncounterPage implements OnDestroy {
   private readonly stageEl = viewChild.required<ElementRef<HTMLElement>>('stage');
   private readonly videoEl = viewChild.required<ElementRef<HTMLVideoElement>>('video');
   private readonly canvasEl = viewChild.required<ElementRef<HTMLCanvasElement>>('canvas');
+  private readonly flashEl = viewChild.required<ElementRef<HTMLElement>>('flash');
 
   protected readonly phase = signal<Phase>('loading');
   protected readonly view = signal<EncounterView | null>(null);
@@ -219,6 +244,10 @@ export class EncounterPage implements OnDestroy {
   /** Altura del horizonte del fondo ilustrado (la de la escena sin AR). */
   protected readonly horizon = signal('34%');
   protected readonly arOn = computed(() => this.settings.settings().arEnabled);
+  /** "Reducir efectos" (ajustes) o "reducir movimiento" (sistema): sin partículas ni destellos (D-033). */
+  private readonly reduce = computed(
+    () => this.settings.settings().reduceEffects || prefersReducedMotion(),
+  );
   private readonly species = computed(() => {
     const v = this.view();
     return v ? (this.dataset.species().get(v.speciesId) ?? null) : null;
@@ -252,6 +281,11 @@ export class EncounterPage implements OnDestroy {
   private arMode = false;
   private loadSeq = 0;
   private resizeObs?: ResizeObserver;
+  private personality: Personality = CALM;
+  private jumps: number[] = [];
+  /** Cuándo empezó el encuentro (ms): aterrizaje y saltos cuentan desde aquí; NO se reinicia al volver. */
+  private startedAt = 0;
+  private touchedDown = false;
 
   constructor() {
     document.addEventListener('visibilitychange', this.onVisibility);
@@ -310,14 +344,22 @@ export class EncounterPage implements OnDestroy {
         this.phase.set('resolved');
         return;
       }
-      const height = this.dataset.species().get(v.speciesId)?.height ?? 10;
-      const world = new EncounterScene(pokemonHeightM(height, v.heightScale));
+      const sp = this.dataset.species().get(v.speciesId);
+      const world = new EncounterScene(pokemonHeightM(sp?.height ?? 10, v.heightScale));
       this.world = world;
+      // Personalidad de su ficha (F2-04b): saltos con semilla = id del encuentro (siempre los mismos).
+      this.personality = sp ? personalityOf(sp) : CALM;
+      this.jumps = jumpSchedule(hashString(v.id), this.personality.agility);
+      if (this.personality.ghostly) world.setOpacity(0.7);
+      const type = sp?.types[0] ?? 'normal';
+      world.setFx(this.reduce() ? null : FX_KIND[type], cssColor([`--t-${type}`, '#ffffff']));
+      this.startedAt = performance.now();
+      this.touchedDown = false;
       this.stage = this.createStage(this.canvasEl().nativeElement, world);
       this.stage.onFrame = (now) => this.frame(now);
       this.watchSize();
       this.phase.set('ready');
-      void this.audio.playCry(v.speciesId);
+      this.flashIn();
       void loadFirstTexture(artUrls(v.speciesId, v.shiny)).then((tex) => {
         if (tex && this.world === world) world.setTexture(tex);
         else tex?.dispose();
@@ -370,12 +412,50 @@ export class EncounterPage implements OnDestroy {
         this.horizon.set(`${Math.round(world.horizonY() * 100)}%`);
       }
     }
+    const t = now - this.startedAt;
+    if (!this.touchedDown && t >= TOUCHDOWN_MS) this.touchdown(t);
+    const pose = this.poseAt(t, world.heightM);
     if (ar) {
-      world.update(this.q);
+      world.update(this.q, pose);
     } else {
       world.aimAtPokemon();
-      world.update(null);
+      world.update(null, pose);
     }
+    world.animate(t / 1000);
+  }
+
+  /** Postura en `t` ms del encuentro: cae al entrar y después se mueve según su ficha (F2-04b). */
+  private poseAt(t: number, heightM: number): PokemonPose {
+    const land = landingAt(t);
+    if (land) return { lift: this.personality.hover + land.lift, squash: land.squash, lean: 0 };
+    return motionAt(t, this.personality, this.jumps, heightM);
+  }
+
+  /** Toca el suelo (DISENO §5): polvo (o destello dorado si es shiny), su grito completo y vibración, a la vez. */
+  private touchdown(t: number): void {
+    this.touchedDown = true;
+    const v = this.view();
+    if (!v || !this.world) return;
+    if (!this.reduce()) {
+      this.world.startBurst(
+        t / 1000,
+        v.shiny ? cssColor(['--gold', '#ffcb3d']) : cssColor(['--paper-2', '#efe8d8']),
+        v.shiny,
+      );
+    }
+    void this.audio.playSfx(v.shiny ? 'shiny' : 'land');
+    void this.audio.playCry(v.speciesId);
+    this.haptics.tap();
+  }
+
+  /** Entra desde el mapa con un destello blanco que se va (continuidad con el zoom del mapa, DISENO §4.8). */
+  private flashIn(): void {
+    const el = this.flashEl().nativeElement;
+    if (this.reduce() || typeof el.animate !== 'function') return;
+    el.animate([{ opacity: 1 }, { opacity: 0 }], {
+      duration: 350,
+      easing: 'cubic-bezier(0.23, 1, 0.32, 1)',
+    });
   }
 
   private async openCamera(): Promise<void> {
