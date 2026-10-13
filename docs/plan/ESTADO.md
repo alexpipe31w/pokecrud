@@ -196,7 +196,8 @@ F2-07, F2-12, F2-13, F2-15 hechas; faltan **F2-11**/**F2-14** (ARCore), F2-10 (m
 
 ## En curso
 
-- Nadie. **F3-01a (Samuel) hecha, PR abierto:** plan de la colección en `docs/plan/fases/F3-coleccion.md`.
+- Nadie. Hechas por Samuel: **F0-15** (#63, mezclado) y **F3-01a** (#64, plan de la colección en
+  `docs/plan/fases/F3-coleccion.md`).
 - F1-05 y F1-07 siguen `[~]` (@alex) SOLO por su prueba en la calle (PENDIENTES).
 
 ## Siguiente paso concreto

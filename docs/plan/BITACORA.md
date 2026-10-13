@@ -1408,6 +1408,25 @@ franja antes de volver (lo cubre `spawn-feed.service.spec`).
 **El siguiente debe empezar por:** mezclar el PR de F2-07; con luz, F1-07 7b y F1-05 3b en la calle (joystick
 APAGADO); después F3-01 (plan de la colección con `writing-plans`: "Mis Pokémon" ya tiene datos que enseñar).
 
+## 2026-10-13 12:30 · @samuel (Claude) · F0-15 · rama `feature/F0-15-tests-lentos`
+
+**Qué se hizo:** puesto al día con `develop` (relevo de Kenneth, #59-#62). En el PC de Samuel `test:shared` fallaba a
+veces con "Test timed out in 5000ms" (`capture.spec` "capturado ⇒ 3 sacudidas…" 7,3 s y `spawns.spec` "valores siempre
+dentro de rango…" 6,8 s; el servidor dio un fallo igual en una vuelta y 22/22 en la siguiente). Causa: `expect` dentro de
+bucles de miles de vueltas. Tarea nueva F0-15: en esos tests se apuntan los casos malos y hay un solo `expect` con la
+lista; además `SIMULATION_TIMEOUT_MS` = 30 s en las simulaciones (como el `120_000` de combate e IA, que ya lo tenían).
+**Archivos clave:** `shared/engine/capture.spec.ts`, `spawns.spec.ts`, `rng.spec.ts` (solo tests).
+**Cómo se probó (salida real):**
+
+    antes:  capturado ⇒ 3 sacudidas… 4.801-7.268 ms · valores siempre dentro de rango… 3.153-6.795 ms · valores en [0,1) 1.312 ms
+    después: 62 ms · 65 ms · 3 ms (40.000 lanzamientos 251 ms, ningún legendario 84 ms)
+    sabotaje (IV hp con rng.int(0, 40)) → falla con [{ problem: "IV 36" }, { problem: "IV 34" }, …]; restaurado
+    test:shared ×3 → 147 passed (147) las tres · tsc -p shared/tsconfig.json OK · lint OK · prettier OK en los 3 archivos
+
+**Quedó a medias / roto:** nada. (Prettier ya marcaba `shared/engine/combat-power.spec.ts` antes de esta tarea.)
+**Decisiones nuevas:** ninguna.
+**El siguiente debe empezar por:** F3-01 (plan de la colección; Samuel la coge ahora).
+
 ## 2026-10-13 13:30 · @samuel (Claude) · F3-01a · rama `feature/F3-01a-plan-coleccion`
 
 **Qué se hizo:** F3-01 partida en F3-01a/F3-01b (consejo de Kenneth). F3-01a: plan de la colección con `writing-plans`
