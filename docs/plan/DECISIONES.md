@@ -593,3 +593,33 @@ Sigue existiendo `SFX_CATALOG` para sonidos grabados que lleguen más tarde (en 
 - **Código para F2-04/F4-07:** `src/app/game/encounter-scene/device-pose.ts` (orientación → cámara three.js, rumbo,
   punto del suelo delante) y `pose-delay.ts` (orientación de hace N ms), con tests. Suelo a 1,4 m bajo la cámara;
   distancia del Pokémon = máx(2 m, 1,8 × altura real del dataset). `/dev/ar` se queda para medir otros móviles.
+
+## D-046 · Encuentro y captura (plan de F2, F2-02): quién decide qué y cómo se lanza (2026-10-12, Kenneth)
+
+- **El cliente decide si la bola TOCA al Pokémon; el servidor, todo lo demás.** El vuelo se calcula entero al soltar
+  (`throw-physics.ts`): los saltos del Pokémon están programados con una semilla (el id del encuentro,
+  `pokemon-motion.ts`), así que dónde estará al llegar la bola se sabe ya. Si toca, `POST /encounters/:id/throw` con la
+  calidad propuesta (el servidor gasta la bola, tira el RNG, decide captura/huida y rebaja un "excelente" inverosímil,
+  D-028). **Si no toca, no se llama al servidor y no se gasta nada** (ni bola ni Frambu): fallar no da ninguna ventaja, así
+  que no hace falta que el servidor lo sepa, y no se castiga al jugador por la física.
+- **Lanzamiento normalizado por distancia** (como Pokémon GO): con potencia 1 (un gesto de `REF_FLICK_PX_S` = 1800 px/s
+  hacia arriba) y puntería 0 la bola llega al centro del Pokémon esté a 2 m o a 12 m; con más pasa por encima, con menos
+  se queda corta; torcido falla. Gravedad real; tiempo de vuelo 0,55 s + 0,06 s/m. Los diminutos tienen una caja mínima
+  (0,36 × 0,35 m) para que se les pueda dar.
+- **Curva = girar el dedo ~0,9 vueltas alrededor de la bola antes de lanzar.** La bola se abre 0,6 m a un lado y vuelve
+  a su línea: llega al mismo sitio (con el bonus ×1,7 de D-027); no exige apuntar desviado.
+- **El aro de precisión es una elipse del tamaño de la caja del Pokémon** (no un círculo): lo que se ve es exactamente la
+  zona que cuenta. Encoge de 1 a 0,2 cada 1,6 s; dentro y con el aro > 0,7 = Bien, > 0,4 = Genial, si no Excelente. Su
+  color es la probabilidad SIN bonus de lanzamiento (≥ 60 % verde, ≥ 30 % amarillo, ≥ 15 % naranja, rojo).
+- **Coreografía en dos partes:** al golpear empieza lo que no depende del servidor (absorber 0,6 s + caer 0,7 s) y a la
+  vez sale la petición; las sacudidas y el final se añaden cuando responde. Así la latencia de Render se esconde y, si
+  tarda más, la bola espera en el suelo balanceándose. Cada paso suena y vibra en el fotograma en que empieza.
+- **Tipos del lanzamiento** (`ThrowRequest`, `ThrowResult`, `CaughtView`, `BagView`) en `shared/protocol/encounters.ts`;
+  el servidor los reexporta. Lo capturado o huido se oculta del mapa en la app (`SpawnFeedService.hide`) porque el
+  servidor no guarda spawns (D-025); la XP del HUD se suma en local con la misma curva (`AuthService.addXp`).
+- **Naturalezas en español** en `shared/data/natures-es.ts`, sacadas de PokéAPI (el dataset no las trae).
+- **Escena sin AR** (sin cámara, AR apagada o sin giroscopio): cámara quieta **mirando al Pokémon** (si mirara al
+  horizonte, un Pikachu a 2 m quedaría fuera) y el horizonte del fondo ilustrado a la altura del de la escena.
+- **F2-04 se parte en F2-04a (escena AR base) y F2-04b (personalidad, efectos y entrada).**
+- Recetas de sonido nuevas (D-044): `land`, `shiny`, `ball-throw` (no `throw`: es un sonido de archivo en el spec de
+  `AudioService`), `ball-hit`, `absorb`, `shake`, `capture`, `escape`.

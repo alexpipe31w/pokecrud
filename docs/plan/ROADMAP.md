@@ -156,16 +156,23 @@
       en 20 s; calibrado FOV 64° y retraso 80 ms. Sin WebXR (AR solo de orientación). Cámara y sensores se sueltan al
       salir y en segundo plano; 3 idas y vueltas al mapa sin perder el contexto WebGL. Evidencias `F2-01_0{1..6}_*`. D-045.
       Código para F2-04: `game/encounter-scene/device-pose.ts` y `pose-delay.ts` (17 tests).
-- [~] **F2-02 · Plan detallado de F2** (@kenneth, 2026-10-12) (`docs/plan/fases/F2-captura.md`). Dep: F2-01.
+- [x] **F2-02 · Plan detallado de F2** (@kenneth, 2026-10-12) (`docs/plan/fases/F2-captura.md`). Dep: F2-01.
+      **Hecho:** plan de F2-04a, F2-04b, F2-05 y F2-07 con TODO el código y sus tests, **verificado capa a capa antes de
+      subirlo** (estado final: app 393 tests, shared 143, servidor 22; los diffs del plan reproducen ese estado byte a
+      byte). F2-04 partida en F2-04a/F2-04b. D-046. F2-10 (música) queda fuera: no depende de él.
 - [x] **F2-03 · Fórmula de captura** (@alex, 2026-10-11) — `shared/engine/capture.ts` (+ huida) con tests de casos conocidos.
       Dep: F0-03.
       **Hecho:** fórmula Gen III+ de ARQUITECTURA §6, huida por rareza/velocidad, `resolveThrow` con RNG inyectado;
       12 tests (casos calculados a mano + 40.000 lanzamientos que cuadran con la probabilidad). D-027.
-- [ ] **F2-04 · Escena de encuentro** — cámara/fondo ilustrado, Pokémon a tamaño real con XS/XL,
-      animación idle/esquiva por velocidad, efectos por tipo, transición desde el mapa (DISENO §5).
-      Dep: F2-02, F1-07.
+- [ ] **F2-04a · Escena de encuentro en AR (base)** — `/encuentro/:id` definitivo: cámara trasera principal de fondo
+      (o fondo ilustrado sin permiso / sin cámara / AR apagada), Pokémon a tamaño real con XS/XL anclado con el
+      giroscopio, placa, "Huir", estados de error; cámara y sensores se sueltan al salir (D-045). Dep: F2-02, F1-07.
+      Criterio: Android ≥ 55 fps; mapa ↔ encuentro ×3 sin perder el contexto WebGL. Plan: `fases/F2-captura.md`.
+- [ ] **F2-04b · Personalidad, efectos del tipo y entrada** — idle/saltos por velocidad, vuelo, fantasma, partículas
+      del tipo, transición desde el mapa, aterrizaje con polvo + grito + vibración, destello shiny (DISENO §5).
+      Dep: F2-04a. Criterio: Android ≥ 55 fps con partículas; vídeo de la entrada.
 - [ ] **F2-05 · Lanzamiento** — gesto 1:1, física, curva, círculo de precisión, bolas y bayas, hápticos.
-      Dep: F2-04.
+      Dep: F2-04b. (Fallar no llama al servidor ni gasta, D-046.)
 - [x] **F2-06 · Captura autoritativa en servidor** (@alex, 2026-10-11) — `POST /encounters/:id/throw` con transacción,
       descuento atómico, `UNIQUE` de idempotencia, validación de distancia (ARQUITECTURA §6); test de
       concurrencia (dos lanzamientos simultáneos). Dep: F2-03, F1-06, F1-08.
@@ -225,7 +232,7 @@
       **Hecho:** `ai.ts` + 3 entrenadores; difícil gana al fácil 71,8 % (500 espejo) y al azar 95,7 %. Conectarla a la
       escena es el paso 1 de F4-05 (D-032).
 - [ ] **F4-07 · Combate en realidad aumentada (D-034)** — la escena de combate con la cámara: los dos Pokémon anclados
-      en el suelo real (three.js sobre la cámara + giroscopio, la misma base que el encuentro F2-04), ataques con
+      en el suelo real (three.js sobre la cámara + giroscopio, la misma base que el encuentro F2-04a), ataques con
       partículas 3D del tipo, sacudida, número de daño. Reutiliza `BattleController`, el motor, la IA y el menú de
       F4-05 (solo cambia la capa visual). Sin cámara → fondo ilustrado. Dep: F2-01 (spike cámara), F4-05.
       Criterio: combate completo contra la IA en un Android real, grabado en vídeo.
