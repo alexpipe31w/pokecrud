@@ -5881,7 +5881,7 @@ final, los pasos intermedios no "empiezan" y no suenan.
 
 **Files:** Modify `src/app/features/encounter/encounter.page.ts`, `encounter.page.spec.ts`
 
-- [ ] **6a. Tests:**
+- [x] **6a. Tests:**
 
 ```diff
 --- a/src/app/features/encounter/encounter.page.spec.ts
@@ -5977,7 +5977,7 @@ final, los pasos intermedios no "empiezan" y no suenan.
    it('un lanzamiento flojo no llega y no llama al servidor (D-046)', async () => {
 ```
 
-- [ ] **6b.** → FALLAN. **6c. Implementación:**
+- [x] **6b.** → FALLAN. **6c. Implementación:**
 
 ```diff
 --- a/src/app/features/encounter/encounter.page.ts
@@ -6329,7 +6329,7 @@ final, los pasos intermedios no "empiezan" y no suenan.
      this.stage?.dispose();
 ```
 
-- [ ] **6d.** `npx ng test --include=src/app/features/encounter/encounter.page.spec.ts --watch=false` → PASA (13). Commit + push.
+- [x] **6d.** `npx ng test --include=src/app/features/encounter/encounter.page.spec.ts --watch=false` → PASA (13). Commit + push.
 
 ### Paso 7 — Verde y Android
 

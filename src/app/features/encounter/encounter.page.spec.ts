@@ -84,7 +84,9 @@ describe('EncounterPage', () => {
     scene: new THREE.Group().add(new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1))) as THREE.Group,
     clips: [],
   });
-  const loadModel = vi.fn(async (_id: number, _shiny: boolean) => cube() as ReturnType<typeof cube> | null);
+  const loadModel = vi.fn(
+    async (_id: number, _shiny: boolean) => cube() as ReturnType<typeof cube> | null,
+  );
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -101,12 +103,16 @@ describe('EncounterPage', () => {
         { provide: BagService, useValue: bag },
         { provide: AudioService, useValue: { playCry, playSfx } },
         // El plugin real de Capacitor no existe en web.
-        { provide: HapticsService, useValue: { tap: vi.fn(), throw: vi.fn() } },
+        {
+          provide: HapticsService,
+          useValue: { tap: vi.fn(), throw: vi.fn(), shake: vi.fn(), success: vi.fn() },
+        },
         {
           provide: DatasetService,
           useValue: {
             load: () => Promise.resolve(),
             species: () => new Map([[25, PIKACHU]]),
+            moves: () => new Map([[85, { names: { es: 'Rayo' } }]]),
           },
         },
         { provide: CameraService, useValue: camera },
@@ -174,16 +180,71 @@ describe('EncounterPage', () => {
     await settle(f);
   };
 
-  it('lanzar (F2-05): si le da, el servidor decide con la bola elegida y se enseña lo que diga', async () => {
+  /** Deja acabar la coreografía (F2-07, como mucho ~5 s) con un fotograma cada 100 ms; el reloj de `performance` es falso. */
+  const finish = async (f: Awaited<ReturnType<typeof open>>) => {
+    for (let i = 0; i < 80; i++) {
+      vi.advanceTimersByTime(100); // fotograma a fotograma, como en el móvil: cada paso suena al empezar
+      stage.onFrame!(performance.now());
+    }
+    await settle(f);
+  };
+  const result = (over: object) => ({
+    clientThrowId: 't',
+    captured: false,
+    shakes: 0,
+    fled: false,
+    throwQuality: 'none',
+    xpGained: 0,
+    caught: null,
+    bag: { items: [] },
+    ...over,
+  });
+
+  it('lanzar: si le da, el servidor decide con la bola elegida y, capturado, sale la tarjeta (F2-07)', async () => {
     vi.useFakeTimers({ toFake: ['performance'] });
-    api.throw.mockResolvedValueOnce({ captured: true, fled: false, shakes: 3 });
+    api.throw.mockResolvedValueOnce(
+      result({
+        captured: true,
+        shakes: 3,
+        xpGained: 160,
+        caught: { ...view, id: 'c1', nature: 'adamant', moves: [85] },
+      }),
+    );
     const f = await open(Promise.resolve(view));
     await throwAt(f, { power: 1, aim: 0, curve: 0 });
     expect(api.throw).toHaveBeenCalledWith(
       '12:34:5',
       expect.objectContaining({ ball: 'POKE_BALL', berry: null, curve: false }),
     );
+    expect(text(f)).not.toContain('¡Capturado!'); // aún se sacude
+    await finish(f);
     expect(text(f)).toContain('¡Capturado!');
+    expect(text(f)).toContain('Firme');
+    expect(text(f)).toContain('Rayo');
+    expect(playSfx).toHaveBeenCalledWith('absorb');
+    expect(playSfx).toHaveBeenCalledWith('shake');
+    expect(playSfx).toHaveBeenCalledWith('capture');
+  });
+
+  it('se escapa: vuelve a haber bola en la mano', async () => {
+    vi.useFakeTimers({ toFake: ['performance'] });
+    api.throw.mockResolvedValueOnce(result({ shakes: 1 }));
+    const f = await open(Promise.resolve(view));
+    await throwAt(f, { power: 1, aim: 0, curve: 0 });
+    await finish(f);
+    expect(text(f)).toContain('¡Se escapó!');
+    expect(playSfx).toHaveBeenCalledWith('escape');
+    const hand = (f.nativeElement as HTMLElement).querySelector('.hand')!;
+    expect(hand.classList.contains('is-off')).toBe(false);
+  });
+
+  it('huye: lo dice', async () => {
+    vi.useFakeTimers({ toFake: ['performance'] });
+    api.throw.mockResolvedValueOnce(result({ fled: true }));
+    const f = await open(Promise.resolve(view));
+    await throwAt(f, { power: 1, aim: 0, curve: 0 });
+    await finish(f);
+    expect(text(f)).toContain('¡Huyó!');
   });
 
   it('un lanzamiento flojo no llega y no llama al servidor (D-046)', async () => {
