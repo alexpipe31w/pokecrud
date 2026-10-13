@@ -79,7 +79,11 @@ export class EncounterScene {
   private readonly shadowTex: THREE.Texture;
   private readonly glowTex: THREE.Texture;
   private aspect = 1;
+  /** Largo (hacia la cámara) / alto del modelo; el arte plano no tiene (F2-15). */
+  private depthRatio = 0;
   private placed = false;
+  /** Hacia dónde se colocó (para recolocarlo a otra distancia sin cambiar de dirección, F2-15). */
+  private yaw = 0;
   private fxKind: FxKind | null = null;
   private readonly fxColor = new THREE.Color();
   private readonly burstColor = new THREE.Color();
@@ -137,16 +141,22 @@ export class EncounterScene {
     return hitBox(this.heightM, this.aspect);
   }
 
-  /** Distancia a la que está (D-045: máx(2 m, 1,8 × altura), tope 12 m). */
+  /** Distancia a la que está (D-045: máx(2 m, 1,8 × altura), tope 12 m; F2-15: y que quepa a lo ancho). */
   get distance(): number {
-    return encounterDistance(this.heightM);
+    const halfWidthTan = Math.tan(THREE.MathUtils.degToRad(this.camera.fov / 2)) * this.camera.aspect;
+    const h = this.heightM;
+    return encounterDistance(h, h * this.aspect, halfWidthTan, h * this.depthRatio);
   }
 
   setTexture(tex: THREE.Texture): void {
     this.body.material.map = tex;
     this.body.material.needsUpdate = true;
     const img = tex.image as { width?: number; height?: number } | undefined;
-    if (img?.width && img.height) this.aspect = img.width / img.height;
+    // Si el modelo 3D ya llegó, manda su proporción (el arte queda oculto detrás).
+    if (!this.model && img?.width && img.height) {
+      this.aspect = img.width / img.height;
+      this.refit();
+    }
   }
 
   /**
@@ -180,6 +190,8 @@ export class EncounterScene {
     this.anchor.add(pivot);
     this.model = pivot;
     this.aspect = size.x / size.y;
+    this.depthRatio = size.z / size.y;
+    this.refit();
     this.restBox.set(
       new THREE.Vector3((-size.x * k) / 2, 0, (-size.z * k) / 2),
       new THREE.Vector3((size.x * k) / 2, this.heightM, (size.z * k) / 2),
@@ -210,9 +222,15 @@ export class EncounterScene {
 
   /** Pone al Pokémon en el suelo delante de hacia donde mira el móvil (`yaw` de `cameraYaw`). */
   placeAt(yaw: number): void {
+    this.yaw = yaw;
     spotInFront(yaw, this.distance, -EYE_HEIGHT_M, this.anchor.position);
     this.anchor.visible = true;
     this.placed = true;
+  }
+
+  /** Ya colocado y con otra proporción (llegó el modelo o el arte): a la distancia que pide su ancho (F2-15). */
+  private refit(): void {
+    if (this.placed) spotInFront(this.yaw, this.distance, -EYE_HEIGHT_M, this.anchor.position);
   }
 
   /**

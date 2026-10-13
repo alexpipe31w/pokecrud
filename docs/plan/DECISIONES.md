@@ -692,3 +692,18 @@ Ahora `turnAngle` suma cuánto gira el **rumbo** del dedo (tramos ≥ 4 px, para
 máximo alcanzado (el tirón final hacia arriba no lo deshace): esas 4 curvas dan 2,17-2,32 vueltas. Umbral igual
 (0,9 vueltas). `MAX_SAMPLES` del gesto 120 → 300 (en el A36 llegan ~50 muestras/s y dos círculos + lanzar ≈ 1,7 s).
 Sus recorridos están en `a36-curve-gestures.data.ts` y el test los usa.
+
+## D-051 · Distancia del encuentro: también el ANCHO, y medida desde el FRENTE del Pokémon (F2-15) (2026-10-12, Kenneth)
+
+**Contexto:** D-045 colocaba al Pokémon a máx(2 m, 1,8 × altura). En vertical la pantalla abarca ~32° de ancho frente a
+64° de alto (A36: 384 × 832, FOV vertical 64°), así que a 1,8 × altura un Pokémon tan ancho como alto llena el 96 % del
+ancho. Y la regla se aplicaba a su CENTRO: Slowpoke XL (1,75 m, largo de cabeza a cola) mira a la cámara con la cara
+~1,7 m por delante del centro → "me ocupaba prácticamente toda la pantalla" (Kenneth).
+**Decisión:** `encounterDistance(alto, ancho, tan(FOV horizontal / 2), largo)` = máx(2 m, 1,8 × alto, ancho / (2 · tan ·
+`MAX_WIDTH_FILL` = 0,7)) con tope de 12 m **para su frente**, + largo / 2 hasta su centro. El ancho y el largo salen de
+la caja del modelo 3D (`size.x/size.y`, `size.z/size.y`); el arte plano no tiene largo. El modelo llega después de
+colocarlo, así que `setModel` lo **recoloca** en la misma dirección; si el arte plano llega después del modelo, ya no
+le cambia la proporción. Medido en el A36: Slowpoke XL pasa de llenar la pantalla a ~52 % del ancho, 59,6 fps.
+Los pequeños y los estrechos no cambian (Pikachu 2 m; Diggersby ya cabía, ~70 %).
+**Consecuencia:** el aro y la caja del lanzamiento siguen en el CENTRO del Pokémon: en los largos se ven más pequeños
+que su cara (`F2-15_01`). Si molesta, la caja podría ir a su frente (`throwTarget`), con su test de física.

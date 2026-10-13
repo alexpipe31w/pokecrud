@@ -1337,3 +1337,32 @@ XL no cabía en la pantalla (F2-15); la entrada al encuentro (F2-16).
 **El siguiente debe empezar por:** mezclar el PR de esta rama; después, con luz, F1-07 7b y F1-05 3b en la calle con
 el APK de producción y el joystick APAGADO (menú de la Poké Ball → Joystick: No), fps por CDP con el snippet de F2-04a
 12c. Si no hay móvil: F2-15 (`encounterDistance` con el ancho; tests en `encounter-layout.spec.ts`).
+
+## 2026-10-12 23:45 · @kenneth (Claude) · F2-15 · rama `feature/F2-15-anchos-caben`
+
+**Qué se hizo:** PR #59 mezclado (Kenneth lo pidió). F2-15 con TDD en dos pasos, los dos probados en el A36:
+(1) `encounterDistance` también mira el ANCHO (≤ 70 % de la pantalla, con el campo de visión horizontal real de la
+cámara) y la escena recoloca al Pokémon al llegar el modelo; el arte plano tardío ya no pisa la proporción del modelo.
+En el A36 Slowpoke XL seguía tapando: el aro (su caja, a ~4 m) estaba bien, pero su CARA quedaba ~1,7 m por delante del
+centro. (2) La regla se aplica a su FRENTE y el centro va media profundidad más allá (`size.z/size.y` del modelo). D-051.
+Para ver Slowpoke XL sin esperar a que salga, `page.route` por CDP sobre `GET /encounters/:id` cambiando `speciesId: 79`
+y `heightScale: 1.46` (solo visual; el servidor valida el real).
+**Archivos clave:** `src/app/game/encounter-scene/encounter-layout.ts` (`MAX_WIDTH_FILL`, `encounterDistance` con ancho,
+tan del FOV horizontal y largo), `encounter-scene.ts` (`distance` con la cámara, `yaw` guardado, `refit()`,
+`depthRatio`, `setTexture` no pisa el modelo), sus specs, `docs/plan/DECISIONES.md` (D-051).
+**Cómo se probó (salida real):**
+
+    rojo primero: TS2305 MAX_WIDTH_FILL / TS2554 "Expected 1 arguments, but got 3" → luego "Expected 1-3 arguments, but got 4"
+    encounter-layout + encounter-scene: 39 passed
+    npm run lint → All files pass linting · npm test → 73 archivos, 413 passed · test:shared → 144 passed · build OK
+    A36, APK de producción, Slowpoke XL forzado:
+      paso 1: aro a ~4 m (35 % del alto) pero la cara llenaba la pantalla ("aún me tapa mucho", Kenneth)
+      paso 2: ~52 % del ancho, entero ("ahora sí se ve entero", Kenneth); fps {"fps":59.6,"p95ms":16.8,"jank":0.7}
+    evidencia con la AR apagada: F2-15_01_a36-slowpoke-xl-cabe.jpg (las de la cámara enseñan la casa: no se suben)
+
+**Quedó a medias / roto:** nada de F2-15. Visto: en los largos el aro y la caja del lanzamiento siguen en el centro del
+Pokémon y se ven más pequeños que su cara (D-051, "Consecuencia").
+**Decisiones nuevas:** D-051.
+**El siguiente debe empezar por:** mezclar el PR de F2-15; luego, con luz, F1-07 7b y F1-05 3b en la calle (joystick
+APAGADO). Sin calle: F2-07 (coreografía de captura) siguiendo `fases/F2-captura.md` → "F2-07" y la entrada de F2-05 de
+esta bitácora para aplicar los diffs a mano sobre el modelo 3D.
