@@ -196,6 +196,7 @@ describe('EncounterPage', () => {
     throwQuality: 'none',
     xpGained: 0,
     caught: null,
+    candy: null,
     bag: { items: [] },
     ...over,
   });

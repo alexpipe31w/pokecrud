@@ -396,4 +396,72 @@ describe('Encuentros y captura (e2e)', { timeout: 60_000 }, () => {
     expect(await prisma.throw.count({ where: { playerId: p.id } })).toBe(1);
     expect(await qty(p, 'GREAT_BALL')).toBe(4);
   });
+
+  // F3-02a (D-052): la captura deja la colección lista (PC, caramelos por familia, Pokédex).
+  const familyOfSpecies = (speciesId: number): number => {
+    const dataset = JSON.parse(
+      readFileSync(
+        resolve(process.cwd(), '../src/assets/data/pokedex.json'),
+        'utf8',
+      ),
+    ) as Species[];
+    return dataset.find((s) => s.id === speciesId)!.evolutionChainId;
+  };
+  const pokedexRow = (p: Player, speciesId: number) =>
+    prisma.pokedexEntry.findUnique({
+      where: { playerId_speciesId: { playerId: p.id, speciesId } },
+    });
+
+  it('capturar guarda el PC, suma 3 caramelos a la familia y marca la Pokédex', async () => {
+    const { p, spawn } = await playerAtSpawn();
+    forced = CAUGHT;
+    const res = await throwAt(p, spawn).expect(200);
+    const familyId = familyOfSpecies(spawn.speciesId);
+    expect(res.body.candy).toEqual({ familyId, gained: 3, total: 3 });
+    const [row] = await prisma.caughtPokemon.findMany({
+      where: { playerId: p.id },
+    });
+    expect(row.cp).toBeGreaterThanOrEqual(10);
+    expect(
+      await prisma.candy.findUnique({
+        where: { playerId_familyId: { playerId: p.id, familyId } },
+      }),
+    ).toMatchObject({ qty: 3 });
+    const entry = await pokedexRow(p, spawn.speciesId);
+    expect(entry).toMatchObject({ caught: true });
+    expect(entry!.firstCaughtAt).toBeInstanceOf(Date);
+  });
+
+  it('abrir el encuentro lo marca como visto; fallar no da caramelos ni lo marca capturado', async () => {
+    const { p, spawn } = await playerAtSpawn();
+    await as(
+      p,
+      http().get(`/encounters/${encodeURIComponent(spawn.id)}`),
+    ).expect(200);
+    expect(await pokedexRow(p, spawn.speciesId)).toMatchObject({
+      caught: false,
+      firstCaughtAt: null,
+    });
+    forced = MISSED;
+    const res = await throwAt(p, spawn).expect(200);
+    expect(res.body.candy).toBeNull();
+    expect(await prisma.candy.count({ where: { playerId: p.id } })).toBe(0);
+    expect(await pokedexRow(p, spawn.speciesId)).toMatchObject({
+      caught: false,
+    });
+  });
+
+  it('reintento de una captura con el mismo clientThrowId → mismos caramelos, sin sumar dos veces', async () => {
+    const { p, spawn } = await playerAtSpawn();
+    forced = CAUGHT;
+    const clientThrowId = randomUUID();
+    const first = await throwAt(p, spawn, { clientThrowId }).expect(200);
+    const again = await throwAt(p, spawn, { clientThrowId }).expect(200);
+    expect(again.body.candy).toEqual(first.body.candy);
+    expect(
+      (await prisma.candy.findMany({ where: { playerId: p.id } })).map(
+        (c) => c.qty,
+      ),
+    ).toEqual([3]);
+  });
 });

@@ -59,5 +59,7 @@ export interface ThrowResult {
   throwQuality: ThrowQuality;
   xpGained: number;
   caught: CaughtView | null;
+  /** Caramelos ganados al capturar (F3-02a, D-052); null si no capturó. */
+  candy: { familyId: number; gained: number; total: number } | null;
   bag: BagView;
 }

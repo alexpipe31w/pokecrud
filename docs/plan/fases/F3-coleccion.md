@@ -176,7 +176,7 @@ script; e2e en verde; migración aplicada en Supabase **antes** de mezclar.
 
 **Files:** Create `shared/engine/candy.ts`, `shared/engine/nickname.ts`; Tests `candy.spec.ts`, `nickname.spec.ts`
 
-- [ ] **1a. Tests que fallan:**
+- [x] **1a. Tests que fallan:**
 
 ```ts
 // shared/engine/candy.spec.ts
@@ -218,8 +218,8 @@ describe('normalizeNickname', () => {
 });
 ```
 
-- [ ] **1b.** `npm run test:shared -- candy nickname` → FALLA (no existen los módulos).
-- [ ] **1c. Implementación:**
+- [x] **1b.** `npm run test:shared -- candy nickname` → FALLA (no existen los módulos).
+- [x] **1c. Implementación:**
 
 ```ts
 // shared/engine/candy.ts
@@ -246,7 +246,7 @@ export function normalizeNickname(raw: string | null | undefined): string | null
 }
 ```
 
-- [ ] **1d.** → PASA. Commit `F3-02a: reglas de caramelos y mote con tests` + `/guardar`.
+- [x] **1d.** → PASA. Commit `F3-02a: reglas de caramelos y mote con tests` + `/guardar`.
 
 ### Paso 2 — Valoración de IVs (pura; la usa la ficha de F3-03)
 
@@ -255,7 +255,7 @@ export function normalizeNickname(raw: string | null | undefined): string | null
 Escala propia sobre 6 IVs de 0-31 (186 en total), con los cortes de la valoración de Pokémon GO en porcentaje:
 0★ < 51 %, 1★ < 66,7 %, 2★ < 82,2 %, 3★ hasta 99 %, y 4 = perfecto (100 %).
 
-- [ ] **2a. Test que falla:**
+- [x] **2a. Test que falla:**
 
 ```ts
 import { ivPercent, ivStars } from './iv-appraisal.js';
@@ -278,7 +278,7 @@ describe('valoración de IVs', () => {
 });
 ```
 
-- [ ] **2b.** falla. **2c.**
+- [x] **2b.** falla. **2c.**
 
 ```ts
 import type { Stats } from './battle/stats.js';
@@ -299,18 +299,18 @@ export function ivStars(ivs: Stats): 0 | 1 | 2 | 3 | 4 {
 ```
 
   (Comprobado: 17·6 = 102 → 54,8 % → 1★; 22·6 = 132 → 71 % → 2★; 30·6 = 180 → 96,8 % → 3★.)
-- [ ] **2d.** pasa. Commit + `/guardar`.
+- [x] **2d.** pasa. Commit + `/guardar`.
 
 ### Paso 3 — Contrato
 
-- [ ] **3a.** Crear `shared/protocol/collection.ts` con el bloque de "Contrato" de arriba. `npx tsc -p
+- [x] **3a.** Crear `shared/protocol/collection.ts` con el bloque de "Contrato" de arriba. `npx tsc -p
   shared/tsconfig.json --noEmit` → sin errores. Commit `F3-02a: contrato de la colección` + `/guardar`.
 
 ### Paso 4 — Esquema y migración
 
 **Files:** Modify `server/prisma/schema.prisma`; Create `server/prisma/migrations/20261013010000_collection/migration.sql`
 
-- [ ] **4a. Esquema:** en `CaughtPokemon`, `cp Int?` (null = filas de antes del script del paso 7) y
+- [x] **4a. Esquema:** en `CaughtPokemon`, `cp Int?` (null = filas de antes del script del paso 7) y
   `@@index([playerId, cp])`, `@@index([playerId, favorite])`; en `Player`, `candies Candy[]` y `pokedex PokedexEntry[]`;
   modelos nuevos:
 
@@ -339,7 +339,7 @@ model PokedexEntry {
 }
 ```
 
-- [ ] **4b. Migración:** `cd server && npx prisma migrate dev --create-only --name collection` **contra el Postgres
+- [x] **4b. Migración:** `cd server && npx prisma migrate dev --create-only --name collection` **contra el Postgres
   portátil** (`embedded-postgres`, ver ESTADO; NUNCA `migrate dev` contra Supabase: puede pedir resetear la base). Mover
   la carpeta a `20261013010000_collection` y añadir al final del SQL:
 
@@ -357,7 +357,7 @@ GROUP BY "playerId", "speciesId"
 ON CONFLICT ("playerId", "speciesId") DO NOTHING;
 ```
 
-- [ ] **4c.** `npx prisma migrate deploy` y `npx prisma generate` contra el Postgres portátil; `npm run build`. Commit
+- [x] **4c.** `npx prisma migrate deploy` y `npx prisma generate` contra el Postgres portátil; `npm run build`. Commit
   `F3-02a: migración collection (cp, Candy, PokedexEntry)` + `/guardar`.
 
 ### Paso 5 — La captura guarda PC, caramelos y Pokédex; abrir un encuentro marca "visto"
@@ -365,7 +365,7 @@ ON CONFLICT ("playerId", "speciesId") DO NOTHING;
 **Files:** Modify `server/src/spawns/spawns.service.ts`, `server/src/encounters/encounters.service.ts`,
 `shared/protocol/encounters.ts`, `server/test/encounters.e2e-spec.ts`
 
-- [ ] **5a. e2e que fallan** (en `encounters.e2e-spec.ts`, con el `forced` que ya existe):
+- [x] **5a. e2e que fallan** (en `encounters.e2e-spec.ts`, con el `forced` que ya existe):
 
 ```ts
   it('capturar guarda el PC, suma 3 caramelos a la familia y marca la Pokédex', async () => {
@@ -401,9 +401,9 @@ ON CONFLICT ("playerId", "speciesId") DO NOTHING;
 
   (Si el archivo no tiene `nearbySpawn`/`enc`/`throwBody` con esos nombres, usar los equivalentes que ya usan sus
   tests de captura; no duplicar helpers.) `cd server && npm run test:e2e -- encounters` → FALLA.
-- [ ] **5b.** `SpeciesDetails` gana `familyId: number` (= `familyOf(species)`) y `types: TypeName[]`, rellenados donde
+- [x] **5b.** `SpeciesDetails` gana `familyId: number` (= `familyOf(species)`) y `types: TypeName[]`, rellenados donde
   se construye hoy (`speciesDetails`).
-- [ ] **5c.** En `details()`, tras `reachableSpawn`, marcar "visto" (fuera de cualquier transacción, mejor esfuerzo:
+- [x] **5c.** En `details()`, tras `reachableSpawn`, marcar "visto" (fuera de cualquier transacción, mejor esfuerzo:
   si falla, se registra y la respuesta sigue):
 
 ```ts
@@ -416,7 +416,7 @@ ON CONFLICT ("playerId", "speciesId") DO NOTHING;
       .catch((err) => this.logger.warn({ msg: 'pokedex.seen', playerId, err: String(err) }));
 ```
 
-- [ ] **5d.** En `throw()`, dentro de la transacción, si `outcome.captured`: `cp` en el `create` de `caughtPokemon`
+- [x] **5d.** En `throw()`, dentro de la transacción, si `outcome.captured`: `cp` en el `create` de `caughtPokemon`
   (`combatPower(calcStats(species.baseStats, spawn.ivs, spawn.level, spawn.nature))`) y después:
 
 ```ts
@@ -436,10 +436,10 @@ ON CONFLICT ("playerId", "speciesId") DO NOTHING;
   `where: { playerId, speciesId, firstCaughtAt: null } data: { firstCaughtAt: new Date(now) }` (así nunca se pisa la
   primera fecha). La transacción devuelve `{ created, candy }` y la respuesta lleva
   `candy: created ? { familyId: candy.familyId, gained: CANDY_PER_CATCH, total: candy.qty } : null`.
-- [ ] **5e. Reintentos:** `replay()` devuelve lo guardado; como `Throw` no guarda los caramelos, en un reintento de una
+- [x] **5e. Reintentos:** `replay()` devuelve lo guardado; como `Throw` no guarda los caramelos, en un reintento de una
   captura se lee la fila `Candy` actual (`gained: CANDY_PER_CATCH`, `total` = lo que haya). Test e2e: dos POST con el
   mismo `clientThrowId` → el segundo da el mismo `candy.familyId` y `gained: 3`, y la base tiene 3 (no 6).
-- [ ] **5f.** `ThrowResult.candy` en `shared/protocol/encounters.ts` (bloque de "Contrato"). En la app, de momento solo
+- [x] **5f.** `ThrowResult.candy` en `shared/protocol/encounters.ts` (bloque de "Contrato"). En la app, de momento solo
   compila (lo pinta F3-02b). e2e → PASA; `npm run build`, `npm test`, lint del servidor; `ng test` y build de la app.
   Commit + `/guardar`.
 
@@ -448,7 +448,7 @@ ON CONFLICT ("playerId", "speciesId") DO NOTHING;
 **Files:** Create `server/src/collection/collection.module.ts`, `collection.controller.ts`, `collection.service.ts`,
 `collection.dto.ts`; Test `server/test/collection.e2e-spec.ts`; Modify `server/src/app.module.ts`
 
-- [ ] **6a. e2e que fallan** (`collection.e2e-spec.ts`, prefijo de limpieza propio `col+`, D-021). Para crear capturas
+- [x] **6a. e2e que fallan** (`collection.e2e-spec.ts`, prefijo de limpieza propio `col+`, D-021). Para crear capturas
   sin depender de spawns, insertar filas con Prisma directamente (helper `seedCaught(p, n, over?)` que pone `speciesId`,
   `cp`, `shiny`, `favorite`, `caughtAt` y el resto con valores válidos):
   1. sin sesión → 401; con sesión y nada capturado → `{ items: [], nextCursor: null, total: 0 }`.
@@ -458,10 +458,10 @@ ON CONFLICT ("playerId", "speciesId") DO NOTHING;
   4. `type=fire` → solo especies de tipo Fuego (4, 5, 6 sí; 1 no); `shiny=true`; `favorite=true`; `total` con filtros.
   5. lo de otro jugador no sale nunca; `limit=51` → 400; `sort=nombre` → 400; `cursor=no-uuid` → 400.
   6. `GET /pokedex` → solo especies vistas, con `caught` correcto.
-- [ ] **6b. DTO** (`class-validator`; booleanos de query como `'true'|'false'` con `@Transform`):
+- [x] **6b. DTO** (`class-validator`; booleanos de query como `'true'|'false'` con `@Transform`):
   `sort ∈ CollectionSort` (por defecto `caughtAt`), `order ∈ asc|desc` (por defecto `desc`), `type ∈ TYPE_NAMES`,
   `shiny`, `favorite`, `cursor @IsUUID()`, `limit @IsInt() @Min(1) @Max(50)` (por defecto 30).
-- [ ] **6c. Servicio:**
+- [x] **6c. Servicio:**
 
 ```ts
   async list(playerId: string, q: CollectionQueryDto): Promise<CollectionPage> {
@@ -500,19 +500,20 @@ ON CONFLICT ("playerId", "speciesId") DO NOTHING;
   `ivs`, `nature`, `level` en `ITEM_SELECT`). Un `cursor` que no es de este jugador o no existe → Prisma no devuelve
   nada raro (el `where` incluye `playerId`), pero un cursor inexistente lanza: capturarlo y responder 400
   "Cursor no válido". `speciesIdsOfType(type)` se calcula una vez al cargar el dataset (`Map<TypeName, number[]>`).
-- [ ] **6d.** `GET /pokedex` → `findMany({ where: { playerId }, select: { speciesId, caught } })` → `PokedexView`.
-- [ ] **6e.** Controlador con `@CurrentPlayer()` (sesión obligatoria por el guard global) y límite propio 60/min por IP
+- [x] **6d.** `GET /pokedex` → `findMany({ where: { playerId }, select: { speciesId, caught } })` → `PokedexView`.
+- [x] **6e.** Controlador con `@CurrentPlayer()` (sesión obligatoria por el guard global) y límite propio 60/min por IP
   (`@Throttle`), como `/spawns`. e2e → PASA; build, unitarios, lint. Commit + `/guardar`.
 
 ### Paso 7 — Recuperar lo capturado antes
 
 **Files:** Create `server/prisma/backfill-collection.ts`; Modify `server/package.json`
 
-- [ ] **7a.** Script `npm run db:backfill-collection` (`tsx prisma/backfill-collection.ts`, como `admin`): carga
+- [x] **7a.** Script `npm run db:backfill-collection` (`tsx prisma/backfill-collection.ts`, como `admin`): carga
   `pokedex.json`; (1) `cp` de las filas con `cp IS NULL` (por lotes de 200); (2) caramelos: **solo para jugadores sin
   ninguna fila `Candy`** (así se puede ejecutar dos veces sin duplicar), `CANDY_PER_CATCH × capturados` por familia;
-  imprime cuántas filas tocó. La Pokédex ya la rellenó la migración.
-- [ ] **7b.** Probarlo en el Postgres portátil: sembrar 3 capturas de antes (sin `cp`, sin `Candy`) → ejecutar →
+  (3) Pokédex "capturado" de todo lo capturado (`createMany skipDuplicates`): la migración solo cubre lo capturado
+  ANTES de aplicarla, y entre la migración y el despliegue el código viejo sigue capturando. Imprime cuántas filas tocó.
+- [x] **7b.** Probarlo en el Postgres portátil: sembrar 3 capturas de antes (sin `cp`, sin `Candy`) → ejecutar →
   `cp` relleno y 9 caramelos repartidos por familia → ejecutarlo otra vez → "0 filas". Commit + `/guardar`.
 
 ### Paso 8 — Aplicar en Supabase (ANTES de mezclar el PR)
@@ -520,7 +521,8 @@ ON CONFLICT ("playerId", "speciesId") DO NOTHING;
 Render despliega solo al mezclar (ESTADO). Si el código nuevo llega antes que la migración, **cada captura daría 500**
 (las tablas no existen). Orden obligatorio:
 
-- [ ] **8a.** Quien tenga `DIRECT_URL`: `cd server && npx prisma migrate deploy` contra Supabase (aplica SOLO
+- [x] **8a.** (Samuel, 2026-10-13: `20261013010000_collection` aplicada; script → PC en 12 capturas, 12 filas de
+  caramelos para 1 jugador, Pokédex 0 nuevas porque ya la hizo la migración) Quien tenga `DIRECT_URL`: `cd server && npx prisma migrate deploy` contra Supabase (aplica SOLO
   `20261013010000_collection`; comprobar en la salida que no hay más pendientes) y `npm run db:backfill-collection`.
   Pegar la salida (sin la URL) en la bitácora.
 - [ ] **8b.** Mezclar el PR. Tras el despliegue de Render: una captura real desde el navegador →

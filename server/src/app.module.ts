@@ -16,6 +16,7 @@ import { SpawnsModule } from './spawns/spawns.module.js';
 import { BagModule } from './bag/bag.module.js';
 import { ProgressionModule } from './progression/progression.module.js';
 import { EncountersModule } from './encounters/encounters.module.js';
+import { CollectionModule } from './collection/collection.module.js';
 import { TeamsModule } from './teams/teams.module.js';
 
 const isProd = process.env['NODE_ENV'] === 'production';
@@ -74,6 +75,7 @@ function requestId(req: IncomingMessage, res: ServerResponse): string {
     ProgressionModule,
     // F2-06: encuentro y captura autoritativos.
     EncountersModule,
+    CollectionModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: ThrottlerGuard },

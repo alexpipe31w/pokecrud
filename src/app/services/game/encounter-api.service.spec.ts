@@ -25,6 +25,7 @@ const RESULT: ThrowResult = {
   throwQuality: 'great',
   xpGained: 150,
   caught: null,
+  candy: { familyId: 10, gained: 3, total: 3 },
   bag: { items: [{ item: 'POKE_BALL', qty: 29 }] },
 };
 const REQ = {

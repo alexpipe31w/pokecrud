@@ -196,8 +196,11 @@ F2-07, F2-12, F2-13, F2-15 hechas; faltan **F2-11**/**F2-14** (ARCore), F2-10 (m
 
 ## En curso
 
-- Nadie. Hechas por Samuel: **F0-15** (#63, mezclado) y **F3-01a** (#64, plan de la colección en
-  `docs/plan/fases/F3-coleccion.md`).
+- **F3-02a (@samuel, 2026-10-13)** — rama `feature/F3-02a-coleccion-servidor`. **Punto de guardado:** reclamada;
+  pasos 1-4 hechos (reglas puras + contrato + migración `20261013010000_collection`, probada SOLO en un Postgres 17
+  portátil); paso 5 hecho (la captura guarda PC, +3 caramelos y Pokédex; abrir encuentro = visto; e2e 14/14).
+  Paso 6 hecho (`GET /collection` y `GET /pokedex`; e2e 78/78 en local). Paso 7 hecho (`npm run db:backfill-collection`, probado 2 veces en local).
+  Paso siguiente: D-052 + PR; luego paso 8 (migración + script en Supabase ANTES de mezclar, con permiso de Samuel). (F0-15 #63 y F3-01a #64 mezclados.)
 - F1-05 y F1-07 siguen `[~]` (@alex) SOLO por su prueba en la calle (PENDIENTES).
 
 ## Siguiente paso concreto
@@ -231,7 +234,8 @@ F2-07, F2-12, F2-13, F2-15 hechas; faltan **F2-11**/**F2-14** (ARCore), F2-10 (m
 
 **Quien haga F3-02a (tiene que tener `DIRECT_URL`):**
 
-- [ ] Migración `20261013010000_collection` + `npm run db:backfill-collection` en Supabase ANTES de mezclar el PR.
+- [x] (Samuel, 2026-10-13) Migración `20261013010000_collection` + `npm run db:backfill-collection` en Supabase
+      (12 capturas con PC, 12 filas de caramelos) ANTES de mezclar #65.
 
 **Kenneth o Samuel (Android):**
 

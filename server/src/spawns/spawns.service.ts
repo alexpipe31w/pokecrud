@@ -7,7 +7,12 @@ import {
   ServiceUnavailableException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import type { Move, Species } from '../../../shared/data/dataset.types.js';
+import type {
+  Move,
+  Species,
+  TypeName,
+} from '../../../shared/data/dataset.types.js';
+import { familyOf } from '../../../shared/engine/candy.js';
 import {
   defaultMoves,
   isSupportedMove,
@@ -47,6 +52,9 @@ export interface SpeciesDetails {
   isLegendary: boolean;
   isMythical: boolean;
   learnset: { moveId: number; level: number }[];
+  /** Familia de caramelos = cadena evolutiva (F3-02a, D-052). */
+  familyId: number;
+  types: TypeName[];
 }
 
 /**
@@ -60,6 +68,8 @@ export class SpawnsService {
   private readonly salt: string | undefined;
   private species: SpawnSpecies[] | null = null;
   private readonly details = new Map<number, SpeciesDetails>();
+  /** Especies de cada tipo, para filtrar la colección por tipo (F3-02a). */
+  private readonly byType = new Map<TypeName, number[]>();
   /** Movimientos que el motor de combate v1 sabe ejecutar (F4-03): solo esos se asignan al capturar. */
   private readonly supportedMoves = new Set<number>();
   private readonly tables = new Map<string, SpawnTable>();
@@ -100,7 +110,14 @@ export class SpawnsService {
           isLegendary: s.isLegendary,
           isMythical: s.isMythical,
           learnset: s.learnset,
+          familyId: familyOf(s),
+          types: s.types,
         });
+        for (const t of s.types) {
+          const ids = this.byType.get(t) ?? [];
+          ids.push(s.id);
+          this.byType.set(t, ids);
+        }
       }
       const moves = JSON.parse(
         readFileSync(resolve(dirname(datasetPath), 'moves.json'), 'utf8'),
@@ -202,6 +219,11 @@ export class SpawnsService {
 
   speciesDetails(speciesId: number): SpeciesDetails | undefined {
     return this.details.get(speciesId);
+  }
+
+  /** Ids de las especies de un tipo (cualquiera de sus dos tipos). */
+  speciesIdsOfType(type: TypeName): number[] {
+    return this.byType.get(type) ?? [];
   }
 
   /** Tamaño individual XS-XL (0,5-1,5 de la altura de la especie), fijo para cada spawn y secreto como la semilla. */

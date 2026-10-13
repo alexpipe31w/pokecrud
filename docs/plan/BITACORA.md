@@ -1444,3 +1444,33 @@ del contrato comprobados (`TypeName` está en `shared/data/dataset.types.ts`, co
 **Decisiones nuevas:** ninguna aún (D-052 propuesta en el plan).
 **El siguiente debe empezar por:** F3-02a paso 1 (`shared/engine/candy.ts`), con el Postgres portátil para los e2e; y
 recordar el paso 8: migración en Supabase ANTES de mezclar.
+
+## 2026-10-13 15:00 · @samuel (Claude) · F3-02a (pasos 1-7) · rama `feature/F3-02a-coleccion-servidor`
+
+**Qué se hizo:** #63 y #64 mezclados (conflicto de docs resuelto conservando las dos entradas). F3-02a siguiendo
+`fases/F3-coleccion.md`, un commit por paso: reglas puras (`candy.ts`, `nickname.ts`, `iv-appraisal.ts`) y contrato
+`shared/protocol/collection.ts`; migración `20261013010000_collection` (solo añade: `CaughtPokemon.cp` opcional, `Candy`,
+`PokedexEntry`, índices, CHECKs y Pokédex de lo ya capturado); la captura guarda PC, +3 caramelos por familia y la
+Pokédex en su transacción, y `ThrowResult.candy`; abrir un encuentro marca "visto"; `GET /collection` (cursor, orden,
+filtros) y `GET /pokedex`; script `npm run db:backfill-collection`. **Todo probado en un Postgres 17 portátil
+(`embedded-postgres` 17.10.0-beta.17 en una carpeta temporal, fuera del repo), nunca contra Supabase.**
+**Hallazgo:** la migración solo rellena la Pokédex de lo capturado ANTES de aplicarla; lo que capture el código viejo
+entre la migración y el despliegue se quedaba fuera → el script también rellena la Pokédex (idempotente).
+**Archivos clave:** `server/src/collection/*`, `server/src/encounters/encounters.service.ts`,
+`server/src/spawns/spawns.service.ts` (`familyId`, `types`, `speciesIdsOfType`), `server/prisma/backfill-collection.ts`,
+`server/test/collection.e2e-spec.ts` (8) y 3 casos nuevos en `encounters.e2e-spec.ts`.
+**Cómo se probó (salida real):**
+
+    base local antes de tocar nada: e2e Test Files 7 passed, Tests 67 passed
+    nuevos e2e en rojo primero (3 de encuentros: "expected undefined to deeply equal { familyId: 224, … }"; 8 de colección)
+    después: e2e Test Files 8 passed (8), Tests 78 passed (78) · unitarios 22 · lint exit 0 · build OK · tsc OK
+    app: ng test 75 archivos, 435 passed (2 objetos de prueba con `candy`) · shared 17 archivos, 155 passed · lint OK
+    script (3 capturas sin cp ni caramelos: Pikachu, Pichu, Bulbasaur):
+      1ª: PC rellenado en 3 capturas · caramelos: 2 filas para 1 jugadores · Pokédex: 3 especies nuevas
+          → cp 34 / 13 / 47, caramelos familia 10 = 6 y familia 1 = 3
+      2ª: PC rellenado en 0 capturas · caramelos: 0 filas … · Pokédex: 0 especies nuevas
+
+**Quedó a medias:** paso 8 (migración + script en Supabase, con permiso de Samuel) y mezclar. NO mezclar antes.
+**Decisiones nuevas:** D-052.
+**El siguiente debe empezar por:** si el PR sigue sin mezclar, paso 8 de `fases/F3-coleccion.md` → F3-02a (orden
+obligatorio: `migrate deploy` + `db:backfill-collection` en Supabase y DESPUÉS mezclar). Luego F3-02b.
