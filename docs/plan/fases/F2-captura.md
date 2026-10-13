@@ -4489,7 +4489,7 @@ Pokémon y los aros son `MeshBasic`).
 
 ### Paso 9 — Sonidos del lanzamiento
 
-- [ ] **9a.** En `SFX_RECIPES` (`sfx-synth.ts`):
+- [x] **9a.** En `SFX_RECIPES` (`sfx-synth.ts`):
 
 ```ts
   /** Lanzar la bola (F2-05): soplido de aire. ("throw" NO: es un sonido de archivo en el spec de AudioService.) */
@@ -4503,7 +4503,7 @@ Pokémon y los aros son `MeshBasic`).
   ],
 ```
 
-- [ ] **9b.** `npx ng test --include=src/app/services/game/sfx-synth.spec.ts --watch=false` → PASA. Commit + push.
+- [x] **9b.** `npx ng test --include=src/app/services/game/sfx-synth.spec.ts --watch=false` → PASA. Commit + push.
 
 ### Paso 10 — La mano: bola y baya
 
