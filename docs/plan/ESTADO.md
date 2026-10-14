@@ -220,7 +220,10 @@ F2-07, F2-12, F2-13, F2-15 hechas; faltan **F2-11**/**F2-14** (ARCore) y los pul
 
 ## En curso
 
-- Nadie. **F5-04** (#78 mezclado, `[~]`): falta SOLO el criterio, un combate entre DOS MÓVILES con el APK de producción
+- **Samuel (Redmi Note 10), rama `feature/pruebas-android-redmi`:** guía `docs/PRUEBAS-ANDROID.md` con el recorrido
+  completo y las pruebas que cierran F1-05 3b, F1-07 7b, F2-01 (D-045), F2-10, F3 y F5-04. APK de `develop` (9c39ea8,
+  11,67 MB) instalado en el Redmi el 2026-10-13. Falta: hacer las pruebas y subir evidencias `*_redmi-*`.
+- **F5-04** (#78 mezclado, `[~]`): falta SOLO el criterio, un combate entre DOS MÓVILES con el APK de producción
   grabado en vídeo (`docs/evidencias/F5-04_*`). **F2-10** (música) hecha en `feature/F2-10-musica` (PR #79).
 - Cuentas de prueba locales: `demo+alex@pokecrud.test` y `demo+rival@pokecrud.test` (contraseña: pídesela a Alex; no va en el repo), con equipo "Arena" de 3. `test:e2e` las borra pasada 1 h: se recrean registrándolas y con el script de la bitácora de F5-03.
 - **Ojo:** el inventario de IS-11 está ahora en `/inventario` (la Pokédex 1025 ocupa `/pokedex`).
