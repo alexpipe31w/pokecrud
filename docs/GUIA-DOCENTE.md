@@ -31,23 +31,23 @@ especies, evolución, equipos, combate contra la IA y **combate en tiempo real e
 
 Todo se abre desde el **menú de la Poké Ball** (botón rojo abajo en el mapa).
 
-| # | Qué probar | Cómo |
-| --- | --- | --- |
-| 1 | **Mapa** | Mapa 3D de Google con tu avatar, brújula, clima real y modo noche (19:00-6:00). La música cambia de día a noche. |
-| 2 | **Moverse sin salir de casa** | Menú → **Joystick: Sí**. Aparece un joystick para caminar por el mapa. (Con el GPS real basta con andar.) |
-| 3 | **Pokémon salvajes** | Salen entre la hierba alrededor (todos los jugadores ven los mismos en el mismo sitio). Tocar uno lejano dice "Acércate más"; acercarse con el joystick y tocarlo. |
-| 4 | **Encuentro y captura** | El Pokémon aparece a tamaño real sobre la cámara (o un fondo). Botón ⓘ: su ficha (PC, tipo, altura). **Deslizar la Poké Ball hacia arriba** para lanzarla; si el dedo da una vuelta antes, es bola curva. Abajo se eligen Super Ball y Baya Frambu. Fallar no gasta bola. |
-| 5 | **¡Capturado!** | Sacudidas, estrellas, XP y "+3 caramelos". El **servidor** decide la captura (no se puede hacer trampa desde el móvil). |
-| 6 | **Mis Pokémon** | Menú → Mis Pokémon: orden por PC/fecha/número y filtros por tipo, shiny y favorito. |
-| 7 | **Ficha y evolución** | Tocar un Pokémon: IVs, estadísticas, movimientos, mapa de dónde se capturó, cambiar el mote, marcar favorito, transferir (con "Deshacer"). Con caramelos suficientes: **Evolucionar** (animación de evolución). |
-| 8 | **Pokédex** | Menú → Pokédex: las 1025 especies por generación (sin ver / vistas / capturadas). Cada ficha: descripción, debilidades calculadas, cadena evolutiva y botón **♡ Favorito** con estrellas y nota. |
-| 9 | **Favoritos** | Menú → Favoritos: las especies marcadas con su valoración. |
-| 10 | **Equipos** | Menú → Equipos → Crear equipo: elegir hasta 6 Pokémon capturados. Editar, quitar y borrar. |
-| 11 | **Personalizados** | Menú → Personalizados: inventar un Pokémon (nombre, tipos, estadísticas con deslizadores, imagen por URL). |
-| 12 | **Inventario (CRUD de la asignatura)** | Menú → Inventario: la tienda de 151 Pokémon con precio y stock, búsqueda y ficha. **Agregar / editar / eliminar** solo para cuentas administradoras (ver sección 3). |
-| 13 | **Combate contra la IA** | Menú → Combate de prueba: elegir rival (fácil, normal, difícil), movimientos con su eficacia, cambiar de Pokémon, rendirse. |
-| 14 | **Combate en vivo (PvP)** | Necesita **dos personas con la app** (dos móviles) y un equipo cada una. Menú → Combate en vivo → una pulsa **Invitar** (sale un código de 6 letras) y la otra **Tengo un código**. Cara a cara → **¡A combatir!** Turnos de 30 s (si no eliges, el servidor juega por ti), aviso si el rival se desconecta (tiene 60 s para volver), rendirse. También existe **Buscar rival** (empareja a quien esté buscando). |
-| 15 | **Ajustes y salida** | Menú: Reducir efectos (menos animación), Cerrar sesión. |
+| #   | Qué probar                             | Cómo                                                                                                                                                                                                                                                                                                                                                                                                              |
+| --- | -------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | **Mapa**                               | Mapa 3D de Google con tu avatar, brújula, clima real y modo noche (19:00-6:00). La música cambia de día a noche.                                                                                                                                                                                                                                                                                                  |
+| 2   | **Moverse sin salir de casa**          | Menú → **Joystick: Sí**. Aparece un joystick para caminar por el mapa. (Con el GPS real basta con andar.)                                                                                                                                                                                                                                                                                                         |
+| 3   | **Pokémon salvajes**                   | Salen entre la hierba alrededor (todos los jugadores ven los mismos en el mismo sitio). Tocar uno lejano dice "Acércate más"; acercarse con el joystick y tocarlo.                                                                                                                                                                                                                                                |
+| 4   | **Encuentro y captura**                | El Pokémon aparece a tamaño real sobre la cámara (o un fondo). Botón ⓘ: su ficha (PC, tipo, altura). **Deslizar la Poké Ball hacia arriba** para lanzarla; si el dedo da una vuelta antes, es bola curva. Abajo se eligen Super Ball y Baya Frambu. Fallar no gasta bola.                                                                                                                                         |
+| 5   | **¡Capturado!**                        | Sacudidas, estrellas, XP y "+3 caramelos". El **servidor** decide la captura (no se puede hacer trampa desde el móvil).                                                                                                                                                                                                                                                                                           |
+| 6   | **Mis Pokémon**                        | Menú → Mis Pokémon: orden por PC/fecha/número y filtros por tipo, shiny y favorito.                                                                                                                                                                                                                                                                                                                               |
+| 7   | **Ficha y evolución**                  | Tocar un Pokémon: IVs, estadísticas, movimientos, mapa de dónde se capturó, cambiar el mote, marcar favorito, transferir (con "Deshacer"). Con caramelos suficientes: **Evolucionar** (animación de evolución).                                                                                                                                                                                                   |
+| 8   | **Pokédex**                            | Menú → Pokédex: las 1025 especies por generación (sin ver / vistas / capturadas). Cada ficha: descripción, debilidades calculadas, cadena evolutiva y botón **♡ Favorito** con estrellas y nota.                                                                                                                                                                                                                  |
+| 9   | **Favoritos**                          | Menú → Favoritos: las especies marcadas con su valoración.                                                                                                                                                                                                                                                                                                                                                        |
+| 10  | **Equipos**                            | Menú → Equipos → Crear equipo: elegir hasta 6 Pokémon capturados. Editar, quitar y borrar.                                                                                                                                                                                                                                                                                                                        |
+| 11  | **Personalizados**                     | Menú → Personalizados: inventar un Pokémon (nombre, tipos, estadísticas con deslizadores, imagen por URL).                                                                                                                                                                                                                                                                                                        |
+| 12  | **Inventario (CRUD de la asignatura)** | Menú → Inventario: la tienda de 151 Pokémon con precio y stock, búsqueda y ficha. **Agregar / editar / eliminar** solo para cuentas administradoras (ver sección 3).                                                                                                                                                                                                                                              |
+| 13  | **Combate contra la IA**               | Menú → Combate de prueba: elegir rival (fácil, normal, difícil), movimientos con su eficacia, cambiar de Pokémon, rendirse.                                                                                                                                                                                                                                                                                       |
+| 14  | **Combate en vivo (PvP)**              | Necesita **dos personas con la app** (dos móviles) y un equipo cada una. Menú → Combate en vivo → una pulsa **Invitar** (sale un código de 6 letras) y la otra **Tengo un código**. Cara a cara → **¡A combatir!** Turnos de 30 s (si no eliges, el servidor juega por ti), aviso si el rival se desconecta (tiene 60 s para volver), rendirse. También existe **Buscar rival** (empareja a quien esté buscando). |
+| 15  | **Ajustes y salida**                   | Menú: Reducir efectos (menos animación), Cerrar sesión.                                                                                                                                                                                                                                                                                                                                                           |
 
 Consejos: cada cuenta nueva empieza con 30 Poké Balls, 5 Super Balls y 5 Bayas Frambu. Para el PvP hace falta haber
 capturado al menos un Pokémon y crear un equipo con él (el combate se juega a nivel 50 para que sea justo).
@@ -69,13 +69,13 @@ cabecera `X-Total-Count`) y está en **<https://pokecrud-server.onrender.com>**
    poner su correo y contraseña en `adminEmail` y `adminPassword`. (No publicamos contraseñas en el repositorio porque es
    público.)
 
-| Recurso | Endpoint | Métodos | Acceso |
-| --- | --- | --- | --- |
-| Inventario | `/pokemon`, `/pokemon/:id` | GET · POST, PUT, PATCH, DELETE | leer: público · escribir: ADMIN |
-| Equipos | `/teams`, `/teams/:id` | GET, POST, PUT, PATCH, DELETE | sesión (solo lo tuyo) |
-| Favoritos | `/favorites`, `/favorites/:id` | GET, POST, PUT, PATCH, DELETE | sesión (solo lo tuyo) |
-| Pokémon personalizados | `/customPokemon`, `/customPokemon/:id` | GET, POST, PUT, PATCH, DELETE | sesión (solo lo tuyo) |
-| Cuenta | `/auth/register`, `/auth/login`, `/auth/refresh`, `/auth/logout`, `/auth/me` | POST · GET | — |
+| Recurso                | Endpoint                                                                     | Métodos                        | Acceso                          |
+| ---------------------- | ---------------------------------------------------------------------------- | ------------------------------ | ------------------------------- |
+| Inventario             | `/pokemon`, `/pokemon/:id`                                                   | GET · POST, PUT, PATCH, DELETE | leer: público · escribir: ADMIN |
+| Equipos                | `/teams`, `/teams/:id`                                                       | GET, POST, PUT, PATCH, DELETE  | sesión (solo lo tuyo)           |
+| Favoritos              | `/favorites`, `/favorites/:id`                                               | GET, POST, PUT, PATCH, DELETE  | sesión (solo lo tuyo)           |
+| Pokémon personalizados | `/customPokemon`, `/customPokemon/:id`                                       | GET, POST, PUT, PATCH, DELETE  | sesión (solo lo tuyo)           |
+| Cuenta                 | `/auth/register`, `/auth/login`, `/auth/refresh`, `/auth/logout`, `/auth/me` | POST · GET                     | —                               |
 
 ---
 
@@ -86,7 +86,7 @@ cabecera `X-Total-Count`) y está en **<https://pokecrud-server.onrender.com>**
 - **Cómo se trabajó:** [`docs/plan/ROADMAP.md`](plan/ROADMAP.md) (todas las tareas con su criterio de aceptación y
   estado), [`docs/plan/BITACORA.md`](plan/BITACORA.md) (qué hizo cada uno, cómo lo probó y con qué resultado),
   [`docs/plan/DECISIONES.md`](plan/DECISIONES.md) (59 decisiones técnicas con su porqué). Cada cambio entró por Pull
-  Request con integración continua obligatoria (pestaña *Actions* de GitHub: lint, pruebas y compilación de la app y del
+  Request con integración continua obligatoria (pestaña _Actions_ de GitHub: lint, pruebas y compilación de la app y del
   servidor).
 - **Evidencias:** [`docs/evidencias/`](evidencias/) — capturas por tarea (p. ej. `F3-05_*` evolución, `F5-04_*` combate
   en vivo con dos cuentas), vídeos del móvil y la música del juego en `F2-10_musica/*.wav`.

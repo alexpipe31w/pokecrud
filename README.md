@@ -97,21 +97,21 @@ pokecrud/
 
 Casi todo se abre desde el **menú de la Poké Ball** del mapa. Todas exigen sesión salvo el inventario y su ficha.
 
-| Ruta | Pantalla | Tarea |
-| --- | --- | --- |
-| `/login`, `/registro` | Entrar y crear cuenta | F0-07 |
-| `/mapa` | Mapa 3D con GPS o joystick, Pokémon salvajes, clima, día/noche | F1 |
-| `/encuentro/:id` | Encuentro en realidad aumentada y captura | F2 |
-| `/coleccion`, `/coleccion/:id` | Mis Pokémon y la ficha de cada uno (evolucionar, transferir) | F3-02…F3-05 |
-| `/pokedex`, `/pokedex/:id` | Pokédex de las 1025 especies y ficha de especie (favorito) | F3-04, F3-06c |
-| `/equipos`, `/equipos/nuevo`, `/equipos/:id` | Equipos de hasta 6 Pokémon capturados | F3-06b |
-| `/favoritos` | Especies favoritas con valoración y nota | F3-06c |
-| `/personalizados`, `/personalizados/nuevo`, `/personalizados/:id` | Pokémon inventados | F3-06c |
-| `/inventario` | Inventario de la tienda (lista, buscar); `/tabs/pokedex` redirige aquí | HU-03, HU-05, HU-14 |
-| `/pokemon/nuevo`, `/pokemon/:id/editar` | Agregar (desde PokéAPI) y editar — solo ADMIN | HU-03 |
-| `/pokemon/:id` | Detalle de un Pokémon del inventario (eliminar: solo ADMIN) | HU-04 |
-| `/combate/prueba` | Combate contra la IA | F4 |
-| `/pvp`, `/pvp/combate` | Combate en vivo contra otro jugador (invitar con código o buscar rival) | F5 |
+| Ruta                                                              | Pantalla                                                                | Tarea               |
+| ----------------------------------------------------------------- | ----------------------------------------------------------------------- | ------------------- |
+| `/login`, `/registro`                                             | Entrar y crear cuenta                                                   | F0-07               |
+| `/mapa`                                                           | Mapa 3D con GPS o joystick, Pokémon salvajes, clima, día/noche          | F1                  |
+| `/encuentro/:id`                                                  | Encuentro en realidad aumentada y captura                               | F2                  |
+| `/coleccion`, `/coleccion/:id`                                    | Mis Pokémon y la ficha de cada uno (evolucionar, transferir)            | F3-02…F3-05         |
+| `/pokedex`, `/pokedex/:id`                                        | Pokédex de las 1025 especies y ficha de especie (favorito)              | F3-04, F3-06c       |
+| `/equipos`, `/equipos/nuevo`, `/equipos/:id`                      | Equipos de hasta 6 Pokémon capturados                                   | F3-06b              |
+| `/favoritos`                                                      | Especies favoritas con valoración y nota                                | F3-06c              |
+| `/personalizados`, `/personalizados/nuevo`, `/personalizados/:id` | Pokémon inventados                                                      | F3-06c              |
+| `/inventario`                                                     | Inventario de la tienda (lista, buscar); `/tabs/pokedex` redirige aquí  | HU-03, HU-05, HU-14 |
+| `/pokemon/nuevo`, `/pokemon/:id/editar`                           | Agregar (desde PokéAPI) y editar — solo ADMIN                           | HU-03               |
+| `/pokemon/:id`                                                    | Detalle de un Pokémon del inventario (eliminar: solo ADMIN)             | HU-04               |
+| `/combate/prueba`                                                 | Combate contra la IA                                                    | F4                  |
+| `/pvp`, `/pvp/combate`                                            | Combate en vivo contra otro jugador (invitar con código o buscar rival) | F5                  |
 
 ## Backend propio (servidor NestJS)
 
