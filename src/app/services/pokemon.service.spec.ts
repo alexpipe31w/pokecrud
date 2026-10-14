@@ -26,7 +26,7 @@ const MEWTWO: Pokemon = {
 describe('PokemonService', () => {
   let service: PokemonService;
   let http: HttpTestingController;
-  const url = `${environment.apiUrl}/pokemon`;
+  const url = `${environment.serverUrl}/pokemon`;
 
   beforeEach(() => {
     TestBed.configureTestingModule({

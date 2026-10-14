@@ -1,0 +1,284 @@
+// Esquema de PokéCRUD GO (docs/plan/ARQUITECTURA.md). Toda modificación va con su migración:
+// `npm run db:migrate -- --name <cambio>` (nunca tocar la base a mano).
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum PlayerRole {
+  PLAYER
+  ADMIN
+}
+
+model Player {
+  id               String            @id @default(uuid()) @db.Uuid
+  email            String            @unique
+  passwordHash     String
+  nickname         String            @unique
+  /// F0-12: solo ADMIN escribe en el inventario `/pokemon`. Se lee de la BD en cada escritura (no va en el token).
+  role             PlayerRole        @default(PLAYER)
+  level            Int               @default(1)
+  xp               Int               @default(0)
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  refreshTokens    RefreshToken[]
+  teams            Team[]
+  favorites        Favorite[]
+  customPokemon    CustomPokemon[]
+  inventory        Inventory[]
+  /// Última posición conocida (la manda GET /spawns). La captura exige estar a ≤ 80 m del spawn (F2-06, D-028).
+  lastLat          Float?
+  lastLng          Float?
+  lastLocatedAt    DateTime?
+  caught           CaughtPokemon[]
+  encounterResults EncounterResult[]
+  throws           Throw[]
+  candies          Candy[]
+  pokedex          PokedexEntry[]
+  battlesAsP1      Battle[]          @relation("BattleP1")
+  battlesAsP2      Battle[]          @relation("BattleP2")
+}
+
+model RefreshToken {
+  id        String    @id @default(uuid()) @db.Uuid
+  playerId  String    @db.Uuid
+  player    Player    @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  tokenHash String    @unique
+  familyId  String    @db.Uuid
+  expiresAt DateTime
+  revokedAt DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([playerId])
+  @@index([familyId])
+}
+
+// ── CRUD del curso (F0-08): mismo contrato que tenía JSON Server. Ver docs/plan/fases/F0-fundaciones.md ──
+// CHECKs (stock ≥ 0, rating 1-5, máx. 6 Pokémon por equipo) en la migración `crud_curso`: Prisma no los modela.
+
+/// `/pokemon` de IS-11: inventario compartido de la clase. El id es el nº de la Pokédex (como en JSON Server).
+model InventoryPokemon {
+  id             Int      @id
+  name           String
+  types          String[]
+  abilities      String[]
+  imageUrl       String
+  height         Float
+  weight         Float
+  baseExperience Int
+  stats          Json
+  price          Int
+  stock          Int      @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([name])
+}
+
+model Team {
+  id          Int      @id @default(autoincrement())
+  playerId    String   @db.Uuid
+  player      Player   @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  name        String
+  description String   @default("")
+  pokemonIds  Int[]
+  /// Ids de CaughtPokemon del jugador (F3-06b, D-054), máx. 6 (CHECK `max_six_caught`). Transferir los quita.
+  caughtIds   String[] @default([]) @db.Uuid
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([playerId, id])
+}
+
+model Favorite {
+  id          Int      @id @default(autoincrement())
+  playerId    String   @db.Uuid
+  player      Player   @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  pokemonId   Int
+  pokemonName String
+  note        String   @default("")
+  rating      Int
+  createdAt   DateTime @default(now())
+
+  @@unique([playerId, pokemonId])
+  @@index([playerId, id])
+}
+
+model CustomPokemon {
+  id          Int      @id @default(autoincrement())
+  playerId    String   @db.Uuid
+  player      Player   @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  name        String
+  types       String[]
+  stats       Json
+  imageUrl    String   @default("")
+  description String   @default("")
+  createdAt   DateTime @default(now())
+
+  @@index([playerId, id])
+}
+
+/// Objetos del juego (F1-08). Mismas claves que ITEMS en shared/engine/items.ts.
+enum InventoryItem {
+  POKE_BALL
+  GREAT_BALL
+  ULTRA_BALL
+  RAZZ_BERRY
+}
+
+/// Bolsa del jugador: una fila por objeto. CHECK 0 ≤ qty ≤ 999 en la migración. Las filas NO se borran al llegar a
+/// 0 (el kit inicial se garantiza con INSERT … ON CONFLICT DO NOTHING; borrar una fila lo regalaría otra vez).
+/// Gastar una bola en F2 = UPDATE … SET qty = qty - 1 WHERE … AND qty >= 1 (atómico, ARQUITECTURA §6).
+model Inventory {
+  playerId  String        @db.Uuid
+  item      InventoryItem
+  qty       Int           @default(0)
+  updatedAt DateTime      @updatedAt
+  player    Player        @relation(fields: [playerId], references: [id], onDelete: Cascade)
+
+  @@id([playerId, item])
+}
+
+enum PokemonGender {
+  M
+  F
+}
+
+enum EncounterOutcome {
+  CAUGHT
+  FLED
+}
+
+enum ThrowQuality {
+  none
+  nice
+  great
+  excellent
+}
+
+/// Pokémon capturado (F2-06). Sus datos salen del spawn recalculado en el servidor, nunca del cliente.
+model CaughtPokemon {
+  id          String         @id @default(uuid()) @db.Uuid
+  playerId    String         @db.Uuid
+  speciesId   Int
+  nickname    String?
+  level       Int
+  /// { hp, attack, defense, specialAttack, specialDefense, speed } 0-31.
+  ivs         Json
+  nature      String
+  gender      PokemonGender?
+  shiny       Boolean
+  heightScale Float
+  /// Hasta 4 movimientos (los últimos aprendidos por nivel), para el combate (F4).
+  moves       Int[]
+  ball        InventoryItem
+  /// Spawn del que salió (`celda:franja:índice`).
+  encounterId String
+  caughtLat   Float
+  caughtLng   Float
+  caughtAt    DateTime       @default(now())
+  favorite    Boolean        @default(false)
+  /// PC (D-049) calculado al capturar, para ordenar y paginar en la base (D-052). null = capturado antes de F3-02a
+  /// (lo rellena `npm run db:backfill-collection`); se recalcula si cambia el nivel (F3-05).
+  cp          Int?
+  player      Player         @relation(fields: [playerId], references: [id], onDelete: Cascade)
+
+  @@index([playerId, caughtAt])
+  @@index([playerId, speciesId])
+  @@index([playerId, cp])
+  @@index([playerId, favorite])
+}
+
+/// Caramelos por familia (cadena evolutiva del dataset, D-052). Capturar +3, transferir +1, evolucionar gasta (F3-05).
+model Candy {
+  playerId  String   @db.Uuid
+  familyId  Int
+  qty       Int      @default(0)
+  updatedAt DateTime @updatedAt
+  player    Player   @relation(fields: [playerId], references: [id], onDelete: Cascade)
+
+  @@id([playerId, familyId])
+}
+
+/// Pokédex del jugador (F3): una fila por especie vista; `caught` al capturarla alguna vez.
+model PokedexEntry {
+  playerId      String    @db.Uuid
+  speciesId     Int
+  caught        Boolean   @default(false)
+  firstSeenAt   DateTime  @default(now())
+  firstCaughtAt DateTime?
+  player        Player    @relation(fields: [playerId], references: [id], onDelete: Cascade)
+
+  @@id([playerId, speciesId])
+}
+
+/// Un spawn solo se resuelve una vez por jugador: capturado o huido (UNIQUE). Se puede borrar pasado 1 día: la
+/// franja del spawn dura 10 min y después el id ya no se acepta.
+model EncounterResult {
+  id          String           @id @default(uuid()) @db.Uuid
+  playerId    String           @db.Uuid
+  encounterId String
+  outcome     EncounterOutcome
+  createdAt   DateTime         @default(now())
+  player      Player           @relation(fields: [playerId], references: [id], onDelete: Cascade)
+
+  @@unique([playerId, encounterId])
+  @@index([createdAt])
+}
+
+/// Cada lanzamiento, con su resultado: un reintento con el mismo clientThrowId devuelve esto y no gasta otra bola.
+/// Retención 7 días (se borran al lanzar; D-028).
+model Throw {
+  id              String         @id @default(uuid()) @db.Uuid
+  playerId        String         @db.Uuid
+  clientThrowId   String         @db.Uuid
+  encounterId     String
+  ball            InventoryItem
+  berry           InventoryItem?
+  throwQuality    ThrowQuality
+  curve           Boolean
+  captured        Boolean
+  shakes          Int
+  fled            Boolean
+  xpGained        Int
+  caughtPokemonId String?        @db.Uuid
+  createdAt       DateTime       @default(now())
+  player          Player         @relation(fields: [playerId], references: [id], onDelete: Cascade)
+
+  @@unique([playerId, clientThrowId])
+  @@index([playerId, createdAt])
+}
+
+enum BattleKind {
+  PVP
+  AI
+  TOURNAMENT
+}
+
+/// Resultado de un combate (F5-04, D-056 regla 10). `id` = el de la sala; con `seed` + `log` (acciones de cada decisión)
+/// se reproduce entero (el motor es determinista). Se inserta una vez (ON CONFLICT DO NOTHING). Lo leerá el ranking (F7-05).
+model Battle {
+  id        String     @id @db.Uuid
+  kind      BattleKind
+  p1Id      String     @db.Uuid
+  p1        Player     @relation("BattleP1", fields: [p1Id], references: [id], onDelete: Cascade)
+  p2Id      String     @db.Uuid
+  p2        Player     @relation("BattleP2", fields: [p2Id], references: [id], onDelete: Cascade)
+  /// null = nadie ganó (los dos abandonaron). CHECK `winner_is_player`: p1Id o p2Id.
+  winnerId  String?    @db.Uuid
+  /// faint | forfeit | abandon | inactive (CHECK `battle_reason`).
+  reason    String
+  seed      Int
+  turns     Int
+  log       Json?
+  startedAt DateTime
+  endedAt   DateTime
+
+  @@index([p1Id, endedAt])
+  @@index([p2Id, endedAt])
+}

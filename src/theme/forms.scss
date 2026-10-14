@@ -1,0 +1,98 @@
+// Campos de formulario del sistema de diseño (F0-07). Globales: los reutiliza cualquier formulario.
+// Uso: .form > .field > (.field__label + .field__input + .field__error|.field__hint); .form__alert para errores generales.
+
+.form {
+  display: grid;
+  gap: var(--s-4);
+}
+
+.field {
+  display: grid;
+  gap: var(--s-1);
+}
+
+.field__label {
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.field__control {
+  position: relative;
+}
+
+.field__input {
+  width: 100%;
+  min-height: 48px;
+  padding: 0 var(--s-4);
+  border-radius: 14px;
+  border: 1px solid var(--field-border);
+  background: var(--field-bg);
+  color: var(--surface-text);
+  font: inherit;
+  font-size: 1rem; // 16 px: evita el zoom automático al enfocar en móvil
+}
+
+.field__input:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.field__input[aria-invalid='true'] {
+  border-color: var(--danger-ink);
+}
+
+.field__input--with-toggle {
+  padding-right: 56px;
+}
+
+.field__toggle {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 48px;
+  height: 48px;
+  border: 0;
+  background: none;
+  color: var(--surface-text);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  opacity: 0.75;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.field__hint {
+  margin: 0;
+  font-size: 0.8125rem;
+  opacity: 0.75;
+}
+
+.field__error,
+.form__alert {
+  margin: 0;
+  color: var(--danger-ink);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  animation: appear var(--dur-small) var(--ease-out);
+}
+
+.form__alert {
+  padding: var(--s-3) var(--s-4);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--danger) 14%, transparent);
+  font-size: 0.875rem;
+}
+
+.form__waking {
+  margin: 0;
+  font-size: 0.875rem;
+  text-align: center;
+  opacity: 0.85;
+  animation: appear var(--dur-small) var(--ease-out);
+}
+
+@keyframes appear {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}

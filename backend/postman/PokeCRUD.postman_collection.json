@@ -1,41 +1,84 @@
 {
   "info": {
-    "name": "PokéCRUD - Backend JSON Server",
-    "description": "Peticiones a las colecciones teams, favorites, customPokemon y pokemon (primeros 151). Levantar antes el backend con `npm run api`.",
+    "name": "PokéCRUD",
+    "description": "CRUD del curso contra el servidor NestJS (F0-08): /pokemon (inventario compartido; leer es público, escribir exige sesión con rol ADMIN (F0-12)) y /teams, /favorites, /customPokemon (de cada jugador). Mismo contrato que tenía JSON Server.\n\nAntes: `cd server && npm run start:dev` (puerto 3000). La primera carpeta registra un jugador de prueba (@pokecrud.test, lo borran los e2e del servidor) y guarda su accessToken; el resto lo usa como Bearer. Se puede ejecutar entera en el Runner las veces que haga falta.\n\nInventario (F0-12): las escrituras en /pokemon necesitan una cuenta ADMIN (se da con `cd server && npm run admin -- grant <correo>`). Pon su correo y contraseña en las variables `adminEmail` y `adminPassword` de TU entorno de Postman (no en la colección: el repo es público). Sin ellas, el login ADMIN falla y las escrituras del inventario dan 401.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{accessToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000"
+    },
+    {
+      "key": "accessToken",
+      "value": ""
+    },
+    {
+      "key": "adminToken",
+      "value": ""
+    },
+    {
+      "key": "adminEmail",
+      "value": ""
+    },
+    {
+      "key": "adminPassword",
+      "value": ""
+    },
+    {
+      "key": "runId",
+      "value": ""
+    },
+    {
+      "key": "teamId",
+      "value": ""
+    },
+    {
+      "key": "favoriteId",
+      "value": ""
+    },
+    {
+      "key": "customPokemonId",
+      "value": ""
+    }
+  ],
   "item": [
     {
-      "name": "Equipos (/teams)",
+      "name": "0 · Sesión",
       "item": [
         {
-          "name": "Listar",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{apiUrl}}/teams",
-              "host": ["{{apiUrl}}"],
-              "path": ["teams"]
+          "name": "Registrar jugador de prueba",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('runId', Date.now().toString(36));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 201', () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set('accessToken', pm.response.json().accessToken);"
+                ]
+              }
             }
-          },
-          "response": []
-        },
-        {
-          "name": "Obtener por id",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{apiUrl}}/teams/1",
-              "host": ["{{apiUrl}}"],
-              "path": ["teams", "1"]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Crear",
+          ],
           "request": {
             "method": "POST",
             "header": [
@@ -44,123 +87,40 @@
                 "value": "application/json"
               }
             ],
+            "auth": {
+              "type": "noauth"
+            },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Equipo Agua\",\n  \"description\": \"Solo tipo agua\",\n  \"pokemonIds\": [\n    7,\n    54,\n    131\n  ],\n  \"createdAt\": \"2026-10-01T12:00:00.000Z\",\n  \"updatedAt\": \"2026-10-01T12:00:00.000Z\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
+              "raw": "{\n  \"email\": \"postman+{{runId}}@pokecrud.test\",\n  \"password\": \"postman-clave-123\",\n  \"nickname\": \"pm_{{runId}}\"\n}"
             },
             "url": {
-              "raw": "{{apiUrl}}/teams",
-              "host": ["{{apiUrl}}"],
-              "path": ["teams"]
+              "raw": "{{baseUrl}}/auth/register",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "register"
+              ]
             }
-          },
-          "response": []
+          }
         },
         {
-          "name": "Reemplazar",
-          "request": {
-            "method": "PUT",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
+          "name": "Login ADMIN (variables adminEmail / adminPassword de tu entorno)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"login ADMIN 200 (si falla: pon adminEmail/adminPassword en tu entorno de Postman)\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"la cuenta es ADMIN\", () => pm.expect(pm.response.json().player.role).to.eql(\"ADMIN\"));",
+                  "pm.collectionVariables.set(\"adminToken\", pm.response.json().accessToken);"
+                ]
               }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"name\": \"Equipo Kanto (editado)\",\n  \"description\": \"Actualizado con PUT\",\n  \"pokemonIds\": [\n    25,\n    6,\n    9\n  ],\n  \"createdAt\": \"2026-09-28T14:00:00.000Z\",\n  \"updatedAt\": \"2026-10-01T12:30:00.000Z\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "{{apiUrl}}/teams/1",
-              "host": ["{{apiUrl}}"],
-              "path": ["teams", "1"]
             }
-          },
-          "response": []
-        },
-        {
-          "name": "Actualizar parcial",
-          "request": {
-            "method": "PATCH",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"description\": \"Descripción cambiada con PATCH\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "{{apiUrl}}/teams/1",
-              "host": ["{{apiUrl}}"],
-              "path": ["teams", "1"]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Eliminar",
-          "request": {
-            "method": "DELETE",
-            "header": [],
-            "url": {
-              "raw": "{{apiUrl}}/teams/2",
-              "host": ["{{apiUrl}}"],
-              "path": ["teams", "2"]
-            }
-          },
-          "response": []
-        }
-      ]
-    },
-    {
-      "name": "Favoritos (/favorites)",
-      "item": [
-        {
-          "name": "Listar",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{apiUrl}}/favorites",
-              "host": ["{{apiUrl}}"],
-              "path": ["favorites"]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Obtener por id",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{apiUrl}}/favorites/1",
-              "host": ["{{apiUrl}}"],
-              "path": ["favorites", "1"]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Crear",
+          ],
           "request": {
             "method": "POST",
             "header": [
@@ -169,229 +129,88 @@
                 "value": "application/json"
               }
             ],
+            "auth": {
+              "type": "noauth"
+            },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"pokemonId\": 1,\n  \"pokemonName\": \"bulbasaur\",\n  \"note\": \"Mi inicial de planta\",\n  \"rating\": 3,\n  \"createdAt\": \"2026-10-01T12:00:00.000Z\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
+              "raw": "{\n  \"email\": \"{{adminEmail}}\",\n  \"password\": \"{{adminPassword}}\"\n}"
             },
             "url": {
-              "raw": "{{apiUrl}}/favorites",
-              "host": ["{{apiUrl}}"],
-              "path": ["favorites"]
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
             }
-          },
-          "response": []
-        },
-        {
-          "name": "Reemplazar",
-          "request": {
-            "method": "PUT",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"pokemonId\": 25,\n  \"pokemonName\": \"pikachu\",\n  \"note\": \"Nota reemplazada con PUT\",\n  \"rating\": 5,\n  \"createdAt\": \"2026-09-28T15:10:00.000Z\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "{{apiUrl}}/favorites/1",
-              "host": ["{{apiUrl}}"],
-              "path": ["favorites", "1"]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Actualizar parcial",
-          "request": {
-            "method": "PATCH",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"rating\": 2\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "{{apiUrl}}/favorites/1",
-              "host": ["{{apiUrl}}"],
-              "path": ["favorites", "1"]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Eliminar",
-          "request": {
-            "method": "DELETE",
-            "header": [],
-            "url": {
-              "raw": "{{apiUrl}}/favorites/2",
-              "host": ["{{apiUrl}}"],
-              "path": ["favorites", "2"]
-            }
-          },
-          "response": []
+          }
         }
       ]
     },
     {
-      "name": "Pokémon personalizados (/customPokemon)",
+      "name": "Inventario (/pokemon)",
       "item": [
         {
-          "name": "Listar",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{apiUrl}}/customPokemon",
-              "host": ["{{apiUrl}}"],
-              "path": ["customPokemon"]
+          "name": "Limpieza previa (200 o 404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 o 404', () => pm.expect(pm.response.code).to.be.oneOf([200, 404]));"
+                ]
+              }
             }
-          },
-          "response": []
-        },
-        {
-          "name": "Obtener por id",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{apiUrl}}/customPokemon/1",
-              "host": ["{{apiUrl}}"],
-              "path": ["customPokemon", "1"]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Crear",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"name\": \"Cafetín\",\n  \"types\": [\n    \"grass\"\n  ],\n  \"stats\": {\n    \"hp\": 60,\n    \"attack\": 55,\n    \"defense\": 65,\n    \"speed\": 120\n  },\n  \"imageUrl\": \"\",\n  \"description\": \"Nunca duerme.\",\n  \"createdAt\": \"2026-10-01T12:00:00.000Z\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "{{apiUrl}}/customPokemon",
-              "host": ["{{apiUrl}}"],
-              "path": ["customPokemon"]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Reemplazar",
-          "request": {
-            "method": "PUT",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"name\": \"Opitazo\",\n  \"types\": [\n    \"fire\"\n  ],\n  \"stats\": {\n    \"hp\": 90,\n    \"attack\": 120,\n    \"defense\": 75,\n    \"speed\": 100\n  },\n  \"imageUrl\": \"\",\n  \"description\": \"Reemplazado con PUT\",\n  \"createdAt\": \"2026-09-29T11:00:00.000Z\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "{{apiUrl}}/customPokemon/1",
-              "host": ["{{apiUrl}}"],
-              "path": ["customPokemon", "1"]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Actualizar parcial",
-          "request": {
-            "method": "PATCH",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"description\": \"Descripción cambiada con PATCH\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "{{apiUrl}}/customPokemon/1",
-              "host": ["{{apiUrl}}"],
-              "path": ["customPokemon", "1"]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Eliminar",
+          ],
           "request": {
             "method": "DELETE",
             "header": [],
             "url": {
-              "raw": "{{apiUrl}}/customPokemon/2",
-              "host": ["{{apiUrl}}"],
-              "path": ["customPokemon", "2"]
+              "raw": "{{baseUrl}}/pokemon/99150",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pokemon",
+                "99150"
+              ]
             }
-          },
-          "response": []
-        }
-      ]
-    },
-    {
-      "name": "Primeros 151 (/pokemon)",
-      "item": [
+          }
+        },
         {
-          "name": "Listar (ordenado por id)",
+          "name": "Listar ordenado por id (público)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 200', () => pm.response.to.have.status(200));",
+                  "const ids = pm.response.json().map((p) => p.id);",
+                  "pm.test('al menos los 151', () => pm.expect(ids.length).to.be.at.least(151));",
+                  "pm.test('ordenado por id', () => pm.expect(ids).to.eql([...ids].sort((a, b) => a - b)));"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [],
+            "auth": {
+              "type": "noauth"
+            },
             "url": {
-              "raw": "{{apiUrl}}/pokemon?_sort=id&_order=asc",
-              "host": ["{{apiUrl}}"],
-              "path": ["pokemon"],
+              "raw": "{{baseUrl}}/pokemon?_sort=id&_order=asc",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pokemon"
+              ],
               "query": [
                 {
                   "key": "_sort",
@@ -403,18 +222,37 @@
                 }
               ]
             }
-          },
-          "response": []
+          }
         },
         {
-          "name": "Buscar por nombre",
+          "name": "Buscar por nombre (name_like)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 200', () => pm.response.to.have.status(200));",
+                  "const names = pm.response.json().map((p) => p.name);",
+                  "pm.test('encuentra mew y mewtwo', () => pm.expect(names).to.include.members(['mew', 'mewtwo']));"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [],
+            "auth": {
+              "type": "noauth"
+            },
             "url": {
-              "raw": "{{apiUrl}}/pokemon?name_like=mew",
-              "host": ["{{apiUrl}}"],
-              "path": ["pokemon"],
+              "raw": "{{baseUrl}}/pokemon?name_like=mew",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pokemon"
+              ],
               "query": [
                 {
                   "key": "name_like",
@@ -422,24 +260,142 @@
                 }
               ]
             }
-          },
-          "response": []
+          }
         },
         {
-          "name": "Obtener por id",
+          "name": "Listar paginado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('página 2 = ids 11-20', () => pm.expect(pm.response.json().map((p) => p.id)).to.eql([11,12,13,14,15,16,17,18,19,20]));",
+                  "pm.test('trae X-Total-Count', () => pm.response.to.have.header('X-Total-Count'));"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [],
+            "auth": {
+              "type": "noauth"
+            },
             "url": {
-              "raw": "{{apiUrl}}/pokemon/150",
-              "host": ["{{apiUrl}}"],
-              "path": ["pokemon", "150"]
+              "raw": "{{baseUrl}}/pokemon?_sort=id&_order=asc&_page=2&_limit=10",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pokemon"
+              ],
+              "query": [
+                {
+                  "key": "_sort",
+                  "value": "id"
+                },
+                {
+                  "key": "_order",
+                  "value": "asc"
+                },
+                {
+                  "key": "_page",
+                  "value": "2"
+                },
+                {
+                  "key": "_limit",
+                  "value": "10"
+                }
+              ]
             }
-          },
-          "response": []
+          }
         },
         {
-          "name": "Crear (después de eliminar el 150)",
+          "name": "Obtener por id (público)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('es mewtwo', () => pm.expect(pm.response.json().name).to.eql('mewtwo'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "noauth"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/pokemon/150",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pokemon",
+                "150"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Crear sin sesión → 401",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 401', () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": 99150,\n  \"name\": \"mewtwo-postman\",\n  \"types\": [\n    \"psychic\"\n  ],\n  \"abilities\": [\n    \"pressure\",\n    \"unnerve\"\n  ],\n  \"imageUrl\": \"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/150.png\",\n  \"height\": 2,\n  \"weight\": 122,\n  \"baseExperience\": 340,\n  \"stats\": {\n    \"hp\": 106,\n    \"attack\": 110,\n    \"defense\": 90,\n    \"specialAttack\": 154,\n    \"specialDefense\": 90,\n    \"speed\": 130\n  },\n  \"price\": 50000,\n  \"stock\": 3,\n  \"createdAt\": \"2026-10-01T12:00:00.000Z\",\n  \"updatedAt\": \"2026-10-01T12:00:00.000Z\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/pokemon",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pokemon"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Crear como jugador normal → 403 (F0-12)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"responde 403: solo un ADMIN escribe en el inventario\", () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [
@@ -450,23 +406,151 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"id\": 150,\n  \"name\": \"mewtwo\",\n  \"types\": [\n    \"psychic\"\n  ],\n  \"abilities\": [\n    \"pressure\",\n    \"unnerve\"\n  ],\n  \"imageUrl\": \"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/150.png\",\n  \"height\": 2,\n  \"weight\": 122,\n  \"baseExperience\": 306,\n  \"stats\": {\n    \"hp\": 106,\n    \"attack\": 110,\n    \"defense\": 90,\n    \"specialAttack\": 154,\n    \"specialDefense\": 90,\n    \"speed\": 130\n  },\n  \"price\": 30600,\n  \"stock\": 5,\n  \"createdAt\": \"2026-10-08T12:00:00.000Z\",\n  \"updatedAt\": \"2026-10-08T12:00:00.000Z\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
+              "raw": "{\n  \"id\": 99150,\n  \"name\": \"mewtwo-postman\",\n  \"types\": [\n    \"psychic\"\n  ],\n  \"abilities\": [\n    \"pressure\",\n    \"unnerve\"\n  ],\n  \"imageUrl\": \"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/150.png\",\n  \"height\": 2,\n  \"weight\": 122,\n  \"baseExperience\": 340,\n  \"stats\": {\n    \"hp\": 106,\n    \"attack\": 110,\n    \"defense\": 90,\n    \"specialAttack\": 154,\n    \"specialDefense\": 90,\n    \"speed\": 130\n  },\n  \"price\": 50000,\n  \"stock\": 3,\n  \"createdAt\": \"2026-10-01T12:00:00.000Z\",\n  \"updatedAt\": \"2026-10-01T12:00:00.000Z\"\n}"
             },
             "url": {
-              "raw": "{{apiUrl}}/pokemon",
-              "host": ["{{apiUrl}}"],
-              "path": ["pokemon"]
+              "raw": "{{baseUrl}}/pokemon",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pokemon"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
             }
-          },
-          "response": []
+          }
         },
         {
-          "name": "Reemplazar",
+          "name": "Crear",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 201', () => pm.response.to.have.status(201));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": 99150,\n  \"name\": \"mewtwo-postman\",\n  \"types\": [\n    \"psychic\"\n  ],\n  \"abilities\": [\n    \"pressure\",\n    \"unnerve\"\n  ],\n  \"imageUrl\": \"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/150.png\",\n  \"height\": 2,\n  \"weight\": 122,\n  \"baseExperience\": 340,\n  \"stats\": {\n    \"hp\": 106,\n    \"attack\": 110,\n    \"defense\": 90,\n    \"specialAttack\": 154,\n    \"specialDefense\": 90,\n    \"speed\": 130\n  },\n  \"price\": 50000,\n  \"stock\": 3,\n  \"createdAt\": \"2026-10-01T12:00:00.000Z\",\n  \"updatedAt\": \"2026-10-01T12:00:00.000Z\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/pokemon",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pokemon"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Crear id repetido → 409",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": 99150,\n  \"name\": \"mewtwo-postman\",\n  \"types\": [\n    \"psychic\"\n  ],\n  \"abilities\": [\n    \"pressure\",\n    \"unnerve\"\n  ],\n  \"imageUrl\": \"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/150.png\",\n  \"height\": 2,\n  \"weight\": 122,\n  \"baseExperience\": 340,\n  \"stats\": {\n    \"hp\": 106,\n    \"attack\": 110,\n    \"defense\": 90,\n    \"specialAttack\": 154,\n    \"specialDefense\": 90,\n    \"speed\": 130\n  },\n  \"price\": 50000,\n  \"stock\": 3,\n  \"createdAt\": \"2026-10-01T12:00:00.000Z\",\n  \"updatedAt\": \"2026-10-01T12:00:00.000Z\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/pokemon",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pokemon"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Validación: stock negativo → 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": 99151,\n  \"name\": \"mewtwo-postman\",\n  \"types\": [\n    \"psychic\"\n  ],\n  \"abilities\": [\n    \"pressure\",\n    \"unnerve\"\n  ],\n  \"imageUrl\": \"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/150.png\",\n  \"height\": 2,\n  \"weight\": 122,\n  \"baseExperience\": 340,\n  \"stats\": {\n    \"hp\": 106,\n    \"attack\": 110,\n    \"defense\": 90,\n    \"specialAttack\": 154,\n    \"specialDefense\": 90,\n    \"speed\": 130\n  },\n  \"price\": 50000,\n  \"stock\": -1,\n  \"createdAt\": \"2026-10-01T12:00:00.000Z\",\n  \"updatedAt\": \"2026-10-01T12:00:00.000Z\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/pokemon",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pokemon"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Reemplazar (PUT)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('reemplazado', () => pm.expect(pm.response.json()).to.include({ name: 'mewtwo-reemplazado', price: 48000 }));"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "PUT",
             "header": [
@@ -477,23 +561,34 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"id\": 150,\n  \"name\": \"mewtwo\",\n  \"types\": [\n    \"psychic\"\n  ],\n  \"abilities\": [\n    \"pressure\",\n    \"unnerve\"\n  ],\n  \"imageUrl\": \"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/150.png\",\n  \"height\": 2,\n  \"weight\": 122,\n  \"baseExperience\": 306,\n  \"stats\": {\n    \"hp\": 106,\n    \"attack\": 110,\n    \"defense\": 90,\n    \"specialAttack\": 154,\n    \"specialDefense\": 90,\n    \"speed\": 130\n  },\n  \"price\": 50000,\n  \"stock\": 2,\n  \"createdAt\": \"2026-10-08T12:00:00.000Z\",\n  \"updatedAt\": \"2026-10-08T13:00:00.000Z\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
+              "raw": "{\n  \"id\": 99150,\n  \"name\": \"mewtwo-reemplazado\",\n  \"types\": [\n    \"psychic\"\n  ],\n  \"abilities\": [\n    \"pressure\",\n    \"unnerve\"\n  ],\n  \"imageUrl\": \"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/150.png\",\n  \"height\": 2,\n  \"weight\": 122,\n  \"baseExperience\": 340,\n  \"stats\": {\n    \"hp\": 106,\n    \"attack\": 110,\n    \"defense\": 90,\n    \"specialAttack\": 154,\n    \"specialDefense\": 90,\n    \"speed\": 130\n  },\n  \"price\": 48000,\n  \"stock\": 3,\n  \"createdAt\": \"2026-10-01T12:00:00.000Z\",\n  \"updatedAt\": \"2026-10-01T12:00:00.000Z\"\n}"
             },
             "url": {
-              "raw": "{{apiUrl}}/pokemon/150",
-              "host": ["{{apiUrl}}"],
-              "path": ["pokemon", "150"]
+              "raw": "{{baseUrl}}/pokemon/99150",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pokemon",
+                "99150"
+              ]
             }
-          },
-          "response": []
+          }
         },
         {
           "name": "Actualizar parcial (precio y stock)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('precio y stock', () => pm.expect(pm.response.json()).to.include({ name: 'mewtwo-reemplazado', price: 45000, stock: 10 }));"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "PATCH",
             "header": [
@@ -504,41 +599,1107 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"price\": 45000,\n  \"stock\": 10\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
+              "raw": "{\n  \"price\": 45000,\n  \"stock\": 10\n}"
             },
             "url": {
-              "raw": "{{apiUrl}}/pokemon/150",
-              "host": ["{{apiUrl}}"],
-              "path": ["pokemon", "150"]
+              "raw": "{{baseUrl}}/pokemon/99150",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pokemon",
+                "99150"
+              ]
             }
-          },
-          "response": []
+          }
         },
         {
           "name": "Eliminar",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "DELETE",
             "header": [],
             "url": {
-              "raw": "{{apiUrl}}/pokemon/150",
-              "host": ["{{apiUrl}}"],
-              "path": ["pokemon", "150"]
+              "raw": "{{baseUrl}}/pokemon/99150",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pokemon",
+                "99150"
+              ]
             }
-          },
-          "response": []
+          }
+        },
+        {
+          "name": "Ya no existe → 404",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 404', () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "noauth"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/pokemon/99150",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pokemon",
+                "99150"
+              ]
+            }
+          }
+        }
+      ],
+      "auth": {
+        "type": "bearer",
+        "bearer": [
+          {
+            "key": "token",
+            "value": "{{adminToken}}",
+            "type": "string"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Equipos (/teams)",
+      "item": [
+        {
+          "name": "Crear",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 201', () => pm.response.to.have.status(201));",
+                  "pm.test('no expone playerId', () => pm.expect(pm.response.json()).to.not.have.property('playerId'));",
+                  "pm.collectionVariables.set('teamId', pm.response.json().id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Equipo Agua\",\n  \"description\": \"Solo tipo agua\",\n  \"pokemonIds\": [\n    7,\n    54,\n    131\n  ],\n  \"createdAt\": \"2026-10-01T12:00:00.000Z\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/teams",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "teams"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Listar (solo los míos)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('es un array', () => pm.expect(pm.response.json()).to.be.an('array'));",
+                  "pm.test('incluye el creado', () => pm.expect(pm.response.json().map((x) => x.id)).to.include(pm.collectionVariables.get('teamId')));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/teams",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "teams"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Listar paginado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('trae X-Total-Count', () => pm.response.to.have.header('X-Total-Count'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/teams?_page=1&_limit=5",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "teams"
+              ],
+              "query": [
+                {
+                  "key": "_page",
+                  "value": "1"
+                },
+                {
+                  "key": "_limit",
+                  "value": "5"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Obtener por id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('no expone playerId', () => pm.expect(pm.response.json()).to.not.have.property('playerId'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/teams/{{teamId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "teams",
+                "{{teamId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Reemplazar (PUT)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('name reemplazado', () => pm.expect(pm.response.json().name).to.eql(\"Equipo Kanto (editado)\"));",
+                  "pm.test('description reemplazado', () => pm.expect(pm.response.json().description).to.eql(\"Actualizado con PUT\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Equipo Kanto (editado)\",\n  \"description\": \"Actualizado con PUT\",\n  \"pokemonIds\": [\n    25,\n    6,\n    9\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/teams/{{teamId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "teams",
+                "{{teamId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Actualizar parcial (PATCH)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('description actualizado', () => pm.expect(pm.response.json().description).to.eql(\"Descripción cambiada con PATCH\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"description\": \"Descripción cambiada con PATCH\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/teams/{{teamId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "teams",
+                "{{teamId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Validación: 7 Pokémon → 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Demasiados\",\n  \"pokemonIds\": [\n    1,\n    2,\n    3,\n    4,\n    5,\n    6,\n    7\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/teams",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "teams"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Sin sesión → 401",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 401', () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "noauth"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/teams",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "teams"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Eliminar",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/teams/{{teamId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "teams",
+                "{{teamId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Ya no existe → 404",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 404', () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/teams/{{teamId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "teams",
+                "{{teamId}}"
+              ]
+            }
+          }
         }
       ]
-    }
-  ],
-  "variable": [
+    },
     {
-      "key": "apiUrl",
-      "value": "http://localhost:3000"
+      "name": "Favoritos (/favorites)",
+      "item": [
+        {
+          "name": "Crear",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 201', () => pm.response.to.have.status(201));",
+                  "pm.test('no expone playerId', () => pm.expect(pm.response.json()).to.not.have.property('playerId'));",
+                  "pm.collectionVariables.set('favoriteId', pm.response.json().id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pokemonId\": 1,\n  \"pokemonName\": \"bulbasaur\",\n  \"note\": \"Mi inicial de planta\",\n  \"rating\": 3,\n  \"createdAt\": \"2026-10-01T12:00:00.000Z\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/favorites",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "favorites"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Listar (solo los míos)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('es un array', () => pm.expect(pm.response.json()).to.be.an('array'));",
+                  "pm.test('incluye el creado', () => pm.expect(pm.response.json().map((x) => x.id)).to.include(pm.collectionVariables.get('favoriteId')));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/favorites",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "favorites"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Listar paginado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('trae X-Total-Count', () => pm.response.to.have.header('X-Total-Count'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/favorites?_page=1&_limit=5",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "favorites"
+              ],
+              "query": [
+                {
+                  "key": "_page",
+                  "value": "1"
+                },
+                {
+                  "key": "_limit",
+                  "value": "5"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Obtener por id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('no expone playerId', () => pm.expect(pm.response.json()).to.not.have.property('playerId'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/favorites/{{favoriteId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "favorites",
+                "{{favoriteId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Reemplazar (PUT)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('pokemonId reemplazado', () => pm.expect(pm.response.json().pokemonId).to.eql(25));",
+                  "pm.test('pokemonName reemplazado', () => pm.expect(pm.response.json().pokemonName).to.eql(\"pikachu\"));",
+                  "pm.test('note reemplazado', () => pm.expect(pm.response.json().note).to.eql(\"Nota reemplazada con PUT\"));",
+                  "pm.test('rating reemplazado', () => pm.expect(pm.response.json().rating).to.eql(5));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pokemonId\": 25,\n  \"pokemonName\": \"pikachu\",\n  \"note\": \"Nota reemplazada con PUT\",\n  \"rating\": 5\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/favorites/{{favoriteId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "favorites",
+                "{{favoriteId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Actualizar parcial (PATCH)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('rating actualizado', () => pm.expect(pm.response.json().rating).to.eql(2));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"rating\": 2\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/favorites/{{favoriteId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "favorites",
+                "{{favoriteId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Validación: valoración 6 → 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pokemonId\": 4,\n  \"pokemonName\": \"charmander\",\n  \"rating\": 6\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/favorites",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "favorites"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Sin sesión → 401",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 401', () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "noauth"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/favorites",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "favorites"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Eliminar",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/favorites/{{favoriteId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "favorites",
+                "{{favoriteId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Ya no existe → 404",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 404', () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/favorites/{{favoriteId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "favorites",
+                "{{favoriteId}}"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Pokémon personalizados (/customPokemon)",
+      "item": [
+        {
+          "name": "Crear",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 201', () => pm.response.to.have.status(201));",
+                  "pm.test('no expone playerId', () => pm.expect(pm.response.json()).to.not.have.property('playerId'));",
+                  "pm.collectionVariables.set('customPokemonId', pm.response.json().id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Cafetín\",\n  \"types\": [\n    \"grass\"\n  ],\n  \"stats\": {\n    \"hp\": 60,\n    \"attack\": 55,\n    \"defense\": 65,\n    \"speed\": 120\n  },\n  \"imageUrl\": \"\",\n  \"description\": \"Nunca duerme\",\n  \"createdAt\": \"2026-10-01T12:00:00.000Z\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/customPokemon",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "customPokemon"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Listar (solo los míos)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('es un array', () => pm.expect(pm.response.json()).to.be.an('array'));",
+                  "pm.test('incluye el creado', () => pm.expect(pm.response.json().map((x) => x.id)).to.include(pm.collectionVariables.get('customPokemonId')));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/customPokemon",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "customPokemon"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Listar paginado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('trae X-Total-Count', () => pm.response.to.have.header('X-Total-Count'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/customPokemon?_page=1&_limit=5",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "customPokemon"
+              ],
+              "query": [
+                {
+                  "key": "_page",
+                  "value": "1"
+                },
+                {
+                  "key": "_limit",
+                  "value": "5"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Obtener por id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('no expone playerId', () => pm.expect(pm.response.json()).to.not.have.property('playerId'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/customPokemon/{{customPokemonId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "customPokemon",
+                "{{customPokemonId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Reemplazar (PUT)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('name reemplazado', () => pm.expect(pm.response.json().name).to.eql(\"Opitazo\"));",
+                  "pm.test('imageUrl reemplazado', () => pm.expect(pm.response.json().imageUrl).to.eql(\"\"));",
+                  "pm.test('description reemplazado', () => pm.expect(pm.response.json().description).to.eql(\"Reemplazado con PUT\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Opitazo\",\n  \"types\": [\n    \"fire\"\n  ],\n  \"stats\": {\n    \"hp\": 90,\n    \"attack\": 120,\n    \"defense\": 75,\n    \"speed\": 100\n  },\n  \"imageUrl\": \"\",\n  \"description\": \"Reemplazado con PUT\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/customPokemon/{{customPokemonId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "customPokemon",
+                "{{customPokemonId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Actualizar parcial (PATCH)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('description actualizado', () => pm.expect(pm.response.json().description).to.eql(\"Descripción cambiada con PATCH\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"description\": \"Descripción cambiada con PATCH\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/customPokemon/{{customPokemonId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "customPokemon",
+                "{{customPokemonId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Validación: tipo inexistente → 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Raro\",\n  \"types\": [\n    \"plasma\"\n  ],\n  \"stats\": {\n    \"hp\": 1,\n    \"attack\": 1,\n    \"defense\": 1,\n    \"speed\": 1\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/customPokemon",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "customPokemon"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Sin sesión → 401",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 401', () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "noauth"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/customPokemon",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "customPokemon"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Eliminar",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/customPokemon/{{customPokemonId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "customPokemon",
+                "{{customPokemonId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Ya no existe → 404",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 404', () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/customPokemon/{{customPokemonId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "customPokemon",
+                "{{customPokemonId}}"
+              ]
+            }
+          }
+        }
+      ]
     }
   ]
 }

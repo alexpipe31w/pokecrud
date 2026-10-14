@@ -1,0 +1,104 @@
+.page {
+  padding: var(--s-4) var(--s-4) calc(var(--ion-safe-area-bottom, 0px) + 96px);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: var(--s-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.mon {
+  display: grid;
+  justify-items: center;
+  gap: var(--s-1);
+  padding: var(--s-3) var(--s-2);
+  border-radius: var(--r-card);
+  background:
+    radial-gradient(circle at 50% 35%, color-mix(in srgb, var(--tint), white 35%), transparent 70%),
+    color-mix(in srgb, var(--tint), var(--paper) 70%);
+  color: var(--ink);
+  text-decoration: none;
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--dur-press) var(--ease-out);
+
+  &:active {
+    transform: scale(0.97);
+  }
+
+  img {
+    width: 96px;
+    height: 96px;
+    object-fit: contain;
+  }
+
+  strong {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+.total {
+  font: 700 0.85rem/1 var(--font-display);
+  color: var(--ink-2);
+}
+
+.silhouette {
+  display: grid;
+  place-items: center;
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--ink) 12%, transparent);
+  color: color-mix(in srgb, var(--ink) 45%, transparent);
+  font: 700 2.6rem/1 var(--font-display);
+}
+
+.big {
+  width: 120px;
+  height: 120px;
+}
+
+.state {
+  grid-column: 1 / -1;
+  display: grid;
+  justify-items: center;
+  gap: var(--s-2);
+  padding: var(--s-8) var(--s-4);
+  text-align: center;
+  color: var(--ink-2);
+
+  h2 {
+    margin: 0;
+    color: var(--ink);
+    font: 700 1.3rem/1.2 var(--font-display);
+  }
+
+  p {
+    margin: 0;
+  }
+}
+
+.cta {
+  display: inline-grid;
+  place-items: center;
+  min-height: 48px;
+  padding: 0 var(--s-6);
+  border-radius: var(--r-chip);
+  background: var(--accent);
+  color: var(--accent-ink);
+  font: 600 1rem/1 var(--font-display);
+  text-decoration: none;
+  box-shadow: var(--shadow-accent);
+}
+
+.new {
+  position: absolute;
+  right: var(--s-4);
+  bottom: calc(var(--ion-safe-area-bottom, 0px) + var(--s-4));
+}

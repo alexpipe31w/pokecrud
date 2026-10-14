@@ -1,0 +1,5 @@
+{
+  "//": "shared/ es ESM: así el servidor (module nodenext) lo compila y lo carga como módulo ES (D-024).",
+  "private": true,
+  "type": "module"
+}

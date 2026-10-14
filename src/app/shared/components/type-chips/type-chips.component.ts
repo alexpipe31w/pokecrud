@@ -7,7 +7,9 @@ import { POKEMON_TYPES } from '../../../core/constants/pokemon-types';
   selector: 'app-type-chips',
   template: `
     @for (type of types(); track type) {
-      <span class="type-chip" [style.background]="color(type)">{{ label(type) }}</span>
+      <span class="type-chip" [style.background]="color(type)" [style.color]="textColor(type)">{{
+        label(type)
+      }}</span>
     }
   `,
   styles: `
@@ -17,7 +19,6 @@ import { POKEMON_TYPES } from '../../../core/constants/pokemon-types';
       gap: 4px;
     }
     .type-chip {
-      color: #fff;
       font-size: 0.72rem;
       font-weight: 600;
       line-height: 1;
@@ -36,6 +37,10 @@ export class TypeChipsComponent {
   }
 
   color(type: string): string {
-    return POKEMON_TYPES[type]?.color ?? '#777';
+    return POKEMON_TYPES[type]?.color ?? 'var(--ink-2)';
+  }
+
+  textColor(type: string): string {
+    return POKEMON_TYPES[type]?.text ?? 'var(--accent-ink)';
   }
 }

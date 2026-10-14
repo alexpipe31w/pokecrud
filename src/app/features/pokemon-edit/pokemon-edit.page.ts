@@ -5,8 +5,6 @@ import {
   IonButtons,
   IonContent,
   IonHeader,
-  IonSpinner,
-  IonText,
   IonTitle,
   IonToolbar,
   NavController,
@@ -23,6 +21,13 @@ import { PokemonFormComponent } from '../../shared/components/pokemon-form/pokem
 @Component({
   selector: 'app-pokemon-edit',
   templateUrl: 'pokemon-edit.page.html',
+  styles: `
+    .state {
+      padding: var(--s-8) var(--s-4);
+      text-align: center;
+      color: var(--ink-2);
+    }
+  `,
   imports: [
     TitleCasePipe,
     IonHeader,
@@ -31,8 +36,6 @@ import { PokemonFormComponent } from '../../shared/components/pokemon-form/pokem
     IonBackButton,
     IonTitle,
     IonContent,
-    IonSpinner,
-    IonText,
     PokemonFormComponent,
   ],
 })

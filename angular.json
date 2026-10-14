@@ -31,6 +31,11 @@
                 "glob": "**/*",
                 "input": "src/assets",
                 "output": "assets"
+              },
+              {
+                "glob": "**/*",
+                "input": "node_modules/three/examples/jsm/libs/draco/gltf",
+                "output": "assets/draco"
               }
             ],
             "styles": ["src/global.scss", "src/theme/variables.scss"],
@@ -67,6 +72,28 @@
             },
             "ci": {
               "progress": false
+            },
+            "device": {
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "2mb",
+                  "maximumError": "5mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "2kb",
+                  "maximumError": "4kb"
+                }
+              ],
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.device.ts"
+                }
+              ],
+              "outputHashing": "all",
+              "sourceMap": true
             }
           },
           "defaultConfiguration": "production"

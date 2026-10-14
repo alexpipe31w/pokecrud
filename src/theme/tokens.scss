@@ -1,0 +1,114 @@
+// Tokens del sistema de diseño (docs/plan/DISENO.md §2). No se escriben colores sueltos fuera de aquí.
+:root {
+  /* Base */
+  --ink: #0f1a2b; /* texto principal, paneles de noche */
+  --ink-2: #33415c;
+  --paper: #fbf7ee; /* paneles de día */
+  --paper-2: #efe8d8;
+  --accent: #ff4d4d; /* rojo Poké Ball: acción principal */
+  --accent-ink: #ffffff;
+  --gold: #ffcb3d; /* recompensas, shiny, Excelente */
+  --success: #3ccf8e;
+  --danger: #ff5a5f;
+
+  /* Tipos (colores canónicos de la comunidad, legibles en ambos temas) */
+  --t-normal: #a8a77a;
+  --t-fire: #ee8130;
+  --t-water: #6390f0;
+  --t-electric: #f7d02c;
+  --t-grass: #7ac74c;
+  --t-ice: #96d9d6;
+  --t-fighting: #c22e28;
+  --t-poison: #a33ea1;
+  --t-ground: #e2bf65;
+  --t-flying: #a98ff3;
+  --t-psychic: #f95587;
+  --t-bug: #a6b91a;
+  --t-rock: #b6a136;
+  --t-ghost: #735797;
+  --t-dragon: #6f35fc;
+  --t-dark: #705746;
+  --t-steel: #b7b7ce;
+  --t-fairy: #d685ad;
+
+  /* Movimiento */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1); /* entradas y respuesta a toques */
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1); /* cosas que se mueven en pantalla */
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1); /* hojas y paneles */
+  --dur-press: 120ms;
+  --dur-small: 180ms;
+  --dur-panel: 320ms;
+
+  /* Radios y espacio (escala de 4) */
+  --r-chip: 999px;
+  --r-card: 20px;
+  --r-sheet: 28px;
+  --s-1: 4px;
+  --s-2: 8px;
+  --s-3: 12px;
+  --s-4: 16px;
+  --s-6: 24px;
+  --s-8: 32px;
+}
+
+// Colores de superficie de día y de noche: se usan con prefers-color-scheme y, en el mapa, con .theme-day/-night.
+@mixin surfaces-day {
+  --surface: rgba(251, 247, 238, 0.78);
+  --surface-text: #0f1a2b;
+  --surface-opaque: rgba(251, 247, 238, 0.94); /* vidrio sin esmerilar: más opaco para que se lea igual */
+  --shadow-sm: 0 2px 8px rgb(15 26 43 / 0.12); /* chips y paneles pequeños */
+  --shadow-lg: 0 18px 48px rgb(15 26 43 / 0.28); /* paneles grandes */
+  --track: rgb(15 26 43 / 0.12); /* fondo de barras (stats, PS) */
+  --danger-ink: #b3261e; /* texto de error sobre paneles: 6,1:1 sobre --paper (--danger da 2,9:1) */
+  --field-bg: rgb(255 255 255 / 0.7); /* campos de formulario */
+  --field-border: rgb(15 26 43 / 0.18);
+}
+
+@mixin surfaces-night {
+  --surface: rgba(15, 26, 43, 0.72);
+  --surface-opaque: rgba(15, 26, 43, 0.92);
+  --surface-text: #fbf7ee;
+  --shadow-sm: 0 2px 8px rgb(0 0 0 / 0.35);
+  --shadow-lg: 0 18px 48px rgb(0 0 0 / 0.55);
+  --track: rgb(251 247 238 / 0.16);
+  --danger-ink: #ff8a8d; /* 7,7:1 sobre --ink */
+  --field-bg: rgb(15 26 43 / 0.55);
+  --field-border: rgb(251 247 238 / 0.22);
+}
+
+:root {
+  @include surfaces-day;
+
+  /* Profundidad y detalles de vidrio (F0-04) */
+  --glass-edge: rgb(255 255 255 / 0.35); /* borde superior claro de los paneles */
+  /* Esmerilado del vidrio. Sobre el mapa 3D vale `none` (lo pone MapPage): el desenfoque obliga a releer el fondo en
+     cada fotograma y en el Samsung A36 bajaba el menú de 60 a 42 fps (D-039). */
+  --glass-filter: blur(20px) saturate(160%);
+  --shadow-accent: 0 6px 18px rgb(255 77 77 / 0.35); /* botón principal */
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    @include surfaces-night;
+  }
+}
+
+/* F1-10: en el mapa la UI sigue al MAPA (DISENO §1), no al modo oscuro del sistema. MapPage pone una de estas
+   clases en su raíz según su día/noche; dentro, mandan sobre lo de arriba (HUD, menú, avisos). */
+.theme-day {
+  @include surfaces-day;
+}
+.theme-night {
+  @include surfaces-night;
+}
+
+/* Red de seguridad de movimiento: SIEMPRE el último bloque del archivo. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+  }
+}

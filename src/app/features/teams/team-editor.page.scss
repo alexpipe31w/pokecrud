@@ -1,0 +1,58 @@
+.page {
+  padding: 0 var(--s-4) calc(var(--ion-safe-area-bottom, 0px) + var(--s-8));
+}
+
+// Nombre y huecos quedan arriba mientras se baja por la lista.
+.top {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: grid;
+  gap: var(--s-3);
+  margin: 0 calc(-1 * var(--s-4));
+  padding: var(--s-3) var(--s-4) var(--s-4);
+  background: var(--surface-opaque);
+  color: var(--surface-text);
+  box-shadow: var(--shadow-sm);
+}
+
+.slots-head {
+  display: flex;
+  justify-content: space-between;
+  font-weight: 600;
+}
+
+h2 {
+  margin: var(--s-6) 0 var(--s-3);
+  font: 700 1.1rem/1.2 var(--font-display);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
+  gap: var(--s-2);
+  margin: 0 0 var(--s-3);
+  padding: 0;
+  list-style: none;
+}
+
+.state,
+.notice {
+  text-align: center;
+}
+
+.state {
+  padding: var(--s-6) var(--s-4);
+  color: var(--ink-2);
+}
+
+.notice {
+  color: var(--danger-ink);
+  font-weight: 600;
+}
+
+.actions {
+  display: grid;
+  gap: var(--s-2);
+  margin-top: var(--s-6);
+}

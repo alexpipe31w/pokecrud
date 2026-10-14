@@ -1,0 +1,9 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    // El motor puro de la raíz (shared/) se compila con el servidor (D-024): dist/server/src/main.js y dist/shared/…
+    "rootDir": ".."
+  },
+  "include": ["src", "../shared/**/*.ts"],
+  "exclude": ["node_modules", "test", "dist", "**/*spec.ts", "../shared/**/*.spec.ts"]
+}

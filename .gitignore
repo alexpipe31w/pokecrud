@@ -68,3 +68,29 @@ testem.log
 # System files
 .DS_Store
 Thumbs.db
+
+# PokéCRUD GO
+/.cache
+/server/node_modules
+/server/dist
+# F0-13: restos de compilación junto a las fuentes de shared/ (shared/ solo lleva .ts, .json y snapshots de tests).
+# Si algún día hace falta un .js o .d.ts escrito a mano ahí, añadir una excepción con "!" y anotarlo en DECISIONES.
+/shared/**/*.js
+/shared/**/*.js.map
+/shared/**/*.d.ts
+/shared/**/*.d.ts.map
+.env
+.env.*
+!.env.example
+/src/environments/environment.local.ts
+*.keystore
+*.jks
+.claude/settings.local.json
+/.playwright-mcp
+
+# Postman en modo local crea aquí su copia de trabajo (YAML + id del workspace de cada uno). La colección
+# compartida es backend/postman/PokeCRUD.postman_collection.json.
+/postman/
+/.postman/
+# Lo genera scripts/apk.mjs con la IP LAN de cada PC (npm run apk -- device). Ver ARQUITECTURA §11.
+/src/environments/environment.device.ts

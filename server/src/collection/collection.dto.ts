@@ -1,0 +1,101 @@
+import { BadRequestException } from '@nestjs/common';
+import { Transform, Type } from 'class-transformer';
+import {
+  ArrayMaxSize,
+  IsBoolean,
+  IsIn,
+  IsInt,
+  IsOptional,
+  IsString,
+  IsUUID,
+  Max,
+  MaxLength,
+  Min,
+  ValidateIf,
+} from 'class-validator';
+import type { TypeName } from '../../../shared/data/dataset.types.js';
+import { TYPE_NAMES } from '../../../shared/engine/battle/type-chart.js';
+import type {
+  CollectionSort,
+  SortOrder,
+} from '../../../shared/protocol/collection.js';
+
+/**
+ * `PATCH /collection/:id` (F3-03). `nickname: null` quita el mote; la forma la decide `normalizeNickname` (shared/),
+ * la misma regla que el formulario de la app. Cualquier otro campo → 400 (forbidNonWhitelisted).
+ */
+export class CollectionPatchDto {
+  @ValidateIf(
+    (o: CollectionPatchDto) => o.nickname !== null && o.nickname !== undefined,
+  )
+  @IsString()
+  @MaxLength(64)
+  nickname?: string | null;
+
+  @IsOptional()
+  @IsBoolean()
+  favorite?: boolean;
+}
+
+/** `POST /collection/:id/evolve` (F3-05): la especie a la que evoluciona (las ramas de Eevee se eligen). */
+export class CollectionEvolveDto {
+  @IsInt()
+  @Min(1)
+  to!: number;
+}
+
+export const COLLECTION_DEFAULT_LIMIT = 30;
+export const COLLECTION_MAX_LIMIT = 50;
+
+/** `'true'`/`'false'` de la query → boolean; cualquier otra cosa se rechaza (no se adivina). */
+const toBool = ({ value }: { value: unknown }): unknown => {
+  if (value === undefined || typeof value === 'boolean') return value;
+  if (value === 'true') return true;
+  if (value === 'false') return false;
+  throw new BadRequestException('shiny y favorite solo admiten true o false');
+};
+
+/** `GET /collection?…` (F3-02a). Cualquier otro parámetro → 400 (forbidNonWhitelisted). */
+export class CollectionQueryDto {
+  @IsOptional()
+  @IsIn(['caughtAt', 'cp', 'speciesId'])
+  sort: CollectionSort = 'caughtAt';
+
+  @IsOptional()
+  @IsIn(['asc', 'desc'])
+  order: SortOrder = 'desc';
+
+  @IsOptional()
+  @IsIn(TYPE_NAMES)
+  type?: TypeName;
+
+  @IsOptional()
+  @Transform(toBool)
+  @IsBoolean()
+  shiny?: boolean;
+
+  @IsOptional()
+  @Transform(toBool)
+  @IsBoolean()
+  favorite?: boolean;
+
+  @IsOptional()
+  @IsUUID()
+  cursor?: string;
+
+  /** F3-06b: solo estos (`?ids=a,b,c`, ≤ 50 UUID): la app pinta los Pokémon de sus equipos de una vez. */
+  @IsOptional()
+  @Transform(({ value }: { value: unknown }) =>
+    typeof value === 'string' ? value.split(',').filter(Boolean) : value,
+  )
+  @ArrayMaxSize(COLLECTION_MAX_LIMIT)
+  @IsUUID('all', { each: true })
+  ids?: string[];
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  @Max(COLLECTION_MAX_LIMIT)
+  limit: number = COLLECTION_DEFAULT_LIMIT;
+}

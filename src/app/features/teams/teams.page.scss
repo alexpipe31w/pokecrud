@@ -1,0 +1,109 @@
+.page {
+  display: grid;
+  gap: var(--s-4);
+  padding: var(--s-4) var(--s-4) calc(var(--ion-safe-area-bottom, 0px) + 96px);
+}
+
+.team {
+  display: grid;
+  gap: var(--s-3);
+  padding: var(--s-4);
+  border-radius: var(--r-card);
+  background: var(--surface-opaque);
+  color: var(--surface-text);
+  text-decoration: none;
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--dur-press) var(--ease-out);
+
+  &:active {
+    transform: scale(0.98);
+  }
+}
+
+.head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+
+  h2 {
+    margin: 0;
+    font: 700 1.2rem/1.2 var(--font-display);
+  }
+}
+
+.count,
+.cp {
+  font-weight: 700;
+  color: var(--ink-2);
+}
+
+.cp {
+  margin: var(--s-1) 0 0;
+  font-family: var(--font-display);
+}
+
+.empty,
+.state {
+  display: grid;
+  justify-items: center;
+  gap: var(--s-2);
+  padding: var(--s-8) var(--s-4);
+  text-align: center;
+  color: var(--ink-2);
+
+  h2 {
+    margin: 0;
+    color: var(--ink);
+    font: 700 1.3rem/1.2 var(--font-display);
+  }
+
+  p {
+    margin: 0;
+  }
+}
+
+// Poké Ball dibujada con CSS para la vacía.
+.ball {
+  width: 72px;
+  height: 72px;
+  border: 4px solid var(--ink);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle, white 0 8px, var(--ink) 8px 12px, transparent 12px),
+    linear-gradient(var(--accent) 0 46%, var(--ink) 46% 54%, white 54%);
+  animation: wobble 2.4s ease-in-out infinite;
+}
+
+.cta {
+  display: inline-grid;
+  place-items: center;
+  min-height: 48px;
+  margin-top: var(--s-2);
+  padding: 0 var(--s-6);
+  border-radius: var(--r-chip);
+  background: var(--accent);
+  color: var(--accent-ink);
+  font: 600 1rem/1 var(--font-display);
+  text-decoration: none;
+  box-shadow: var(--shadow-accent);
+}
+
+.new {
+  position: absolute;
+  right: var(--s-4);
+  bottom: calc(var(--ion-safe-area-bottom, 0px) + var(--s-4));
+}
+
+@keyframes wobble {
+  0%,
+  70%,
+  100% {
+    rotate: 0deg;
+  }
+  80% {
+    rotate: -14deg;
+  }
+  90% {
+    rotate: 10deg;
+  }
+}

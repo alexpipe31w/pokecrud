@@ -1,31 +1,62 @@
+.form {
+  padding: 0 var(--s-4) calc(var(--ion-safe-area-bottom, 0px) + var(--s-6));
+}
+
 .preview {
   position: relative;
   display: flex;
   justify-content: center;
-  padding: 12px 16px 0;
+  min-height: 48px;
+  padding-top: var(--s-3);
+  border-radius: 0 0 var(--r-card) var(--r-card);
+  background: radial-gradient(
+    circle at 50% 45%,
+    color-mix(in srgb, var(--tint) 45%, transparent),
+    transparent 70%
+  );
 
   img {
     width: 160px;
     height: 160px;
     object-fit: contain;
+    filter: drop-shadow(0 6px 10px rgb(15 26 43 / 0.3));
   }
 
   .dex {
     position: absolute;
-    top: 12px;
-    right: 16px;
-    font-weight: 700;
-    color: var(--ion-color-medium);
+    top: var(--s-3);
+    right: 0;
+    font: 700 1rem/1 var(--font-display);
+    color: var(--ink-2);
   }
+}
+
+.group {
+  display: grid;
+  gap: var(--s-3);
+  margin: 0;
+  padding: var(--s-4);
+  border: 0;
+  border-radius: var(--r-card);
+  background: var(--surface-opaque);
+  color: var(--surface-text);
+  box-shadow: var(--shadow-sm);
+
+  legend {
+    float: left; // así el fondo de la tarjeta lo contiene
+    width: 100%;
+    margin-bottom: var(--s-1);
+    padding: 0;
+    font: 700 1.05rem/1.2 var(--font-display);
+  }
+}
+
+.shop {
+  border-left: 6px solid var(--gold);
 }
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-}
-
-.field-error {
-  margin: 4px 16px 0;
-  font-size: 0.75rem;
-  color: var(--ion-color-danger);
+  grid-template-columns: repeat(auto-fit, minmax(96px, 1fr));
+  gap: var(--s-3);
 }

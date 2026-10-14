@@ -1,0 +1,68 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <!-- Inventario de la tienda (IS-11; F3-04 lo mudó de /pokedex a /inventario). Se abre desde el menú de la Poké Ball. -->
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/mapa" text="Mapa"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Inventario</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-refresher slot="fixed" (ionRefresh)="load($any($event))">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <div class="page">
+    <app-search-field
+      class="search"
+      label="Buscar en el inventario"
+      placeholder="Buscar por número o nombre"
+      (query)="onSearch($event)"
+    />
+
+    @if (loading()) {
+      <p class="state" role="status">Cargando el inventario…</p>
+    } @else if (error()) {
+      <div class="state">
+        <p>{{ error() }}</p>
+        <app-game-button label="Reintentar" variant="glass" (pressed)="load()" />
+      </div>
+    } @else {
+      <p class="count">{{ filtered().length }} de {{ pokemon().length }} Pokémon</p>
+
+      <ul class="grid">
+        @for (p of visible(); track p.id; let i = $index) {
+          <li><app-inventory-card [pokemon]="p" [index]="i" /></li>
+        } @empty {
+          <li class="state">
+            @if (pokemon().length === 0) {
+              <p>
+                No hay Pokémon en el inventario.
+                @if (isAdmin()) {
+                  Pulsa «Agregar» para traer uno de PokéAPI.
+                }
+              </p>
+            } @else {
+              <p>No se encontró ningún Pokémon.</p>
+            }
+          </li>
+        }
+      </ul>
+
+      <ion-infinite-scroll [disabled]="!hasMore()" (ionInfinite)="loadMore($any($event))">
+        <ion-infinite-scroll-content
+          loadingText="Cargando más Pokémon…"
+        ></ion-infinite-scroll-content>
+      </ion-infinite-scroll>
+    }
+  </div>
+
+  @if (isAdmin()) {
+    <div class="add" slot="fixed">
+      <app-game-button label="Agregar" ariaLabel="Agregar Pokémon" (pressed)="add()">
+        <span slot="icon" aria-hidden="true" class="plus">+</span>
+      </app-game-button>
+    </div>
+  }
+</ion-content>

@@ -1,42 +1,44 @@
 import { CurrencyPipe, DecimalPipe, TitleCasePipe } from '@angular/common';
-import { Component, inject, input, signal } from '@angular/core';
+import { Component, computed, inject, input, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import {
   IonBackButton,
-  IonButton,
   IonButtons,
   IonContent,
   IonHeader,
-  IonIcon,
-  IonProgressBar,
-  IonSpinner,
-  IonText,
   IonTitle,
   IonToolbar,
   NavController,
   ViewWillEnter,
 } from '@ionic/angular';
-import { addIcons } from 'ionicons';
-import { createOutline, trashOutline } from 'ionicons/icons';
 import { catchError, of } from 'rxjs';
 
+import { POKEMON_TYPES } from '../../core/constants/pokemon-types';
 import { dexNumber, displayName } from '../../core/utils/pokemon-defaults';
+import { spriteUrls } from '../../core/utils/sprites';
 import { Pokemon, PokemonStats } from '../../models/pokemon.model';
 import { PokeApiService } from '../../services/poke-api.service';
 import { PokemonService } from '../../services/pokemon.service';
+import { AuthService } from '../../core/auth/auth.service';
 import { UiService } from '../../services/ui.service';
 import { TypeChipsComponent } from '../../shared/components/type-chips/type-chips.component';
+import { ConfirmPanelComponent } from '../../shared/ui/confirm-panel.component';
+import { GameButtonComponent } from '../../shared/ui/game-button.component';
+import { StatBarComponent } from '../../shared/ui/stat-bar.component';
 
 const STAT_LABELS: { key: keyof PokemonStats; label: string }[] = [
   { key: 'hp', label: 'PS' },
   { key: 'attack', label: 'Ataque' },
   { key: 'defense', label: 'Defensa' },
-  { key: 'specialAttack', label: 'Ataque esp.' },
-  { key: 'specialDefense', label: 'Defensa esp.' },
+  { key: 'specialAttack', label: 'At. Esp.' },
+  { key: 'specialDefense', label: 'Def. Esp.' },
   { key: 'speed', label: 'Velocidad' },
 ];
 
-/** Detalle de un Pokémon guardado en la base de datos (IS-12 · HU-04). */
+/**
+ * Detalle de un Pokémon del inventario (IS-12 · HU-04) con el sistema de diseño (F3-06a): teñido con su tipo, precio y
+ * stock destacados, barras de stats del juego y, para ADMIN, editar y eliminar con una confirmación propia.
+ */
 @Component({
   selector: 'app-pokemon-detail',
   templateUrl: 'pokemon-detail.page.html',
@@ -51,12 +53,10 @@ const STAT_LABELS: { key: keyof PokemonStats; label: string }[] = [
     IonBackButton,
     IonTitle,
     IonContent,
-    IonButton,
-    IonIcon,
-    IonProgressBar,
-    IonSpinner,
-    IonText,
     TypeChipsComponent,
+    GameButtonComponent,
+    StatBarComponent,
+    ConfirmPanelComponent,
   ],
 })
 export class PokemonDetailPage implements ViewWillEnter {
@@ -66,6 +66,8 @@ export class PokemonDetailPage implements ViewWillEnter {
   private readonly pokemonService = inject(PokemonService);
   private readonly pokeApi = inject(PokeApiService);
   private readonly ui = inject(UiService);
+  /** Solo un ADMIN ve agregar/editar/eliminar (F0-12); el servidor lo exige igualmente. */
+  protected readonly isAdmin = inject(AuthService).isAdmin;
   private readonly router = inject(Router);
   private readonly navCtrl = inject(NavController);
 
@@ -75,12 +77,23 @@ export class PokemonDetailPage implements ViewWillEnter {
   /** `null` mientras carga; texto vacío si PokéAPI no responde. */
   protected readonly description = signal<string | null>(null);
 
+  protected readonly confirming = signal(false);
+  protected readonly deleting = signal(false);
+  protected readonly notice = signal<string | null>(null);
+  /** Si la imagen guardada falla: el arte de PokéAPI (`home` → `official-artwork` → sprite). */
+  private readonly artIndex = signal(-1);
+
   protected readonly statLabels = STAT_LABELS;
   protected readonly dexNumber = dexNumber;
-
-  constructor() {
-    addIcons({ createOutline, trashOutline });
-  }
+  protected readonly tint = computed(
+    () => POKEMON_TYPES[this.pokemon()?.types[0] ?? '']?.color ?? 'var(--ink-2)',
+  );
+  protected readonly art = computed(() => {
+    const p = this.pokemon();
+    if (!p) return '';
+    const i = this.artIndex();
+    return i < 0 && p.imageUrl ? p.imageUrl : (spriteUrls(p.id)[Math.max(0, i)] ?? '');
+  });
 
   ionViewWillEnter(): void {
     this.load();
@@ -90,6 +103,8 @@ export class PokemonDetailPage implements ViewWillEnter {
     const id = Number(this.id());
     this.loading.set(true);
     this.notFound.set(false);
+    this.confirming.set(false);
+    this.artIndex.set(-1);
     this.description.set(null);
     this.pokeApi
       .getDescription(id)
@@ -107,28 +122,33 @@ export class PokemonDetailPage implements ViewWillEnter {
     });
   }
 
+  protected nextArt(): void {
+    this.artIndex.update((i) => i + 1);
+  }
+
   protected goToList(): void {
-    this.navCtrl.navigateBack('/tabs/pokedex');
+    this.navCtrl.navigateBack('/inventario');
   }
 
   protected edit(): void {
     this.router.navigate(['/pokemon', this.id(), 'editar']);
   }
 
-  protected async remove(): Promise<void> {
+  protected remove(): void {
     const p = this.pokemon();
     if (!p) return;
-    const ok = await this.ui.confirm(
-      'Eliminar Pokémon',
-      `¿Seguro que quieres eliminar a ${displayName(p.name)} (${dexNumber(p.id)})?`,
-    );
-    if (!ok) return;
+    this.deleting.set(true);
     this.pokemonService.delete(p.id).subscribe({
       next: () => {
-        this.ui.toast(`${displayName(p.name)} eliminado`);
-        this.navCtrl.navigateBack('/tabs/pokedex');
+        this.deleting.set(false);
+        void this.ui.toast(`${displayName(p.name)} eliminado`);
+        this.navCtrl.navigateBack('/inventario');
       },
-      error: () => this.ui.toast('No se pudo eliminar', 'danger'),
+      error: () => {
+        this.deleting.set(false);
+        this.confirming.set(false);
+        this.notice.set('No se pudo eliminar. Inténtalo de nuevo.');
+      },
     });
   }
 }
