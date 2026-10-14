@@ -1922,3 +1922,30 @@ combate, salir → silencio) y `EncounterPage` (silencio). `CREDITOS.md` al día
 **Decisiones nuevas:** D-059.
 **El siguiente debe empezar por:** mezclar #78 (F5-04) y luego este PR (resolviendo `battle.page.ts`); con dos móviles,
 el vídeo de F5-04. Sin móvil: F5-05 (espectadores) cuando F5-04 esté `[x]`, F7-07 (extra) o F1-11.
+
+## 2026-10-13 21:30 · @samuel (Claude) · Entrega del avance al docente · ramas `docs/entrega-avance` y `docs/estado-entrega`
+
+**Qué se hizo:** entrega por GitHub del avance de las 11 p. m. (permiso de Samuel para hacerla completa).
+`docs/GUIA-DOCENTE.md` nueva (instalar el APK, recorrido por todas las funciones desde el menú de la Poké Ball,
+Postman contra Render, cómo ejecutar las pruebas, hecho / pendiente) y README con cabecera "PokéCRUD GO" que la enlaza,
+tabla de rutas al día y clonado sin `checkout develop` (#80). El CI de #80 falló: `ctx.suspend is not a function`
+(los `AudioContext` falsos de otros specs no tienen `suspend` y disparan `visibilitychange`); arreglado en
+`audio.service.ts` con comprobación de tipo + `try/catch` y test nuevo en `audio-music.spec.ts`. Después PR `develop` →
+`main` (#81, `main` iba 432 commits por detrás) y Release `avance-2026-10-13` con el APK de producción.
+**Archivos clave:** `docs/GUIA-DOCENTE.md`, `README.md`, `src/app/services/game/audio.service.ts`,
+`src/app/services/game/audio-music.spec.ts`, `docs/plan/ESTADO.md`.
+**Cómo se probó (salida real):**
+
+    audio-music: test nuevo rojo (TypeError: ctx.suspend is not a function) → 7 passed · app 572 passed · lint OK
+    CI #80: App pass 1m6s · Servidor pass 37s → mezclado · CI #81: 4/4 pass, CLEAN → mezclado (main f4b9c13)
+    npm run apk (producción): 11,67 MB; contiene la URL de Render, sin localhost:3000 ni cadenas de supabase/JWT/
+      SPAWN_SALT/postgres
+    gh release create avance-2026-10-13 → releases/latest 200; descarga pública del APK: sha256 d794aec44281a91c
+      (igual al compilado) · GUIA-DOCENTE.md en main 200 · Render /health/ready {"status":"ok","db":"ok"} · /pokemon 200
+
+**Quedó a medias:** nada de la entrega. La cuenta ADMIN del docente NO se publica (repo público): se da con
+`npm run admin -- grant <correo>` si la pide. El APK se compiló antes del arreglo de `suspend` (solo afecta a los dobles
+de prueba; el WebView real sí tiene `suspend`), no hace falta recompilar.
+**Decisiones nuevas:** ninguna (`main` solo avanza con PR `develop` → `main` en cada entrega, anotado en ESTADO).
+**El siguiente debe empezar por:** leer "ENTREGA DEL AVANCE" en ESTADO.md; si se toca algo antes de que califiquen,
+repetir PR `develop` → `main` (y subir el APK nuevo al Release). Luego, con dos móviles, el vídeo de F5-04.
