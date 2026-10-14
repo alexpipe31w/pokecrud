@@ -1897,3 +1897,28 @@ Samuel): `migrate status` → solo faltaba `battle`; `deploy` → applied; `migr
 **El siguiente debe empezar por:** con permiso, `cd server && npx prisma migrate deploy` contra Supabase (comprobar antes
 con `prisma migrate status` que apunta a Supabase y que solo falta `battle`), PR de la rama, mezclar, `npm run apk` y
 grabar un combate entre dos móviles.
+## 2026-10-13 19:10 · @samuel (Claude) · F2-10 · rama `feature/F2-10-musica`
+
+**Qué se hizo:** la migración `battle` de F5-04 se aplicó en Supabase (permiso de Samuel) y se abrió el PR #78 (F5-04
+sigue `[~]` hasta el vídeo con dos móviles). F2-10 (D-059): `music-synth.ts` (`noteFreq`, `parsePart`, `renderSong` con
+ADSR, filtro paso bajo, bombo/caja/charles y colas envueltas), tres temas propios en `music-songs.ts`, `music.worker.ts`,
+`MUSIC_RENDERER` (worker con respaldo en el hilo principal) y `AudioService.playMusic`/`music` (fundidos, uno a la vez,
+suspender en segundo plano). Enganchado en `MapPage` (`ionViewDidEnter` y al cambiar día/noche), `BattlePage` (entrar →
+combate, salir → silencio) y `EncounterPage` (silencio). `CREDITOS.md` al día.
+**Ojo:** esta rama sale de `develop` sin #78: al mezclar ambas chocarán `battle.page.ts` (los dos tocan el constructor y
+`ngOnDestroy`) y los documentos; resolver dejando las dos cosas.
+**Cómo se probó (salida real):**
+
+    music-synth 6 (rojo: "Cannot find module './music-synth'") → 6 passed · audio-music 6 (rojo: falta playMusic) → 6
+      passed · audio.service 12 siguen · encuentro +1 (rojo) → app 99 archivos, 553 passed · lint · ng build OK (el
+      worker sale en su propio fichero, worker-….js)
+    .wav (tsx): map-day 19,2 s de bucle en 174 ms (1,6 MB), map-night 24,6 s en 312 ms (2,1 MB), battle 25,6 s en 495 ms
+      (2,2 MB) → docs/evidencias/F2-10_musica/*.wav (cada tema dos veces seguidas, para oír el empalme)
+    Chrome sin ventana 390×844 (app y Nest locales): /combate/prueba → {"music":"battle","sonando":true,"bucle":true,
+      "contexto":"running","muestras":564480,"hz":22050} listo en ~0,3-0,6 s, worker creado, tareas largas del hilo
+      principal: [] · /mapa (de noche) → {"noche":true,"music":"map-night","sonando":true} · errores de consola: 0
+
+**Quedó a medias:** nada del criterio. Opcional: escucharla en un Android.
+**Decisiones nuevas:** D-059.
+**El siguiente debe empezar por:** mezclar #78 (F5-04) y luego este PR (resolviendo `battle.page.ts`); con dos móviles,
+el vídeo de F5-04. Sin móvil: F5-05 (espectadores) cuando F5-04 esté `[x]`, F7-07 (extra) o F1-11.

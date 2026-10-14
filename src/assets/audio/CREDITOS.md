@@ -17,7 +17,9 @@ educativos, como el resto de datos y medios de PokéAPI (D-010).
 
 ## Música
 
-Todavía no hay música (tarea F2-10). Cuando llegue: solo libre (CC0 / CC BY, con su atribución aquí) o propia.
+Los tres temas (`map-day`, `map-night`, `battle`) son **propios**: compuestos para PokéCRUD GO como partituras en
+`src/app/services/game/music-songs.ts` y generados por el propio juego (`music-synth.ts`, en un Web Worker; F2-10,
+D-059). No hay archivos de audio de terceros. Para escucharlos sin abrir la app: `docs/evidencias/F2-10_musica/*.wav`.
 
 ## Añadir un sonido grabado
 

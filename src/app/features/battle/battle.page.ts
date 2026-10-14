@@ -3,6 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { IonContent } from '@ionic/angular';
 import type { TypeName } from '@shared/data/dataset.types';
 import type { SideIndex } from '@shared/engine/battle/types';
+import { AudioService } from '../../services/game/audio.service';
 import { SettingsService } from '../../services/game/settings.service';
 import { BattleBurstComponent } from './battle-burst.component';
 import { BattleDockComponent } from './battle-dock.component';
@@ -118,6 +119,7 @@ export class BattlePage implements OnDestroy {
   /** `/pvp/combate`: contra otro jugador (modo remoto). */
   protected readonly pvp = inject(ActivatedRoute).snapshot.data['pvp'] === true;
   private readonly settings = inject(SettingsService);
+  private readonly audio = inject(AudioService);
 
   private readonly arena = viewChild<ElementRef<HTMLElement>>('arena');
   private readonly foeSprite = viewChild<ElementRef<HTMLImageElement>>('foeSprite');
@@ -133,11 +135,14 @@ export class BattlePage implements OnDestroy {
       if (fx) this.animate(fx);
     });
     if (this.pvp) void this.session.open(this.ctrl);
+    void this.audio.playMusic('battle');
   }
 
   ngOnDestroy(): void {
     for (const t of this.timers) clearTimeout(t);
     this.session.close();
+    // F2-10: fuera del combate se calla; el mapa pone su tema al volver.
+    void this.audio.playMusic(null);
   }
 
   protected leave(): void {

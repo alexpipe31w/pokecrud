@@ -492,6 +492,8 @@ export class EncounterPage implements OnDestroy {
   }
 
   ionViewWillEnter(): void {
+    // F2-10: en el encuentro manda el Pokémon (grito, captura): la música del mapa se funde.
+    void this.audio.playMusic(null);
     void this.load();
   }
 

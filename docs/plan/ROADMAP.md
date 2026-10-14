@@ -275,9 +275,16 @@
       eficaz / poco eficaz / crítico, fallo, debilitado, curación, estadísticas, estado, victoria; `battle-sfx.ts`);
       precarga de todos los gritos al empezar el combate (con datos móviles el primero no sonaba); mezcla en el bus
       `sfx` con su volumen de Ajustes; `src/assets/audio/CREDITOS.md`. Para escucharlos: `docs/evidencias/F2-08_sfx/*.wav`.
-- [ ] **F2-10 · Música** — tema del mapa (bucle tranquilo, de día y de noche) y del combate, libre (CC0/CC BY con
+- [x] **F2-10 · Música** (@samuel, 2026-10-13) — tema del mapa (bucle tranquilo, de día y de noche) y del combate, libre (CC0/CC BY con
       atribución en CREDITOS.md) o propia; bus `music` (ya existe, con volumen en Ajustes), fundido al cambiar de
       pantalla, nunca dos a la vez. Dep: F2-08.
+      **Hecho (D-059):** música PROPIA generada en el juego (como los SFX, D-044): `music-synth.ts` (partituras de
+      semicorcheas → bucle; colas envueltas para que no corte) y 3 temas en `music-songs.ts` (mapa de día, Do mayor 100;
+      de noche, La menor 78; combate, Mi menor 150). Se generan en un Web Worker a 22 050 Hz (en el navegador: ~0,3-0,6 s,
+      0 tareas largas en el hilo principal) y se guardan (~2 MB cada uno). `AudioService.playMusic`: fundido de 0,8 s,
+      uno a la vez, el mismo no se reinicia; en segundo plano se suspende. Mapa (día/noche según su modo), combate (IA y
+      PvP) y silencio en el encuentro. App 553 tests. Para oírlos: `docs/evidencias/F2-10_musica/*.wav`.
+      Pendiente opcional: escucharla en un Android (volumen relativo a gritos y efectos).
 
 ## F3 · Colección y Pokédex
 

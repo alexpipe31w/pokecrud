@@ -67,6 +67,7 @@ describe('EncounterPage', () => {
     load: vi.fn(),
   };
   const playCry = vi.fn(() => Promise.resolve(true));
+  const playMusic = vi.fn(() => Promise.resolve());
   const playSfx = vi.fn(() => Promise.resolve());
   const camState = signal<CameraState>('off');
   const camera = { state: camState, open: vi.fn(async () => null), close: vi.fn() };
@@ -101,7 +102,7 @@ describe('EncounterPage', () => {
         provideRouter([]),
         { provide: EncounterApiService, useValue: api },
         { provide: BagService, useValue: bag },
-        { provide: AudioService, useValue: { playCry, playSfx } },
+        { provide: AudioService, useValue: { playCry, playSfx, playMusic } },
         // El plugin real de Capacitor no existe en web.
         {
           provide: HapticsService,
@@ -351,5 +352,11 @@ describe('EncounterPage', () => {
     await settle(f);
     expect(btn.getAttribute('aria-expanded')).toBe('false');
     expect(el.querySelector('app-encounter-card')).toBeNull();
+  });
+
+  it('F2-10: al entrar en el encuentro la música de fondo se calla (que se oiga el Pokémon)', async () => {
+    playMusic.mockClear();
+    await open(new Promise<EncounterView>(() => undefined));
+    expect(playMusic).toHaveBeenCalledWith(null);
   });
 });
