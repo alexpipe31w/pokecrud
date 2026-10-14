@@ -150,4 +150,18 @@ describe('AudioService · música (F2-10)', () => {
     doc.dispatchEvent(new Event('visibilitychange'));
     expect(fake.ctx.resume).toHaveBeenCalled();
   });
+
+  it('si el AudioContext no sabe suspender (dobles de prueba, WebViews viejos), ir a segundo plano no rompe nada', async () => {
+    const p = audio.playMusic('map-day');
+    await ready('map-day');
+    await p;
+    const ctx = fake.ctx as Partial<typeof fake.ctx>;
+    delete ctx.suspend;
+    delete ctx.resume;
+    const doc = TestBed.inject(DOCUMENT);
+    Object.defineProperty(doc, 'hidden', { configurable: true, get: () => true });
+    expect(() => doc.dispatchEvent(new Event('visibilitychange'))).not.toThrow();
+    Object.defineProperty(doc, 'hidden', { configurable: true, get: () => false });
+    expect(() => doc.dispatchEvent(new Event('visibilitychange'))).not.toThrow();
+  });
 });
