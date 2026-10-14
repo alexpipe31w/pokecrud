@@ -40,6 +40,8 @@ model Player {
   throws           Throw[]
   candies          Candy[]
   pokedex          PokedexEntry[]
+  battlesAsP1      Battle[]          @relation("BattleP1")
+  battlesAsP2      Battle[]          @relation("BattleP2")
 }
 
 model RefreshToken {
@@ -250,4 +252,33 @@ model Throw {
 
   @@unique([playerId, clientThrowId])
   @@index([playerId, createdAt])
+}
+
+enum BattleKind {
+  PVP
+  AI
+  TOURNAMENT
+}
+
+/// Resultado de un combate (F5-04, D-056 regla 10). `id` = el de la sala; con `seed` + `log` (acciones de cada decisión)
+/// se reproduce entero (el motor es determinista). Se inserta una vez (ON CONFLICT DO NOTHING). Lo leerá el ranking (F7-05).
+model Battle {
+  id        String     @id @db.Uuid
+  kind      BattleKind
+  p1Id      String     @db.Uuid
+  p1        Player     @relation("BattleP1", fields: [p1Id], references: [id], onDelete: Cascade)
+  p2Id      String     @db.Uuid
+  p2        Player     @relation("BattleP2", fields: [p2Id], references: [id], onDelete: Cascade)
+  /// null = nadie ganó (los dos abandonaron). CHECK `winner_is_player`: p1Id o p2Id.
+  winnerId  String?    @db.Uuid
+  /// faint | forfeit | abandon | inactive (CHECK `battle_reason`).
+  reason    String
+  seed      Int
+  turns     Int
+  log       Json?
+  startedAt DateTime
+  endedAt   DateTime
+
+  @@index([p1Id, endedAt])
+  @@index([p2Id, endedAt])
 }

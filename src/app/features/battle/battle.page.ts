@@ -1,5 +1,5 @@
 import { Component, ElementRef, OnDestroy, effect, inject, signal, viewChild } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { IonContent } from '@ionic/angular';
 import type { TypeName } from '@shared/data/dataset.types';
 import type { SideIndex } from '@shared/engine/battle/types';
@@ -11,6 +11,8 @@ import { BattleInfoComponent } from './battle-info.component';
 import { BattlePickerComponent } from './battle-picker.component';
 import { BattleSheetComponent } from './battle-sheet.component';
 import { BattleController, type BattleFx, PLAYER, RIVAL } from './battle.controller';
+import { BattlePvpBarComponent } from './battle-pvp-bar.component';
+import { PvpBattleSession } from './pvp-battle-session';
 
 interface Burst {
   id: number;
@@ -23,7 +25,9 @@ interface Burst {
 
 /**
  * Escena de combate (F4-05, DISENO modo Experience) en `/combate/prueba`: contra los entrenadores de prueba y la IA
- * de F4-06. La lógica está en `BattleController` + el motor de `shared/`; aquí solo se pinta y se anima.
+ * de F4-06. En `/pvp/combate` (F5-04, `data.pvp`) la misma escena contra otro jugador: el servidor decide y
+ * `PvpBattleSession` conecta el socket con el controlador. La lógica está en `BattleController` + el motor de
+ * `shared/`; aquí solo se pinta y se anima.
  */
 @Component({
   selector: 'app-battle',
@@ -34,14 +38,15 @@ interface Burst {
     BattleDockComponent,
     BattleSheetComponent,
     BattleBurstComponent,
+    BattlePvpBarComponent,
   ],
-  providers: [BattleController],
+  providers: [BattleController, PvpBattleSession],
   template: `
     <ion-content
       [scrollY]="false"
       style="--padding-top: 0; --padding-bottom: 0; --padding-start: 0; --padding-end: 0"
     >
-      @if (ctrl.phase() === 'pick-rival' || ctrl.phase() === 'error') {
+      @if (!pvp && (ctrl.phase() === 'pick-rival' || ctrl.phase() === 'error')) {
         <app-battle-picker (leave)="leave()" />
       } @else {
         <div class="screen">
@@ -90,7 +95,10 @@ interface Burst {
               />
             }
           </div>
-          <app-battle-dock class="dock" (openSheet)="sheet.set(true)" />
+          @if (pvp) {
+            <app-battle-pvp-bar />
+          }
+          <app-battle-dock class="dock" (openSheet)="sheet.set(true)" (exit)="leave()" />
           @if (ctrl.phase() === 'switch' || (sheet() && ctrl.phase() === 'choose')) {
             <app-battle-sheet
               [forced]="ctrl.phase() === 'switch'"
@@ -107,6 +115,9 @@ interface Burst {
 export class BattlePage implements OnDestroy {
   protected readonly ctrl = inject(BattleController);
   private readonly router = inject(Router);
+  private readonly session = inject(PvpBattleSession);
+  /** `/pvp/combate`: contra otro jugador (modo remoto). */
+  protected readonly pvp = inject(ActivatedRoute).snapshot.data['pvp'] === true;
   private readonly settings = inject(SettingsService);
   private readonly audio = inject(AudioService);
 
@@ -123,17 +134,19 @@ export class BattlePage implements OnDestroy {
       const fx = this.ctrl.fx();
       if (fx) this.animate(fx);
     });
+    if (this.pvp) void this.session.open(this.ctrl);
     void this.audio.playMusic('battle');
   }
 
   ngOnDestroy(): void {
     for (const t of this.timers) clearTimeout(t);
+    this.session.close();
     // F2-10: fuera del combate se calla; el mapa pone su tema al volver.
     void this.audio.playMusic(null);
   }
 
   protected leave(): void {
-    void this.router.navigateByUrl('/dev/ui');
+    void this.router.navigateByUrl(this.pvp ? '/pvp' : '/dev/ui');
   }
 
   protected pickMember(index: number): void {

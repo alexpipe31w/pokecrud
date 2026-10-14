@@ -1,4 +1,4 @@
-import { Injectable, computed, inject, signal } from '@angular/core';
+import { DestroyRef, Injectable, computed, inject, signal } from '@angular/core';
 import type { Move, TypeName } from '@shared/data/dataset.types';
 import { TRAINERS, type TrainerDef, trainerTeam } from '@shared/data/trainers';
 import { chooseAction } from '@shared/engine/battle/ai';
@@ -9,16 +9,29 @@ import type {
   BattleAction,
   BattleContext,
   BattleEvent,
+  BattleSide,
   BattleState,
   MajorStatus,
   SideIndex,
 } from '@shared/engine/battle/types';
 import { createRng, type Rng } from '@shared/engine/rng';
+import type {
+  BattleActReply,
+  BattleEndMsg,
+  BattleForfeitReply,
+  BattleOpponentMsg,
+  BattleTurnMsg,
+  PublicPokemon,
+  PvpBattleView,
+  PvpEndReason,
+  PvpErrorCode,
+  PvpEvent,
+} from '@shared/protocol/pvp';
 import { AudioService } from '../../services/game/audio.service';
 import { eventSfx, hitSfx } from './battle-sfx';
 import { DatasetService } from '../../services/game/dataset.service';
 import { HapticsService } from '../../services/game/haptics.service';
-import { describeEvent } from './battle-text';
+import { PVP_END_TEXT, describeEvent } from './battle-text';
 
 /** Lo que se ve de cada lado: va al ritmo de los eventos, no salta al estado final del turno. */
 export interface ShownPokemon {
@@ -46,7 +59,22 @@ export interface BattleFx {
 }
 
 export type Phase =
-  'pick-rival' | 'loading' | 'choose' | 'animating' | 'switch' | 'ended' | 'error';
+  'pick-rival' | 'loading' | 'choose' | 'animating' | 'switch' | 'waiting' | 'ended' | 'error';
+
+/** Cómo habla el controlador con el servidor en PvP (F5-04). La página lo implementa con `PvpSocketService`. */
+export interface RemoteLink {
+  act(battleId: string, decision: number, action: BattleAction): Promise<BattleActReply>;
+  forfeit(battleId: string): Promise<BattleForfeitReply>;
+}
+
+/** Reintentos de `battle:act` si la red falla (la misma decisión: es idempotente, D-056). */
+const ACT_RETRY_MS = [1000, 2000, 4000];
+
+const REMOTE_MESSAGES: Partial<Record<PvpErrorCode, string>> = {
+  'invalid-action': 'No puedes hacer eso ahora.',
+  'not-your-turn': 'Ahora le toca a tu rival.',
+  'rate-limited': 'Vas muy rápido. Espera un segundo.',
+};
 
 export const PLAYER: SideIndex = 0;
 export const RIVAL: SideIndex = 1;
@@ -56,7 +84,9 @@ const PACE = { text: 1000, silent: 420, hit: 700 };
 
 /**
  * Combate local contra la IA (F4-05): el motor puro (`shared/engine/battle`) decide; esto lo pone en escena.
- * En PvP (F5) el estado y los eventos llegarán del servidor y esta misma reproducción los mostrará.
+ * En PvP (F5-04, modo remoto) el servidor decide: llegan la vista (`PvpBattleView`, tu lado completo y lo público del
+ * rival) y los eventos de cada turno ya girados (tú = lado 0), y esta misma reproducción los muestra. Lo vive todo aquí
+ * para que la escena AR (F4-07) lo herede.
  */
 @Injectable()
 export class BattleController {
@@ -81,13 +111,45 @@ export class BattleController {
   private readonly fast =
     typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+  // ── PvP (modo remoto) ──
+  readonly remote = signal(false);
+  /** Lo último que mandó el servidor. */
+  readonly view = signal<PvpBattleView | null>(null);
+  readonly opponent = signal('');
+  readonly endReason = signal<PvpEndReason | null>(null);
+  private link: RemoteLink | null = null;
+  /** Los turnos se reproducen en orden aunque lleguen mientras se anima el anterior. */
+  private queue: Promise<void> = Promise.resolve();
+  private readonly now = signal(Date.now());
+  private readonly deadline = signal(0);
+  private readonly awayUntil = signal<number | null>(null);
+  private ticker: ReturnType<typeof setInterval> | null = null;
+  /** Segundos para elegir (cuenta atrás del servidor; el reloj del móvil no manda). */
+  readonly remainingS = computed(() =>
+    Math.max(0, Math.ceil((this.deadline() - this.now()) / 1000)),
+  );
+  /** Segundos que le quedan al rival desconectado para volver, o null si está. */
+  readonly opponentAwayS = computed(() => {
+    const until = this.awayUntil();
+    return until === null ? null : Math.max(0, Math.ceil((until - this.now()) / 1000));
+  });
+
+  constructor() {
+    inject(DestroyRef).onDestroy(() => this.stopTicker());
+  }
+
+  /** Tu lado: el del motor en local, el que manda el servidor en PvP (para el menú: PP y banquillo). */
+  private readonly mySide = computed<BattleSide | null>(() =>
+    this.remote() ? (this.view()?.me ?? null) : (this.state()?.sides[PLAYER] ?? null),
+  );
+
   /** Movimientos del activo del jugador con lo que hace falta para el menú. */
   readonly moves = computed(() => {
-    const s = this.state();
+    const side = this.mySide();
     const ctx = this.ctx;
     const foe = this.shown()[RIVAL];
-    if (!s || !ctx || !foe) return [];
-    const me = s.sides[PLAYER].team[s.sides[PLAYER].active];
+    if (!side || !ctx || !foe) return [];
+    const me = side.team[side.active];
     return me.moves.map((slot, index) => {
       const move = ctx.moves.get(slot.moveId) as Move;
       return {
@@ -106,9 +168,8 @@ export class BattleController {
 
   /** Equipo del jugador para la hoja de cambio. */
   readonly bench = computed(() => {
-    const s = this.state();
-    if (!s) return [];
-    const side = s.sides[PLAYER];
+    const side = this.mySide();
+    if (!side) return [];
     return side.team.map((p, i) => ({
       index: i,
       speciesId: p.speciesId,
@@ -181,8 +242,110 @@ export class BattleController {
     this.phase.set('pick-rival');
   }
 
+  /**
+   * PvP: empieza (o retoma, `fresh = false`) el combate con lo que mandó el servidor (`battle:start` o `pvp:hello`).
+   * La página engancha `battle:turn`, `battle:end` y `battle:opponent` a `onTurn`, `onEnd` y `onOpponent`.
+   */
+  async startRemote(
+    view: PvpBattleView,
+    opponent: string,
+    link: RemoteLink,
+    fresh: boolean,
+  ): Promise<void> {
+    this.remote.set(true);
+    this.link = link;
+    this.opponent.set(opponent);
+    this.endReason.set(null);
+    this.winner.set(null);
+    this.error.set(null);
+    this.phase.set('loading');
+    try {
+      await this.dataset.load();
+      this.ctx = { moves: this.dataset.moves(), chart: buildTypeChart(this.dataset.types()) };
+    } catch (err) {
+      console.error('[battle] no se pudo preparar el combate', err);
+      this.error.set('No se pudo preparar el combate. Revisa la conexión e inténtalo otra vez.');
+      this.phase.set('error');
+      return;
+    }
+    this.setView(view);
+    this.audio.preloadCries([
+      ...view.me.team.map((m) => m.speciesId),
+      ...view.foe.revealed.map((m) => m.speciesId),
+    ]);
+    this.shown.set([this.viewSnapshot(view, PLAYER), this.viewSnapshot(view, RIVAL)]);
+    this.startTicker();
+    if (fresh) {
+      this.phase.set('animating');
+      await this.say(`¡${opponent} quiere luchar!`, 1200);
+      this.emitFx({ side: RIVAL, kind: 'enter' });
+      const foe = this.shown()[RIVAL];
+      if (foe) void this.audio.playCry(foe.speciesId);
+      await this.say(`${opponent} saca a ${foe?.name ?? '¿?'}.`);
+      this.emitFx({ side: PLAYER, kind: 'enter' });
+      void this.audio.playCry(view.me.team[view.me.active].speciesId);
+      await this.say(`¡Adelante, ${this.shown()[PLAYER]?.name}!`);
+    }
+    // Pudo llegar un turno durante la presentación: manda la vista más reciente.
+    if (this.phase() !== 'ended') this.applyView();
+  }
+
+  /** `battle:turn`: se reproduce en cola, en orden. */
+  onTurn(msg: BattleTurnMsg): void {
+    if (!this.mine(msg.battleId)) return;
+    this.queue = this.queue.then(() => this.playTurn(msg));
+  }
+
+  /** `battle:end`: después de los turnos que falten por reproducir. */
+  onEnd(msg: BattleEndMsg): void {
+    if (!this.mine(msg.battleId)) return;
+    this.queue = this.queue.then(() => this.finishRemote(msg.winner, msg.reason));
+  }
+
+  /** `battle:opponent`: el rival se fue (con lo que le queda para volver) o volvió. */
+  onOpponent(msg: BattleOpponentMsg): void {
+    if (!this.mine(msg.battleId)) return;
+    this.now.set(Date.now());
+    this.awayUntil.set(msg.connected ? null : Date.now() + msg.graceMs);
+  }
+
+  /** El servidor ya no conoce el combate (se reinició al desplegar, D-005) o no se pudo recuperar: sin resultado. */
+  interrupted(message = 'El combate se interrumpió (el servidor se reinició). No cuenta.'): void {
+    this.stopTicker();
+    this.winner.set(null);
+    this.message.set(message);
+    this.phase.set('ended');
+  }
+
+  /** Tras un corte de red: la vista que manda el servidor (los turnos perdidos no se animan). */
+  resync(view: PvpBattleView): void {
+    if (!this.remote()) return;
+    this.queue = this.queue.then(() => {
+      if (this.phase() === 'ended') return;
+      this.setView(view);
+      this.shown.set([this.viewSnapshot(view, PLAYER), this.viewSnapshot(view, RIVAL)]);
+      this.applyView();
+    });
+  }
+
+  /** Rendirse en PvP (en local se rinde con `act({ kind: 'forfeit' })`). */
+  async forfeit(): Promise<void> {
+    const v = this.view();
+    if (!this.remote() || !v || !this.link) return;
+    try {
+      const r = await this.link.forfeit(v.battleId);
+      if (!r.ok && r.code === 'battle-not-found') this.interrupted();
+    } catch {
+      this.message.set('Sin conexión: no se pudo rendir. Inténtalo otra vez.');
+    }
+  }
+
   /** El jugador elige; la IA elige; se resuelve el turno y se reproduce. */
   async act(action: BattleAction): Promise<void> {
+    if (this.remote()) {
+      if (action.kind === 'forfeit') return this.forfeit();
+      return this.remoteAct(action);
+    }
     const s = this.state();
     const ctx = this.ctx;
     const rival = this.rival();
@@ -244,6 +407,7 @@ export class BattleController {
 
   /** Cambio forzado del jugador (si el rival también debe cambiar, su IA elige a la vez). */
   async forcedSwitch(teamIndex: number): Promise<void> {
+    if (this.remote()) return this.remoteAct({ kind: 'switch', teamIndex });
     const s = this.state();
     const ctx = this.ctx;
     if (!s || !ctx || this.phase() !== 'switch') return;
@@ -255,17 +419,25 @@ export class BattleController {
   }
 
   /** Reproduce los eventos uno a uno: texto + efecto + sonido + vibración en el mismo momento (DISENO §4.10). */
-  private async play(before: BattleState, events: BattleEvent[]): Promise<void> {
+  private async play(
+    before: BattleState | null,
+    events: readonly (BattleEvent | PvpEvent)[],
+  ): Promise<void> {
     let lastMove: Move | null = null;
     let crit = false;
     let multiplier = 1;
     for (const e of events) {
       const sfx = eventSfx(e);
       if (sfx) void this.audio.playSfx(sfx);
-      const text = describeEvent(e, {
+      const text = describeEvent(e as BattleEvent, {
         pokemon: (side) => this.shown()[side]?.name ?? '',
         move: (id) => this.ctx?.moves.get(id)?.names.es ?? '¿?',
-        trainer: (side) => (side === PLAYER ? 'Tú' : (this.rival()?.name ?? 'Rival')),
+        trainer: (side) =>
+          side === PLAYER
+            ? 'Tú'
+            : this.remote()
+              ? this.opponent()
+              : (this.rival()?.name ?? 'Rival'),
         player: PLAYER,
       });
       switch (e.kind) {
@@ -321,20 +493,17 @@ export class BattleController {
           break;
         }
         case 'switch': {
-          const member = before.sides[e.side].team[e.teamIndex];
-          this.setShown(e.side, {
-            teamIndex: e.teamIndex,
-            speciesId: member.speciesId,
-            name: this.speciesName(member.speciesId),
-            level: member.level,
-            types: member.types,
-            hp: member.hp,
-            maxHp: member.stats.hp,
-            status: member.status,
-            fainted: false,
-          });
+          // En PvP el evento trae el Pokémon que sale (no se conoce el equipo del rival); en local, el estado de antes.
+          const shown =
+            'pokemon' in e
+              ? this.fromPublic(e.pokemon)
+              : before
+                ? this.fromMember(before.sides[e.side].team[e.teamIndex], e.teamIndex)
+                : null;
+          if (!shown) break;
+          this.setShown(e.side, shown);
           this.emitFx({ side: e.side, kind: 'enter' });
-          void this.audio.playCry(member.speciesId);
+          void this.audio.playCry(shown.speciesId);
           break;
         }
       }
@@ -381,9 +550,12 @@ export class BattleController {
 
   private snapshot(state: BattleState, side: SideIndex): ShownPokemon {
     const s = state.sides[side];
-    const p = s.team[s.active];
+    return this.fromMember(s.team[s.active], s.active);
+  }
+
+  private fromMember(p: BattleState['sides'][0]['team'][0], teamIndex: number): ShownPokemon {
     return {
-      teamIndex: s.active,
+      teamIndex,
       speciesId: p.speciesId,
       name: this.speciesName(p.speciesId),
       level: p.level,
@@ -393,6 +565,116 @@ export class BattleController {
       status: p.status,
       fainted: p.hp === 0,
     };
+  }
+
+  private fromPublic(p: PublicPokemon): ShownPokemon {
+    return {
+      teamIndex: p.teamIndex,
+      speciesId: p.speciesId,
+      name: this.speciesName(p.speciesId),
+      level: p.level,
+      types: p.types,
+      hp: p.hp,
+      maxHp: p.maxHp,
+      status: p.status,
+      fainted: p.hp === 0,
+    };
+  }
+
+  /** Lo que se ve de un lado según la vista del servidor (tú = 0; del rival, el revelado que está en combate). */
+  private viewSnapshot(v: PvpBattleView, side: SideIndex): ShownPokemon | null {
+    if (side === PLAYER) return this.fromMember(v.me.team[v.me.active], v.me.active);
+    const foe = v.foe.revealed.find((p) => p.teamIndex === v.foe.active);
+    return foe ? this.fromPublic(foe) : null;
+  }
+
+  private mine(battleId: string): boolean {
+    return this.remote() && this.view()?.battleId === battleId;
+  }
+
+  private setView(v: PvpBattleView): void {
+    this.view.set(v);
+    this.now.set(Date.now());
+    this.deadline.set(Date.now() + v.remainingMs);
+  }
+
+  /** Qué toca según la vista: elegir, cambiar o esperar al rival. */
+  private applyView(): void {
+    const v = this.view();
+    if (!v || v.winner !== null) return;
+    if (v.mustDo === 'act') return this.toChoose();
+    if (v.mustDo === 'switch') {
+      this.message.set('Elige a tu siguiente Pokémon.');
+      this.phase.set('switch');
+      return;
+    }
+    this.message.set(`Esperando a ${this.opponent()}…`);
+    this.phase.set('waiting');
+  }
+
+  /** Manda la acción de la decisión abierta y espera el turno. Si la red falla, reintenta la MISMA decisión. */
+  private async remoteAct(action: BattleAction): Promise<void> {
+    const v = this.view();
+    const link = this.link;
+    const before = this.phase();
+    if (!v || !link || v.decision === null) return;
+    if (before !== 'choose' && before !== 'switch') return;
+    this.phase.set('waiting');
+    this.message.set(`Esperando a ${this.opponent()}…`);
+    for (let attempt = 0; ; attempt++) {
+      let reply: BattleActReply;
+      try {
+        reply = await link.act(v.battleId, v.decision, action);
+      } catch {
+        if (attempt >= ACT_RETRY_MS.length) {
+          this.message.set('Sin conexión. Reintentando cuando vuelva la red…');
+          return;
+        }
+        await new Promise((r) => setTimeout(r, ACT_RETRY_MS[attempt]));
+        continue;
+      }
+      if (reply.ok || reply.code === 'stale-decision') return; // el turno llega (o llegó) por battle:turn
+      if (reply.code === 'battle-not-found') return this.interrupted();
+      this.haptics.shake();
+      this.message.set(REMOTE_MESSAGES[reply.code] ?? 'No se pudo enviar. Inténtalo otra vez.');
+      this.phase.set(before);
+      return;
+    }
+  }
+
+  private async playTurn(msg: BattleTurnMsg): Promise<void> {
+    if (this.phase() === 'ended') return;
+    this.phase.set('animating');
+    await this.play(null, msg.events);
+    this.setView(msg.view);
+    this.shown.set([this.viewSnapshot(msg.view, PLAYER), this.viewSnapshot(msg.view, RIVAL)]);
+    this.applyView();
+  }
+
+  private async finishRemote(winner: SideIndex | null, reason: PvpEndReason): Promise<void> {
+    this.stopTicker();
+    this.awayUntil.set(null);
+    this.winner.set(winner);
+    this.endReason.set(reason);
+    const [win, lose] = PVP_END_TEXT[reason];
+    this.message.set(
+      winner === PLAYER ? win : winner === RIVAL ? lose : 'El combate terminó sin ganador.',
+    );
+    this.phase.set('ended');
+    if (winner === PLAYER) {
+      this.haptics.success();
+      void this.audio.playSfx('victory');
+    }
+  }
+
+  private startTicker(): void {
+    this.stopTicker();
+    this.ticker = setInterval(() => this.now.set(Date.now()), 500);
+  }
+
+  private stopTicker(): void {
+    if (this.ticker) clearInterval(this.ticker);
+    this.ticker = null;
   }
 
   /** Al acabar el turno, lo mostrado y el estado real deben coincidir (red de seguridad contra desajustes). */
