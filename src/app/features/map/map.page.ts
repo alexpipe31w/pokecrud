@@ -271,6 +271,12 @@ export class MapPage implements ViewDidEnter, ViewWillLeave, OnDestroy {
     void this.startLocation();
     this.lastFrame = 0;
     this.raf = requestAnimationFrame((t) => this.tick(t));
+    this.playMapMusic();
+  }
+
+  /** F2-10: el tema del mapa sigue a su modo (día/noche), como el HUD (F1-10). */
+  private playMapMusic(): void {
+    if (this.active) void this.audio.playMusic(this.night() ? 'map-night' : 'map-day');
   }
 
   ionViewWillLeave(): void {
@@ -404,6 +410,7 @@ export class MapPage implements ViewDidEnter, ViewWillLeave, OnDestroy {
     const night = isNightLocal(new Date());
     this.night.set(night);
     this.mapScene.setNight(night);
+    this.playMapMusic();
     const center = this.cameraCenter();
     this.map = new Map(this.mapEl().nativeElement, {
       center,

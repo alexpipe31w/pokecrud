@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { IonContent } from '@ionic/angular';
 import type { TypeName } from '@shared/data/dataset.types';
 import type { SideIndex } from '@shared/engine/battle/types';
+import { AudioService } from '../../services/game/audio.service';
 import { SettingsService } from '../../services/game/settings.service';
 import { BattleBurstComponent } from './battle-burst.component';
 import { BattleDockComponent } from './battle-dock.component';
@@ -107,6 +108,7 @@ export class BattlePage implements OnDestroy {
   protected readonly ctrl = inject(BattleController);
   private readonly router = inject(Router);
   private readonly settings = inject(SettingsService);
+  private readonly audio = inject(AudioService);
 
   private readonly arena = viewChild<ElementRef<HTMLElement>>('arena');
   private readonly foeSprite = viewChild<ElementRef<HTMLImageElement>>('foeSprite');
@@ -121,10 +123,13 @@ export class BattlePage implements OnDestroy {
       const fx = this.ctrl.fx();
       if (fx) this.animate(fx);
     });
+    void this.audio.playMusic('battle');
   }
 
   ngOnDestroy(): void {
     for (const t of this.timers) clearTimeout(t);
+    // F2-10: fuera del combate se calla; el mapa pone su tema al volver.
+    void this.audio.playMusic(null);
   }
 
   protected leave(): void {
