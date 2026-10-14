@@ -806,3 +806,18 @@ gateway. Un despliegue en Render corta los combates en curso (salas en memoria, 
 - Código de error nuevo `server-error` en el contrato (fallo inesperado; queda en el log con el jugador).
 - La pantalla `/pvp` es de noche siempre (arena), no sigue al día/noche del mapa: es modo _Experience_ y el color lo
   ponen los Pokémon de cada lado.
+
+## D-059 · Música propia generada en el juego, en un Web Worker (F2-10) (2026-10-13, Samuel)
+
+**Contexto:** F2-10 pedía música de mapa (día/noche) y de combate, libre o propia. Los efectos ya se generan en el juego
+(D-044) por licencias y por no descargar nada con datos móviles.
+**Decisión:** la música también es **propia y generada**: partituras en `music-songs.ts` (compases de 16 semicorcheas;
+`C4` empieza, `_` alarga, `.` silencio, `+` acorde; `k`/`s`/`h` percusión) que `music-synth.ts` convierte en un bucle
+(las colas del final se envuelven al principio: el bucle no corta). Se generan **en un Web Worker** (`music.worker.ts`):
+en el PC tardan 0,2-0,5 s y en un móvil de gama media serían > 1 s congelando el mapa (REGLA 3); sin workers o si falla,
+se genera en el hilo principal. **22 050 Hz** (mitad de memoria; ~2 MB por tema, se guardan los tres). `AudioService
+.playMusic(tema | null)`: fundido de 0,8 s, nunca dos a la vez, el mismo no se reinicia, lo que llega tarde (se pidió
+otro mientras se generaba) no suena; con la app en segundo plano el audio se suspende. Quién pone qué: el mapa (día/noche
+según su modo, como el HUD), la escena de combate (IA y PvP) y el encuentro calla la música (manda el Pokémon).
+**Consecuencia:** para cambiar un tema se toca su partitura (y se regeneran los `.wav` de `docs/evidencias/F2-10_musica/`
+para oírlo). Pantallas nuevas con su ambiente: llamar a `playMusic` al entrar.

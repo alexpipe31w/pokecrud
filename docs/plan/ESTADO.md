@@ -67,7 +67,7 @@ puede, F2-07 hecha) o F2-11 (ARCore, Android); pulidos F2-17/F2-18 si sobra tiem
 ## Fase actual
 
 **F0 completa.** **F1:** todo hecho salvo la calle (F1-05 3b, F1-07 7b) y F1-11 (nueva). **F2:** F2-01…F2-06, F2-08,
-F2-07, F2-12, F2-13, F2-15 hechas; faltan **F2-11**/**F2-14** (ARCore), F2-10 (música) y los pulidos F2-16…F2-18.
+F2-07, F2-12, F2-13, F2-15 hechas; faltan **F2-11**/**F2-14** (ARCore) y los pulidos F2-16…F2-18 (F2-10, música, hecha).
 **F3:** completa en código (F3-01…F3-06c); quedan los vistazos opcionales en Android. **F4:** completa en código salvo F4-07 (combate en AR 3D, D-048). **F5:** F5-01, F5-02 y F5-03 hechas; sigue F5-04.
 
 ## Hecho
@@ -220,15 +220,12 @@ F2-07, F2-12, F2-13, F2-15 hechas; faltan **F2-11**/**F2-14** (ARCore), F2-10 (m
 
 ## En curso
 
-- **F2-10 (Samuel, rama `feature/F2-10-musica`):** música generada en el juego (como los SFX, D-044): mapa día/noche y
-  combate, fundido al cambiar, nunca dos a la vez. Punto de guardado: sintetizador, 3 temas, `playMusic` y worker
-  hechos (tests); falta engancharla a mapa/combate/encuentro y probar. (F5-04 en el PR #78, `[~]` a la
-  espera de los dos móviles.)
-- Cuentas de prueba locales: `demo+alex@pokecrud.test` y `demo+rival@pokecrud.test` (contraseña: pídesela a Alex; no va en el repo), con equipo "Arena" de 3. `test:e2e` las borra pasada 1 h: se recrean registrándolas y con el script de la bitácora de F5-03.
-- Samuel cerró **F3-06c** (#73 mezclado; sin migración). **Con esto la F3 está completa en código.**
+- Nadie. Samuel cerró **F2-10** (rama `feature/F2-10-musica`, PR; sin migración). F5-04 en el PR #78, `[~]` a la espera
+  de los dos móviles (migración `battle` ya en Supabase).
 - **Ojo:** el inventario de IS-11 está ahora en `/inventario` (la Pokédex 1025 ocupa `/pokedex`).
 
 ### PRUEBAS EN EL MÓVIL PENDIENTES (con el APK de producción, `npm run apk -- --install`)
+- **F2-10:** escuchar la música en el móvil (mapa de día/noche, combate; volumen frente a gritos y efectos).
 - **F1-07 7b + F1-05 3b (en la calle, con luz, joystick APAGADO):** andar y trotar; fps ≥ 55 con Pokémon; grito
   bajito al acercarse; tocar lejos → "Acércate más"; cerca → encuentro.
 - **F2-01 en el Redmi (D-045):** `/dev/ar`, campo de visión con el que el Pokémon se queda quieto y cámara elegida.
