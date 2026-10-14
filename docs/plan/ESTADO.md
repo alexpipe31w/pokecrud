@@ -3,7 +3,22 @@
 > Se **reescribe** al cerrar cada sesión (no es histórico; el histórico es `BITACORA.md`).
 > Máximo una pantalla. Si lees esto al empezar: después lee `ROADMAP.md`.
 
-**Última actualización:** 2026-10-13 · por Samuel (Claude) · F5-04 en la rama `feature/F5-04-combate-pvp` · `develop` con #77
+**Última actualización:** 2026-10-13 21:30 · por Samuel (Claude) · entrega del avance al docente · `develop` y `main` con #81
+
+## 👉 ENTREGA DEL AVANCE (Samuel, 2026-10-13): lo que ve el docente
+
+- **`main` = `develop`** (PR #81). Es la rama que el docente ve al abrir el repo. Desde ahora `main` solo avanza con un
+  PR `develop` → `main` en cada entrega (nunca push directo).
+- **Release `avance-2026-10-13`** (el último): https://github.com/alexpipe31w/pokecrud/releases/latest con
+  `PokeCRUD-GO-avance.apk` (APK de producción contra Render, firmado en modo depuración, 11,7 MB, sha256 `d794aec4…`).
+  Las notas del Release dicen cómo instalarlo y qué incluye.
+- **Guía del docente:** `docs/GUIA-DOCENTE.md` (APK, recorrido por las 15 funciones desde el menú de la Poké Ball,
+  Postman contra Render, cómo ejecutar las pruebas, hecho / pendiente). El README empieza enlazándola.
+- **Cuenta ADMIN del docente:** NO se publica (repo público; ADMIN solo sirve para escribir en el inventario de la
+  tienda). Si el docente la pide: que se registre en la app y `cd server && npm run admin -- grant <su correo>`, o
+  crearle una y pasarle la contraseña por la plataforma de la asignatura. Sin ADMIN puede usar todo lo demás.
+- **Si cambias algo que el docente deba ver antes de calificar:** PR a `develop`, luego PR `develop` → `main`, y si
+  cambia la app, `npm run apk` y subir el APK nuevo al Release (`gh release upload avance-2026-10-13 <apk> --clobber`).
 
 ## 👉 F5 EMPIEZA AQUÍ (Alex, 2026-10-13)
 
@@ -221,7 +236,8 @@ F2-07, F2-12, F2-13, F2-15 hechas; faltan **F2-11**/**F2-14** (ARCore) y los pul
 ## En curso
 
 - Nadie. **F5-04** (#78 mezclado, `[~]`): falta SOLO el criterio, un combate entre DOS MÓVILES con el APK de producción
-  grabado en vídeo (`docs/evidencias/F5-04_*`). **F2-10** (música) hecha en `feature/F2-10-musica` (PR #79).
+  grabado en vídeo (`docs/evidencias/F5-04_*`). **F2-10** (música) `[x]` y mezclada (#79).
+- Samuel tiene abierta la rama `feature/pruebas-android-redmi` (guía para probar en su Redmi Note 10, sin PR todavía).
 - Cuentas de prueba locales: `demo+alex@pokecrud.test` y `demo+rival@pokecrud.test` (contraseña: pídesela a Alex; no va en el repo), con equipo "Arena" de 3. `test:e2e` las borra pasada 1 h: se recrean registrándolas y con el script de la bitácora de F5-03.
 - **Ojo:** el inventario de IS-11 está ahora en `/inventario` (la Pokédex 1025 ocupa `/pokedex`).
 
@@ -248,7 +264,7 @@ F2-07, F2-12, F2-13, F2-15 hechas; faltan **F2-11**/**F2-14** (ARCore) y los pul
    status` que apunta a 127.0.0.1. La app en `localhost:8100` (en el PC de Samuel el 4200 lo ocupa OTRO proyecto suyo).
    Ojo: cada `npm run test:e2e` borra las cuentas `@pokecrud.test` de más de 1 h (también las `demo+…`).
 2. **Con luz, en la calle (Kenneth o Samuel):** F1-07 7b + F1-05 3b con el APK de producción y el **joystick apagado**.
-3. **F2-11** (ARCore, Android) · F1-11 / F2-16…F2-18 (arreglos vistos en el móvil) · sin móvil: F2-10 (música), F5-01 (plan del PvP).
+3. **F2-11** (ARCore, Android) · F1-11 / F2-16…F2-18 (arreglos vistos en el móvil).
 4. APK en otro PC: JDK 21 (`winget install Microsoft.OpenJDK.21`; si da "el hash no coincide",
    `winget install EclipseAdoptium.Temurin.21.JDK`) y `npm run apk`.
 
@@ -372,6 +388,8 @@ F2-07, F2-12, F2-13, F2-15 hechas; faltan **F2-11**/**F2-14** (ARCore) y los pul
   (`DATABASE_URL` y `DIRECT_URL`) por privado. Ojo: Supabase gratis pausa el proyecto tras ~7 días sin uso; si pasa,
   se reactiva desde el panel (Alex).
 - Hay 6 capturas de evidencia HU-02 sin commitear en `docs/evidencias/` (son de Alex, no se tocaron).
+- **Entrega del avance:** si el docente pide ADMIN, dárselo con `npm run admin -- grant <correo>` (alguien con
+  `server/.env`). Avisarle de que Render tarda hasta 1 min en despertar (ya está en la guía y en el Release).
 
 ## URLs / datos útiles
 
