@@ -124,11 +124,16 @@ export class AudioService {
     doc.addEventListener('visibilitychange', () => {
       const ctx = this.ctx;
       if (!ctx) return;
-      if (doc.hidden) {
-        this.wasRunning = ctx.state === 'running';
-        void ctx.suspend().catch(() => undefined);
-      } else if (this.wasRunning) {
-        void ctx.resume().catch(() => undefined);
+      // Si el contexto no sabe suspender/reanudar (WebViews viejos, dobles de prueba), se sigue como estaba.
+      try {
+        if (doc.hidden) {
+          this.wasRunning = ctx.state === 'running';
+          if (typeof ctx.suspend === 'function') void ctx.suspend().catch(() => undefined);
+        } else if (this.wasRunning && typeof ctx.resume === 'function') {
+          void ctx.resume().catch(() => undefined);
+        }
+      } catch (err) {
+        console.warn('[audio] no se pudo pausar/reanudar en segundo plano', err);
       }
     });
   }

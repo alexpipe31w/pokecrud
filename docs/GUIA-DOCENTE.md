@@ -113,7 +113,7 @@ npm test
 En PowerShell: `$env:DATABASE_URL='postgresql://ci:ci@localhost:5432/ci'; $env:DIRECT_URL=$env:DATABASE_URL` y
 después `npm.cmd install` y `npm.cmd test` dentro de `server`.
 
-Resultado esperado de este avance: app 571 pruebas, motor compartido 178, servidor 64 unitarias. (Las 114 pruebas de
+Resultado esperado de este avance: app 572 pruebas, motor compartido 178, servidor 64 unitarias. (Las 114 pruebas de
 extremo a extremo del servidor necesitan una base de datos PostgreSQL; se ejecutan en el equipo de desarrollo.)
 
 > Correr la app completa en un PC requiere claves privadas (base de datos, Google Maps) que por seguridad no están en el
