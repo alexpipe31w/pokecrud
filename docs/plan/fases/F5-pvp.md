@@ -204,25 +204,25 @@ para el criterio (vídeo); hasta entonces, dos ventanas del navegador a 390×844
 
 ## F5-04 · Combate PvP completo
 
-- [ ] **Paso 1 — `pvp-view.ts`** (puro, + spec): `viewFor(state, me, decision, mustDo, remainingMs, revealed)` (tu lado
+- [x] **Paso 1 — `pvp-view.ts`** (puro, + spec): `viewFor(state, me, decision, mustDo, remainingMs, revealed)` (tu lado
   completo; el rival solo con lo revelado); `eventsFor(events, stateBefore, me)` (gira los lados: `side === me ? 0 : 1`;
   y el `switch` lleva `pokemon: PublicPokemon` sacado de `stateBefore`); `defaultAction(state, side)`. Tests: la vista
   del rival NO contiene `moves`, `stats` ni `ivs` (comprobar con `JSON.stringify`); girar dos veces = original; el combate
   de snapshot de F4-04 visto desde el lado 1 tiene los mismos eventos con los lados cambiados.
-- [ ] **Paso 2 — `BattleRoom`** (+ spec con reloj falso, `vi.useFakeTimers`): `start`, `act(player, decision, action)`
+- [x] **Paso 2 — `BattleRoom`** (+ spec con reloj falso, `vi.useFakeTimers`): `start`, `act(player, decision, action)`
   (regla 3), temporizador (regla 4), `disconnect`/`reconnect` (regla 5), `forfeit`, fin. Emite por un callback
   `send(playerId, evento, msg)` (la sala no conoce Socket.IO). Tests: acción duplicada; decisión vieja; acción inválida
   no gasta la decisión; solo el que debe cambiar puede actuar; 3 tiempos agotados → `inactive`; desconexión 60 s →
   `abandon`; reconectar a los 59 s → sigue; los dos fuera → `winner null`; **dos `act` del mismo jugador "a la vez"
   → se aplica una**; combate entero con semilla fija → mismo resultado que `resolveTurn` en local.
-- [ ] **Paso 3 — persistencia:** modelo `Battle` + migración `battle` (índices `(p1Id, endedAt)`, `(p2Id, endedAt)`),
+- [x] **Paso 3 — persistencia:** modelo `Battle` + migración `battle` (índices `(p1Id, endedAt)`, `(p2Id, endedAt)`),
   `BattlesRepository.save` idempotente (regla 10). e2e: guardar dos veces el mismo id → una fila. **Aplicar en Supabase
   ANTES de mezclar** (con `DIRECT_URL` y permiso del humano), como F3-02a y F3-06b.
-- [ ] **Paso 4 — `BattleRoomsService` + gateway:** `battle:act`, `battle:forfeit`, `pvp:hello` con el combate en curso,
+- [x] **Paso 4 — `BattleRoomsService` + gateway:** `battle:act`, `battle:forfeit`, `pvp:hello` con el combate en curso,
   `handleDisconnect` → sala; `battle-data.service.ts` carga movimientos soportados y tabla de tipos una vez (de
   `src/assets/data`, como `SpawnsService`). e2e con dos clientes: combate entero hasta `battle:end` y fila en `Battle`;
   reconexión a mitad (cerrar un socket y abrir otro con el mismo token → `hello` trae la vista y se sigue).
-- [ ] **Paso 5 — app, modo remoto de `BattleController`:** `startRemote(view, opponent)` y aplicar cada `battle:turn`
+- [x] **Paso 5 — app, modo remoto de `BattleController`:** `startRemote(view, opponent)` y aplicar cada `battle:turn`
   con la MISMA reproducción (`play`): el `switch` usa `e.pokemon` si viene (en local sigue leyendo `before`). `moves` y
   `bench` leen solo tu lado (`view.me`), que es un `BattleSide` igual que en local. `act()` manda `battle:act` y espera
   el ack (si la red falla, reintenta la MISMA decisión: es idempotente). Mientras el rival elige: "Esperando a <rival>…"
@@ -230,7 +230,7 @@ para el criterio (vídeo); hasta entonces, dos ventanas del navegador a 390×844
   (`forfeit` "se rindió", `abandon` "se desconectó", `inactive` "no eligió a tiempo"). Combate interrumpido por
   reinicio del servidor: mensaje claro y vuelta a `/pvp`. Escena: la de F4-05 hasta que F4-07 (AR) la sustituya
   (D-034); todo lo de aquí vive en el controlador, así F4-07 lo hereda.
-- [ ] **Paso 6:** dos cuentas en dos pestañas a 390×844 (combate entero, rendirse, cerrar una pestaña y volver, dejar
+- [~] **Paso 6:** (navegador hecho, falta el vídeo con dos móviles) dos cuentas en dos pestañas a 390×844 (combate entero, rendirse, cerrar una pestaña y volver, dejar
   correr el tiempo). **Criterio de aceptación:** combate entre **dos móviles reales** (APK de producción contra Render)
   grabado en vídeo → `docs/evidencias/F5-04_*`. REGLA 2.
 

@@ -3,6 +3,7 @@ import { AuthModule } from '../auth/auth.module.js';
 import { SpawnsModule } from '../spawns/spawns.module.js';
 import { BattleDataService } from './battle-data.service.js';
 import { BattleRoomsService } from './battle-rooms.service.js';
+import { BattlesRepository } from './battles.repository.js';
 import { PvpLobby } from './pvp-lobby.js';
 import { PvpTeamsService } from './pvp-teams.service.js';
 import { PvpGateway } from './pvp.gateway.js';
@@ -15,6 +16,7 @@ import { PvpGateway } from './pvp.gateway.js';
     PvpTeamsService,
     BattleDataService,
     BattleRoomsService,
+    BattlesRepository,
     // Clase pura (reloj y azar inyectables para sus tests): una instancia para todo el servidor.
     { provide: PvpLobby, useFactory: () => new PvpLobby() },
   ],

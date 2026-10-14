@@ -143,6 +143,18 @@ function validate(state: BattleState, side: SideIndex, action: BattleAction | nu
   return action;
 }
 
+/**
+ * ¿Vale la acción de `side` ahora? (PvP, F5-04: la sala la comprueba al llegar, sin esperar al rival ni tirar el azar.)
+ * En un cambio forzado solo vale cambiar (o rendirse) y solo para el lado que debe cambiar. Lanza `BattleError`.
+ */
+export function validateAction(state: BattleState, side: SideIndex, action: BattleAction): void {
+  if (state.winner !== null) throw new BattleError('El combate ya terminó');
+  const forced = state.pendingSwitch[0] || state.pendingSwitch[1];
+  if (forced && !state.pendingSwitch[side]) throw new BattleError('Ahora no te toca');
+  const a = validate(state, side, action);
+  if (forced && a.kind === 'move') throw new BattleError('Tienes que elegir otro Pokémon');
+}
+
 /** Turno completo. `actions[i]` es la del lado i (o null si ese lado no tiene que actuar en un cambio forzado). */
 export function resolveTurn(
   ctx: BattleContext,

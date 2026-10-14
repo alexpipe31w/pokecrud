@@ -806,3 +806,26 @@ gateway. Un despliegue en Render corta los combates en curso (salas en memoria, 
 - Código de error nuevo `server-error` en el contrato (fallo inesperado; queda en el log con el jugador).
 - La pantalla `/pvp` es de noche siempre (arena), no sigue al día/noche del mapa: es modo _Experience_ y el color lo
   ponen los Pokémon de cada lado.
+
+## D-058 · Combate PvP: reglas finas de la sala, tabla `Battle` y modo remoto de la escena (F5-04) (2026-10-13, Samuel)
+
+Concreta D-056 donde el plan no lo decía:
+- **Decisiones:** misma decisión ya elegida → `{ok, duplicate: true}` (la primera manda); decisión ya resuelta →
+  `stale-decision`; decisión que aún no existe → `bad-request`; quien no tiene que elegir (cambio forzado del rival) →
+  `not-your-turn`; acción imposible → `invalid-action` SIN gastar la decisión. La sala valida al llegar con
+  `validateAction` (exportada del motor: misma validación que `resolveTurn`, sin tirar el azar).
+- **Tiempo:** 3 decisiones seguidas agotando los 30 s → `inactive`; si los dos llegan a 3 en la misma → sin ganador. Elegir
+  a tiempo pone a 0 tu contador. La decisión que acaba por tiempo queda en el registro (`timedOut`).
+- **Abandono:** 60 s desconectado → gana el otro; si el otro tampoco está → sin ganador (`abandon`, `winnerId` null).
+- **Salas → gateway:** `BattleRoom` no conoce Socket.IO ni Nest; manda por un callback. `BattleRoomsService` lo reenvía por
+  un canal que el gateway conecta en `afterInit` (los temporizadores mandan mensajes fuera de cualquier petición). Un error
+  dentro de un temporizador se registra (`battle.timer_error`) y nunca tumba el proceso.
+- **Tabla `Battle`:** `kind` enum (`PVP`, `AI`, `TOURNAMENT`), `p1Id`/`p2Id` con borrado en cascada, `winnerId` con CHECK
+  `winner_is_player`, `reason` con CHECK `battle_reason`, `seed` de 31 bits (cabe en `Int`), `log` JSONB con las acciones de
+  cada decisión. Se guarda DESPUÉS de cerrar la sala (`createMany` + `skipDuplicates` = `ON CONFLICT DO NOTHING`; 3
+  reintentos 250 ms / 1 s / 4 s y si no, `battle.save_failed` en el log).
+- **App:** todo el modo remoto vive en `BattleController` (lo heredará la escena AR, F4-07): `startRemote`, cola de turnos
+  (`battle:end` se muestra después del último turno), `battle:act` con 3 reintentos de la MISMA decisión, `resync` tras un
+  corte de red (los turnos perdidos no se animan). `PvpBattleSession` une la página con el socket. La escena es
+  `/pvp/combate` (la de F4-05 con `data.pvp`); al cara a cara se le añade "¡A combatir!" (no salta solo: cada uno entra
+  cuando quiere, el tiempo ya corre). Salir de la escena NO rinde: `/pvp` te devuelve al combate en curso.

@@ -5,13 +5,14 @@ import {
   MessageBody,
   OnGatewayConnection,
   OnGatewayDisconnect,
+  OnGatewayInit,
   SubscribeMessage,
   WebSocketGateway,
-  WebSocketServer,
 } from '@nestjs/websockets';
 import type { Namespace, Socket } from 'socket.io';
 import {
   PVP_NAMESPACE,
+  type BattleActReply,
   type BattleForfeitReply,
   type HelloReply,
   type InviteCreateReply,
@@ -23,12 +24,13 @@ import {
 } from '../../../shared/protocol/pvp.js';
 import { JWT_VERIFY_OPTIONS } from '../auth/jwt.config.js';
 import { corsOrigins } from '../common/cors.js';
-import { BattleRoomsService, type Outgoing } from './battle-rooms.service.js';
+import { BattleRoomsService } from './battle-rooms.service.js';
 import { PvpFailure } from './pvp-failure.js';
 import { PvpLobby } from './pvp-lobby.js';
 import { PvpSessions } from './pvp-sessions.js';
 import { PvpTeamsService } from './pvp-teams.service.js';
 import {
+  parseBattleAct,
   parseBattleForfeit,
   parseEmpty,
   parseInviteJoin,
@@ -49,6 +51,7 @@ interface SocketData {
  * Socket `/pvp` (F5-02/F5-03, D-056). SOLO transporte: autentica en el handshake, limita por socket, valida la carga
  * y delega en la sala de espera (`PvpLobby`) y los combates (`BattleRoomsService`). El `playerId` sale SIEMPRE del
  * token, nunca del cuerpo. Los guards globales (`JwtAuthGuard`, `HttpThrottlerGuard`) ignoran este contexto.
+ * Los combates mandan mensajes también desde sus temporizadores: salen por el canal que se conecta en `afterInit`.
  */
 @WebSocketGateway({
   namespace: PVP_NAMESPACE,
@@ -61,9 +64,9 @@ interface SocketData {
   },
   maxHttpBufferSize: MAX_MESSAGE_BYTES,
 })
-export class PvpGateway implements OnGatewayConnection, OnGatewayDisconnect {
-  @WebSocketServer() private readonly server!: Namespace;
-
+export class PvpGateway
+  implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
+{
   private readonly logger = new Logger(PvpGateway.name);
   private readonly sessions = new PvpSessions();
   private readonly limiter = new SocketRateLimiter();
@@ -75,6 +78,12 @@ export class PvpGateway implements OnGatewayConnection, OnGatewayDisconnect {
     private readonly teams: PvpTeamsService,
   ) {}
 
+  afterInit(server: Namespace): void {
+    this.rooms.attach((o) =>
+      server.to(`player:${o.playerId}`).emit(o.event, o.msg),
+    );
+  }
+
   async handleConnection(client: Socket): Promise<void> {
     const playerId = await this.verify(client.handshake.auth);
     if (!playerId) return this.reject(client, 'unauthorized');
@@ -83,6 +92,8 @@ export class PvpGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
     (client.data as SocketData).playerId = playerId;
     await client.join(`player:${playerId}`);
+    // Si tenía un combate y se había ido, vuelve (el rival deja de ver el aviso; la vista llega con `pvp:hello`).
+    this.rooms.reconnect(playerId);
     this.logger.log({ msg: 'pvp.connect', playerId, socketId: client.id });
   }
 
@@ -96,9 +107,11 @@ export class PvpGateway implements OnGatewayConnection, OnGatewayDisconnect {
       socketId: client.id,
       remaining: left.remaining,
     });
-    // Sin ningún socket abierto, nadie puede aceptar tu invitación ni emparejarte: se cancela.
-    if (left.remaining === 0) this.lobby.leave(left.playerId);
-    // TODO(F5-04): si está en un combate, avisar a la sala (gracia de 60 s).
+    if (left.remaining > 0) return;
+    // Sin ningún socket abierto, nadie puede aceptar tu invitación ni emparejarte: se cancela (D-057).
+    this.lobby.leave(left.playerId);
+    // En un combate: el rival lo sabe y tienes 60 s para volver (D-056, regla 5).
+    this.rooms.disconnect(left.playerId);
   }
 
   @SubscribeMessage('pvp:hello')
@@ -142,8 +155,7 @@ export class PvpGateway implements OnGatewayConnection, OnGatewayDisconnect {
         const side = await this.loadTeam(playerId, teamId);
         // Desde aquí, síncrono: reclamar el código y crear el combate sin `await` en medio.
         const host = this.lobby.joinInvite(playerId, code);
-        const { battleId, out } = this.rooms.start(host, { playerId, side });
-        this.send(out);
+        const battleId = this.rooms.start(host, { playerId, side });
         return { ok: true, battleId };
       },
     );
@@ -162,7 +174,7 @@ export class PvpGateway implements OnGatewayConnection, OnGatewayDisconnect {
         const side = await this.loadTeam(playerId, teamId);
         const rival = this.lobby.joinQueue({ playerId, side });
         if (!rival) return { ok: true, matched: false };
-        this.send(this.rooms.start(rival, { playerId, side }).out);
+        this.rooms.start(rival, { playerId, side });
         return { ok: true, matched: true };
       },
     );
@@ -179,6 +191,23 @@ export class PvpGateway implements OnGatewayConnection, OnGatewayDisconnect {
     });
   }
 
+  /** Una acción para la decisión abierta (D-056, regla 3): idempotente; la primera manda. */
+  @SubscribeMessage('battle:act')
+  act(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() body: unknown,
+  ): Promise<BattleActReply> {
+    return this.handle(
+      client,
+      body,
+      parseBattleAct,
+      (playerId, { battleId, decision, action }) => ({
+        ok: true,
+        ...this.rooms.act(playerId, battleId, decision, action),
+      }),
+    );
+  }
+
   @SubscribeMessage('battle:forfeit')
   forfeit(
     @ConnectedSocket() client: Socket,
@@ -189,7 +218,7 @@ export class PvpGateway implements OnGatewayConnection, OnGatewayDisconnect {
       body,
       parseBattleForfeit,
       (playerId, { battleId }) => {
-        this.send(this.rooms.forfeit(playerId, battleId));
+        this.rooms.forfeit(playerId, battleId);
         return { ok: true };
       },
     );
@@ -204,11 +233,6 @@ export class PvpGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const side = await this.teams.load(playerId, teamId);
     if (this.rooms.has(playerId)) throw new PvpFailure('already-in-battle');
     return side;
-  }
-
-  private send(out: Outgoing[]): void {
-    for (const o of out)
-      this.server.to(`player:${o.playerId}`).emit(o.event, o.msg);
   }
 
   /**

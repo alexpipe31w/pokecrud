@@ -400,9 +400,18 @@
       `BattleRoomsService` empieza el combate de verdad y sabe rendirse, `viewFor` en `shared/`) y pantalla `/pvp`
       (arena: elegir equipo, invitar, escribir código, buscar rival, cara a cara con el tipo de cada Pokémon). En el
       menú de la Poké Ball: "Combate en vivo". Los turnos llegan en F5-04. D-057.
-- [ ] **F5-04 · Combate PvP completo** — servidor aplica el engine, temporizador 30 s, abandono 60 s,
+- [~] **F5-04 · Combate PvP completo** (@samuel, 2026-10-13) — servidor aplica el engine, temporizador 30 s, abandono 60 s,
       resultado persistido; la escena de F4-05 reutilizada. Dep: F5-03, F4-05. Criterio: combate entre dos
       móviles reales grabado en vídeo.
+      **Código hecho (pasos 1-5, Samuel):** `pvp-view` (`eventsFor`, `defaultAction`), `validateAction` en el motor,
+      `BattleRoom` (decisiones, 30 s → acción por defecto, 3 seguidas → `inactive`, 60 s → `abandon`, rendirse),
+      tabla `Battle` + `BattlesRepository` (idempotente), gateway con `battle:act`, reconexión y abandono; app: modo
+      remoto de `BattleController`, `PvpBattleSession`, `/pvp/combate` y "¡A combatir!" en el cara a cara. D-058.
+      Servidor e2e 114, unitarios 64; app 558; shared 178. Dos cuentas en el navegador: combate entero, cambio forzado,
+      tiempo agotado, desconexión y vuelta, rendirse (`F5-04_0{1..9}_*`).
+      **Migración `battle` YA aplicada en Supabase** (2026-10-13, permiso de Samuel; tabla vacía, CHECKs e índices).
+      **Falta** el criterio:
+      combate entre DOS MÓVILES REALES (APK de producción contra Render) grabado en vídeo.
 - [ ] **F5-05 · Espectadores.** Dep: F5-04.
 
 ## F6 · Torneos

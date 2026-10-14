@@ -1,9 +1,10 @@
 import { readFileSync } from 'node:fs';
 import type { Move, TypeInfo } from '../../data/dataset.types.js';
-import { type PokemonInit, createBattle } from './battle-engine.js';
-import { mirrorSide, viewFor } from './pvp-view.js';
+import { type PokemonInit, createBattle, resolveTurn } from './battle-engine.js';
+import { createRng } from '../rng.js';
+import { defaultAction, eventsFor, mirrorSide, viewFor } from './pvp-view.js';
 import { buildTypeChart } from './type-chart.js';
-import type { BattleContext, BattleState } from './types.js';
+import type { BattleAction, BattleContext, BattleEvent, BattleState } from './types.js';
 
 const load = <T>(file: string): T =>
   JSON.parse(
@@ -106,5 +107,85 @@ describe('viewFor (PvP, D-056)', () => {
     expect(mirrorSide(1, 0)).toBe(1);
     expect(mirrorSide(0, 1)).toBe(1);
     expect(mirrorSide(1, 1)).toBe(0);
+  });
+});
+
+describe('eventsFor (PvP, D-056)', () => {
+  it('quien mira es el lado 0: los lados de los eventos se giran; girar dos veces deja lo mismo', () => {
+    const events: BattleEvent[] = [
+      { kind: 'move', side: 0, moveId: 33 },
+      { kind: 'damage', side: 1, amount: 10, hpAfter: 90, source: 'move' },
+      { kind: 'faint', side: 1 },
+    ];
+    const state = battle();
+    expect(eventsFor(events, state, 0)).toEqual(events);
+    const seen = eventsFor(events, state, 1);
+    expect(seen.map((e) => e.side)).toEqual([1, 0, 0]);
+    expect(eventsFor(seen as BattleEvent[], state, 1)).toEqual(events);
+  });
+
+  it('el cambio trae el Pokémon que sale (lo público), sacado del estado de antes del turno', () => {
+    const state = battle();
+    state.sides[1].team[2].hp = 77;
+    const [e] = eventsFor([{ kind: 'switch', side: 1, teamIndex: 2 }], state, 0);
+    expect(e).toEqual({
+      kind: 'switch',
+      side: 1,
+      teamIndex: 2,
+      pokemon: {
+        teamIndex: 2,
+        speciesId: 6,
+        level: 50,
+        types: ['electric'],
+        hp: 77,
+        maxHp: 120,
+        status: null,
+      },
+    });
+    expect(JSON.stringify(e)).not.toContain('moves');
+  });
+
+  it('un combate entero visto desde el lado 1 = los mismos eventos con los lados cambiados', () => {
+    let state = battle();
+    const rng = createRng(7);
+    for (let turn = 0; turn < 40 && state.winner === null; turn++) {
+      const actions = ([0, 1] as const).map((side) =>
+        state.pendingSwitch[0] || state.pendingSwitch[1]
+          ? state.pendingSwitch[side]
+            ? defaultAction(state, side)
+            : null
+          : defaultAction(state, side),
+      ) as [BattleAction | null, BattleAction | null];
+      const r = resolveTurn(ctx, state, actions, rng);
+      const mine = eventsFor(r.events, state, 0);
+      const theirs = eventsFor(r.events, state, 1);
+      expect(theirs.map((e) => e.kind)).toEqual(mine.map((e) => e.kind));
+      expect(theirs.map((e) => 1 - e.side)).toEqual(mine.map((e) => e.side));
+      state = r.state;
+    }
+    expect(state.winner).not.toBeNull();
+  });
+});
+
+describe('defaultAction (se juega al acabarse el tiempo)', () => {
+  it('el primer movimiento con PP', () => {
+    const state = battle();
+    expect(defaultAction(state, 0)).toEqual({ kind: 'move', moveIndex: 0 });
+    state.sides[0].team[0].moves[0].pp = 0;
+    expect(defaultAction(state, 0)).toEqual({ kind: 'move', moveIndex: 1 });
+  });
+
+  it('sin PP en ninguno: el índice 0 (el motor lo convierte en Forcejeo)', () => {
+    const state = battle();
+    for (const m of state.sides[0].team[0].moves) m.pp = 0;
+    expect(defaultAction(state, 0)).toEqual({ kind: 'move', moveIndex: 0 });
+  });
+
+  it('en un cambio forzado: el primer Pokémon en pie que no está en combate', () => {
+    const state = battle();
+    state.sides[1].team[0].hp = 0;
+    state.sides[1].team[1].hp = 0;
+    state.pendingSwitch[1] = true;
+    expect(defaultAction(state, 1)).toEqual({ kind: 'switch', teamIndex: 2 });
   });
 });
